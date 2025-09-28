@@ -1,2 +1,0 @@
-chmod +x setup_venvs.sh
-./setup_venvs.sh

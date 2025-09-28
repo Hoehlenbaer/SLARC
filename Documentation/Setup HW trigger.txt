@@ -1,8 +1,0 @@
-sudo su
-echo 1 > /sys/module/imx296/parameters/trigger_mode
-
-
-echo 0 | sudo tee /sys/class/pwm/pwmchip0/export
-echo 25000000  | sudo tee /sys/class/pwm/pwmchip0/pwm0/period
-echo 24900000  | sudo tee /sys/class/pwm/pwmchip0/pwm0/duty_cycle
-echo 1 | sudo tee /sys/class/pwm/pwmchip0/pwm0/enable
