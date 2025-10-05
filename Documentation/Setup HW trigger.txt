@@ -2,10 +2,10 @@ sudo su
 echo 1 > /sys/module/imx296/parameters/trigger_mode
 
 
-#60 Hz, 1ms
+#60 Hz, 2ms
 echo 0 | sudo tee /sys/class/pwm/pwmchip0/export
 echo 16666666 | sudo tee /sys/class/pwm/pwmchip0/pwm0/period
-echo 15666666 | sudo tee /sys/class/pwm/pwmchip0/pwm0/duty_cycle
+echo 14666666 | sudo tee /sys/class/pwm/pwmchip0/pwm0/duty_cycle
 echo 1 | sudo tee /sys/class/pwm/pwmchip0/pwm0/enable
 
 
