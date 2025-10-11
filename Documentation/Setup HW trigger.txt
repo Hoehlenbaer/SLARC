@@ -8,6 +8,24 @@ echo 16666666 | sudo tee /sys/class/pwm/pwmchip0/pwm0/period
 echo 14666666 | sudo tee /sys/class/pwm/pwmchip0/pwm0/duty_cycle
 echo 1 | sudo tee /sys/class/pwm/pwmchip0/pwm0/enable
 
+#50 Hz, 2ms
+echo 0 | sudo tee /sys/class/pwm/pwmchip0/export
+echo 20000000 | sudo tee /sys/class/pwm/pwmchip0/pwm0/period
+echo 18000000 | sudo tee /sys/class/pwm/pwmchip0/pwm0/duty_cycle
+echo 1 | sudo tee /sys/class/pwm/pwmchip0/pwm0/enable
+
+#40 Hz, 2ms
+echo 0 | sudo tee /sys/class/pwm/pwmchip0/export
+echo 25000000 | sudo tee /sys/class/pwm/pwmchip0/pwm0/period
+echo 23000000 | sudo tee /sys/class/pwm/pwmchip0/pwm0/duty_cycle
+echo 1 | sudo tee /sys/class/pwm/pwmchip0/pwm0/enable
+
+#30 Hz, 2ms
+echo 0 | sudo tee /sys/class/pwm/pwmchip0/export
+echo 33333333 | sudo tee /sys/class/pwm/pwmchip0/pwm0/period
+echo 31333333 | sudo tee /sys/class/pwm/pwmchip0/pwm0/duty_cycle
+echo 1 | sudo tee /sys/class/pwm/pwmchip0/pwm0/enable
+
 
 #run camera
 rpicam-hello --cam 0 --timeout 30000 --gain 15.0 --shutter 2000 --metering centre
