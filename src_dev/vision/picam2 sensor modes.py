@@ -10,3 +10,5 @@ for i, mode in enumerate(picam2.sensor_modes):
     unpacked = mode['unpacked']
     depth = mode['bit_depth']
     print(f"Mode {i}: {res}, Format: {fmt}, Max FPS: {fps}, unpacked: {unpacked}, depht: {depth}")
+print(f"Advertised controls: {picam2.camera_controls}")
+
