@@ -1,5 +1,6 @@
 import numpy as np
 import cv2
+import time
 from multiprocessing import shared_memory
 
 # Image dimensions
@@ -29,6 +30,7 @@ def consumer(shm_name0, shm_name1):
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
+            time.sleep(0.001)
     except KeyboardInterrupt:
         print("\n[consumer] Interrupted.")
     finally:

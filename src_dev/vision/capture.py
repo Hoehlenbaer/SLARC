@@ -17,12 +17,22 @@ def setup_camera(index):
     config = cam.create_video_configuration(
         main={"size": (WIDTH, HEIGHT), "format": "YUV420"},
         controls={
-            "FrameDurationLimits": (int(1e9 / FPS), int(1e9 / FPS)),  # lock frame rate
-            "ExposureTime": 8000,       # 8 ms exposure (in µs)
-            "AnalogueGain": 1.0,        # fixed gain
-            "AeEnable": False,          # disable auto exposure
-            "ExposureTimeMode": 1,      # manual mode
-            "AnalogueGainMode": 1       # manual gain mode
+            "FrameDurationLimits": (int(1e9 / FPS), int(1e9 / FPS)), # lock frame rate
+            "ExposureTime": 8000,        # 8 ms exposure (in µs)
+            "AnalogueGain": 1.0,         # fixed gain
+            
+            # --- FIXES TO ELIMINATE FLICKERING ---
+            "AeEnable": False,           # Disable Auto Exposure (necessary)
+            # Remove "AwbEnable": False as it causes the RuntimeError
+
+            # New controls to force absolute stability:
+            "ExposureValue": 0.0,        # Ensure no brightness offset is applied
+            "Brightness": 0.0,           # Ensure no brightness correction is applied
+            # "AfMode": 0,                 # Set Autofocus to Manual/Fixed
+            
+            "ExposureTimeMode": 1,       # Manual mode for exposure
+            "AnalogueGainMode": 1,       # Manual mode for gain
+            # --- END FIXES ---
         }
 
     )
