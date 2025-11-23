@@ -50,7 +50,7 @@ install_packages() {
 }
 
 # Package installations
-install_packages "vision" opencv-python --no-deps pyzmq
+install_packages "vision" opencv-python --no-deps pyzmq moderngl glcontext 
 install_packages "ai" numpy opencv-python onnxruntime
 install_packages "sensors" smbus2 numpy==1.24 matplotlib icm20948 scipy==1.11.4
 install_packages "motion_control" RPi.GPIO
