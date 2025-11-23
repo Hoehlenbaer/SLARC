@@ -22,7 +22,7 @@ def setup_camera(index):
         controls={
             "FrameDurationLimits": (int(1e9 / FPS), int(1e9 / FPS)),
             "ExposureTime": 8000,
-            "AnalogueGain": 1.0,
+            "AnalogueGain": 15.0,
             "AeEnable": False,
             "ExposureValue": 0.0,
             "Brightness": 0.0,

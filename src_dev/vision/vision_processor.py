@@ -12,7 +12,7 @@ import cv2
 # --- CONFIGURATION ---
 IN_WIDTH, IN_HEIGHT = 1440, 1080
 OUT_WIDTH, OUT_HEIGHT = 320, 240 # Standard for StereoNet/YOLO
-FPS_REPORT_INTERVAL = 100
+FPS_REPORT_INTERVAL = 50
 CALIB_FILE = "calibration.json"
 
 # --- SHADERS ---
@@ -191,12 +191,14 @@ def post_process_worker(shm0_name, shm1_name, ts_shm_name, semaphore):
     cv2.resizeWindow("Stereo Pipeline", 640, 240)
 
     count = 0
-    start_t = time.time()
+    start_t = 0.0
 
     try:
         while True:
             semaphore.acquire()
-            
+            if count == 0:
+                # Set the stable start time *after* the first synchronization
+                start_t = time.time()
             # --- RENDER LEFT ---
             tex_l.write(raw_l)
             tex_l.use(location=0)
