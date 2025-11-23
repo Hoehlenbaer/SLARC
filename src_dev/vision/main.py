@@ -13,7 +13,7 @@ if VISION_DIR not in sys.path:
 
 # Import capture and post_process modules
 from capture import start_capture_process
-# from post_process import start_post_process  # Uncomment when ready
+from vision_processor import start_post_process  
 
 # Constants
 WIDTH, HEIGHT = 1440, 1080
@@ -61,8 +61,10 @@ def main():
     print("[vision] Capture workers started.")
 
     # Example: Launch post-processing worker
-    # pp = start_post_process(shm0.name, shm1.name, ts_shm.name, frame_ready_sem)
-    # pp.start()
+    pp = start_post_process(shm0.name, shm1.name, ts_shm.name, frame_ready_sem)
+    pp.start()
+
+    print("[vision] Post process workers started.")
 
     def shutdown_handler(sig, frame):
         print("\n[vision] Shutting down...")
