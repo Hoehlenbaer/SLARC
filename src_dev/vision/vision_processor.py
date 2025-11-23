@@ -11,7 +11,7 @@ import cv2
 
 # --- CONFIGURATION ---
 IN_WIDTH, IN_HEIGHT = 1440, 1080
-OUT_WIDTH, OUT_HEIGHT = 320, 240 # Standard for StereoNet/YOLO
+OUT_WIDTH, OUT_HEIGHT = 640, 480 # Standard for StereoNet/YOLO
 FPS_REPORT_INTERVAL = 50
 CALIB_FILE = "calibration.json"
 
@@ -188,7 +188,7 @@ def post_process_worker(shm0_name, shm1_name, ts_shm_name, semaphore):
     print("[post] Worker running...")
     
     cv2.namedWindow("Stereo Pipeline", cv2.WINDOW_NORMAL)
-    cv2.resizeWindow("Stereo Pipeline", 640, 240)
+    cv2.resizeWindow("Stereo Pipeline", OUT_WIDTH*2, OUT_HEIGHT)
 
     count = 0
     start_t = 0.0
