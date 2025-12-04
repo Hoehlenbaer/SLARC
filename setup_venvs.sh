@@ -27,6 +27,7 @@ create_venv() {
 }
 
 # Create venvs
+create_venv "slarc_base" false
 create_venv "vision" true
 create_venv "ai" true
 create_venv "sensors" false
@@ -50,10 +51,11 @@ install_packages() {
 }
 
 # Package installations
-install_packages "vision" opencv-python --no-deps pyzmq moderngl glcontext 
-install_packages "ai" numpy opencv-python onnxruntime
-install_packages "sensors" smbus2 numpy==1.24 matplotlib icm20948 scipy==1.11.4
-install_packages "motion_control" RPi.GPIO
-install_packages "slam" opencv-python matplotlib numpy==1.24
+install_packages "slarc_base" posix_ipc
+install_packages "vision" opencv-python --no-deps pyzmq moderngl glcontext posix_ipc
+install_packages "ai" numpy opencv-python onnxruntime posix_ipc
+install_packages "sensors" smbus2 numpy==1.24 matplotlib icm20948 scipy==1.11.4 posix_ipc
+install_packages "motion_control" RPi.GPIO posix_ipc
+install_packages "slam" opencv-python matplotlib numpy==1.24 posix_ipc
 
 echo "🎉 All venvs checked, created if needed, and configured successfully."

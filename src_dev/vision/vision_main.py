@@ -1,4 +1,4 @@
-# main.py
+# vision_main.py
 # version 2.2
 
 import sys
@@ -24,7 +24,7 @@ if VISION_DIR not in sys.path:
     sys.path.insert(0, VISION_DIR)
 
 # Import capture and post_process modules
-from capture import start_capture_process
+from vision_capture import start_capture_process
 from vision_processor import start_post_process  
 
 def main():
