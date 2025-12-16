@@ -6,15 +6,15 @@ from typing import List, Dict, Any
 
 # --- GLOBAL CONFIGURATION ---
 MODEL_PATHS = [
-    "/home/admin/.models/Qwen3-0.6B-Q4_K_M.gguf",
-    "/home/admin/.models/Qwen3-0.6B-Q8_0.gguf",
-    "/home/admin/.models/Qwen3-1.7B-Q4_K_M.gguf",
-    "/home/admin/.models/Qwen3-1.7B-Q8_0.gguf",
-    "/home/admin/.models/Qwen3-0.6B-Q5_K_M.gguf",
-    "/home/admin/.models/Qwen3-0.6B-Q6_K.gguf",
+    "C:/daten/models/Qwen3-0.6B-Q4_K_M.gguf",
+    #"C:/daten/models/Qwen3-0.6B-Q8_0.gguf",
+    #"/home/admin/.models/Qwen3-1.7B-Q4_K_M.gguf",
+    #"/home/admin/.models/Qwen3-1.7B-Q8_0.gguf",
+    #"/home/admin/.models/Qwen3-0.6B-Q5_K_M.gguf",
+    #"/home/admin/.models/Qwen3-0.6B-Q6_K.gguf",
 ]
 
-N_THREADS = 4        
+N_THREADS = 8        
 MAX_TOKENS = 1024    # High token count to allow CoT to complete and ensure command generation.
 TEMPERATURE = 0.0    
 
