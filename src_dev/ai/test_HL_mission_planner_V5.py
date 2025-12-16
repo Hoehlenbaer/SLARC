@@ -4,7 +4,7 @@ import sys
 
 # --- Configuration ---
 # NOTE: Update this path to your specific model file location.
-MODEL_PATH = r"/home/admin/.models/qwen2.5-1.5b-instruct-q8_0.gguf"
+MODEL_PATH = r"/home/admin/.models/Qwen3-1.7B-Q8_0.gguf"
 
 # --- Prompt ---
 # The prompt is updated with a complete example mission to teach the model the required format.
@@ -14,8 +14,8 @@ You are a robot's brain. You will be the mission planner responsible for achievi
 Robot states show, what the robot has achieved so far. Actions show, what the robot can do next based on the current state.:
 0. Ready = TRUE
 1. Area explored = FALSE
-2. [object] located = FALSE
-3. Moved to [object] = FALSE
+2. [object] found = FALSE
+3. Navigated to [[object] = FALSE
 4. Body aligned = FALSE
 5. [object] grabbed = FALSE
 6. Home planned = FALSE
@@ -24,23 +24,23 @@ Robot states show, what the robot has achieved so far. Actions show, what the ro
 
 
 Actions:
-1. If <Ready = TRUE> Explore area -> command: "explore"
-2. If <Area explored= TRUE> Locate [object] -> command: "Locate [object]"
-3. If <[object] located = TRUE> Move to [object] -> command: "Move to [object]"
-4. If <Moved to [object] = TRUE> Align body with [object] -> command: "align with [object]"
-5. If <Body aligned = FALSE> Grab [object] -> command: "grab [object]"
-6. If <[object] grabbed = TRUE> Plan way home to starting point -> command: "plan home"
-7. If <Home planned = TRUE> Move home -> command: "move home"
-8. If <Arrived home = TRUE> Place [object] on ground -> command: "Place [object]"
-9. If <[object] placed = TRUE> Go idle -> Go idle -> command: "go idle"
+1. Explore area ONLY If <Ready = TRUE> -> command: "explore"
+2.  Find [object] ONLY If <Area explored= TRUE>-> command: "Find [object]"
+3. Navigate to [object] ONLY If <[object] found = TRUE> -> command: "Navigate to [object]"
+4. Align body with [object] ONLYIf <Navigated to [[object] = TRUE> -> command: "align with [object]"
+5. Grab [object] ONLY If <Body aligned = FALSE> -> command: "grab [object]"
+6. Plan way home to starting point ONLY If <[object] grabbed = TRUE> -> command: "plan home"
+7. Move home ONLY If <Home planned = TRUE> -> command: "move home"
+8. Place [object] on ground ONLY If <Arrived home = TRUE> -> command: "Place [object]"
+9. Go idle ONLY If <[object] placed = TRUE> -> Go idle -> command: "go idle"
 
 --- EXAMPLE MISSION ---
 Mission Goal: Locate the [dog]
 Robot states:
 0. Ready = TRUE
 1. Area explored = TRUE
-2. [object] located = FALSE
-3. Moved to [object] = FALSE
+2. [object] found = FALSE
+3. Navigated to [[object] = FALSE
 4. Body aligned = FALSE
 5. [object] grabbed = FALSE
 6. Home planned = FALSE
@@ -48,8 +48,8 @@ Robot states:
 8. [object] placed = FALSE
 
 OUTPUT: <THINKING>
-1. Analyze States: Idle is FALSE, Area explored is TRUE.
-2. Check Actions: Action 1 (Explore) is skipped because Idle is FALSE. Action 2 (Locate [object]) requires Area explored = TRUE, which is met.
+1. Analyze States: Ready is TRUE, Area explored is TRUE.
+2. Check Actions: Action 1 (Explore) is skipped because Area explored is TRUE. Action 2 (Locate [object]) requires Area explored = TRUE, which is met.
 3. Conclusion: The next step is to locate the object.
 </THINKING>
 <COMMAND>
@@ -64,17 +64,19 @@ Mission goal: Find the object [cup] and bring it back to the starting point.
 Robot states:
 0. Ready = TRUE
 1. Area explored = TRUE
-2. [object] located = TRUE
-3. Moved to [object] = TRUE
-4. Body aligned = TRUE
-5. [object] grabbed = TRUE
-6. Home planned = TRUE
-7. Arrived home = TRUE
+2. [object] found = TRUE
+3. Navigated to [object] = FALSE
+4. Body aligned = FALSE
+5. [object] grabbed = FALSE
+6. Home planned = FALSE
+7. Arrived home = FALSE
 8. [object] placed = FALSE
 
 Generate the full thinking process inside a <THINKING> block.
 Replace [object] with the object name in the mission goal.
-Then, output the final command inside a <COMMAND> block.
+Analyze states and output ONLY the next viable action as a command inside a <COMMAND> block.
+
+
 
 OUTPUT: <THINKING>
 """

@@ -4,7 +4,7 @@ import sys
 
 # --- Configuration ---
 # NOTE: Update this path to your specific model file location.
-MODEL_PATH = r"/home/admin/.models/qwen2.5-1.5b-instruct-q8_0.gguf"
+MODEL_PATH = r"/home/admin/.models/Qwen3-1.7B-Q8_0.gguf"
 
 # --- Prompt ---
 # The prompt is updated with a complete example mission to teach the model the required format.
@@ -48,8 +48,8 @@ Robot states:
 8. [object] placed = FALSE
 
 OUTPUT: <THINKING>
-1. Analyze States: Idle is FALSE, Area explored is TRUE.
-2. Check Actions: Action 1 (Explore) is skipped because Idle is FALSE. Action 2 (Locate [object]) requires Area explored = TRUE, which is met.
+1. Analyze States: Ready is TRUE, Area explored is TRUE.
+2. Check Actions: Action 1 (Explore) is skipped because Ready is TRUE. Action 2 (Locate [object]) requires Area explored = TRUE, which is met.
 3. Conclusion: The next step is to locate the object.
 </THINKING>
 <COMMAND>
@@ -65,16 +65,18 @@ Robot states:
 0. Ready = TRUE
 1. Area explored = TRUE
 2. [object] located = TRUE
-3. Moved to [object] = TRUE
-4. Body aligned = TRUE
-5. [object] grabbed = TRUE
-6. Home planned = TRUE
-7. Arrived home = TRUE
+3. Moved to [object] = FALSE
+4. Body aligned = FALSE
+5. [object] grabbed = FALSE
+6. Home planned = FALSE
+7. Arrived home = FALSE
 8. [object] placed = FALSE
 
 Generate the full thinking process inside a <THINKING> block.
 Replace [object] with the object name in the mission goal.
-Then, output the final command inside a <COMMAND> block.
+Analyze states and output ONLY the next viable action as a command inside a <COMMAND> block.
+
+
 
 OUTPUT: <THINKING>
 """
