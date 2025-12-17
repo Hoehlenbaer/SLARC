@@ -7,29 +7,32 @@ MODEL_PATH = r"/home/admin/.models/Qwen3-1.7B-Q8_0.gguf"
 
 # --- Goal-Oriented System Instructions ---
 SYSTEM_PROMPT = """
-You are a Robot Logic Controller. You must trace the mission status step-by-step.
+You are a Causal Logic Engine for a robot.
 
---- ACTION HIERARCHY ---
-1. Action: "explore" -> Condition: Area Explored is [FALSE].
-2. Action: "Find [object]" -> Condition: Explored is [TRUE] and Found is [FALSE].
-3. Action: "Navigate to [object]" -> Condition: Found is [TRUE] and Navigated is [FALSE].
-4. Action: "align with [object]" -> Condition: Navigated is [TRUE] and Aligned is [FALSE].
-5. Action: "grab [object]" -> Condition: Aligned is [TRUE] and Grabbed is [FALSE].
-6. Action: "plan home" -> Condition: Grabbed is [TRUE] and Path Home Planned is [FALSE].
-7. Action: "move home" -> Condition: Path Home Planned is [TRUE] and Arrived Home is [FALSE].
-8. Action: "Place [object]" -> Condition: Arrived Home is [TRUE] and Placed is [FALSE].
-9. Action: "go idle" -> Condition: Placed is [TRUE].
+--- THE CAUSAL CHAIN ---
+1. [Ready] -> allows -> [Explore]
+2. [Explored] -> allows -> [Find]
+3. [Found] -> allows -> [Navigate]
+4. [Navigated] -> allows -> [Align]
+5. [Aligned] -> allows -> [Grab]
+6. [Grabbed] -> allows -> [Plan Home]
+7. [Planned] -> allows -> [Move Home]
+8. [Arrived Home] + [Grabbed] -> allows -> [Place]
 
---- OUTPUT RULE ---
-You MUST list every step in the <THINKING> block until you hit a FALSE condition. 
-Example Thinking:
-1. Ready? TRUE.
-2. Explored? TRUE.
-3. Found? FALSE. (Next action is Find)
+--- MISSION ---
+Goal: [cup] must be [Placed].
+
+--- TASK ---
+1. Analyze the status from bottom to top.
+2. Find the FIRST 'FALSE' in the Causal Chain.
+3. The command is the ACTION that turns that FALSE into TRUE.
 
 FORMAT:
 <THINKING>
-[Your line-by-line status check here]
+Chain Analysis:
+- Step 1 [Ready]: Status...
+- Step 2 [Explored]: Status...
+Conclusion: The chain breaks at [Step].
 </THINKING>
 <COMMAND>
 [Action]
@@ -50,6 +53,9 @@ TEST_CASES = [
     # Complex case: Robot is at the cup but "Aligned" became FALSE (cup moved)
     # It should "align with cup" even if it previously thought it was aligned.
     ("Recovery: Cup nudged", 'TRUE', 'TRUE', 'TRUE', 'TRUE', 'FALSE', 'FALSE', 'FALSE', 'FALSE', 'FALSE', "align with cup"),
+
+    # Name, Ready, Explored, Found, Nav, Align, Grab, Plan, Arrived, Placed
+("Recovery: Dropped cup (Realistic)", 'TRUE', 'TRUE', 'TRUE', 'TRUE', 'FALSE', 'FALSE', 'TRUE', 'TRUE', 'FALSE', "align with cup")
 ]
 
 def generate_user_input(ready, explored, found, nav, align, grab, plan, arrived, placed):
