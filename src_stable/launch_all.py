@@ -167,9 +167,7 @@ def shutdown_all(sig, frame):
         try:
             shm.close()
             shm.unlink()
-            print(f"   -> Unlinked {shm.name}")
         except Exception:
-            print(f"   -> WARNING: Failed to unlink {shm.name}. It may have already been unlinked.")
             # Allow this to fail silently as it may have been cleaned up by a crash
             pass
             
