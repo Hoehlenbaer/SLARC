@@ -7,38 +7,45 @@ MODEL_PATH = r"C:\daten\models\Qwen3-1.7B-Q8_0.gguf"
 
 # --- Goal-Oriented System Instructions ---
 SYSTEM_PROMPT = """
-You are a Causal Logic Engine for a robot.
+You are a Robot Safety and Logic Controller. You must find the deepest blocker using impossibility constraints.
 
---- THE CAUSAL CHAIN ---
-1. [Ready] -> allows -> [Explore]
-2. [Explored] -> allows -> [Find]
-3. [Found] -> allows -> [Navigate]
-4. [Navigated] -> allows -> [Align]
-5. [Aligned] -> allows -> [Grab]
-6. [Grabbed] -> allows -> [Plan Home]
-7. [Planned] -> allows -> [Move Home]
-8. [Arrived Home] + [Grabbed] -> allows -> [Place]
+--- ACTION -> STATE MAPPING ---
+- Action: "explore"          -> State: 'Explored'
+- Action: "Find cup"         -> State: 'Found'
+- Action: "Navigate to cup"  -> State: 'Navigated'
+- Action: "align with cup"   -> State: 'Aligned'
+- Action: "grab cup"         -> State: 'Grabbed'
+- Action: "plan home"        -> State: 'Path Planned'
+- Action: "move home"        -> State: 'Arrived Home'
+- Action: "Place cup"        -> State: 'Placed'
 
---- MISSION ---
-Goal: [cup] must be [Placed].
+--- PHYSICAL IMPOSSIBILITY RULES ---
+- It is IMPOSSIBLE to place the cup if 'Arrived Home' is FALSE.
+- It is IMPOSSIBLE to move home if 'Path Planned' is FALSE.
+- It is IMPOSSIBLE to plan home if 'Grabbed' is FALSE.
+- It is IMPOSSIBLE to grab the cup if 'Aligned' is FALSE.
+- It is IMPOSSIBLE to align with the cup if 'Navigated' is FALSE.
+- It is IMPOSSIBLE to navigate to the cup if 'Found' is FALSE.
+- It is IMPOSSIBLE to find the cup if 'Explored' is FALSE.
 
 --- TASK ---
-1. Analyze the status from bottom to top.
-2. Find the FIRST 'FALSE' in the Causal Chain.
-3. The command is the ACTION that turns that FALSE into TRUE.
+1. Audit the STATUS list. 
+2. Find the FIRST 'FALSE' state in the chain (starting from 'Explored' up to 'Placed').
+3. Use the ACTION MAPPING to output the exact command that fixes that FALSE state.
 
-FORMAT:
+--- SPEED RULE ---
+Your <THINKING> must be a concise boolean checklist. Do not explain the physics.
+Example:
 <THINKING>
-Chain Analysis:
-- Step 1 [Ready]: Status...
-- Step 2 [Explored]: Status...
-Conclusion: The chain breaks at [Step].
+- Explored: TRUE
+- Found: FALSE
+Conclusion: Blocker is 'Found'.
 </THINKING>
+
 <COMMAND>
-[Action]
+[Exact string from Action Mapping]
 </COMMAND>
 """
-
 # --- Test Cases ---
 # We can now test "out of order" or "broken" dependencies.
 # Structure: (Name, Ready, Explored, Found, Navigated, Aligned, Grabbed, Planned, Arrived, Placed, Expected)
@@ -116,7 +123,7 @@ def test_full_mission(model_path: str):
                     {"role": "user", "content": user_input}
                 ],
                 max_tokens=2048,
-                temperature=0.1,
+                temperature=0.0,
                 stream=True
             )
 

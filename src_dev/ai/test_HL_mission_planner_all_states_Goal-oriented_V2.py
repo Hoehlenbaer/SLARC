@@ -3,7 +3,7 @@ import os
 import time 
 
 # --- Configuration ---
-MODEL_PATH = r"/home/admin/.models/Qwen3-1.7B-Q8_0.gguf" 
+MODEL_PATH = r"C:\daten\models\Qwen3-1.7B-Q8_0.gguf" 
 
 # --- Goal-Oriented System Instructions ---
 SYSTEM_PROMPT = """

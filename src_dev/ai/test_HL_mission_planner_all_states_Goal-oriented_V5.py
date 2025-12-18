@@ -7,38 +7,35 @@ MODEL_PATH = r"C:\daten\models\Qwen3-1.7B-Q8_0.gguf"
 
 # --- Goal-Oriented System Instructions ---
 SYSTEM_PROMPT = """
-You are a Causal Logic Engine for a robot.
+You are a Robot Safety and Logic Controller. You must ensure no actions are taken unless all physical conditions are met.
 
---- THE CAUSAL CHAIN ---
-1. [Ready] -> allows -> [Explore]
-2. [Explored] -> allows -> [Find]
-3. [Found] -> allows -> [Navigate]
-4. [Navigated] -> allows -> [Align]
-5. [Aligned] -> allows -> [Grab]
-6. [Grabbed] -> allows -> [Plan Home]
-7. [Planned] -> allows -> [Move Home]
-8. [Arrived Home] + [Grabbed] -> allows -> [Place]
-
---- MISSION ---
-Goal: [cup] must be [Placed].
+--- PHYSICAL CONSTRAINTS ---
+- It is IMPOSSIBLE to place the cup if 'Arrived Home' is FALSE.
+- It is IMPOSSIBLE to move home if 'Path Home Planned' is FALSE.
+- It is IMPOSSIBLE to plan a path if 'Grabbed' is FALSE.
+- It is IMPOSSIBLE to grab the cup if 'Aligned' is FALSE.
+- It is IMPOSSIBLE to align with the cup if 'Navigated' is FALSE.
+- It is IMPOSSIBLE to navigate to the cup if 'Found' is FALSE.
+- It is IMPOSSIBLE to find the cup if 'Explored' is FALSE.
 
 --- TASK ---
-1. Analyze the status from bottom to top.
-2. Find the FIRST 'FALSE' in the Causal Chain.
-3. The command is the ACTION that turns that FALSE into TRUE.
+1. Look at the Final Goal: "Place cup and go idle."
+2. Check the constraints above. Find the "Deepest Blocker" (the first thing in the list that prevents the goal).
+3. Output the COMMAND that resolves that blocker.
 
 FORMAT:
 <THINKING>
-Chain Analysis:
-- Step 1 [Ready]: Status...
-- Step 2 [Explored]: Status...
-Conclusion: The chain breaks at [Step].
+Goal: Place cup.
+Constraint Check:
+- Can I place? No, because [Blocker].
+- Can I move home? No, because [Blocker].
+...
+Conclusion: I must first [Action].
 </THINKING>
 <COMMAND>
 [Action]
 </COMMAND>
 """
-
 # --- Test Cases ---
 # We can now test "out of order" or "broken" dependencies.
 # Structure: (Name, Ready, Explored, Found, Navigated, Aligned, Grabbed, Planned, Arrived, Placed, Expected)
