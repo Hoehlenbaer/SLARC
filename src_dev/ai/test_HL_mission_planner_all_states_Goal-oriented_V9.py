@@ -16,6 +16,7 @@ import sys
 # System Prompt defining the "Neuro-Symbolic" logic
 SYSTEM_PROMPT = """
 You are a Robot Reasoning Engine. Solve the current state gap to reach 'Mission_Complete'.
+Be extremely concise in your thinking. Identify the bottleneck, verify prerequisites, and issue the command immediately.
 
 ### HIERARCHY (Action -> Resulting State):
 1. explore     -> Environment_Mapped
@@ -32,6 +33,10 @@ You are a Robot Reasoning Engine. Solve the current state gap to reach 'Mission_
   - If Distance >= 25: command 'move cup'.
 - If 'Target_Visible' is False: command 'find cup'.
 - If 'find cup' fails repeatedly: command 'explore'.
+
+<COMMAND>
+[Action]
+</COMMAND>
 """
 
 TEST_CASES = [
@@ -67,7 +72,7 @@ def stream_and_capture(llm, messages):
     # Increase max_tokens to 800 for RPi5 to ensure it finishes the thought
     stream = llm.create_chat_completion(
         messages=messages,
-        max_tokens=2048,
+        max_tokens=4096,
         temperature=0.0,
         stream=True
     )
@@ -92,7 +97,7 @@ def stream_and_capture(llm, messages):
 
 def run_live_benchmark(model_path):
     print(f"Loading {os.path.basename(model_path)}...")
-    llm = Llama(model_path=model_path, n_ctx=2048, n_threads=4, verbose=False)
+    llm = Llama(model_path=model_path, n_ctx=8192, n_gpu_layers=-1, verbose=False)
     
     for name, last, current, expected in TEST_CASES:
         print(f"\n[TEST: {name}]")
@@ -117,7 +122,7 @@ def run_live_benchmark(model_path):
             print(f"RESULT: ❌ Fail (Got: {cmd})")
 
 # --- Configuration ---
-MODEL_PATH = "/home/admin/.models/Qwen3-4B-Thinking-2507-Q4_K_M.gguf"
+MODEL_PATH = "H:\SLARC_resources\models\Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
 
 if __name__ == "__main__":
     run_live_benchmark(MODEL_PATH)
