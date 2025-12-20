@@ -3,25 +3,31 @@ import os
 import time 
 
 # --- Configuration ---
-MODEL_PATH = r"/home/admin/.models/Qwen3-4B-Instruct-2507-Q4_K_M.gguf"  
+MODEL_PATH = r"/home/admin/.models/Qwen3-1.7B-Q8_0.gguf" 
 
 # --- Goal-Oriented System Instructions ---
 SYSTEM_PROMPT = """
-You are a Robot Safety and Logic Controller. You must ensure no actions are taken unless all physical conditions are met.
+You are a Robot Logic Controller.
+Goal: Place [object]
 
---- PHYSICAL CONSTRAINTS ---
-- It is IMPOSSIBLE to place the cup if 'Arrived Home' is FALSE.
-- It is IMPOSSIBLE to move home if 'Path Home Planned' is FALSE.
-- It is IMPOSSIBLE to plan a path if 'Grabbed' is FALSE.
-- It is IMPOSSIBLE to grab the cup if 'Aligned' is FALSE.
-- It is IMPOSSIBLE to align with the cup if 'Navigated' is FALSE.
-- It is IMPOSSIBLE to navigate to the cup if 'Found' is FALSE.
-- It is IMPOSSIBLE to find the cup if 'Explored' is FALSE.
+--- BACKWARD LOGIC CHAIN ---
+To "Place", you must first have "Arrived Home".
+To "Arrived Home", you must first have "Grabbed [object]".
+To "Grabbed [object]", you must first have "Arrived [object]".
+To "Arrived [object]", you must first have "Found [object]".
+To "Found [object]", you must first have "Explored".
 
 --- TASK ---
-1. Look at the Final Goal: "Place cup and go idle."
-2. Check the constraints above. Find the "Deepest Blocker" (the first thing in the list that prevents the goal).
-3. Output the COMMAND that resolves that blocker.
+Start at the Goal (Place). Work backwards through the chain. 
+The FIRST requirement you find that is FALSE is the command you must issue.
+
+--- COMMAND MAPPING ---
+- If not Explored -> "explore"
+- If not Found -> "find [object]"
+- If not Arrived [object] -> "move [object]"
+- If not Grabbed -> "grab [object]"
+- If not Arrived Home -> "move home"
+- If all above TRUE -> "place [object]"
 
 FORMAT:
 <THINKING>
@@ -36,49 +42,44 @@ Conclusion: I must first [Action].
 [Action]
 </COMMAND>
 """
-# --- Test Cases ---
-# We can now test "out of order" or "broken" dependencies.
-# Structure: (Name, Ready, Explored, Found, Navigated, Aligned, Grabbed, Planned, Arrived, Placed, Expected)
+# Updated for the simplified 6-step flow
+# Name, Explored, Found, Arrived_Obj, Grabbed, Arrived_Home, Placed, Expected
 TEST_CASES = [
-    # Normal start
-    ("Start from scratch", 'TRUE', 'FALSE', 'FALSE', 'FALSE', 'FALSE', 'FALSE', 'FALSE', 'FALSE', 'FALSE', "explore"),
-    
-    # Complex case: The robot has the cup, but suddenly "Arrived Home" becomes FALSE (it got pushed away)
-    # Even though it already "Planned" the path, it must "move home" again.
-    ("Recovery: Pushed away from home", 'TRUE', 'TRUE', 'TRUE', 'TRUE', 'TRUE', 'TRUE', 'TRUE', 'FALSE', 'FALSE', "move home"),
-
-    # Complex case: Robot is at the cup but "Aligned" became FALSE (cup moved)
-    # It should "align with cup" even if it previously thought it was aligned.
-    ("Recovery: Cup nudged", 'TRUE', 'TRUE', 'TRUE', 'TRUE', 'FALSE', 'FALSE', 'FALSE', 'FALSE', 'FALSE', "align with cup"),
-
-    # Name, Ready, Explored, Found, Nav, Align, Grab, Plan, Arrived, Placed
-    ("Recovery: Dropped cup (Realistic)", 'TRUE', 'TRUE', 'TRUE', 'TRUE', 'FALSE', 'FALSE', 'TRUE', 'TRUE', 'FALSE', "align with cup")
+    # (Name, Explored, Found, Arrived_Obj, Grabbed, Arrived_Home, Placed, Expected)
+    ("Start", 'FALSE', 'FALSE', 'FALSE', 'FALSE', 'FALSE', 'FALSE', "explore"),
+    ("Dropped mid-move", 'TRUE', 'TRUE', 'TRUE', 'FALSE', 'FALSE', 'FALSE', "grab [object]"),
+    ("Pushed away", 'TRUE', 'TRUE', 'TRUE', 'TRUE', 'FALSE', 'FALSE', "move home")
 ]
-
-def generate_user_input(ready, explored, found, nav, align, grab, plan, arrived, placed):
+def generate_user_input(explored, found, arrived_obj, grabbed, arrived_home, placed):
     return f"""
-Current Mission: Bring the [cup] home and go idle.
-
-STATUS:
-- Robot Ready: {ready}
-- Area Explored: {explored}
-- Object [cup] Found: {found}
-- Navigated to [cup]: {nav}
-- Aligned with [cup]: {align}
-- [cup] Grabbed: {grab}
-- Path Home Planned: {plan}
-- Arrived Home: {arrived}
-- [cup] Placed: {placed}
+Current Status:
+- Explored: {explored}
+- Found [object]: {found}
+- Arrived [object]: {arrived_obj}
+- Grabbed [object]: {grabbed}
+- Arrived Home: {arrived_home}
+- Placed [object]: {placed}
 """
-
 # ... [The rest of the test_full_mission logic remains the same as your working V11/V12]
 
 def extract_command(full_text):
-    """Robustly extracts the command from the LLM output."""
+    """Robustly extracts and cleans the command from the LLM output."""
     if "<COMMAND>" in full_text and "</COMMAND>" in full_text:
         start = full_text.find("<COMMAND>") + len("<COMMAND>")
         end = full_text.find("</COMMAND>")
-        return full_text[start:end].strip()
+        cmd = full_text[start:end].strip().lower()
+        
+        # Mapping to standardize the output
+        if "explore" in cmd: return "explore"
+        if "find" in cmd: return "find cup"
+        if "navigate" in cmd: return "navigate to cup"
+        if "align" in cmd: return "align with cup"
+        if "grab" in cmd: return "grab cup"
+        if "plan" in cmd: return "plan path"
+        if "move home" in cmd or "arrive" in cmd: return "move home"
+        if "place" in cmd: return "place cup"
+        
+        return cmd
     return None
 
 def test_full_mission(model_path: str):
@@ -101,8 +102,12 @@ def test_full_mission(model_path: str):
         total_tests = len(TEST_CASES)
         passed_tests = 0
 
-        for i, (name, ready, explored, found, nav, align, grab, plan, arrived, placed, expected) in enumerate(TEST_CASES):
-            user_input = generate_user_input(ready, explored, found, nav, align, grab, plan, arrived, placed)
+        # The list now has 8 items: 
+        # (Name, Explored, Found, Arrived_Obj, Grabbed, Arrived_Home, Placed, Expected)
+
+        for i, (name, explored, found, arrived_obj, grabbed, arrived_home, placed, expected) in enumerate(TEST_CASES):
+            # Update the input generator call to match the new arguments
+            user_input = generate_user_input(explored, found, arrived_obj, grabbed, arrived_home, placed)
             
             start_time = time.perf_counter()
             print(f"--- Running Test {i+1}/{total_tests}: {name} ---")
