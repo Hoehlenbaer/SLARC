@@ -122,7 +122,7 @@ def run_live_benchmark(model_path):
             print(f"RESULT: ❌ Fail (Got: {cmd})")
 
 # --- Configuration ---
-MODEL_PATH = "H:\SLARC_resources\models\Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
+MODEL_PATH = "/home/admin/.models/Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
 
 if __name__ == "__main__":
     run_live_benchmark(MODEL_PATH)
