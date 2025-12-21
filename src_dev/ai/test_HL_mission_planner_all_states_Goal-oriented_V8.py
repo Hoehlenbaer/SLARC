@@ -111,7 +111,7 @@ def test_full_mission(model_path: str):
             n_ctx=4096,
             n_gpu_layers=-1,
             verbose=False,
-            n_threads=3,
+            n_threads=2,
             chat_format="chatml"
         )
         print("Model loaded successfully.\n")

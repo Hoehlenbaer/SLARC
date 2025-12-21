@@ -135,7 +135,15 @@ def stream_and_capture(llm, messages):
 def run_benchmark(model_path):
     print(f"Initializing model: {os.path.basename(model_path)}...")
     #llm = Llama(model_path=model_path, n_ctx=2048, n_threads=4, verbose=False)
-    llm = Llama(model_path=model_path, n_ctx=2048,  n_gpu_layers=-1, verbose=False)
+    llm = Llama(
+        model_path=model_path, 
+        n_ctx=2048,           # Good for your use case
+        n_threads=3,          # RPi5 has 4 performance cores; 4 is usually the "sweet spot"
+        n_batch=512,          # Processes prompt in smaller chunks to save RAM
+        use_mlock=True,       # Pins the model in RAM to prevent swapping to the SD card
+        verbose=False
+        )
+    #llm = Llama(model_path=model_path, n_ctx=2048,  n_gpu_layers=-1, verbose=False)
 
     results = []
     
@@ -175,7 +183,7 @@ def run_benchmark(model_path):
         print(f"{name:<25} | {dur:>6.2f}s | {status}")
 
 # --- Configuration ---
-MODEL_PATH = "H:\SLARC_resources\models\Qwen3-4B-Instruct-2507-Q8_0.gguf"
+MODEL_PATH = "/home/admin/.models/Qwen3-1.7B-Q8_0.gguf"
 
 if __name__ == "__main__":
     # Ensure this path is correct for your RPi5 setup
