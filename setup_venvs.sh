@@ -124,7 +124,7 @@ install_packages "ai" opencv-python onnxruntime posix_ipc numpy==2.2.6 tabulate
 # The custom function installed llama-cpp-python; this ensures the other requirements are met.
 
 install_packages "sensors" smbus2 numpy==1.24 matplotlib icm20948 scipy==1.11.4 posix_ipc
-install_packages "motion_control" RPi.GPIO posix_ipc
+install_packages "motion_control" RPi.GPIO posix_ipc matplotlib scipy
 install_packages "slam" opencv-python matplotlib numpy==1.24 posix_ipc
 
 echo "🎉 All venvs checked, created if needed, and configured successfully."

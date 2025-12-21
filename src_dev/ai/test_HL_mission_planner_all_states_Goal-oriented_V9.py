@@ -46,6 +46,11 @@ FORMAT:
 """
 
 TEST_CASES = [
+    ("Warm up", 
+     {}, # Last
+     {"Environment_Mapped": False, "find_retries": 4}, # Current
+     "explore"),
+    
     ("Start Mission", 
      {}, # Last
      {"Environment_Mapped": False, "find_retries": 4}, # Current
@@ -109,7 +114,7 @@ def stream_and_capture(llm, messages):
     token_count = 0
     
     print("\n--- LIVE THINKING PROCESS ---")
-    stream = llm.create_chat_completion(messages=messages, max_tokens=1024, temperature=0.0, stream=True)
+    stream = llm.create_chat_completion(messages=messages, max_tokens=128, temperature=0.0, stream=True)
 
     for chunk in stream:
         if 'content' in chunk['choices'][0]['delta']:
@@ -136,11 +141,11 @@ def run_benchmark(model_path):
     print(f"Initializing model: {os.path.basename(model_path)}...")
     #llm = Llama(model_path=model_path, n_ctx=2048, n_threads=4, verbose=False)
     llm = Llama(
-        model_path=model_path, 
-        n_ctx=2048,           # Good for your use case
-        n_threads=3,          # RPi5 has 4 performance cores; 4 is usually the "sweet spot"
-        n_batch=512,          # Processes prompt in smaller chunks to save RAM
-        use_mlock=True,       # Pins the model in RAM to prevent swapping to the SD card
+        model_path=model_path,
+        n_ctx=512,
+        n_threads=2,        # stabiler als 4 auf dem RPi5
+        n_batch=128,        # verhindert Thread-Explosion
+        use_mlock=True,     # wenn genug RAM frei ist
         verbose=False
         )
     #llm = Llama(model_path=model_path, n_ctx=2048,  n_gpu_layers=-1, verbose=False)
@@ -160,8 +165,7 @@ def run_benchmark(model_path):
         input_data = "FULL ROBOT STATUS:\n"
         for k in DEFAULT_STATE.keys():
             input_data += f"- {k}: {current[k]}\n"
-        print('Input Data:')
-        print(input_data)    
+  
         full_output, duration = stream_and_capture(llm, [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": input_data}
@@ -176,14 +180,14 @@ def run_benchmark(model_path):
 
     # Final Summary Table
     print(f"\n\n{'#'*20} BENCHMARK SUMMARY {'#'*20}")
-    print(f"{'Test Case':<25} | {'Time':<8} | {'Status'}")
+    print(f"{'Test Case':<50} | {'Time':<16} | {'Status'}")
     print("-" * 50)
     for name, dur, success in results:
         status = "PASS" if success else "FAIL"
-        print(f"{name:<25} | {dur:>6.2f}s | {status}")
+        print(f"{name:<50} | {dur:>6.2f}s | {status}")
 
 # --- Configuration ---
-MODEL_PATH = "/home/admin/.models/Qwen3-1.7B-Q8_0.gguf"
+MODEL_PATH = "/home/admin/.models/Qwen3-4B-Instruct-2507-Q8_0.gguf"
 
 if __name__ == "__main__":
     # Ensure this path is correct for your RPi5 setup

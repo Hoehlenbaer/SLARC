@@ -1,9 +1,15 @@
+#pathfinder logic version 1.2: Random start and target locations with larger obstacles (4x4 blocks) and minimum clearance
+
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 import numpy as np
 import heapq
 import random
 import math
+from scipy.ndimage import distance_transform_edt
+
+
+
 
 # --- CONFIGURATION ---
 GRID_SIZE = 100           # Increased size to accommodate larger blocks
@@ -16,6 +22,13 @@ EMPTY, WALL, START, END, EXPLORED, PATH = 0, 1, 2, 3, 4, 5
 COLORS = ['#FFFFFF', '#2C3E50', '#27AE60', '#E74C3C', '#7FB3D5', '#F1C40F']
 CMAP = ListedColormap(COLORS)
 
+def compute_clearance_map(grid):
+    # Walls are True, free space is False
+    wall_mask = (grid == WALL)
+    # Distance to nearest wall for each cell
+    clearance = distance_transform_edt(~wall_mask)
+    return clearance
+
 def heuristic(current, target, start):
     dx, dy = abs(current[0] - target[0]), abs(current[1] - target[1])
     h = math.sqrt(dx**2 + dy**2)
@@ -24,49 +37,81 @@ def heuristic(current, target, start):
     dx2, dy2 = start[0] - target[0], start[1] - target[1]
     return h + abs(dx1*dy2 - dx2*dy1) * 0.001
 
-def get_neighbors(node, grid, size):
+def get_neighbors(node, grid, size, clearance, min_width=2):
     neighbors = []
-    # 8-way movement: (dx, dy, cost)
     directions = [
         (0, 1, 1.0), (0, -1, 1.0), (1, 0, 1.0), (-1, 0, 1.0),
         (1, 1, 1.414), (1, -1, 1.414), (-1, 1, 1.414), (-1, -1, 1.414)
     ]
+
     for dx, dy, cost in directions:
         nx, ny = node[0] + dx, node[1] + dy
-        if 0 <= nx < size and 0 <= ny < size and grid[nx][ny] != WALL:
-            neighbors.append(((nx, ny), cost))
+
+        if 0 <= nx < size and 0 <= ny < size:
+            # Reject if too close to walls
+            if clearance[nx, ny] < min_width:
+                continue
+            if grid[nx][ny] != WALL:
+                neighbors.append(((nx, ny), cost))
+
     return neighbors
+
 
 def generate_map():
     grid = np.zeros((GRID_SIZE, GRID_SIZE))
+
     # Border walls
     grid[0, :] = grid[-1, :] = grid[:, 0] = grid[:, -1] = WALL
-    
-    start, target = (GRID_SIZE - 3, 2), (2, GRID_SIZE - 3)
-    
-    # Safe zones to ensure start/end are not buried in a 4x4 block
-    safe = {(r, c) for r in range(start[0]-2, start[0]+3) for c in range(start[1]-2, start[1]+3)} | \
-           {(r, c) for r in range(target[0]-2, target[0]+3) for c in range(target[1]-2, target[1]+3)}
 
-    # Place 4x4 blocks
+    # --- RANDOM START & TARGET ---
+    def random_free_cell():
+        return (
+            random.randint(2, GRID_SIZE - 3),
+            random.randint(2, GRID_SIZE - 3)
+        )
+
+    # Ensure start and target are not too close
+    while True:
+        start = random_free_cell()
+        target = random_free_cell()
+        if abs(start[0] - target[0]) + abs(start[1] - target[1]) > GRID_SIZE // 3:
+            break
+
+    # --- SAFE ZONES ---
+    safe = {(r, c) for r in range(start[0]-2, start[0]+3)
+                    for c in range(start[1]-2, start[1]+3)}
+    safe |= {(r, c) for r in range(target[0]-2, target[0]+3)
+                     for c in range(target[1]-2, target[1]+3)}
+
+    # --- PLACE BLOCKS ---
     blocks_placed = 0
     while blocks_placed < NUM_BLOCKS:
-        r, c = random.randint(1, GRID_SIZE - BLOCK_SIZE - 1), random.randint(1, GRID_SIZE - BLOCK_SIZE - 1)
-        
-        # Create a candidate 4x4 block
-        block_cells = {(r+i, c+j) for i in range(BLOCK_SIZE) for j in range(BLOCK_SIZE)}
-        
-        # Check if block overlaps safe zones
-        if not (block_cells & safe):
-            for br, bc in block_cells:
-                grid[br, bc] = WALL
-            blocks_placed += 1
+        r = random.randint(1, GRID_SIZE - BLOCK_SIZE - 1)
+        c = random.randint(1, GRID_SIZE - BLOCK_SIZE - 1)
 
-    grid[start], grid[target] = START, END
+        block_cells = {(r+i, c+j) for i in range(BLOCK_SIZE)
+                                   for j in range(BLOCK_SIZE)}
+
+        # Skip if block intersects safe zones
+        if block_cells & safe:
+            continue
+
+        for br, bc in block_cells:
+            grid[br, bc] = WALL
+
+        blocks_placed += 1
+
+    # Mark start and target
+    grid[start] = START
+    grid[target] = END
+
     return grid, start, target
+
 
 def a_star_visual():
     grid, start, target = generate_map()
+    clearance = compute_clearance_map(grid)
+
 
     plt.ion()
     fig, ax = plt.subplots(figsize=(9, 9))
@@ -89,7 +134,7 @@ def a_star_visual():
         if current != start:
             grid[current] = EXPLORED
 
-        for neighbor, step_cost in get_neighbors(current, grid, GRID_SIZE):
+        for neighbor, step_cost in get_neighbors(current, grid, GRID_SIZE, clearance):
             tentative_g = g_score[current] + step_cost
             if tentative_g < g_score.get(neighbor, float('inf')):
                 came_from[neighbor] = current

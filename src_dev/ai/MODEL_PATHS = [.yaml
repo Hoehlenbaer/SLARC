@@ -1,0 +1,6 @@
+MODEL_PATHS = [
+    "/home/admin/.models/Qwen3-0.6B-Q4_K_M.gguf",
+    "/home/admin/.models/Qwen3-0.6B-Q8_0.gguf",
+    "/home/admin/.models/Qwen3-1.7B-Q4_K_M.gguf",
+    "/home/admin/.models/Qwen3-1.7B-Q8_0.gguf",
+]
