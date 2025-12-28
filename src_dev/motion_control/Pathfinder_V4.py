@@ -19,7 +19,7 @@ NUM_BLOCKS = 25
 
 # Costmap weights
 W_OCC = 255
-W_CLEARANCE = 40
+W_CLEARANCE = 160
 W_SLOPE = 200     # much stronger slope weight
 W_BASE = 1
 
@@ -41,8 +41,8 @@ C_TARGET = np.array([1.0, 0.0, 0.0, 1.0])
 # ---------------------------------------------------------
 def generate_height_map(size):
     h = np.random.rand(size, size)
-    h = gaussian_filter(h, sigma=3)  # less smoothing -> more variation
-    return h * 2.0  # height range ~0..2 m
+    h = gaussian_filter(h, sigma=5)  # less smoothing -> more variation
+    return h * 8.0  # height range ~0..8 m
 
 
 # ---------------------------------------------------------
