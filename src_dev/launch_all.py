@@ -1,5 +1,9 @@
 # launch_all.py
 # version 2.5 - Central Resource Manager (Fix Graceful Shutdown)
+#
+# Launches all subsystems with proper Shared Memory and Semaphore setup.
+# Cleans up resources on shutdown.
+
 
 import subprocess
 import os

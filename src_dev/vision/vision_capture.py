@@ -1,5 +1,10 @@
 # capture.py
 # version 2.0
+#
+# Camera Capture Worker Module
+# Handles camera initialization, frame capture, Shared Memory writing,
+# and synchronization with post-processing via Barriers and Semaphores.
+# Requires vision_main.py to run first.
 
 from picamera2 import Picamera2
 import numpy as np

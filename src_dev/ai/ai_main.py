@@ -1,5 +1,9 @@
 # ai/ai_main.py
 # version 1.2 - AI Subsystem Launcher (POSIX enabled, faster simulation)
+#
+# This script initializes the AI subsystem, attaches to shared memory buffers
+# for rectified stereo images, and synchronizes with the Post-Processor using
+# a POSIX semaphore. It is designed to be launched by launch_all.py.
 
 import sys
 import os
