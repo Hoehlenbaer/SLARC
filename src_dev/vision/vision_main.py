@@ -1,5 +1,11 @@
 # vision_main.py
 # version 2.4 (Fixing TypeError: Semaphore.__init__ missing 'ctx')
+#
+# Central Vision System Main Module
+# Manages camera capture and post-processing workers,
+# Shared Memory attachment, and synchronization primitives.
+# Requires launch_all.py to run first.
+
 
 import sys
 import os

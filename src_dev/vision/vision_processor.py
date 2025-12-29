@@ -1,5 +1,10 @@
 # vision_processor.py
 # version 1.3 (Minimal change for launch_all.py compatibility)
+#
+# Post-Processing Worker Module
+# Handles image rectification using OpenGL shaders,
+# Shared Memory reading/writing, and synchronization with AI via POSIX Semaphores. 
+# Requires vision_main.py to run first.
 
 import time
 import json
