@@ -114,7 +114,7 @@ STATE-ONLY RULE (MANDATORY)
 
 ------------------------------------------------------------
 FINAL RESPONSE FORMAT
-
+<think>Short reasoning</think>
 <COMMAND>...</COMMAND>
 
 """
@@ -176,6 +176,7 @@ TEST_CASES = [
      "explore"),
 ]
 
+
 def get_full_state(partial_state):
     """Merges partial test data with the full global state vector."""
     full = DEFAULT_STATE.copy()
@@ -186,9 +187,9 @@ def stream_and_capture(llm, messages):
     full_text = ""
     start_time = time.time()
     token_count = 0
-    #print(messages)
+    
     print("\n--- LIVE THINKING PROCESS ---")
-    stream = llm.create_chat_completion(messages=messages, max_tokens=2048, temperature=0.0, stream=True)
+    stream = llm.create_chat_completion(messages=messages, max_tokens=256, temperature=0.0, stream=True)
 
     for chunk in stream:
         if 'content' in chunk['choices'][0]['delta']:
@@ -211,29 +212,12 @@ def stream_and_capture(llm, messages):
     print(f"\n{COLOR_STATS}[STATS: {duration:.2f}s | {token_count} tokens | {tps:.2f} t/s]{COLOR_RESET}")
     return full_text, duration
 
-def strip_thinking_prefix(text: str) -> str:
-    end_tag = "</think>"
-    idx = text.lower().rfind(end_tag)
-    if idx != -1:
-        return text[idx + len(end_tag):]
-    return text
-
-
-def extract_command(text: str) -> str:
-    matches = re.findall(
-        r"<COMMAND>(.*?)</COMMAND>",
-        text,
-        flags=re.DOTALL | re.IGNORECASE
-    )
-    return matches[-1].strip().lower() if matches else "none"
-
-
 def run_benchmark(model_path):
     print(f"Initializing model: {os.path.basename(model_path)}...")
     #llm = Llama(model_path=model_path, n_ctx=2048, n_threads=4, verbose=False)
     #llm = Llama(
     #    model_path=model_path,
-    #    n_ctx=1024,
+    #    n_ctx=512,
     #    n_threads=2,        # stabiler als 4 auf dem RPi5
     #    n_batch=128,        # verhindert Thread-Explosion
     #    use_mlock=True,     # wenn genug RAM frei ist
@@ -262,10 +246,8 @@ def run_benchmark(model_path):
             {"role": "user", "content": input_data}
         ])
         
-        clean_output = strip_thinking_prefix(full_output)
-        cmd = extract_command(clean_output)
-
-
+        cmd_match = re.search(r"<COMMAND>(.*?)</COMMAND>", full_output, re.DOTALL | re.IGNORECASE)
+        cmd = cmd_match.group(1).strip().lower() if cmd_match else "none"
         
         success = cmd == expected.lower()
         results.append((name, duration, success))
@@ -280,8 +262,7 @@ def run_benchmark(model_path):
         print(f"{name:<50} | {dur:>6.2f}s | {status}")
 
 # --- Configuration ---
-MODEL_PATH = "H:\SLARC_resources\models\DeepSeek-R1-Distill-Qwen-1.5B-Q4_K_M.gguf"
-
+MODEL_PATH = "H:\SLARC_resources\models\Qwen3-4B-Instruct-2507-Q8_0.gguf"
 
 if __name__ == "__main__":
     # Ensure this path is correct for your RPi5 setup

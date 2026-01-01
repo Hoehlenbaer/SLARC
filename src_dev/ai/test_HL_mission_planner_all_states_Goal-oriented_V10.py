@@ -191,7 +191,7 @@ def run_benchmark(model_path):
         print(f"{name:<50} | {dur:>6.2f}s | {status}")
 
 # --- Configuration ---
-MODEL_PATH = "H:\SLARC_resources\models\DeepSeek-R1-Distill-Qwen-1.5B-Q8_0.gguf"
+MODEL_PATH = "H:\SLARC_resources\models\Qwen3-4B-Instruct-2507-Q8_0.gguf"
 
 if __name__ == "__main__":
     # Ensure this path is correct for your RPi5 setup
