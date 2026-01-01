@@ -144,15 +144,15 @@ def stream_and_capture(llm, messages):
 def run_benchmark(model_path):
     print(f"Initializing model: {os.path.basename(model_path)}...")
     #llm = Llama(model_path=model_path, n_ctx=2048, n_threads=4, verbose=False)
-    llm = Llama(
-        model_path=model_path,
-        n_ctx=512,
-        n_threads=2,        # stabiler als 4 auf dem RPi5
-        n_batch=128,        # verhindert Thread-Explosion
-        use_mlock=True,     # wenn genug RAM frei ist
-        verbose=False
-        )
-    #llm = Llama(model_path=model_path, n_ctx=2048,  n_gpu_layers=-1, verbose=False)
+    #llm = Llama(
+    #    model_path=model_path,
+    #    n_ctx=512,
+    #    n_threads=2,        # stabiler als 4 auf dem RPi5
+    #    n_batch=128,        # verhindert Thread-Explosion
+    #    use_mlock=True,     # wenn genug RAM frei ist
+    #    verbose=False
+    #    )
+    llm = Llama(model_path=model_path, n_ctx=2048,  n_gpu_layers=-1, verbose=False)
 
     results = []
     
@@ -191,7 +191,7 @@ def run_benchmark(model_path):
         print(f"{name:<50} | {dur:>6.2f}s | {status}")
 
 # --- Configuration ---
-MODEL_PATH = "/home/admin/.models/Qwen3-4B-Instruct-2507-Q8_0.gguf"
+MODEL_PATH = "H:\SLARC_resources\models\DeepSeek-R1-Distill-Qwen-1.5B-Q8_0.gguf"
 
 if __name__ == "__main__":
     # Ensure this path is correct for your RPi5 setup
