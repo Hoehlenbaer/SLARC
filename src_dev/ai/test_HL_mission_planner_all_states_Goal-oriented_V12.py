@@ -189,7 +189,7 @@ def stream_and_capture(llm, messages):
     token_count = 0
     
     print("\n--- LIVE THINKING PROCESS ---")
-    stream = llm.create_chat_completion(messages=messages, max_tokens=256, temperature=0.0, stream=True)
+    stream = llm.create_chat_completion(messages=messages, max_tokens=512, temperature=0.0, stream=True)
 
     for chunk in stream:
         if 'content' in chunk['choices'][0]['delta']:
