@@ -19,7 +19,7 @@ COLOR_STATS = "\033[94m"
 DEFAULT_STATE = {
     "Environment_Mapped": False,
     "Target_Found": False,
-    "Distance_cm": 0,
+    "Target_in_Range": False,
     "Object_In_Gripper": False,
     "Robot_At_Home": False,
     "Mission_Complete": False,
@@ -63,7 +63,7 @@ Command if NOT DONE:
 
 PHASE 3 — Approach Phase
 DONE if:
-- Distance_cm <= 20
+- Target_in_Range == True
 Command if NOT DONE:
 <COMMAND>move robot to cup</COMMAND>
 
@@ -122,32 +122,32 @@ TEST_CASES = [
 
     ("Target Found -> Move", 
      {"Target_Found": False}, 
-     {"Environment_Mapped": True, "Target_Found": True, "Distance_cm": 150}, 
+     {"Environment_Mapped": True, "Target_Found": True, "Target_in_Range": False}, 
      "move robot to cup"),
 
     ("In Range -> Grab", 
-     {"Distance_cm": 150}, 
-     {"Environment_Mapped": True, "Target_Found": True, "Distance_cm": 15}, 
+     {"Target_in_Range": False}, 
+     {"Environment_Mapped": True, "Target_Found": True, "Target_in_Range": True}, 
      "grab cup"),
 
     ("Grabbed -> Go Home", 
      {"Object_In_Gripper": False}, 
-     {"Environment_Mapped": True, "Target_Found": True, "Distance_cm": 15, "Object_In_Gripper": True, "Robot_At_Home": False}, 
+     {"Environment_Mapped": True, "Target_Found": True, "Target_in_Range": True, "Object_In_Gripper": True, "Robot_At_Home": False}, 
      "move robot home"),
 
     ("At Home -> Place", 
      {"Robot_At_Home": False}, 
-     {"Environment_Mapped": True, "Target_Found": True, "Distance_cm": 15, "Object_In_Gripper": True, "Robot_At_Home": True, "Mission_Complete": False}, 
+     {"Environment_Mapped": True, "Target_Found": True, "Target_in_Range": True, "Object_In_Gripper": True, "Robot_At_Home": True, "Mission_Complete": False}, 
      "place cup"),
 
     ("Mid-Air Drop (Still Visible)", 
      {"Object_In_Gripper": True}, 
-     {"Environment_Mapped": True, "Target_Found": True, "Object_In_Gripper": False, "Distance_cm": 10}, 
+     {"Environment_Mapped": True, "Target_Found": True, "Object_In_Gripper": False, "Target_in_Range": True}, 
      "grab cup"),
 
      ("Mid-Air Drop and moved away (Still Visible)", 
      {"Object_In_Gripper": True}, 
-     {"Environment_Mapped": True, "Target_Found": True, "Object_In_Gripper": False, "Distance_cm": 50}, 
+     {"Environment_Mapped": True, "Target_Found": True, "Object_In_Gripper": False, "Target_in_Range": False}, 
      "move robot to cup"),
 
     ("Catastrophic Drop (Lost)", 
@@ -249,7 +249,7 @@ def run_benchmark(model_path):
     print(f"\nAverage duration: {avg:.2f}s")
 
 # --- Configuration ---
-MODEL_PATH = "H:\SLARC_resources\models\Qwen3-4B-Instruct-2507-Q8_0.gguf"
+MODEL_PATH = "H:\SLARC_resources\models\Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
 
 if __name__ == "__main__":
     # Ensure this path is correct for your RPi5 setup
