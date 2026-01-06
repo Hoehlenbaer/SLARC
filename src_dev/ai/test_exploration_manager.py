@@ -3,10 +3,10 @@ import json
 import re
 from llama_cpp import Llama
 
-MODEL_PATH = "H:\SLARC_resources\models\Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
+MODEL_PATH = "/home/admin/.models/Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
 
-llm = Llama(model_path=MODEL_PATH,n_ctx=4096,n_gpu_layers=-1,use_mlock=True,use_mmap=True,verbose=False)
-#llm = Llama(model_path=model_path,n_ctx=1024,n_threads=2,n_batch=512,use_mlock=True,verbose=False)
+#llm = Llama(model_path=MODEL_PATH,n_ctx=4096,n_gpu_layers=-1,use_mlock=True,use_mmap=True,verbose=False)
+llm = Llama(model_path=MODEL_PATH,n_ctx=1024,n_threads=2,n_batch=512,use_mlock=True,verbose=False)
 
 PROMPT_TEMPLATE = r"""
 You are the exploration policy planner for a hexapod robot.
