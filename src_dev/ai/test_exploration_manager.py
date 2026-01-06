@@ -8,7 +8,7 @@ MODEL_PATH = "H:\SLARC_resources\models\Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
 llm = Llama(model_path=MODEL_PATH,n_ctx=4096,n_gpu_layers=-1,use_mlock=True,use_mmap=True,verbose=False)
 #llm = Llama(model_path=model_path,n_ctx=1024,n_threads=2,n_batch=512,use_mlock=True,verbose=False)
 
-prompt = r"""
+PROMPT_TEMPLATE = r"""
 You are the exploration policy planner for a hexapod robot.
 
 Your job is NOT to choose exact coordinates.
@@ -35,16 +35,19 @@ Given an exploration intention in natural language, output ONLY a JSON policy ob
 JSON schema (keys and meaning):
 
 {
-  "stop_condition": "<string>",             // e.g. "no_unknown_cells", "object_found", "time_elapsed", "battery_threshold"
-  "direction_bias": "<north|south|east|west|none>",
-  "avoid_regions": ["<string>"],            // list of region descriptors to avoid, can be empty e.g. "right_corridor", "noisy_area", "narrow_passages"
-  "search_strategy": "<flood_fill|directional_sweep|spiral|wall_following|frontier_only>",
+  "stop_conditions": ["<string>"],                       //valid strings: "no_unknown_cells", "object_found", "time_elapsed", "battery_threshold"
+  "direction_bias": "<north|south|east|west|location|none>",
+  "object_name": "<string or null>",
+  "location_name" "<string or null>",
+  "object_interaction": "<grab|greet|inspect|mark_location|avoid|follow|observe>",
+  "avoid_regions": ["<string>"],                        // list of region descriptors to avoid, can be empty e.g. "right_corridor", "noisy_area", "narrow_passages"
+  "search_strategy": "<flood_fill|directional_sweep|spiral|wall_following|frontier_only|null>",
   "exploration_mode": "<normal|careful|aggressive>",
-  "max_distance": <number or null>,         // maximum allowed distance from home or current position; null if no limit; near=5, far=10
-  "time_limit_seconds": <number or null>,   // time limit in seconds; null if no limit
-  "battery_threshold": <number or null>,    // battery percentage at which to stop and return home; null if not used
-  "return_home_on_stop": <boolean>,         // whether the robot should return to home when stop_condition is met
-  "notes": "<string>"                       // short human-readable explanation of the policy
+  "max_distance": <number or null>,                     // maximum allowed distance from home or current position; null if no limit; near=5, far=10
+  "time_limit_seconds": <number or null>,               // time limit in seconds; null if no limit
+  "battery_threshold": <number or null>,                // battery percentage at which to stop and return home; null if not used
+  "return_home_on_stop": <boolean>,                     // whether the robot should return to home when stop_condition is met
+  "notes": "<string>"                                   // short human-readable explanation of the policy
 }
 
 
@@ -55,7 +58,7 @@ Rules:
 
 Now process this exploration intention:
 
-"Go east and a make quick exploration but avoid stairs, then return home"
+"{{INTENTION}}"
 """
 
 
@@ -75,13 +78,12 @@ def run_with_benchmark(prompt):
         min_p = 0.00, 
         top_p = 0.80, 
         top_k = 20, 
-        presence_penalty = 1.0,
-        stop=["\n\n"]
+        presence_penalty = 1.0
     )
 
     end_time = time.time()
     latency = end_time - start_time
-    print(response)
+    
     # Extract raw text
     raw_output = response["choices"][0]["text"].strip()
 
@@ -109,11 +111,30 @@ def run_with_benchmark(prompt):
 
     return policy
 
+def split_into_sentences(text):
+    # Split on periods, exclamation marks, question marks
+    parts = re.split(r'(?<=[.!?])\s+', text.strip())
+    # Remove empty parts
+    return [p.strip() for p in parts if p.strip()]
+
+
 
 # -----------------------------
 # Run the test
 # -----------------------------
-policy = run_with_benchmark(prompt)
 
-print("\nParsed policy object:")
-print(json.dumps(policy, indent=2))
+intention = """Search the cat until all cells are explored or for a maximum of 5 minutes or until you found her. 
+            Mark the cat's location if you found her. 
+            In any case go home afterwards."""
+
+policies = []
+
+for sentence in split_into_sentences(intention):
+    prompt = PROMPT_TEMPLATE.replace("{{INTENTION}}", sentence)
+    policy = run_with_benchmark(prompt)    
+    print("\nParsed policy object:")
+    print(json.dumps(policy, indent=2))
+    policies.append(policy)
+
+print("Merged policies:")
+print(policies)
