@@ -3,7 +3,7 @@ import json
 import re
 from llama_cpp import Llama
 
-MODEL_PATH = "H:\SLARC_resources\models\Qwen3-4B-Instruct-2507-Q8_0.gguf"
+MODEL_PATH = "H:\SLARC_resources\models\Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
 
 llm = Llama(model_path=MODEL_PATH,n_ctx=4096,n_gpu_layers=-1,use_mlock=True,use_mmap=True,verbose=False)
 #llm = Llama(model_path=model_path,n_ctx=1024,n_threads=2,n_batch=512,use_mlock=True,verbose=False)
@@ -81,7 +81,7 @@ def run_with_benchmark(prompt):
 
     end_time = time.time()
     latency = end_time - start_time
-
+    print(response)
     # Extract raw text
     raw_output = response["choices"][0]["text"].strip()
 
