@@ -3,10 +3,10 @@ import json
 import re
 from llama_cpp import Llama
 
-MODEL_PATH = "/home/admin/.models/Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
+MODEL_PATH = "H:\SLARC_resources\models\Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
 
-#llm = Llama(model_path=MODEL_PATH,n_ctx=4096,n_gpu_layers=-1,use_mlock=True,use_mmap=True,verbose=False)
-llm = Llama(model_path=MODEL_PATH,n_ctx=4096,n_threads=2,n_batch=512,use_mlock=True,verbose=False)
+llm = Llama(model_path=MODEL_PATH,n_ctx=4096,n_gpu_layers=-1,use_mlock=True,use_mmap=True,verbose=False)
+#llm = Llama(model_path=MODEL_PATH,n_ctx=4096,n_threads=2,n_batch=512,use_mlock=True,verbose=False)
 
 PROMPT_TEMPLATE = r"""
 You are the exploration policy planner for a hexapod robot.
@@ -36,14 +36,14 @@ JSON schema (keys and meaning):
 
 {
   "stop_conditions": ["<string>"],                       //valid strings: "no_unknown_cells", "object_found", "time_elapsed", "battery_threshold"
-  "direction_bias": "<north|south|east|west|location|none>",
+  "direction_bias": "<north|south|east|west|north-east|north-west|south-east|south-west|location|none>",
   "object_name": "<string or null>",
   "location_name" "<string or null>",
   "object_interaction": "<grab|greet|inspect|mark_location|avoid|follow|observe>",
   "avoid_regions": ["<string>"],                        // list of region descriptors to avoid, can be empty e.g. "right_corridor", "noisy_area", "narrow_passages"
   "search_strategy": "<flood_fill|directional_sweep|spiral|wall_following|frontier_only|null>",
   "exploration_mode": "<normal|careful|aggressive>",
-  "max_distance": <number or null>,                     // maximum allowed distance from home or current position; null if no limit; near=5, far=10
+  "max_distance": <number or null>,                     // maximum allowed distance in meters [m] from home or current position; null if no limit; near=5m, far=20m
   "time_limit_seconds": <number or null>,               // time limit in seconds; null if no limit
   "battery_threshold": <number or null>,                // battery percentage at which to stop and return home; null if not used
   "return_home_on_stop": <boolean>,                     // whether the robot should return to home when stop_condition is met
@@ -123,9 +123,10 @@ def split_into_sentences(text):
 # Run the test
 # -----------------------------
 
-intention = """Search the cat until all cells are explored or for a maximum of 5 minutes or until you found her. 
-            Mark the cat's location if you found her. 
-            In any case go home afterwards."""
+intention = """There are unknown regions in the south, which are far away, and in the near south-east -> Move to south-east with a mximum distance of 10m, then stay in the region.
+            There're no more unknown cells in the south-east, but in the west -> Move there and carefully search and find the cat, then follow her.
+            when your battery is below 50%, greet the cat and return home.
+            The cat's last location is called cat:location -> move there, perform a spiral search to find it again and continue to follow it for 10 miuntes before returning home."""
 
 policies = []
 
