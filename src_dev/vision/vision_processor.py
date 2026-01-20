@@ -186,6 +186,13 @@ def post_process_worker(shm0_name, shm1_name, ts_shm_name, out_shm_l_name, out_s
         R_eye = np.eye(3, dtype='f4'); D_zero = np.zeros(4, dtype='f4')
         
         u_kl_old = u_kr_old = K_raw.T.tobytes()
+
+        # Shader test: Apply 180° rotation to input images 
+        #K_rot = np.array([[-IN_WIDTH,        0, IN_WIDTH/2],
+        #                  [0,          -IN_WIDTH, IN_HEIGHT/2],
+        #                  [0,                 0,          1]], dtype='f4')
+        #u_kl_old = u_kr_old = K_rot.T.tobytes()
+
         u_kl_new_inv = u_kr_new_inv = np.linalg.inv(K_new).T.tobytes()
         u_rl_inv = u_rr_inv = np.linalg.inv(R_eye).T.tobytes()
         u_dl = u_dr = D_zero.tobytes()
