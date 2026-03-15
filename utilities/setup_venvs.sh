@@ -76,6 +76,8 @@ install_system_deps() {
     dpkg -s python3-pip     &>/dev/null || pkgs+=(python3-pip)
 
     # Für llama-cpp-python Build
+    # git: Normalerweise schon vorhanden (wird zum Clonen des Repos benötigt).
+    # Hier als Absicherung für edge cases (z.B. minimales Image ohne Desktop).
     dpkg -s git             &>/dev/null || pkgs+=(git)
     dpkg -s build-essential &>/dev/null || pkgs+=(build-essential)
     dpkg -s cmake           &>/dev/null || pkgs+=(cmake)
