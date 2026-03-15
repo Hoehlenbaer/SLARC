@@ -145,8 +145,10 @@ All Python components run in isolated venvs under `~/projects/slarc/venvs/`:
 ## Quick Start
 
 Clone this repository and run the setup script:
-
 ```bash
+# git is required to clone – on a fresh Trixie image it may be missing:
+sudo apt install -y git
+
 git clone https://github.com/Hoehlenbaer/SLARC.git ~/projects/slarc
 cd ~/projects/slarc/utilities
 sudo bash setup_venvs.sh
@@ -154,7 +156,7 @@ sudo bash setup_venvs.sh
 
 That's it. The script handles everything in the correct order:
 
-1. **System packages** – installs `git`, `build-essential`, `cmake`, `ninja-build`, `libopenblas-dev`, `python3-venv` and others if missing
+1. **System packages** – installs `build-essential`, `cmake`, `ninja-build`, `libopenblas-dev`, `python3-venv` and others if missing
 2. **Hailo stack** – installs `hailo-all` via apt if not already present, then verifies the hardware connection
 3. **Virtual environments** – creates all project venvs
 4. **Python packages** – installs all pip dependencies per venv, including a custom OpenBLAS-accelerated build of `llama-cpp-python`
