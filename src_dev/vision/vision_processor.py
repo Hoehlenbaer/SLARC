@@ -51,6 +51,10 @@ void main() {
     vec3 pixel_dest = vec3(v_uv.x * out_res.x, v_uv.y * out_res.y, 1.0);
     vec3 ray = K_new_inv * pixel_dest;
     vec3 ray_cam = R_inv * ray;
+    if (ray_cam.z <= 0.0) {             // ← Guard: Strahl hinter Kamera → schwarz
+        fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+        return;
+    }
     vec2 xn = ray_cam.xy / ray_cam.z;
     float r2 = dot(xn, xn);
     float r4 = r2 * r2;
@@ -100,17 +104,17 @@ def load_stereo_calibration(filepath):
         mats = {
             "left": {
                 "K": to_arr(data["left"]["K"]),
-                "D": to_arr(data["left"]["D"]),
+                "D": to_arr(data["left"]["D"]).flatten()[:4].astype('f4'),  # ← immer (4,), k3 verworfen
                 "R": to_arr(data["left"]["R"]),
-                "P": to_arr(data["left"]["P"])[:3, :3] # Take 3x3 rotation/scaling part
+                "P": to_arr(data["left"]["P"])[:3, :3]
             },
             "right": {
                 "K": to_arr(data["right"]["K"]),
-                "D": to_arr(data["right"]["D"]),
+                "D": to_arr(data["right"]["D"]).flatten()[:4].astype('f4'),  # ← immer (4,), k3 verworfen
                 "R": to_arr(data["right"]["R"]),
                 "P": to_arr(data["right"]["P"])[:3, :3]
             },
-            "dim": data["dim"] # [width, height] of calibration source
+            "dim": data["dim"]
         }
         return mats
     except Exception as e:
