@@ -3,7 +3,7 @@ import json
 import re
 from llama_cpp import Llama
 
-MODEL_PATH = "H:\SLARC_resources\models\Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
+MODEL_PATH = "/home/admin/.models/Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
 
 llm = Llama(model_path=MODEL_PATH,n_ctx=4096,n_gpu_layers=-1,use_mlock=True,use_mmap=True,verbose=False)
 #llm = Llama(model_path=MODEL_PATH,n_ctx=4096,n_threads=2,n_batch=512,use_mlock=True,verbose=False)
@@ -126,7 +126,8 @@ def split_into_sentences(text):
 intention = """There are unknown regions in the south, which are far away, and in the near south-east -> Move to south-east with a mximum distance of 10m, then stay in the region.
             There're no more unknown cells in the south-east, but in the west -> Move there and carefully search and find the cat, then follow her.
             when your battery is below 50%, greet the cat and return home.
-            The cat's last location is called cat:location -> move there, perform a spiral search to find it again and continue to follow it for 10 miuntes before returning home."""
+            The cat's last location is called cat:location -> move there, perform a spiral search to find it again and continue to follow it. 
+            After following for 10 minutes, return home."""
 
 policies = []
 
