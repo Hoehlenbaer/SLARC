@@ -68,7 +68,7 @@ High-level command interpretation uses a quantized LLM running locally on the Pi
 - **Model**: `Qwen3-4B-Instruct-2507-Q4_K_M.gguf`
 - **Runtime**: `llama-cpp-python` with OpenBLAS acceleration
 - **Role**: translates natural language commands (e.g. *"go to the kitchen and find a red cup"*) into structured JSON objects that the motion controller can execute
-- **Inference**: CPU-only on Pi 5 – the Hailo-8 is fully occupied by the perception model during operation
+- **Inference**: Currently CPU‑only on the Pi 5. I may switch to Hailo‑Ollama later — if the Hailo‑8 still has spare capacity next to the perception engine.
 
 ---
 
