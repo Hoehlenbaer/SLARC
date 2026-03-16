@@ -1,6 +1,6 @@
 # SLARC – Self-Localizing Autonomous Robot Crab
 
-> *"Crab" is a slight misnomer — SLARC has six legs, not ten, and will use its front two limbs for grasping rather than walking. But "SLARC" has a better ring to it than "SLARG".*
+> *Crab’ is a misnomer — SLARC has six legs and no claws, but it will enthusiastically pretend otherwise if it needs to grab something.*
 
 SLARC is a personal hobby project with an ambitious goal: build a **state-of-the-art hexapod robot that is fully AI-controlled** — from low-level motion to high-level mission planning — using entirely off-the-shelf hardware, a fully 3D-printable chassis, and custom-trained neural networks.
 
