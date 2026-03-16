@@ -76,13 +76,14 @@ install_system_deps() {
     dpkg -s python3-pip     &>/dev/null || pkgs+=(python3-pip)
 
     # Für llama-cpp-python Build
-    # git: Normalerweise schon vorhanden (wird zum Clonen des Repos benötigt).
-    # Hier als Absicherung für edge cases (z.B. minimales Image ohne Desktop).
     dpkg -s git             &>/dev/null || pkgs+=(git)
     dpkg -s build-essential &>/dev/null || pkgs+=(build-essential)
     dpkg -s cmake           &>/dev/null || pkgs+=(cmake)
     dpkg -s ninja-build     &>/dev/null || pkgs+=(ninja-build)
     dpkg -s libopenblas-dev &>/dev/null || pkgs+=(libopenblas-dev)
+
+    # Für Hailo DKMS-Kernel-Modul – muss VOR hailo-all installiert sein!
+    dpkg -s dkms            &>/dev/null || pkgs+=(dkms)
 
     if [ ${#pkgs[@]} -eq 0 ]; then
         echo "✅ All system dependencies already installed."
@@ -107,23 +108,62 @@ install_hailo() {
 
     # Prüfen ob hailo-all bereits installiert ist
     if dpkg -s hailo-all &>/dev/null 2>&1; then
-        echo "✅ hailo-all already installed. Skipping."
+        echo "✅ hailo-all already installed. Skipping apt step."
     else
         echo "🆕 Installing Hailo stack (hailo-all)..."
-        echo "   -> Running: sudo apt update && sudo apt install -y hailo-all"
-
         sudo apt update
         if sudo apt install -y hailo-all; then
             echo "✅ hailo-all installed successfully."
         else
             echo "⚠️ hailo-all installation failed."
-            echo "   Mögliche Ursachen:"
             echo "   - Raspberry Pi OS Trixie (64-bit) wird vorausgesetzt"
             echo "   - Hailo APT-Quelle fehlt (ggf. erst: sudo apt update)"
-            echo "   - Hailo Hardware nicht verbunden"
             echo "   Setup wird trotzdem fortgesetzt."
             return 1
         fi
+    fi
+
+    # DKMS-Modul bauen falls noch nicht geschehen
+    # (hailo-dkms/hailort-pcie-driver registriert sich nur korrekt wenn dkms
+    #  bereits VOR der Installation vorhanden war – Reinstall erzwingt den Build)
+    echo "   -> Checking Hailo DKMS kernel module..."
+    if dkms status 2>/dev/null | grep -q "hailo_pci.*installed"; then
+        echo "✅ hailo_pci DKMS module already built and installed."
+    else
+        echo "🆕 Building hailo_pci DKMS module for kernel $(uname -r)..."
+        # Reinstall triggert den DKMS-Build jetzt wo dkms vorhanden ist
+        sudo apt install --reinstall -y hailort-pcie-driver 2>/dev/null || \
+        sudo apt install --reinstall -y hailo-dkms 2>/dev/null || true
+
+        # Falls Reinstall den Build nicht triggert: manuell anstoßen
+        HAILO_VER=$(ls /usr/src/ | grep hailo_pci | sed 's/hailo_pci-//' | tail -1)
+        if [ -n "$HAILO_VER" ]; then
+            sudo dkms build  "hailo_pci/${HAILO_VER}" -k "$(uname -r)" 2>/dev/null || true
+            sudo dkms install "hailo_pci/${HAILO_VER}" -k "$(uname -r)" 2>/dev/null || true
+        fi
+
+        if dkms status 2>/dev/null | grep -q "hailo_pci.*installed"; then
+            echo "✅ hailo_pci DKMS module built successfully."
+        else
+            echo "⚠️ DKMS build failed – bitte manuell prüfen: dkms status"
+        fi
+    fi
+
+    # Autoload beim Boot sicherstellen
+    if [ ! -f /etc/modules-load.d/hailo.conf ]; then
+        echo "   -> Configuring hailo_pci for autoload on boot..."
+        echo "hailo_pci" | sudo tee /etc/modules-load.d/hailo.conf > /dev/null
+        echo "✅ hailo_pci autoload configured."
+    else
+        echo "✅ hailo_pci autoload already configured."
+    fi
+
+    # Modul laden (für diese Session, ohne Reboot)
+    if ! lsmod | grep -q hailo_pci; then
+        sudo modprobe hailo_pci 2>/dev/null && echo "✅ hailo_pci module loaded." \
+            || echo "⚠️ modprobe hailo_pci failed – Reboot erforderlich."
+    else
+        echo "✅ hailo_pci module already loaded."
     fi
 
     # Verbindung zum Hailo-Chip prüfen
@@ -132,8 +172,10 @@ install_hailo() {
         if hailortcli fw-control identify 2>/dev/null; then
             echo "✅ Hailo device detected and responding."
         else
-            echo "⚠️ hailortcli identify failed – ist das Hailo-Board verbunden und PCIe aktiv?"
-            echo "   Bitte nach einem Reboot erneut prüfen: hailortcli fw-control identify"
+            echo "⚠️ hailortcli identify failed."
+            echo "   - Ist das Hailo-Board verbunden und PCIe aktiv?"
+            echo "   - Ein Reboot kann helfen: sudo reboot"
+            echo "   - Nach Reboot prüfen: hailortcli fw-control identify"
         fi
     else
         echo "⚠️ hailortcli nicht gefunden – Reboot möglicherweise erforderlich."
