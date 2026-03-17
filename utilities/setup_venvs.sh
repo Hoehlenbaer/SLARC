@@ -304,6 +304,41 @@ install_packages "motion_control" RPi.GPIO posix_ipc matplotlib scipy
 install_packages "slam" opencv-python matplotlib numpy==1.24 posix_ipc
 
 # =============================================================================
+# 5. Shell-Aliases für venv-Shortcuts
+# =============================================================================
+
+install_bashrc_aliases() {
+    local bashrc="${USER_HOME}/.bashrc"
+    local marker="# SLARC venv shortcuts"
+
+    # Idempotent: nur einfügen wenn der Marker noch nicht vorhanden ist
+    if grep -q "$marker" "$bashrc" 2>/dev/null; then
+        echo "✅ SLARC venv aliases already in ${bashrc}."
+        return 0
+    fi
+
+    echo ""
+    echo "🔧 Adding SLARC venv shortcuts to ${bashrc}..."
+
+    # Als eigentlicher User schreiben (nicht als root)
+    sudo -u "$ACTUAL_USER" tee -a "$bashrc" > /dev/null << EOF
+
+${marker}
+alias venv-ai='source ${VENV_DIR}/ai/bin/activate'
+alias venv-vision='source ${VENV_DIR}/vision/bin/activate'
+alias venv-sensors='source ${VENV_DIR}/sensors/bin/activate'
+alias venv-motion='source ${VENV_DIR}/motion_control/bin/activate'
+alias venv-slam='source ${VENV_DIR}/slam/bin/activate'
+alias venv-base='source ${VENV_DIR}/slarc_base/bin/activate'
+alias venv-off='deactivate'
+EOF
+
+    echo "✅ Aliases added. Active after next login or: source ~/.bashrc"
+}
+
+install_bashrc_aliases
+
+# =============================================================================
 # Fertig
 # =============================================================================
 
