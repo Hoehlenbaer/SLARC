@@ -127,6 +127,22 @@ All Python components run in isolated venvs under `~/projects/slarc/venvs/`:
 
 `vision` and `ai` use `--system-site-packages` to access `hailort` and `picamera2`, which are installed system-wide by the Hailo stack.
 
+### Shell Shortcuts
+
+`setup_venvs.sh` automatically adds convenience aliases to `~/.bashrc`:
+
+```bash
+venv-ai       # source .../venvs/ai/bin/activate
+venv-vision   # source .../venvs/vision/bin/activate
+venv-sensors  # source .../venvs/sensors/bin/activate
+venv-motion   # source .../venvs/motion_control/bin/activate
+venv-slam     # source .../venvs/slam/bin/activate
+venv-base     # source .../venvs/slarc_base/bin/activate
+venv-off      # deactivate
+```
+
+Active after the next login, or immediately with `source ~/.bashrc`.
+
 ---
 
 ## Requirements
@@ -188,7 +204,15 @@ deactivate
 hailortcli fw-control identify
 ```
 
-### PCIe speed
+### Kernel updates
+
+After a kernel update (`apt upgrade`), the Hailo PCIe driver is automatically rebuilt by a DKMS hook that `setup_venvs.sh` installs at `/etc/kernel/postinst.d/dkms-hailo`. No manual action required. If you suspect the driver is missing after an update:
+
+```bash
+dkms status                  # should show current kernel as 'installed'
+sudo modprobe hailo_pci      # load manually if needed
+hailortcli fw-control identify
+```
 
 For best performance, PCIe should run at Gen 3. The AI HAT+ configures this automatically. If you are using an M.2 AI Kit, enable Gen 3 manually:
 
@@ -257,6 +281,14 @@ SLARC/
 ---
 
 ## Troubleshooting
+
+**Hailo stops working after `apt upgrade`**
+A kernel update replaced the running kernel. The DKMS hook should handle this automatically, but if it didn't:
+```bash
+sudo dkms build hailo_pci/4.23.0 -k $(uname -r)
+sudo dkms install hailo_pci/4.23.0 -k $(uname -r)
+sudo modprobe hailo_pci
+```
 
 **Hailo not detected after install**
 Reboot the Raspberry Pi. The kernel module needs to load after a fresh `hailo-all` installation.
