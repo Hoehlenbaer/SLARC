@@ -123,30 +123,53 @@ install_hailo() {
         fi
     fi
 
-    # DKMS-Modul bauen falls noch nicht geschehen
-    # (hailo-dkms/hailort-pcie-driver registriert sich nur korrekt wenn dkms
-    #  bereits VOR der Installation vorhanden war – Reinstall erzwingt den Build)
-    echo "   -> Checking Hailo DKMS kernel module..."
-    if dkms status 2>/dev/null | grep -q "hailo_pci.*installed"; then
-        echo "✅ hailo_pci DKMS module already built and installed."
+    # DKMS-Modul für den AKTUELL LAUFENDEN Kernel prüfen und ggf. bauen.
+    # Wichtig: nach einem Kernel-Update ist das Modul für den neuen Kernel
+    # noch nicht gebaut – daher immer gegen $(uname -r) prüfen, nicht nur
+    # ob irgendein Build existiert.
+    CURRENT_KERNEL="$(uname -r)"
+    HAILO_VER=$(ls /usr/src/ 2>/dev/null | grep hailo_pci | sed 's/hailo_pci-//' | tail -1)
+
+    echo "   -> Checking Hailo DKMS kernel module for kernel ${CURRENT_KERNEL}..."
+
+    if dkms status 2>/dev/null | grep -q "hailo_pci.*${CURRENT_KERNEL}.*installed"; then
+        echo "✅ hailo_pci DKMS module already built for current kernel."
     else
-        echo "🆕 Building hailo_pci DKMS module for kernel $(uname -r)..."
-        # Reinstall triggert den DKMS-Build jetzt wo dkms vorhanden ist
+        echo "🆕 Building hailo_pci DKMS module for kernel ${CURRENT_KERNEL}..."
+
+        # Reinstall triggert den DKMS-Build falls dkms jetzt vorhanden ist
         sudo apt install --reinstall -y hailort-pcie-driver 2>/dev/null || \
         sudo apt install --reinstall -y hailo-dkms 2>/dev/null || true
 
         # Falls Reinstall den Build nicht triggert: manuell anstoßen
-        HAILO_VER=$(ls /usr/src/ | grep hailo_pci | sed 's/hailo_pci-//' | tail -1)
         if [ -n "$HAILO_VER" ]; then
-            sudo dkms build  "hailo_pci/${HAILO_VER}" -k "$(uname -r)" 2>/dev/null || true
-            sudo dkms install "hailo_pci/${HAILO_VER}" -k "$(uname -r)" 2>/dev/null || true
+            sudo dkms build   "hailo_pci/${HAILO_VER}" -k "${CURRENT_KERNEL}" 2>/dev/null || true
+            sudo dkms install "hailo_pci/${HAILO_VER}" -k "${CURRENT_KERNEL}" 2>/dev/null || true
         fi
 
-        if dkms status 2>/dev/null | grep -q "hailo_pci.*installed"; then
-            echo "✅ hailo_pci DKMS module built successfully."
+        if dkms status 2>/dev/null | grep -q "hailo_pci.*${CURRENT_KERNEL}.*installed"; then
+            echo "✅ hailo_pci DKMS module built successfully for ${CURRENT_KERNEL}."
         else
             echo "⚠️ DKMS build failed – bitte manuell prüfen: dkms status"
         fi
+    fi
+
+    # Post-Upgrade Hook: DKMS automatisch nach Kernel-Update rebuilden.
+    # Verhindert dass nach 'apt upgrade' der Hailo-Treiber ohne Aktion fehlt.
+    HOOK_PATH="/etc/kernel/postinst.d/dkms-hailo"
+    if [ ! -f "$HOOK_PATH" ]; then
+        echo "   -> Installing DKMS post-upgrade hook..."
+        sudo tee "$HOOK_PATH" > /dev/null << 'HOOKEOF'
+#!/bin/bash
+# Auto-rebuild Hailo DKMS module after kernel update
+KERNEL_VERSION="$1"
+echo "[hailo] Rebuilding hailo_pci DKMS module for kernel ${KERNEL_VERSION}..."
+dkms autoinstall -k "${KERNEL_VERSION}"
+HOOKEOF
+        sudo chmod +x "$HOOK_PATH"
+        echo "✅ DKMS post-upgrade hook installed at ${HOOK_PATH}."
+    else
+        echo "✅ DKMS post-upgrade hook already installed."
     fi
 
     # Autoload beim Boot sicherstellen
