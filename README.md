@@ -173,9 +173,11 @@ sudo bash setup_venvs.sh
 That's it. The script handles everything in the correct order:
 
 1. **System packages** – installs `build-essential`, `cmake`, `ninja-build`, `libopenblas-dev`, `python3-venv` and others if missing
-2. **Hailo stack** – installs `hailo-all` via apt if not already present, then verifies the hardware connection
+2. **Hailo stack** – installs `hailo-all` via apt if not already present, builds the DKMS kernel module, configures autoload, and installs a post-upgrade hook so the driver survives future kernel updates automatically
 3. **Virtual environments** – creates all project venvs
 4. **Python packages** – installs all pip dependencies per venv, including a custom OpenBLAS-accelerated build of `llama-cpp-python`
+5. **Shell shortcuts** – adds `venv-ai`, `venv-vision`, `venv-off` etc. to `~/.bashrc`
+6. **LLM model** – downloads `Qwen3-4B-Instruct-2507-Q4_K_M.gguf` (~2.3 GB) to `~/.models/` if not already present; download is resumable with Ctrl+C
 
 The script is **fully idempotent** – re-running it on an already configured system skips everything that is already in place.
 
