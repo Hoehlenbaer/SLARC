@@ -339,63 +339,6 @@ EOF
 install_bashrc_aliases
 
 # =============================================================================
-# 6. Modelle herunterladen
-# =============================================================================
-
-download_models() {
-    local models_dir="${USER_HOME}/.models"
-    local model_file="Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
-    local model_path="${models_dir}/${model_file}"
-    local model_url="https://huggingface.co/unsloth/Qwen3-4B-Instruct-2507-GGUF/resolve/main/${model_file}"
-
-    echo ""
-    echo "🧠 Checking AI models..."
-
-    # Zielverzeichnis anlegen (als User, nicht root)
-    sudo -u "$ACTUAL_USER" mkdir -p "$models_dir"
-
-    if [ -f "$model_path" ]; then
-        local size
-        size=$(du -sh "$model_path" | cut -f1)
-        echo "✅ ${model_file} already exists (${size}). Skipping download."
-        return 0
-    fi
-
-    echo "🆕 Downloading ${model_file} (~2.3 GB)..."
-    echo "   Source: ${model_url}"
-    echo "   Target: ${model_path}"
-    echo "   (Download kann mit Ctrl+C unterbrochen und später fortgesetzt werden)"
-
-    # wget -c = Resume bei Unterbrechung
-    # Als User downloaden damit die Datei nicht root gehört
-    if command -v wget &>/dev/null; then
-        sudo -u "$ACTUAL_USER" wget -c --show-progress \
-            -O "${model_path}" \
-            "${model_url}"
-    elif command -v curl &>/dev/null; then
-        sudo -u "$ACTUAL_USER" curl -L -C - \
-            --progress-bar \
-            -o "${model_path}" \
-            "${model_url}"
-    else
-        echo "⚠️ Weder wget noch curl gefunden – manuell herunterladen:"
-        echo "   wget -c -O ${model_path} ${model_url}"
-        return 1
-    fi
-
-    if [ -f "$model_path" ]; then
-        local size
-        size=$(du -sh "$model_path" | cut -f1)
-        echo "✅ ${model_file} heruntergeladen (${size})."
-    else
-        echo "⚠️ Download fehlgeschlagen – bitte manuell herunterladen:"
-        echo "   wget -c -O ${model_path} ${model_url}"
-    fi
-}
-
-download_models
-
-# =============================================================================
 # Fertig
 # =============================================================================
 
