@@ -81,7 +81,7 @@ def quantize():
     print("pools_15x20:",pools_15x20)
     # 1) Model-Script schreiben
     with open(alls_path, 'w', encoding='utf-8') as f:
-        f.write("performance_param(compiler_optimization_level=0)\n")
+        
         f.write("model_optimization_flavor(optimization_level=2, compression_level=0, batch_size=4)\n")
 
         # Normalisierung auf den NPU verlagern (Input: float32 0-255)
@@ -101,6 +101,8 @@ def quantize():
             f.write(f"pre_quantization_optimization(global_avgpool_reduction, "f"layers=[{','.join(pools_30x40)}], division_factors=[6,8])\n")
         if pools_15x20:
             f.write(f"pre_quantization_optimization(global_avgpool_reduction, "f"layers=[{','.join(pools_15x20)}], division_factors=[3,4])\n")
+        
+        f.write("performance_param(compiler_optimization_level=0)\n")
 
     print(f"📝 Model-Script geschrieben: {alls_path}")
     runner.load_model_script(alls_path)
