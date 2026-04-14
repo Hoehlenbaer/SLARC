@@ -225,12 +225,15 @@ def quantize():
         #    print("   ✅ Kein Scope-Fix nötig.")
         # ── ENDE SCOPE-FIX ───────────────────────────────────────────
 
+    try:
         print("⚡ Kompiliere HEF...")
         hef_buf = runner.compile()
         with open(hef_output_path, 'wb') as out:
             out.write(hef_buf)
         print(f"\n🎉 ERFOLG! HEF geschrieben: {hef_output_path}")
-
+    except Exception:
+        print("\n💥 Fehler:")
+        traceback.print_exc()
 
 
 # =====================================================================
