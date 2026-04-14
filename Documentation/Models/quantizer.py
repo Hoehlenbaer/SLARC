@@ -2,6 +2,8 @@ import os
 import numpy as np
 import traceback
 from hailo_sdk_client import ClientRunner
+from hailo_sdk_client import ProfilerLevel
+from hailo_sdk_client import InferenceContext
 
 # =====================================================================
 # KONFIGURATION
@@ -17,6 +19,17 @@ N_CALIB         = 1024
 # Entspricht: (pixel/255 - 0.449) / 0.226
 NORM_MEAN = 0.449 * 255.0   # = 114.495
 NORM_STD  = 0.226 * 255.0   # =  57.630
+
+
+def profile_model():
+    print(f"📊 Starte Profiling für {har_path}...")
+    runner = ClientRunner(har=har_path)
+    # Level 1 ist schnell, Level 2 zeigt detaillierte SRAM/DDR-Bandbreite
+    report = runner.profile(level=ProfilerLevel.LEVEL_2)
+    
+    with open(f"{model_name}_profile.html", "w") as f:
+        f.write(report)
+    print(f"✅ Profiling-Report erstellt: {model_name}_profile.html")
 
 # =====================================================================
 # SCHRITT 1: ONNX → HAR (Translate)
@@ -105,7 +118,7 @@ def quantize():
         f.write("performance_param(compiler_optimization_level=0)\n")
 
     print(f"📝 Model-Script geschrieben: {alls_path}")
-    runner.load_model_script(alls_path)
+    
 
     # 2) Kalibrierungsdaten laden (rohe Graustufenwerte 0-255, kein Normalisieren!)
     print(f"📊 Lade Kalibrierungsdaten ({N_CALIB} Samples)...")
@@ -124,10 +137,70 @@ def quantize():
     print(f"   {n} Paare, Shape: {calib_data[input_layers[0]].shape}, "
           f"Range: [{calib_l[:n].min():.1f}, {calib_l[:n].max():.1f}]")
 
+    # =====================================================================
+    # NATIVE (Absoluter Rohzustand vom ONNX)
+    # =====================================================================
+    print("🧪 Generiere FP32-Referenzwerte (Native SDK)...")
+    test_feed = {k: v[0:1] for k, v in calib_data.items()}
+    with runner.infer_context(InferenceContext.SDK_NATIVE) as ctx:
+        res_fp32 = runner.infer(ctx, test_feed)
+
+    # =====================================================================
+    # FP_OPTIMIZE (Nach Laden des Model-Scripts, vor Quantisierung)
+    # =====================================================================
+    print(f"📝 Lade Model-Script: {alls_path}")
+    runner.load_model_script(alls_path)
+    print("🧪 Schritt 2: Generiere FP_OPTIMIZED Referenz (Nach Fusionen/Equalization)...")
+    with runner.infer_context(InferenceContext.SDK_NATIVE) as ctx:
+        res_fp_opt = runner.infer(ctx, test_feed)
+
     # 3) Optimierung + Compile
     try:
-        print(f"\n🚀 Starte Optimierung...")
+        print(f"\n🚀 Starte Quantisierung (Optimization)...")
         runner.optimize(calib_data)
+
+        # =====================================================================
+        # QUANTIZED (Nach der 8-Bit Quantisierung)
+        # =====================================================================
+        print("🎮 Schritt 3: Generiere QUANTIZED Werte (Emulator)...")
+        with runner.infer_context(InferenceContext.EMULATOR) as ctx:
+            res_quant = runner.infer(ctx, test_feed)
+    
+    # =====================================================================
+    # 📊 DETAILLIERTE STATISTIK-AUSWERTUNG
+    # =====================================================================
+    nodes = ['disp_final', 'seg', 'disp_s8', 'normals', 'yolo_s8', 'yolo_s16', 'yolo_s32']
+    
+    print("\n" + "="*85)
+    print(f"{'Output Node':15} | {'FP-Opt vs Native':20} | {'Quant vs FP-Opt':20} | {'Gesamt-SNR'}")
+    print(f"{'':15} | {'(Struktur-Delta)':20} | {'(Quant-Rauschen)':20} | {'(End-Qualität)'}")
+    print("-" * 85)
+
+    for node in nodes:
+        # Daten holen
+        d_native = res_native[node]
+        d_fp_opt = res_fp_opt[node]
+        d_quant  = res_quant[node]
+
+        def get_snr(ref, target):
+            noise = np.var(ref - target)
+            signal = np.var(ref)
+            return 10 * np.log10(signal / noise) if noise > 1e-10 else 99.9
+
+        # SNR 1: Hat das Model-Script (Equalization) die Werte verändert?
+        snr_struct = get_snr(d_native, d_fp_opt)
+        
+        # SNR 2: Wieviel Präzision kostet die 8-Bit Wandlung?
+        snr_quant  = get_snr(d_fp_opt, d_quant)
+        
+        # SNR Gesamt
+        snr_total  = get_snr(d_native, d_quant)
+
+        status = "✅" if snr_total > 30 else ("⚠️" if snr_total > 20 else "❌")
+        
+        print(f"{node:15} | {snr_struct:18.2f} dB | {snr_quant:18.2f} dB | {snr_total:10.2f} dB {status}")
+    print("="*85 + "\n")    
+
 
         # ── POST-OPTIMIZE SCOPE-FIX ──────────────────────────────────
         # QAFT kann Layer im Root-Scope erzeugen → vor compile() patchen
@@ -164,4 +237,5 @@ def quantize():
 # =====================================================================
 if __name__ == "__main__":
     translate(force=False)  # force=True um HAR neu zu erstellen
+    profile_model()
     quantize()
