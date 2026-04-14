@@ -165,6 +165,9 @@ def quantize():
         print("🎮 Schritt 3: Generiere QUANTIZED Werte (Emulator)...")
         with runner.infer_context(InferenceContext.EMULATOR) as ctx:
             res_quant = runner.infer(ctx, test_feed)
+    except Exception:
+        print("\n💥 Fehler:")
+        traceback.print_exc()
     
     # =====================================================================
     # 📊 DETAILLIERTE STATISTIK-AUSWERTUNG
@@ -228,9 +231,7 @@ def quantize():
             out.write(hef_buf)
         print(f"\n🎉 ERFOLG! HEF geschrieben: {hef_output_path}")
 
-    except Exception:
-        print("\n💥 Fehler:")
-        traceback.print_exc()
+
 
 # =====================================================================
 # MAIN
