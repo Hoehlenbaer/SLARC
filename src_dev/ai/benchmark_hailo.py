@@ -213,28 +213,18 @@ def benchmark_3hef_pipeline(n_frames=50, warmup=5):
         
         def run_pipeline():
             timings = {}
-            '''
-            # 1. Backbone(left)
-            t0 = time.perf_counter()
-            with ng_bb.activate(ng_bb.create_params()):
-                with InferVStreams(ng_bb, bb_in_p, bb_out_p) as pipe:
-                    feat_l = pipe.infer({bb_in_name: img_left})
-            timings['bb_left'] = (time.perf_counter() - t0) * 1000
             
-            # 2. Backbone(right)
-            t0 = time.perf_counter()
-            with ng_bb.activate(ng_bb.create_params()):
-                with InferVStreams(ng_bb, bb_in_p, bb_out_p) as pipe:
-                    feat_r = pipe.infer({bb_in_name: img_right})
-            timings['bb_right'] = (time.perf_counter() - t0) * 1000
-            '''
+            # 1+2. Backbone L+R unter einem Activate + InferVStreams
             t0 = time.perf_counter()
             with ng_bb.activate(ng_bb.create_params()):
                 with InferVStreams(ng_bb, bb_in_p, bb_out_p) as pipe:
                     feat_l = pipe.infer({bb_in_name: img_left})
+                    t1 = time.perf_counter()
+                    timings['bb_left'] = (t1 - t0) * 1000
+                    t2 = time.perf_counter()
                     feat_r = pipe.infer({bb_in_name: img_right})
-            timings['bb_right'] = (time.perf_counter() - t0) * 1000
-            timings['bb_left'] = 0
+            timings['bb_right'] = (time.perf_counter() - t2) * 1000
+            
             # 3. Geometry — Shape-basiertes Mapping
             geo_feed = _match_inputs_by_shape(
                 geo_in_names,
@@ -314,19 +304,16 @@ def benchmark_2hef_pipeline(n_frames=50, warmup=5):
         def run_pipeline():
             timings = {}
             
-            # 1. Backbone(left)
+            # 1+2. Backbone L+R unter einem Activate + InferVStreams
             t0 = time.perf_counter()
             with ng_bb.activate(ng_bb.create_params()):
                 with InferVStreams(ng_bb, bb_in_p, bb_out_p) as pipe:
                     feat_l = pipe.infer({bb_in_name: img_left})
-            timings['bb_left'] = (time.perf_counter() - t0) * 1000
-            
-            # 2. Backbone(right)
-            t0 = time.perf_counter()
-            with ng_bb.activate(ng_bb.create_params()):
-                with InferVStreams(ng_bb, bb_in_p, bb_out_p) as pipe:
+                    t1 = time.perf_counter()
+                    timings['bb_left'] = (t1 - t0) * 1000
+                    t2 = time.perf_counter()
                     feat_r = pipe.infer({bb_in_name: img_right})
-            timings['bb_right'] = (time.perf_counter() - t0) * 1000
+            timings['bb_right'] = (time.perf_counter() - t2) * 1000
             
             # 3. Combined — Shape-basiertes Mapping
             comb_feed = _match_inputs_by_shape(
