@@ -213,7 +213,7 @@ def benchmark_3hef_pipeline(n_frames=50, warmup=5):
         
         def run_pipeline():
             timings = {}
-            
+            '''
             # 1. Backbone(left)
             t0 = time.perf_counter()
             with ng_bb.activate(ng_bb.create_params()):
@@ -227,7 +227,14 @@ def benchmark_3hef_pipeline(n_frames=50, warmup=5):
                 with InferVStreams(ng_bb, bb_in_p, bb_out_p) as pipe:
                     feat_r = pipe.infer({bb_in_name: img_right})
             timings['bb_right'] = (time.perf_counter() - t0) * 1000
-            
+            '''
+            t0 = time.perf_counter()
+            with ng_bb.activate(ng_bb.create_params()):
+                with InferVStreams(ng_bb, bb_in_p, bb_out_p) as pipe:
+                    feat_l = pipe.infer({bb_in_name: img_left})
+                    feat_r = pipe.infer({bb_in_name: img_right})
+            timings['bb_right'] = (time.perf_counter() - t0) * 1000
+            timings['bb_left'] = 0
             # 3. Geometry — Shape-basiertes Mapping
             geo_feed = _match_inputs_by_shape(
                 geo_in_names,
