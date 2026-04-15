@@ -30,6 +30,89 @@ HEF_PATHS = {
 
 
 # =====================================================================
+# SHAPE-BASIERTES INPUT MATCHING
+# =====================================================================
+def _match_inputs_by_shape(input_names, input_infos_dict, hef, 
+                            feat_l, feat_r, bb_out_names, img_left,
+                            normals_data=None):
+    """
+    Mappt HEF-Inputs auf Backbone-Outputs anhand der Shapes.
+    
+    Bekannte Shapes:
+      480x640x1  → img_l (Rohbild)
+      120x160x24 → f_s4 (kommt 2x vor: links und rechts)
+      60x80x40   → f_s8 (kommt 2x vor: links und rechts)
+      30x40x112  → f_s16
+      15x20x960  → f_s32
+      120x160x3  → normals_s4
+    """
+    # Backbone-Outputs nach Shape indizieren
+    bb_by_shape = {}
+    for name in bb_out_names:
+        shape = tuple(feat_l[name].shape[1:])  # ohne Batch
+        if shape not in bb_by_shape:
+            bb_by_shape[shape] = []
+        bb_by_shape[shape].append(name)
+    
+    # Auch für rechte Features
+    bb_r_by_shape = {}
+    if feat_r is not None:
+        for name in bb_out_names:
+            if name in feat_r:
+                shape = tuple(feat_r[name].shape[1:])
+                if shape not in bb_r_by_shape:
+                    bb_r_by_shape[shape] = []
+                bb_r_by_shape[shape].append(name)
+    
+    # HEF-Input-Infos nach Name
+    hef_input_infos = {info.name: info for info in hef.get_input_vstream_infos()}
+    
+    feed = {}
+    used_l = set()  # Track welche L-Features schon verwendet
+    
+    for name in input_names:
+        info = hef_input_infos[name]
+        shape = tuple(info.shape)  # (H, W, C)
+        
+        # Rohbild: 480x640x1
+        if shape == (480, 640, 1):
+            feed[name] = img_left.astype(np.float32)
+            continue
+        
+        # Normals: 120x160x3
+        if shape[-1] == 3 and shape[0] == 120:
+            if normals_data is not None:
+                feed[name] = normals_data
+            else:
+                feed[name] = np.zeros((1,) + shape, dtype=np.float32)
+            continue
+        
+        # Feature-Map: finde passendes Backbone-Output
+        # Bei doppelten Shapes (s4, s8): erste Zuweisung → links, zweite → rechts
+        bb_name = None
+        for bn in bb_out_names:
+            if bn in feat_l and tuple(feat_l[bn].shape[1:]) == shape:
+                if bn not in used_l:
+                    bb_name = bn
+                    used_l.add(bn)
+                    feed[name] = feat_l[bn]
+                    break
+        
+        if bb_name is None and feat_r is not None:
+            # Zweites Vorkommen → rechtes Bild
+            for bn in bb_out_names:
+                if bn in feat_r and tuple(feat_r[bn].shape[1:]) == shape:
+                    feed[name] = feat_r[bn]
+                    break
+        
+        if name not in feed:
+            print(f"   ⚠️  Kein Match für {name} mit Shape {shape}")
+            feed[name] = np.zeros((1,) + shape, dtype=np.float32)
+    
+    return feed
+
+
+# =====================================================================
 # EINZELNES HEF BENCHMARKEN
 # =====================================================================
 def benchmark_single_hef(hef_path, n_frames=50, warmup=5):
@@ -145,14 +228,13 @@ def benchmark_3hef_pipeline(n_frames=50, warmup=5):
                     feat_r = pipe.infer({bb_in_name: img_right})
             timings['bb_right'] = (time.perf_counter() - t0) * 1000
             
-            # 3. Geometry
-            geo_feed = {}
-            for i, name in enumerate(geo_in_names):
-                if i == 0:    geo_feed[name] = feat_l[bb_out_names[0]]
-                elif i == 1:  geo_feed[name] = feat_l[bb_out_names[1]]
-                elif i == 2:  geo_feed[name] = feat_r[bb_out_names[0]]
-                elif i == 3:  geo_feed[name] = feat_r[bb_out_names[1]]
-                elif i == 4:  geo_feed[name] = img_left.astype(np.float32)
+            # 3. Geometry — Shape-basiertes Mapping
+            geo_feed = _match_inputs_by_shape(
+                geo_in_names,
+                {name: hef_geo.get_input_vstream_infos() for name in geo_in_names},
+                hef_geo,
+                feat_l, feat_r, bb_out_names, img_left
+            )
             
             t0 = time.perf_counter()
             with ng_geo.activate(ng_geo.create_params()):
@@ -160,21 +242,21 @@ def benchmark_3hef_pipeline(n_frames=50, warmup=5):
                     geo_out = pipe.infer(geo_feed)
             timings['geometry'] = (time.perf_counter() - t0) * 1000
             
-            # 4. Detection — normals_s4 finden (Shape ...x160x3)
+            # 4. Detection — Shape-basiertes Mapping
+            # normals_s4 finden (Shape ...x160x3)
             normals_key = None
             for k, v in geo_out.items():
                 if v.shape[-1] == 3 and v.shape[-2] == 160:
                     normals_key = k
                     break
             
-            det_feed = {}
-            for i, name in enumerate(det_in_names):
-                if i == 0:    det_feed[name] = feat_l[bb_out_names[0]]
-                elif i == 1:  det_feed[name] = feat_l[bb_out_names[1]]
-                elif i == 2:  det_feed[name] = feat_l[bb_out_names[2]]
-                elif i == 3:  det_feed[name] = feat_l[bb_out_names[3]]
-                elif i == 4:  det_feed[name] = geo_out[normals_key] if normals_key else \
-                                                np.zeros((1, 120, 160, 3), dtype=np.float32)
+            det_feed = _match_inputs_by_shape(
+                det_in_names,
+                {name: hef_det.get_input_vstream_infos() for name in det_in_names},
+                hef_det,
+                feat_l, feat_r, bb_out_names, img_left,
+                normals_data=geo_out.get(normals_key) if normals_key else None
+            )
             
             t0 = time.perf_counter()
             with ng_det.activate(ng_det.create_params()):
@@ -239,16 +321,13 @@ def benchmark_2hef_pipeline(n_frames=50, warmup=5):
                     feat_r = pipe.infer({bb_in_name: img_right})
             timings['bb_right'] = (time.perf_counter() - t0) * 1000
             
-            # 3. Combined
-            comb_feed = {}
-            for i, name in enumerate(comb_in_names):
-                if i == 0:    comb_feed[name] = feat_l[bb_out_names[0]]   # f_s4_l
-                elif i == 1:  comb_feed[name] = feat_l[bb_out_names[1]]   # f_s8_l
-                elif i == 2:  comb_feed[name] = feat_r[bb_out_names[0]]   # f_s4_r
-                elif i == 3:  comb_feed[name] = feat_r[bb_out_names[1]]   # f_s8_r
-                elif i == 4:  comb_feed[name] = feat_l[bb_out_names[2]]   # f_s16_l
-                elif i == 5:  comb_feed[name] = feat_l[bb_out_names[3]]   # f_s32_l
-                elif i == 6:  comb_feed[name] = img_left.astype(np.float32)  # img_l
+            # 3. Combined — Shape-basiertes Mapping
+            comb_feed = _match_inputs_by_shape(
+                comb_in_names,
+                {name: hef_comb.get_input_vstream_infos() for name in comb_in_names},
+                hef_comb,
+                feat_l, feat_r, bb_out_names, img_left
+            )
             
             t0 = time.perf_counter()
             with ng_comb.activate(ng_comb.create_params()):
