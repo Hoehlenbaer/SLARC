@@ -347,3 +347,30 @@
 [2026-04-17 16:06:35.210] [43532] [HailoRT] [info] [queue_elements.cpp:46] [~BaseQueueElement] Queue element PushQEl10hexapod_detection_simplified/input_layer5 has 0 frames in his Queue on destruction
 [2026-04-17 16:06:35.210] [43532] [HailoRT] [info] [core_op.cpp:186] [deactivate] Deactivating took 0.426982 ms
 [2026-04-17 16:06:35.210] [43532] [HailoRT] [info] [core_op.cpp:186] [deactivate] Deactivating took 0.437038 ms
+[2026-04-17 16:24:52.969] [47122] [HailoRT] [info] [vdevice.cpp:535] [create] Creating vdevice with params: device_count: 1, scheduling_algorithm: NONE, multi_process_service: false
+[2026-04-17 16:24:52.982] [47122] [HailoRT] [info] [device.cpp:51] [Device] OS Version: Linux 6.12.75+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.12.75-1+rpt1 (2026-03-11) aarch64
+[2026-04-17 16:24:52.982] [47122] [HailoRT] [info] [control.cpp:113] [control__parse_identify_results] firmware_version is: 4.23.0
+[2026-04-17 16:24:52.982] [47122] [HailoRT] [info] [vdevice.cpp:682] [create] VDevice Infos: 0001:01:00.0
+[2026-04-17 16:24:52.988] [47122] [HailoRT] [info] [internal_buffer_manager.cpp:75] [print_execution_results] Default Internal buffer planner failed to meet requirements
+[2026-04-17 16:24:52.988] [47122] [HailoRT] [info] [internal_buffer_manager.cpp:86] [print_execution_results] Default Internal buffer planner executed successfully
+[2026-04-17 16:24:52.999] [47122] [HailoRT] [info] [device_internal.cpp:57] [configure] Configuring HEF took 16.565992 milliseconds
+[2026-04-17 16:24:52.999] [47122] [HailoRT] [info] [vdevice.cpp:780] [configure] Configuring HEF on VDevice took 16.844845 milliseconds
+[2026-04-17 16:24:53.001] [47122] [HailoRT] [info] [internal_buffer_manager.cpp:77] [print_execution_results] Planned internal buffer memory: CMA=0 CMA-Desc=786432 Pinned=4142080. memory to edge layer usage factor is 1
+[2026-04-17 16:24:53.001] [47122] [HailoRT] [info] [internal_buffer_manager.cpp:86] [print_execution_results] Default Internal buffer planner executed successfully
+[2026-04-17 16:24:53.027] [47122] [HailoRT] [info] [device_internal.cpp:57] [configure] Configuring HEF took 27.582068 milliseconds
+[2026-04-17 16:24:53.027] [47122] [HailoRT] [info] [vdevice.cpp:780] [configure] Configuring HEF on VDevice took 27.901735 milliseconds
+[2026-04-17 16:24:53.029] [47122] [HailoRT] [info] [internal_buffer_manager.cpp:77] [print_execution_results] Planned internal buffer memory: CMA=0 CMA-Desc=262144 Pinned=559104. memory to edge layer usage factor is 1
+[2026-04-17 16:24:53.029] [47122] [HailoRT] [info] [internal_buffer_manager.cpp:86] [print_execution_results] Default Internal buffer planner executed successfully
+[2026-04-17 16:24:53.055] [47122] [HailoRT] [info] [device_internal.cpp:57] [configure] Configuring HEF took 27.37827 milliseconds
+[2026-04-17 16:24:53.055] [47122] [HailoRT] [info] [vdevice.cpp:780] [configure] Configuring HEF on VDevice took 27.745494 milliseconds
+[2026-04-17 16:24:53.055] [47122] [HailoRT] [info] [hef.cpp:1994] [get_network_group_and_network_name] No name was given. Addressing all networks of default network_group: hexapod_backbone_simplified
+[2026-04-17 16:24:53.055] [47122] [HailoRT] [info] [hef.cpp:1994] [get_network_group_and_network_name] No name was given. Addressing all networks of default network_group: hexapod_backbone_simplified
+[2026-04-17 16:24:53.055] [47122] [HailoRT] [info] [hef.cpp:1994] [get_network_group_and_network_name] No name was given. Addressing all networks of default network_group: hexapod_geometry_simplified
+[2026-04-17 16:24:53.055] [47122] [HailoRT] [info] [hef.cpp:1994] [get_network_group_and_network_name] No name was given. Addressing all networks of default network_group: hexapod_detection_simplified
+[2026-04-17 16:24:53.066] [47122] [HailoRT] [info] [core_op.cpp:156] [activate] Activating hexapod_backbone_simplified took 10.26487 milliseconds. Note that the function is asynchronous and thus the network is not fully activated yet.
+[2026-04-17 16:24:53.066] [47122] [HailoRT] [info] [core_op.cpp:156] [activate] Activating hexapod_backbone_simplified took 10.316166 milliseconds. Note that the function is asynchronous and thus the network is not fully activated yet.
+[2026-04-17 16:24:53.066] [47122] [HailoRT] [error] [core_op.cpp:125] [activate] CHECK failed - Cant activate network because a network is already activated
+[2026-04-17 16:24:53.067] [47122] [HailoRT] [error] [network_group.cpp:98] [ActivatedNetworkGroupImpl] Failed activate HAILO_INVALID_OPERATION(6)
+[2026-04-17 16:24:53.068] [47122] [HailoRT] [error] [network_group.cpp:49] [create] CHECK_SUCCESS failed with status=HAILO_INVALID_OPERATION(6)
+[2026-04-17 16:24:53.068] [47122] [HailoRT] [info] [core_op.cpp:186] [deactivate] Deactivating took 0.623057 ms
+[2026-04-17 16:24:53.068] [47122] [HailoRT] [info] [core_op.cpp:186] [deactivate] Deactivating took 0.653539 ms
