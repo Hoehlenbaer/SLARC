@@ -245,33 +245,31 @@ def benchmark_3hef_pipeline(n_frames=50, warmup=5):
         print(f"   🔥 Warmup ({warmup} Frames) & Messe {n_frames} Frames...")
         
         # Alle Netze gleichzeitig auf dem Chip aktivieren (möglich durch ROUND_ROBIN)
-        with ng_bb.activate(ng_bb.create_params()), \
-             ng_geo.activate(ng_geo.create_params()), \
-             ng_det.activate(ng_det.create_params()):
+
             
-            # Streaming-Pipelines aufbauen
-            with InferVStreams(ng_bb, bb_in_p, bb_out_p) as pipe_bb, \
-                 InferVStreams(ng_geo, geo_in_p, geo_out_p) as pipe_geo, \
-                 InferVStreams(ng_det, det_in_p, det_out_p) as pipe_det:
+        # Streaming-Pipelines aufbauen
+        with InferVStreams(ng_bb, bb_in_p, bb_out_p) as pipe_bb, \
+            InferVStreams(ng_geo, geo_in_p, geo_out_p) as pipe_geo, \
+             InferVStreams(ng_det, det_in_p, det_out_p) as pipe_det:
                 
-                # Threads initialisieren
-                t_bb = threading.Thread(target=worker_backbone, args=(pipe_bb,))
-                t_geo = threading.Thread(target=worker_geometry, args=(pipe_geo,))
-                t_det = threading.Thread(target=worker_detection, args=(pipe_det,))
+            # Threads initialisieren
+            t_bb = threading.Thread(target=worker_backbone, args=(pipe_bb,))
+            t_geo = threading.Thread(target=worker_geometry, args=(pipe_geo,))
+            t_det = threading.Thread(target=worker_detection, args=(pipe_det,))
                 
-                time_start = time.perf_counter()
+            time_start = time.perf_counter()
                 
-                # Threads loslaufen lassen
-                t_det.start()
-                t_geo.start()
-                t_bb.start()
+            # Threads loslaufen lassen
+            t_det.start()
+            t_geo.start()
+            t_bb.start()
                 
-                # Warten bis alles verarbeitet wurde
-                t_bb.join()
-                t_geo.join()
-                t_det.join()
+            # Warten bis alles verarbeitet wurde
+            t_bb.join()
+            t_geo.join()
+            t_det.join()
                 
-                time_end = time.perf_counter()
+            time_end = time.perf_counter()
 
         # --- AUSWERTUNG ---
         valid_timings = timings[warmup:]
