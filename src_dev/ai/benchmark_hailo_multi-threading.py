@@ -17,7 +17,7 @@ import queue
 from hailo_platform import (
     HEF, VDevice, HailoStreamInterface,
     ConfigureParams, InferVStreams, InputVStreamParams, OutputVStreamParams,
-    FormatType, SchedulingAlgorithm  # <-- NEU HINZUGEFÜGT
+    FormatType, HailoSchedulingAlgorithm  # <-- KORRIGIERT
 )
 
 # =====================================================================
@@ -152,8 +152,8 @@ def benchmark_3hef_pipeline(n_frames=50, warmup=5):
     hef_det = HEF(HEF_PATHS['detection'])
     
     params = VDevice.create_params()
-    # WICHTIG: Erlaubt das asynchrone Multiplexing mehrerer HEFs auf einem Chip!
-    params.scheduling_algorithm = SchedulingAlgorithm.ROUND_ROBIN 
+    # KORRIGIERT: HailoSchedulingAlgorithm
+    params.scheduling_algorithm = HailoSchedulingAlgorithm.ROUND_ROBIN 
     
     with VDevice(params) as vdevice:
         # 1. Alle Modelle auf den Device konfigurieren
@@ -305,8 +305,8 @@ def benchmark_2hef_pipeline(n_frames=50, warmup=5):
     hef_comb = HEF(HEF_PATHS['combined'])
     
     params = VDevice.create_params()
-    # Auch hier zur Sicherheit den Scheduler aktivieren, falls Modelle überlappen
-    params.scheduling_algorithm = SchedulingAlgorithm.ROUND_ROBIN
+    # KORRIGIERT: HailoSchedulingAlgorithm
+    params.scheduling_algorithm = HailoSchedulingAlgorithm.ROUND_ROBIN
     
     with VDevice(params) as vdevice:
         ng_bb = vdevice.configure(hef_bb, ConfigureParams.create_from_hef(hef_bb, interface=HailoStreamInterface.PCIe))[0]
