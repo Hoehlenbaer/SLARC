@@ -17,7 +17,7 @@ import queue
 from hailo_platform import (
     HEF, VDevice, HailoStreamInterface,
     ConfigureParams, InferVStreams, InputVStreamParams, OutputVStreamParams,
-    FormatType
+    FormatType, SchedulingAlgorithm  # <-- NEU HINZUGEFÜGT
 )
 
 # =====================================================================
@@ -152,6 +152,9 @@ def benchmark_3hef_pipeline(n_frames=50, warmup=5):
     hef_det = HEF(HEF_PATHS['detection'])
     
     params = VDevice.create_params()
+    # WICHTIG: Erlaubt das asynchrone Multiplexing mehrerer HEFs auf einem Chip!
+    params.scheduling_algorithm = SchedulingAlgorithm.ROUND_ROBIN 
+    
     with VDevice(params) as vdevice:
         # 1. Alle Modelle auf den Device konfigurieren
         ng_bb = vdevice.configure(hef_bb, ConfigureParams.create_from_hef(hef_bb, interface=HailoStreamInterface.PCIe))[0]
@@ -171,7 +174,6 @@ def benchmark_3hef_pipeline(n_frames=50, warmup=5):
         det_in_names = [i.name for i in hef_det.get_input_vstream_infos()]
         
         # Queues für den asynchronen Datentransfer zwischen den Modellen
-        # maxsize=3 schützt den Pi-RAM, falls eine Stufe hinterherhinkt
         q_bb_to_geo = queue.Queue(maxsize=3)
         q_geo_to_det = queue.Queue(maxsize=3)
         
@@ -242,7 +244,7 @@ def benchmark_3hef_pipeline(n_frames=50, warmup=5):
         # --- PIPELINE STARTEN ---
         print(f"   🔥 Warmup ({warmup} Frames) & Messe {n_frames} Frames...")
         
-        # Alle Netze gleichzeitig auf dem Chip aktivieren
+        # Alle Netze gleichzeitig auf dem Chip aktivieren (möglich durch ROUND_ROBIN)
         with ng_bb.activate(ng_bb.create_params()), \
              ng_geo.activate(ng_geo.create_params()), \
              ng_det.activate(ng_det.create_params()):
@@ -275,7 +277,6 @@ def benchmark_3hef_pipeline(n_frames=50, warmup=5):
         valid_timings = timings[warmup:]
         total_duration_sec = time_end - time_start
         
-        # FPS = Gesamtanzahl aller verarbeiteten Bilder geteilt durch die echte Zeit
         real_fps = total_runs / total_duration_sec
         median_latency = np.median(valid_timings)
 
@@ -293,7 +294,7 @@ def benchmark_3hef_pipeline(n_frames=50, warmup=5):
 
 
 # =====================================================================
-# 2-HEF PIPELINE (UNVERÄNDERT)
+# 2-HEF PIPELINE 
 # =====================================================================
 def benchmark_2hef_pipeline(n_frames=50, warmup=5):
     print("\n" + "=" * 60)
@@ -304,6 +305,9 @@ def benchmark_2hef_pipeline(n_frames=50, warmup=5):
     hef_comb = HEF(HEF_PATHS['combined'])
     
     params = VDevice.create_params()
+    # Auch hier zur Sicherheit den Scheduler aktivieren, falls Modelle überlappen
+    params.scheduling_algorithm = SchedulingAlgorithm.ROUND_ROBIN
+    
     with VDevice(params) as vdevice:
         ng_bb = vdevice.configure(hef_bb, ConfigureParams.create_from_hef(hef_bb, interface=HailoStreamInterface.PCIe))[0]
         ng_comb = vdevice.configure(hef_comb, ConfigureParams.create_from_hef(hef_comb, interface=HailoStreamInterface.PCIe))[0]
