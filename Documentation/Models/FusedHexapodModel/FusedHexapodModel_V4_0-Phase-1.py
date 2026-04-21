@@ -571,6 +571,14 @@ class HierarchicalStereoHead(nn.Module):
             #print("prob train:", (prob_s8).abs().max().item())
             #print("disp_s8 train:", (disp_s8).abs().max().item())
         
+        # ✅ V4.0: Confidence Gate — unterdrückt unsichere Matches
+        # (Jalousien, Himmel, texturlose Bereiche, repetitive Muster)
+        # Funktioniert identisch in Training und Deploy (keine Branch nötig)
+        confidence = prob_s8.max(dim=1, keepdim=True)[0]
+        gate = torch.clamp((confidence - 0.10) / 0.10, 0.0, 1.0)
+        disp_s8 = disp_s8 * gate
+
+
         max_disp_s4 = self.max_disp_s8 * 2.0
         disp_s4 = self.stereo_refine_s4(disp_s8, feat_l_s4, max_disp=max_disp_s4)
         
@@ -1981,7 +1989,7 @@ for idx in [4, 17, 66]: ade_to_seg6_map[idx] = 4 # VEGETATION
 ade_to_seg6_map = torch.full((256,), 3, dtype=torch.long, device=DEVICE)
 
 # 2. IGNORE BEREICHE (Für den Teacher)
-ade_to_seg6_map[255] = 255 # Echter Ignore-Index für schwarze Bildränder
+#ade_to_seg6_map[255] = 255 # Echter Ignore-Index für schwarze Bildränder
 #ade_to_seg6_map[5] = 255   # 🚨 Ceiling: Teacher schweigt, Geometrie fängt es als Hindernis (180°) ab!
 
 # 0 = WALKABLE (Böden, Erde, Sand, Wege, Gras)
@@ -2005,12 +2013,12 @@ for idx in [5, 12, 15, 19, 20, 21, 23, 63, 64, 97, 116]:
 
 # 4 = NAV_ANCHOR (Große, absolut statische Objekte für SLAM/Loop-Closure)
 # Bäume, Bettpfosten, Schränke, Regale, Badewannen, Säulen, Schilder, Kühlschränke, Laternen...
-for idx in [4, 7, 10, 24, 38, 42, 43, 68, 89, 115]: 
+for idx in [4, 7, 10, 24, 38, 42, 43, 68, 89, 115, 2, 16]: 
     ade_to_seg6_map[idx] = 4 
 
 # 5 = VOID / FAR BACKGROUND (Himmel, ferne Berge)
 # Zwingt den Stereo-Loss in diesen Bereichen auf Disparität = 0
-for idx in [2, 16]: 
+for idx in []: 
     ade_to_seg6_map[idx] = 5
 ## Ausblenden der Decke (spart Netzwerkkapazität des Teachers im Innenräumen)
 #ade_to_seg6_map[5] = 255
@@ -2346,10 +2354,50 @@ def visualize_v29(step, writer):
             #    gt_s = t_batch['seg'][0].cpu().numpy()
             #    show_img(axes[2, 1], cv2.resize(SEG_COLORS[np.where(gt_s==255, 5, gt_s)], (TW, TH), interpolation=cv2.INTER_NEAREST), "GT Seg")
             if t_batch.get('seg') is not None:
+                
                 geo_seg = t_batch['seg'].to(DEVICE)
                 teacher_input = t_batch['teacher'].to(DEVICE) if t_batch.get('teacher') is not None else None
                 merged_seg = fuse_seg_teacher_gpu(geo_seg, teacher_input)
                 gt_s = merged_seg[0].cpu().numpy()
+                
+                '''
+                # Debug print
+                # --- 1. GEO-SEG HOLEN ---
+                geo_s = geo_seg[0].cpu().numpy()
+                
+                # --- 2. TEACHER-SEG HOLEN (Kurze Inferenz für den Debugger) ---
+                teach_s = None
+                if teacher_input is not None:
+                    with torch.no_grad():
+                        t_pix = F.interpolate(teacher_input, size=(512, 512), mode='bilinear', align_corners=False)
+                        t_logits = seg_teacher_model(pixel_values=t_pix).logits
+                        t_pred_150 = t_logits.argmax(dim=1).unsqueeze(1).float()
+                        t_pred_150 = F.interpolate(t_pred_150, size=geo_seg.shape[-2:], mode='nearest').squeeze(1).long()
+                        teach_s = ade_to_seg6_map[t_pred_150][0].cpu().numpy()
+                
+                # --- 3. MERGED-SEG HOLEN ---
+                merged_seg = fuse_seg_teacher_gpu(geo_seg, teacher_input)
+                gt_s = merged_seg[0].cpu().numpy()
+
+                # --- 🔍 DEBUG: MULTI-LEVEL KLASSEN-ANALYSE ---
+                def print_stats(name, arr):
+                    if arr is None: return
+                    u, c = np.unique(arr, return_counts=True)
+                    stats = dict(zip(u, c))
+                    print(f"  [{name}] enthält {len(u)} IDs:")
+                    for val, count in stats.items():
+                        label = " (IGNORE/BLACK)" if val == 255 else f" (Klasse {val})"
+                        print(f"     -> ID {val:3}{label}: {count:8} Pixel")
+
+                print(f"\n=== 🔍 DEBUG [Step {global_step}]: SEGMENTATION PIPELINE ===")
+                print_stats("1. GEOMETRIE (Basis)", geo_s)
+                print_stats("2. TEACHER (Mapped)", teach_s)
+                print_stats("3. MERGED (Target)", gt_s)
+                print("========================================================\n")
+                # ---------------------------------------------
+                '''
+
+
                 show_img(axes[2, 1], cv2.resize(SEG_COLORS[np.where(gt_s==255, 5, gt_s)], (TW, TH), interpolation=cv2.INTER_NEAREST), "GT Seg (merged)")
 
             if t_seg_p is not None:
@@ -2905,7 +2953,7 @@ import math
 from torch.optim.lr_scheduler import LambdaLR
 
 # Der neue adaptive pbar (ohne festes Ende, da wir auf Plateau warten)
-pbar = tqdm(total=None, desc="V3.1 Adaptive Training", unit="it")
+pbar = tqdm(total=None, desc="V4.0 Adaptive Training", unit="it")
 
 # Endlos-Schleife: Der Scheduler bricht ab, wenn der Decay durch ist
 while True:
