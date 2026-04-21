@@ -571,12 +571,13 @@ class HierarchicalStereoHead(nn.Module):
             #print("prob train:", (prob_s8).abs().max().item())
             #print("disp_s8 train:", (disp_s8).abs().max().item())
         
-        # ✅ V4.0: Confidence Gate — unterdrückt unsichere Matches
-        # (Jalousien, Himmel, texturlose Bereiche, repetitive Muster)
-        # Funktioniert identisch in Training und Deploy (keine Branch nötig)
-        confidence = prob_s8.max(dim=1, keepdim=True)[0]
-        gate = torch.clamp((confidence - 0.10) / 0.10, 0.0, 1.0)
-        disp_s8 = disp_s8 * gate
+        if not self.training:
+            # ✅ V4.0: Confidence Gate — unterdrückt unsichere Matches
+            # (Jalousien, Himmel, texturlose Bereiche, repetitive Muster)
+            # Funktioniert identisch in Training und Deploy (keine Branch nötig)
+            confidence = prob_s8.max(dim=1, keepdim=True)[0]
+            gate = torch.clamp((confidence - 0.10) / 0.10, 0.0, 1.0)
+            disp_s8 = disp_s8 * gate
 
 
         max_disp_s4 = self.max_disp_s8 * 2.0
@@ -2111,6 +2112,12 @@ def fuse_seg_teacher_gpu(geo_seg_tensor, teacher_input_tensor):
         
         # 3. VOID Override: Geometrie-Decken/Himmel-Artefakte überschreiben!
         merged[teacher_mapped & (teacher_seg == 5)] = 5
+
+        # 🚨 NEU: REGEL 4 — DER VOID-BUSTER (Jalousie-Fix)
+        # Wenn die Geometrie "VOID" (5) sagt, aber der Teacher eine reale Klasse (0,1,2,3) erkannt hat,
+        # dann überschreiben wir das Geometrie-Loch mit dem Wissen des Teachers!
+        mask_void_hole = (geo_seg_tensor == 5) & teacher_mapped & (teacher_seg < 4)
+        merged[mask_void_hole] = teacher_seg[mask_void_hole]
         
         return merged
     
