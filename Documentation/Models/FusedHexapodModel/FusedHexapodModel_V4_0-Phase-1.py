@@ -571,10 +571,8 @@ class HierarchicalStereoHead(nn.Module):
             #print("prob train:", (prob_s8).abs().max().item())
             #print("disp_s8 train:", (disp_s8).abs().max().item())
         
+        # ✅ V4.0: Confidence Gate — NUR bei Inferenz, nicht beim Training
         if not self.training:
-            # ✅ V4.0: Confidence Gate — unterdrückt unsichere Matches
-            # (Jalousien, Himmel, texturlose Bereiche, repetitive Muster)
-            # Funktioniert identisch in Training und Deploy (keine Branch nötig)
             confidence = prob_s8.max(dim=1, keepdim=True)[0]
             gate = torch.clamp((confidence - 0.10) / 0.10, 0.0, 1.0)
             disp_s8 = disp_s8 * gate
@@ -2815,7 +2813,7 @@ scheduler = MultiHeadPlateauThenDecay(
 # =====================================================================
 import glob
 
-RESUME_TRAINING = False  # Set to False for fresh start
+RESUME_TRAINING = True  # Set to False for fresh start
 
 if RESUME_TRAINING:
     import os
