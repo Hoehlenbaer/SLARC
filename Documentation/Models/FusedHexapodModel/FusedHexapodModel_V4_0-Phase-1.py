@@ -2676,9 +2676,18 @@ print(f"Steps/epoch: {steps_per_epoch}")
 print(f"Total steps: {total_steps} | Warmup: {int(0.1*total_steps)} | Hold Peak: {int(0.4*total_steps)}")
 
 # Gradient clipping
+#CLIP_NORMS = {
+#    'backbone': 5.0, 'fpn_neck': 5.0, 'yolo_head': 5.0,
+#    'stereo_head': 8.0, 'seg_head': 3.0, 'normals_head': 5.0,
+#}
 CLIP_NORMS = {
-    'backbone': 5.0, 'fpn_neck': 5.0, 'yolo_head': 5.0,
-    'stereo_head': 8.0, 'seg_head': 3.0, 'normals_head': 5.0,
+    'backbone': 12.0,     # Erhöht! Muss die Gradienten von 4 Köpfen aufnehmen.
+    'fpn_neck': 8.0,      # Verteilerzentrum, braucht etwas mehr Raum als die Köpfe.
+    
+    'stereo_head': 10.0,  # Das Sorgenkind. Darf am stärksten ziehen, um das Cost-Volume zu formen.
+    'normals_head': 5.0,  # Solide Regression, 5.0 ist ein guter Standard.
+    'yolo_head': 5.0,     # Object Detection ist meist gutmütig.
+    'seg_head': 3.0,      # Bleibt niedrig! Segformer konvergiert schnell und darf den Backbone nicht dominieren.
 }
 
 # --- V3.1 SETUP ---
@@ -3062,6 +3071,7 @@ while True:
     # --- STEP & CLIPPING ---
     # =======================================================
     scaler.unscale_(optimizer)
+    '''
     for tag, module in [('Backbone',model.backbone),('FPN',model.fpn_neck),
                         ('Stereo',model.stereo_head),('Seg',model.seg_head),
                         ('Yolo',model.yolo_head),('Normals',model.normals_head)]:
@@ -3072,6 +3082,56 @@ while True:
         torch.nn.utils.clip_grad_norm_(module.parameters(), max_norm=max_norm)
 
     torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=10.0)
+    '''
+    # 1. Module übersichtlich definieren, damit wir sie zweimal durchlaufen können
+    modules_to_track = [
+        ('Backbone', model.backbone),
+        ('FPN', model.fpn_neck),
+        ('Stereo', model.stereo_head),
+        ('Seg', model.seg_head),
+        ('Yolo', model.yolo_head),
+        ('Normals', model.normals_head)
+    ]
+
+    # ==========================================================
+    # PHASE 1: PRE-LOGGING & INDIVIDUELLES CLIPPING
+    # ==========================================================
+    for tag, module in modules_to_track:
+        # 1a. Pre-Norm berechnen und loggen
+        grad_norm_pre = get_grad_norm(module.parameters())
+        step_logs[f'Grad_Norm_Pre/{tag}'] = grad_norm_pre
+        
+        # 1b. Individuelles Limit holen
+        clip_key = tag.lower() + ('_head' if tag not in ['Backbone','FPN'] else ('_neck' if tag=='FPN' else ''))
+        max_norm = CLIP_NORMS.get(clip_key, 5.0) if 'CLIP_NORMS' in globals() else 5.0
+        
+        # 1c. Individuell clippen
+        torch.nn.utils.clip_grad_norm_(module.parameters(), max_norm=max_norm)
+
+
+    # ==========================================================
+    # PHASE 2: GLOBALES CLIPPING & PRE-GLOBAL LOGGING
+    # ==========================================================
+    # Wichtig: clip_grad_norm_ gibt als Rückgabewert immer den Norm VOR dem eigenen Eingriff zurück!
+    global_norm_pre = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=35.0) # (Hier ggf. auf 35 erhöhen!)
+    step_logs['Grad_Norm_Pre/Global'] = global_norm_pre
+
+
+    # ==========================================================
+    # PHASE 3: POST-LOGGING (Das Ergebnis der Firewall)
+    # ==========================================================
+    for tag, module in modules_to_track:
+        # Jetzt lesen wir die Gradienten erneut, nachdem beide Firewalls drüber gelaufen sind
+        grad_norm_post = get_grad_norm(module.parameters())
+        step_logs[f'Grad_Norm_Post/{tag}'] = grad_norm_post
+
+    # Und noch den tatsächlichen finalen Gesamt-Norm des Modells
+    step_logs['Grad_Norm_Post/Global'] = get_grad_norm(model.parameters())
+
+
+    # ==========================================================
+    # PHASE 4: OPTIMIZER STEP
+    # ==========================================================
 
     scaler.step(optimizer)
     scaler.update()
