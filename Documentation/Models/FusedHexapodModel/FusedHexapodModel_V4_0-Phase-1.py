@@ -1127,7 +1127,7 @@ class SimpleYOLOLoss(nn.Module):
 
         # ANGEPASSTE Gewichtung: Box-Loss ist jetzt wichtiger
         return {
-            'total': 7.0 * l_box + 10.0 * l_obj + l_cls, 
+            'total': 3.0 * l_box + 5.0 * l_obj + l_cls, 
             'box': l_box.item(),
             'obj': l_obj.item(),
             'cls': l_cls.item(),
@@ -2681,12 +2681,12 @@ print(f"Total steps: {total_steps} | Warmup: {int(0.1*total_steps)} | Hold Peak:
 #    'stereo_head': 8.0, 'seg_head': 3.0, 'normals_head': 5.0,
 #}
 CLIP_NORMS = {
-    'backbone': 12.0,     # Erhöht! Muss die Gradienten von 4 Köpfen aufnehmen.
-    'fpn_neck': 8.0,      # Verteilerzentrum, braucht etwas mehr Raum als die Köpfe.
+    'backbone': 15.0,     # Erhöht! Muss die Gradienten von 4 Köpfen aufnehmen.
+    'fpn_neck': 10.0,      # Verteilerzentrum, braucht etwas mehr Raum als die Köpfe.
     
     'stereo_head': 10.0,  # Das Sorgenkind. Darf am stärksten ziehen, um das Cost-Volume zu formen.
     'normals_head': 5.0,  # Solide Regression, 5.0 ist ein guter Standard.
-    'yolo_head': 5.0,     # Object Detection ist meist gutmütig.
+    'yolo_head': 10.0,     # Object Detection ist meist gutmütig.
     'seg_head': 3.0,      # Bleibt niedrig! Segformer konvergiert schnell und darf den Backbone nicht dominieren.
 }
 
@@ -2775,13 +2775,13 @@ class MultiHeadPlateauThenDecay:
                     # Prüfen auf signifikante Verbesserung in DIESEM Head
                     if current_val < self.best_losses[head_name] * (1 - self.threshold):
                         self.best_losses[head_name] = current_val
+                        print(f" {head_name}: Fortschritt erkannt! Reset Patience.")
                         any_improvement = True
                 
                 if any_improvement:
                     # 🚀 Mindestens ein Head lernt noch! Reset Geduld.
                     if self.steps_without_improvement > 0:
                         # Optional: Logge welcher Head den Reset getriggert hat
-                        # print(f" [Scheduler] Fortschritt erkannt! Reset Geduld.")
                         pass
                     self.steps_without_improvement = 0
                 else:
@@ -2823,6 +2823,7 @@ scheduler = MultiHeadPlateauThenDecay(
 import glob
 
 RESUME_TRAINING = True  # Set to False for fresh start
+RESUME_RESET_EMA = True # Reset EMA after ckpt
 
 if RESUME_TRAINING:
     import os
@@ -2919,6 +2920,12 @@ if RESUME_TRAINING:
             old_best = checkpoint.get('best_raw_loss', float('inf'))
             scheduler.best_losses = {'stereo': old_best, 'yolo': old_best, 'normals': old_best, 'seg': old_best}
             print(f"ℹ️ Alter Checkpoint: Multi-Head Scheduler initialisiert.")
+        if RESUME_RESET_EMA:
+            scheduler.best_losses = {}
+            scheduler.steps_without_improvement = 0
+            print(f"EMA scheduler reset: (Patience: {scheduler.steps_without_improvement})")
+
+            
 
         print(f"🚀 Resume bei Step {global_step} (ca. Epoche {global_step // steps_per_epoch})")
 else:
