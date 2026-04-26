@@ -34,15 +34,16 @@ NORM_STD  = 0.226 * 255.0   # =  57.630
 # ── Modell-Definitionen ──────────────────────────────────────────────
 MODELS = {
     'single': {
-        'onnx': f'{ONNX_DIR}/hexapod_backbone_simplified.onnx',
-        'har': f'{ONNX_DIR}/hexapod_backbone.har',
-        'hef': f'{ONNX_DIR}/hexapod_backbone.hef',
+        'onnx': f'{ONNX_DIR}/hexapod_v4_0_simplified.onnx',
+        'har': f'{ONNX_DIR}/hexapod_single.har',
+        'hef': f'{ONNX_DIR}/hexapod_single.hef',
         'alls': f'{ONNX_DIR}/backbone_script.alls',
-        'name': 'hexapod_backbone_simplified',
+        'name': 'hexapod_single_simplified',
         'inputs': {
-            'gray_img': [1, 1, 480, 640],
+            'input_layer1': [1, 1, 480, 640],
+            'input_layer2': [1, 1, 480, 640],
         },
-        'outputs': ['f_s4', 'f_s8', 'f_s16', 'f_s32'],
+        'outputs': ['disp_final','seg','disp_s8','normals_s1','yolo_s8', 'yolo_s16', 'yolo_s32'],
         'needs_norm': True,    # Normalisierung auf NPU
         'norm_inputs': ['gray_img'],
     },
@@ -68,7 +69,7 @@ MODELS = {
         'inputs': {
             'f_s4_l':  [1, 32, 120, 160],
             'f_s8_l':  [1, 48, 60, 80],
-            'f_s4_r':  [1, 43, 120, 160],
+            'f_s4_r':  [1, 32, 120, 160],
             'f_s8_r':  [1, 48, 60, 80],
         },
         'outputs': ['disp_final', 'normals_s4', 'disp_s8'],
@@ -178,7 +179,7 @@ def write_model_script(model_cfg):
         print(f"   AvgPool 15×20: {len(pools_15x20)} Layer")
     
     with open(alls_path, 'w', encoding='utf-8') as f:
-        f.write("model_optimization_flavor(optimization_level=0, compression_level=0, batch_size=4)\n")
+        f.write("model_optimization_flavor(optimization_level=2, compression_level=0, batch_size=4)\n")
         f.write("performance_param(compiler_optimization_level=max)\n")
         
         # Normalisierung nur für Rohbild-Inputs
@@ -214,7 +215,7 @@ def generate_calib_data(model_key, model_cfg):
     """
     Erzeugt Kalibrierungsdaten für ein Sub-Modell.
     
-    Single:    Rohbilder (calib_left.npy)
+    Single:    Rohbilder (calib_left.npy + calib_right.npy)
     Backbone:  Rohbilder (calib_left.npy)
     Geometry:  Backbone-Outputs + Rohbilder → braucht Backbone-Inferenz
     Detection: Backbone-Outputs + Normals → braucht Backbone + Geometry Inferenz
@@ -259,11 +260,19 @@ def generate_calib_data(model_key, model_cfg):
     
     calib_data = {}
     
-    if model_key == 'backbone' or model_key == 'single':
+    if model_key == 'backbone':
         har_layer = har_input_map.get('gray_img')
         if har_layer:
             calib_data[har_layer] = to_nhwc(calib_l[:n])
-        
+
+    if model_key == 'single':
+        har_layer = har_input_map.get('input_layer1')
+        if har_layer:
+            calib_data[har_layer] = to_nhwc(calib_l[:n])
+        har_layer = har_input_map.get('input_layer2')
+        if har_layer:
+            calib_data[har_layer] = to_nhwc(calib_r[:n])
+   
     elif model_key == 'geometry':
         # Feature-Maps: Backbone auf die Kalibrierungsdaten laufen lassen
         bb_har = MODELS['backbone']['har']
@@ -277,7 +286,7 @@ def generate_calib_data(model_key, model_cfg):
             
             bb_runner.load_model_script(MODELS['backbone']['alls'])
             
-            batch_size = 64
+            batch_size = 256
             
             def run_backbone(images_nchw):
                 """Backbone-Inferenz auf einem Bilderstapel."""
@@ -310,16 +319,16 @@ def generate_calib_data(model_key, model_cfg):
                         calib_data[har_layer] = to_nhwc(calib_l[:n])
                     elif inp_name == 'f_s4_r':
                         calib_data[har_layer] = features_r.get('f_s4',
-                            np.random.randn(n, 120, 160, 24).astype(np.float32) * 0.5)
+                            np.random.randn(n, 120, 160, 32).astype(np.float32) * 0.5)
                     elif inp_name == 'f_s8_r':
                         calib_data[har_layer] = features_r.get('f_s8',
-                            np.random.randn(n, 60, 80, 40).astype(np.float32) * 0.5)
+                            np.random.randn(n, 60, 80, 48).astype(np.float32) * 0.5)
                     elif inp_name == 'f_s4_l':
                         calib_data[har_layer] = features_l.get('f_s4',
-                            np.random.randn(n, 120, 160, 24).astype(np.float32) * 0.5)
+                            np.random.randn(n, 120, 160, 32).astype(np.float32) * 0.5)
                     elif inp_name == 'f_s8_l':
                         calib_data[har_layer] = features_l.get('f_s8',
-                            np.random.randn(n, 60, 80, 40).astype(np.float32) * 0.5)
+                            np.random.randn(n, 60, 80, 48).astype(np.float32) * 0.5)
                         
             except Exception as e:
                 print(f"   ⚠️  Backbone-Inferenz fehlgeschlagen: {e}")
@@ -343,7 +352,7 @@ def generate_calib_data(model_key, model_cfg):
             bb_input = sorted([l for l in bb_all if 'input_layer' in l.lower()])[0]
             bb_runner.load_model_script(MODELS['backbone']['alls'])
             
-            batch_size = 64
+            batch_size = 256
             outputs = {k: [] for k in ['f_s4', 'f_s8', 'f_s16', 'f_s32']}
             try:
                 with bb_runner.infer_context(InferenceContext.SDK_NATIVE) as ctx:
@@ -385,7 +394,7 @@ def generate_calib_data(model_key, model_cfg):
             bb_input = sorted([l for l in bb_all if 'input_layer' in l.lower()])[0]
             bb_runner.load_model_script(MODELS['backbone']['alls'])
             
-            batch_size = 64
+            batch_size = 256
             
             def run_backbone_batch(images_nchw):
                 outputs = {k: [] for k in ['f_s4', 'f_s8', 'f_s16', 'f_s32']}
@@ -412,10 +421,10 @@ def generate_calib_data(model_key, model_cfg):
                         calib_data[har_layer] = to_nhwc(calib_l[:n])
                     elif inp_name == 'f_s4_r':
                         calib_data[har_layer] = features_r.get('f_s4',
-                            np.random.randn(n, 120, 160, 24).astype(np.float32) * 0.5)
+                            np.random.randn(n, 120, 160, 32).astype(np.float32) * 0.5)
                     elif inp_name == 'f_s8_r':
                         calib_data[har_layer] = features_r.get('f_s8',
-                            np.random.randn(n, 60, 80, 40).astype(np.float32) * 0.5)
+                            np.random.randn(n, 60, 80, 48).astype(np.float32) * 0.5)
                     else:
                         key = inp_name.replace('_l', '')
                         calib_data[har_layer] = features_l.get(key,
