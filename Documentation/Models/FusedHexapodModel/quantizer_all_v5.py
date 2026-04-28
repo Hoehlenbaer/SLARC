@@ -24,7 +24,7 @@ from hailo_sdk_client import InferenceContext
 # =====================================================================
 # KONFIGURATION
 # =====================================================================
-ONNX_DIR = 'onnx_split/V4.0_baseline'
+ONNX_DIR = 'onnx_split/V5.0_corr_wide'
 N_CALIB = 1024
  
 # Normalisierung (identisch zum Training)
@@ -67,10 +67,10 @@ MODELS = {
         'alls': f'{ONNX_DIR}/geometry_script.alls',
         'name': 'hexapod_geometry_simplified',
         'inputs': {
-            'f_s4_l':  [1, 32, 120, 160],
-            'f_s8_l':  [1, 48, 60, 80],
-            'f_s4_r':  [1, 32, 120, 160],
-            'f_s8_r':  [1, 48, 60, 80],
+            'f_s4_l':  [1, 64, 120, 160],
+            'f_s8_l':  [1, 128, 60, 80],
+            'f_s4_r':  [1, 64, 120, 160],
+            'f_s8_r':  [1, 128, 60, 80],
         },
         'outputs': ['disp_s4', 'normals_s4', 'disp_s8'],
         'needs_norm': True,    # img_l braucht Normalisierung
