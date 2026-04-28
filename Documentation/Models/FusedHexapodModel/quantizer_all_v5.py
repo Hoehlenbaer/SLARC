@@ -32,6 +32,72 @@ NORM_MEAN = 0.449 * 255.0   # = 114.495
 NORM_STD  = 0.226 * 255.0   # =  57.630
  
 # ── Modell-Definitionen ──────────────────────────────────────────────
+def get_models_config(variant='raw'):
+    """Erzeugt MODELS-Dict mit korrekten Shapes für die gewählte Channel-Variante."""
+    
+    channels = {
+        'raw':      {'s4': 32,  's8': 48,  's16': 136, 's32': 448},
+        'moderate': {'s4': 32,  's8': 64,  's16': 128, 's32': 256},
+        'wide':     {'s4': 64,  's8': 128, 's16': 256, 's32': 512},
+    }
+    ch = channels[variant]
+    
+    return {
+        'backbone': {
+            'onnx': f'{ONNX_DIR}/hexapod_backbone_simplified.onnx',
+            'har': f'{ONNX_DIR}/hexapod_backbone.har',
+            'hef': f'{ONNX_DIR}/hexapod_backbone.hef',
+            'alls': f'{ONNX_DIR}/backbone_script.alls',
+            'name': 'hexapod_backbone_simplified',
+            'inputs': {
+                'gray_img': [1, 1, 480, 640],
+            },
+            'outputs': ['f_s4', 'f_s8', 'f_s16', 'f_s32'],
+            'needs_norm': True,
+            'norm_inputs': ['gray_img'],
+        },
+        'geometry': {
+            'onnx': f'{ONNX_DIR}/hexapod_geometry_simplified.onnx',
+            'har': f'{ONNX_DIR}/hexapod_geometry.har',
+            'hef': f'{ONNX_DIR}/hexapod_geometry.hef',
+            'alls': f'{ONNX_DIR}/geometry_script.alls',
+            'name': 'hexapod_geometry_simplified',
+            'inputs': {
+                'f_s4_l':  [1, ch['s4'], 120, 160],
+                'f_s8_l':  [1, ch['s8'], 60, 80],
+                'f_s4_r':  [1, ch['s4'], 120, 160],
+                'f_s8_r':  [1, ch['s8'], 60, 80],
+                'img_l':   [1, 1, 480, 640],
+            },
+            'outputs': ['disp_s4', 'normals_s4', 'disp_s8'],
+            'needs_norm': True,
+            'norm_inputs': ['img_l'],
+        },
+        'detection': {
+            'onnx': f'{ONNX_DIR}/hexapod_detection_simplified.onnx',
+            'har': f'{ONNX_DIR}/hexapod_detection.har',
+            'hef': f'{ONNX_DIR}/hexapod_detection.hef',
+            'alls': f'{ONNX_DIR}/detection_script.alls',
+            'name': 'hexapod_detection_simplified',
+            'inputs': {
+                'f_s4_l':     [1, ch['s4'], 120, 160],
+                'f_s8_l':     [1, ch['s8'], 60, 80],
+                'f_s16_l':    [1, ch['s16'], 30, 40],
+                'f_s32_l':    [1, ch['s32'], 15, 20],
+                'normals_s4': [1, 3, 120, 160],
+            },
+            'outputs': ['seg', 'yolo_s8', 'yolo_s16', 'yolo_s32'],
+            'needs_norm': False,
+            'norm_inputs': [],
+        },
+    }
+
+# =====================================================================
+# USAGE — Variante wählen
+# =====================================================================
+
+
+'''
 MODELS = {
     'single': {
         'onnx': f'{ONNX_DIR}/hexapod_v4_0_simplified.onnx',
@@ -113,6 +179,7 @@ MODELS = {
         'norm_inputs': ['img_l'],
     },
 }
+'''
  
  
 # =====================================================================
@@ -572,8 +639,13 @@ def process_model(model_key, force_translate=False):
 # MAIN
 # =====================================================================
 if __name__ == "__main__":
-    targets = sys.argv[1:] if len(sys.argv) > 1 else ['backbone', 'geometry', 'detection']
+    import sys
+    variant = sys.argv[1] if len(sys.argv) > 1 else 'raw'
+    targets = sys.argv[2:] if len(sys.argv) > 2 else ['backbone', 'geometry', 'detection']
     
+    ONNX_DIR = f'onnx_split/V5.0_corr_{variant}'
+    MODELS = get_models_config(variant)
+        
     # Validierung
     for t in targets:
         if t not in MODELS:
