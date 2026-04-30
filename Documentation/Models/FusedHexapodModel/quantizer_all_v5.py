@@ -24,7 +24,7 @@ from hailo_sdk_client import InferenceContext
 # =====================================================================
 # KONFIGURATION
 # =====================================================================
-ONNX_DIR = 'onnx_split/V5.0_corr_wide'
+ONNX_DIR = 'onnx_split/V5.0_cv_wide'
 N_CALIB = 1024
  
 # Normalisierung (identisch zum Training)
@@ -67,7 +67,7 @@ def get_models_config(variant='raw'):
                 'f_s8_l':  [1, ch['s8'], 60, 80],
                 'f_s4_r':  [1, ch['s4'], 120, 160],
                 'f_s8_r':  [1, ch['s8'], 60, 80],
-                'img_l':   [1, 1, 480, 640],
+                #'img_l':   [1, 1, 480, 640],
             },
             'outputs': ['disp_s4', 'normals_s4', 'disp_s8'],
             'needs_norm': True,
@@ -343,6 +343,8 @@ def generate_calib_data(model_key, model_cfg):
     elif model_key == 'geometry':
         # Feature-Maps: Backbone auf die Kalibrierungsdaten laufen lassen
         bb_har = MODELS['backbone']['har']
+        print(f"   Backbone HAR: {MODELS['backbone']['har']}")
+        print(f"   Exists: {os.path.exists(MODELS['backbone']['har'])}")
         if os.path.exists(bb_har):
             print("   🔄 Generiere Features via Backbone-HAR...")
             print("       Links UND rechts werden durch den Backbone geschickt.")
@@ -356,17 +358,35 @@ def generate_calib_data(model_key, model_cfg):
             batch_size = 256
             
             def run_backbone(images_nchw):
-                """Backbone-Inferenz auf einem Bilderstapel."""
-                outputs = {k: [] for k in ['f_s4', 'f_s8', 'f_s16', 'f_s32']}
+                """Backbone-Inferenz — matcht Outputs per Shape."""
+                all_results = []
                 with bb_runner.infer_context(InferenceContext.SDK_NATIVE) as ctx:
                     for i in range(0, len(images_nchw), batch_size):
                         batch = to_nhwc(images_nchw[i:i+batch_size])
                         res = bb_runner.infer(ctx, {bb_input: batch})
-                        for k in outputs:
-                            matching = [rk for rk in res if k in rk]
-                            if matching:
-                                outputs[k].append(res[matching[0]])
-                return {k: np.concatenate(v, axis=0) for k, v in outputs.items() if v}
+                        # res kann dict ODER list sein — normalisieren
+                        if isinstance(res, list):
+                            # Liste von Arrays → per Index zuordnen
+                            res = {f'output_{j}': r for j, r in enumerate(res)}
+                        all_results.append(res)
+                
+                shape_to_key = {
+                    (120, 160): 'f_s4',
+                    (60, 80):   'f_s8',
+                    (30, 40):   'f_s16',
+                    (15, 20):   'f_s32',
+                }
+                
+                outputs = {}
+                first_res = all_results[0]
+                for res_key, res_val in first_res.items():
+                    h, w = res_val.shape[1], res_val.shape[2]
+                    feat_key = shape_to_key.get((h, w))
+                    if feat_key:
+                        outputs[feat_key] = np.concatenate([r[res_key] for r in all_results], axis=0)
+                        print(f"         {feat_key}: {outputs[feat_key].shape}")
+                
+                return outputs
             
             try:
                 # Linke Bilder → alle 4 Scales
@@ -406,10 +426,7 @@ def generate_calib_data(model_key, model_cfg):
             _fill_random(calib_data, har_input_map, model_cfg, n, calib_l)
             
     elif model_key == 'detection':
-        # Detection: Backbone-Features + normals_s4
-        # Am besten auch hier echte Features durchpropagieren
         bb_har = MODELS['backbone']['har']
-        geo_har = MODELS['geometry']['har']
         
         if os.path.exists(bb_har):
             print("   🔄 Generiere Backbone-Features für Detection...")
@@ -420,27 +437,41 @@ def generate_calib_data(model_key, model_cfg):
             bb_runner.load_model_script(MODELS['backbone']['alls'])
             
             batch_size = 256
-            outputs = {k: [] for k in ['f_s4', 'f_s8', 'f_s16', 'f_s32']}
+            
+            shape_to_key = {
+                (120, 160): 'f_s4',
+                (60, 80):   'f_s8',
+                (30, 40):   'f_s16',
+                (15, 20):   'f_s32',
+            }
+            
             try:
+                all_results = []
                 with bb_runner.infer_context(InferenceContext.SDK_NATIVE) as ctx:
                     for i in range(0, n, batch_size):
                         batch = to_nhwc(calib_l[i:i+batch_size])
                         res = bb_runner.infer(ctx, {bb_input: batch})
-                        for k in outputs:
-                            matching = [rk for rk in res if k in rk]
-                            if matching:
-                                outputs[k].append(res[matching[0]])
-                features_l = {k: np.concatenate(v, axis=0) for k, v in outputs.items() if v}
+                        if isinstance(res, list):
+                            res = {f'output_{j}': r for j, r in enumerate(res)}
+                        all_results.append(res)
+                
+                # Shape-basiertes Mapping
+                features_l = {}
+                first_res = all_results[0]
+                for res_key, res_val in first_res.items():
+                    h, w = res_val.shape[1], res_val.shape[2]
+                    feat_key = shape_to_key.get((h, w))
+                    if feat_key:
+                        features_l[feat_key] = np.concatenate([r[res_key] for r in all_results], axis=0)
+                        print(f"         {feat_key}: {features_l[feat_key].shape}")
                 
                 for inp_name, har_layer in har_input_map.items():
                     if inp_name == 'normals_s4':
-                        # Normalen: Random N(0, 0.5), werden beim Stereo-Compile verfeinert
                         calib_data[har_layer] = np.random.randn(n, 120, 160, 3).astype(np.float32) * 0.5
                     else:
                         key = inp_name.replace('_l', '')
                         calib_data[har_layer] = features_l.get(key,
-                            np.random.randn(n, *[model_cfg['inputs'][inp_name][i] 
-                                for i in [2, 3, 1]]).astype(np.float32) * 0.5)
+                            _random_from_cfg(model_cfg, inp_name, n))
                 
                 print(f"   ✅ {n} Feature-Sets + Random-Normals generiert")
             except Exception as e:
@@ -643,7 +674,7 @@ if __name__ == "__main__":
     variant = sys.argv[1] if len(sys.argv) > 1 else 'raw'
     targets = sys.argv[2:] if len(sys.argv) > 2 else ['backbone', 'geometry', 'detection']
     
-    ONNX_DIR = f'onnx_split/V5.0_corr_{variant}'
+    ONNX_DIR = f'onnx_split/V5.0_cv_{variant}'
     MODELS = get_models_config(variant)
         
     # Validierung
