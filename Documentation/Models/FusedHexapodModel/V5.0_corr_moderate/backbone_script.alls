@@ -1,0 +1,3 @@
+model_optimization_flavor(optimization_level=0, compression_level=0, batch_size=4)
+performance_param(compiler_optimization_level=max)
+norm_0 = normalization([114.495], [57.630], hexapod_backbone_simplified/input_layer1)

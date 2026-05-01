@@ -1,0 +1,2 @@
+model_optimization_flavor(optimization_level=0, compression_level=0, batch_size=4)
+performance_param(compiler_optimization_level=max)

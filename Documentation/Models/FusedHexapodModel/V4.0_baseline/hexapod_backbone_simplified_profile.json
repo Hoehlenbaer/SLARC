@@ -1,0 +1,4110 @@
+{
+  "stats": {
+    "profiler_parameters": {
+      "time": "Sun, 26 Apr 2026 14:39:09 +0200",
+      "compiler_version": "3.33.1",
+      "profiling_mode": "Parsed",
+      "is_quantized": false
+    },
+    "model_details": {
+      "model_name": "hexapod_backbone_simplified",
+      "weights": 3486336.0,
+      "hw_arch": "hailo8",
+      "total_ops_per_frame": 6494438400.0,
+      "input_shapes": [
+        "480x640x1"
+      ],
+      "output_shapes": [
+        "120x160x32",
+        "60x80x48",
+        "30x40x136",
+        "15x20x448"
+      ],
+      "post_processing": [],
+      "input_conversion": [],
+      "resize_input": [],
+      "normalization": false,
+      "transpose": false
+    },
+    "performance_details": []
+  },
+  "csv_data": [],
+  "latency_data": {
+    "runtime_data": {}
+  },
+  "accuracy_data": {},
+  "hn_model": {
+    "name": "hexapod_backbone_simplified",
+    "net_params": {
+      "version": "1.0",
+      "stage": "HN",
+      "clusters_placement": [
+        []
+      ],
+      "clusters_to_skip": [],
+      "output_layers_order": [
+        "hexapod_backbone_simplified/ew_add1",
+        "hexapod_backbone_simplified/ew_add3",
+        "hexapod_backbone_simplified/ew_add8",
+        "hexapod_backbone_simplified/conv34"
+      ],
+      "is_transformer": false,
+      "transposed_net": false,
+      "net_scopes": [
+        "hexapod_backbone_simplified"
+      ],
+      "lora_adapters": []
+    },
+    "layers": {
+      "hexapod_backbone_simplified/input_layer1": {
+        "type": "input_layer",
+        "input": [],
+        "output": [
+          "hexapod_backbone_simplified/conv1"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            480,
+            640,
+            1
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            480,
+            640,
+            1
+          ]
+        ],
+        "original_names": [
+          "gray_img"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "transposed": false,
+        "engine": "nn_core",
+        "io_type": "standard",
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_backbone_simplified/conv1": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/input_layer1"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/dw1"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            480,
+            640,
+            1
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            240,
+            320,
+            48
+          ]
+        ],
+        "original_names": [
+          "/backbone/conv_stem/Conv",
+          "/backbone/bn1/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            1,
+            48
+          ],
+          "strides": [
+            1,
+            2,
+            2,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 480.0,
+        "macs": 36864000.0,
+        "ops": 66355200.0
+      },
+      "hexapod_backbone_simplified/dw1": {
+        "type": "dw",
+        "input": [
+          "hexapod_backbone_simplified/conv1"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv2"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            240,
+            320,
+            48
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            240,
+            320,
+            48
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.0/blocks.0.0/conv_dw/Conv",
+          "/backbone/blocks.0/blocks.0.0/bn1/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            48,
+            1
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 480.0,
+        "macs": 36864000,
+        "ops": 66355200
+      },
+      "hexapod_backbone_simplified/conv2": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/dw1"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv3"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            240,
+            320,
+            48
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            240,
+            320,
+            24
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.0/blocks.0.0/conv_pw/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            48,
+            24
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 1176.0,
+        "macs": 90316800.0,
+        "ops": 176947200.0
+      },
+      "hexapod_backbone_simplified/conv3": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/conv2"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/dw2"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            240,
+            320,
+            24
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            240,
+            320,
+            144
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.1/blocks.1.0/conv_pw/Conv",
+          "/backbone/blocks.1/blocks.1.0/bn1/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            24,
+            144
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 3600.0,
+        "macs": 276480000.0,
+        "ops": 530841600.0
+      },
+      "hexapod_backbone_simplified/dw2": {
+        "type": "dw",
+        "input": [
+          "hexapod_backbone_simplified/conv3"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv4"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            240,
+            320,
+            144
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            120,
+            160,
+            144
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.1/blocks.1.0/conv_dw/Conv",
+          "/backbone/blocks.1/blocks.1.0/bn2/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            144,
+            1
+          ],
+          "strides": [
+            1,
+            2,
+            2,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 1440.0,
+        "macs": 27648000,
+        "ops": 49766400
+      },
+      "hexapod_backbone_simplified/conv4": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/dw2"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv5",
+          "hexapod_backbone_simplified/ew_add1"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            120,
+            160,
+            144
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            120,
+            160,
+            32
+          ],
+          [
+            -1,
+            120,
+            160,
+            32
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.1/blocks.1.0/conv_pwl/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            144,
+            32
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 4640.0,
+        "macs": 89088000.0,
+        "ops": 176947200.0
+      },
+      "hexapod_backbone_simplified/conv5": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/conv4"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/dw3"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            120,
+            160,
+            32
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            120,
+            160,
+            192
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.1/blocks.1.1/conv_pw/Conv",
+          "/backbone/blocks.1/blocks.1.1/bn1/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            32,
+            192
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 6336.0,
+        "macs": 121651200.0,
+        "ops": 235929600.0
+      },
+      "hexapod_backbone_simplified/dw3": {
+        "type": "dw",
+        "input": [
+          "hexapod_backbone_simplified/conv5"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv6"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            120,
+            160,
+            192
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            120,
+            160,
+            192
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.1/blocks.1.1/conv_dw/Conv",
+          "/backbone/blocks.1/blocks.1.1/bn2/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            192,
+            1
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 1920.0,
+        "macs": 36864000,
+        "ops": 66355200
+      },
+      "hexapod_backbone_simplified/conv6": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/dw3"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/ew_add1"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            120,
+            160,
+            192
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            120,
+            160,
+            32
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.1/blocks.1.1/conv_pwl/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            192,
+            32
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 6176.0,
+        "macs": 118579200.0,
+        "ops": 235929600.0
+      },
+      "hexapod_backbone_simplified/ew_add1": {
+        "type": "ew_add",
+        "input": [
+          "hexapod_backbone_simplified/conv6",
+          "hexapod_backbone_simplified/conv4"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv7",
+          "hexapod_backbone_simplified/output_layer1"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            120,
+            160,
+            32
+          ],
+          [
+            -1,
+            120,
+            160,
+            32
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            120,
+            160,
+            32
+          ],
+          [
+            -1,
+            120,
+            160,
+            32
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.1/blocks.1.1/Add"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "activation": "linear"
+        },
+        "weights": 0,
+        "macs": 307200.0,
+        "ops": 614400.0
+      },
+      "hexapod_backbone_simplified/conv7": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/ew_add1"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/dw4"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            120,
+            160,
+            32
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            120,
+            160,
+            192
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.2/blocks.2.0/conv_pw/Conv",
+          "/backbone/blocks.2/blocks.2.0/bn1/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            32,
+            192
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 6336.0,
+        "macs": 121651200.0,
+        "ops": 235929600.0
+      },
+      "hexapod_backbone_simplified/dw4": {
+        "type": "dw",
+        "input": [
+          "hexapod_backbone_simplified/conv7"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv8"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            120,
+            160,
+            192
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            192
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.2/blocks.2.0/conv_dw/Conv",
+          "/backbone/blocks.2/blocks.2.0/bn2/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            192,
+            1
+          ],
+          "strides": [
+            1,
+            2,
+            2,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 1920.0,
+        "macs": 9216000,
+        "ops": 16588800
+      },
+      "hexapod_backbone_simplified/conv8": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/dw4"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv9",
+          "hexapod_backbone_simplified/ew_add2"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            192
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            48
+          ],
+          [
+            -1,
+            60,
+            80,
+            48
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.2/blocks.2.0/conv_pwl/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            192,
+            48
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 9264.0,
+        "macs": 44467200.0,
+        "ops": 88473600.0
+      },
+      "hexapod_backbone_simplified/conv9": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/conv8"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/dw5"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            48
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            288
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.2/blocks.2.1/conv_pw/Conv",
+          "/backbone/blocks.2/blocks.2.1/bn1/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            48,
+            288
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 14112.0,
+        "macs": 67737600.0,
+        "ops": 132710400.0
+      },
+      "hexapod_backbone_simplified/dw5": {
+        "type": "dw",
+        "input": [
+          "hexapod_backbone_simplified/conv9"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv10"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            288
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            288
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.2/blocks.2.1/conv_dw/Conv",
+          "/backbone/blocks.2/blocks.2.1/bn2/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            288,
+            1
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 2880.0,
+        "macs": 13824000,
+        "ops": 24883200
+      },
+      "hexapod_backbone_simplified/conv10": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/dw5"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/ew_add2"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            288
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            48
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.2/blocks.2.1/conv_pwl/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            288,
+            48
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 13872.0,
+        "macs": 66585600.0,
+        "ops": 132710400.0
+      },
+      "hexapod_backbone_simplified/ew_add2": {
+        "type": "ew_add",
+        "input": [
+          "hexapod_backbone_simplified/conv10",
+          "hexapod_backbone_simplified/conv8"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv11",
+          "hexapod_backbone_simplified/ew_add3"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            48
+          ],
+          [
+            -1,
+            60,
+            80,
+            48
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            48
+          ],
+          [
+            -1,
+            60,
+            80,
+            48
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.2/blocks.2.1/Add"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "activation": "linear"
+        },
+        "weights": 0,
+        "macs": 115200.0,
+        "ops": 230400.0
+      },
+      "hexapod_backbone_simplified/conv11": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/ew_add2"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/dw6"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            48
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            288
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.2/blocks.2.2/conv_pw/Conv",
+          "/backbone/blocks.2/blocks.2.2/bn1/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            48,
+            288
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 14112.0,
+        "macs": 67737600.0,
+        "ops": 132710400.0
+      },
+      "hexapod_backbone_simplified/dw6": {
+        "type": "dw",
+        "input": [
+          "hexapod_backbone_simplified/conv11"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv12"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            288
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            288
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.2/blocks.2.2/conv_dw/Conv",
+          "/backbone/blocks.2/blocks.2.2/bn2/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            288,
+            1
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 2880.0,
+        "macs": 13824000,
+        "ops": 24883200
+      },
+      "hexapod_backbone_simplified/conv12": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/dw6"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/ew_add3"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            288
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            48
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.2/blocks.2.2/conv_pwl/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            288,
+            48
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 13872.0,
+        "macs": 66585600.0,
+        "ops": 132710400.0
+      },
+      "hexapod_backbone_simplified/ew_add3": {
+        "type": "ew_add",
+        "input": [
+          "hexapod_backbone_simplified/conv12",
+          "hexapod_backbone_simplified/ew_add2"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv13",
+          "hexapod_backbone_simplified/output_layer2"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            48
+          ],
+          [
+            -1,
+            60,
+            80,
+            48
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            48
+          ],
+          [
+            -1,
+            60,
+            80,
+            48
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.2/blocks.2.2/Add"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "activation": "linear"
+        },
+        "weights": 0,
+        "macs": 115200.0,
+        "ops": 230400.0
+      },
+      "hexapod_backbone_simplified/conv13": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/ew_add3"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/dw7"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            48
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            288
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.3/blocks.3.0/conv_pw/Conv",
+          "/backbone/blocks.3/blocks.3.0/bn1/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            48,
+            288
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 14112.0,
+        "macs": 67737600.0,
+        "ops": 132710400.0
+      },
+      "hexapod_backbone_simplified/dw7": {
+        "type": "dw",
+        "input": [
+          "hexapod_backbone_simplified/conv13"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv14"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            288
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            288
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.3/blocks.3.0/conv_dw/Conv",
+          "/backbone/blocks.3/blocks.3.0/bn2/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            288,
+            1
+          ],
+          "strides": [
+            1,
+            2,
+            2,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 2880.0,
+        "macs": 3456000,
+        "ops": 6220800
+      },
+      "hexapod_backbone_simplified/conv14": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/dw7"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv15",
+          "hexapod_backbone_simplified/ew_add4"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            288
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            88
+          ],
+          [
+            -1,
+            30,
+            40,
+            88
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.3/blocks.3.0/conv_pwl/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            288,
+            88
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 25432.0,
+        "macs": 30518400.0,
+        "ops": 60825600.0
+      },
+      "hexapod_backbone_simplified/conv15": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/conv14"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/dw8"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            88
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            528
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.3/blocks.3.1/conv_pw/Conv",
+          "/backbone/blocks.3/blocks.3.1/bn1/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            88,
+            528
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 46992.0,
+        "macs": 56390400.0,
+        "ops": 111513600.0
+      },
+      "hexapod_backbone_simplified/dw8": {
+        "type": "dw",
+        "input": [
+          "hexapod_backbone_simplified/conv15"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv16"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            528
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            528
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.3/blocks.3.1/conv_dw/Conv",
+          "/backbone/blocks.3/blocks.3.1/bn2/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            528,
+            1
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 5280.0,
+        "macs": 6336000,
+        "ops": 11404800
+      },
+      "hexapod_backbone_simplified/conv16": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/dw8"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/ew_add4"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            528
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            88
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.3/blocks.3.1/conv_pwl/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            528,
+            88
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 46552.0,
+        "macs": 55862400.0,
+        "ops": 111513600.0
+      },
+      "hexapod_backbone_simplified/ew_add4": {
+        "type": "ew_add",
+        "input": [
+          "hexapod_backbone_simplified/conv16",
+          "hexapod_backbone_simplified/conv14"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv17",
+          "hexapod_backbone_simplified/ew_add5"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            88
+          ],
+          [
+            -1,
+            30,
+            40,
+            88
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            88
+          ],
+          [
+            -1,
+            30,
+            40,
+            88
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.3/blocks.3.1/Add"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "activation": "linear"
+        },
+        "weights": 0,
+        "macs": 52800.0,
+        "ops": 105600.0
+      },
+      "hexapod_backbone_simplified/conv17": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/ew_add4"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/dw9"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            88
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            528
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.3/blocks.3.2/conv_pw/Conv",
+          "/backbone/blocks.3/blocks.3.2/bn1/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            88,
+            528
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 46992.0,
+        "macs": 56390400.0,
+        "ops": 111513600.0
+      },
+      "hexapod_backbone_simplified/dw9": {
+        "type": "dw",
+        "input": [
+          "hexapod_backbone_simplified/conv17"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv18"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            528
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            528
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.3/blocks.3.2/conv_dw/Conv",
+          "/backbone/blocks.3/blocks.3.2/bn2/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            528,
+            1
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 5280.0,
+        "macs": 6336000,
+        "ops": 11404800
+      },
+      "hexapod_backbone_simplified/conv18": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/dw9"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/ew_add5"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            528
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            88
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.3/blocks.3.2/conv_pwl/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            528,
+            88
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 46552.0,
+        "macs": 55862400.0,
+        "ops": 111513600.0
+      },
+      "hexapod_backbone_simplified/ew_add5": {
+        "type": "ew_add",
+        "input": [
+          "hexapod_backbone_simplified/conv18",
+          "hexapod_backbone_simplified/ew_add4"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv19",
+          "hexapod_backbone_simplified/ew_add6"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            88
+          ],
+          [
+            -1,
+            30,
+            40,
+            88
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            88
+          ],
+          [
+            -1,
+            30,
+            40,
+            88
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.3/blocks.3.2/Add"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "activation": "linear"
+        },
+        "weights": 0,
+        "macs": 52800.0,
+        "ops": 105600.0
+      },
+      "hexapod_backbone_simplified/conv19": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/ew_add5"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/dw10"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            88
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            528
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.3/blocks.3.3/conv_pw/Conv",
+          "/backbone/blocks.3/blocks.3.3/bn1/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            88,
+            528
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 46992.0,
+        "macs": 56390400.0,
+        "ops": 111513600.0
+      },
+      "hexapod_backbone_simplified/dw10": {
+        "type": "dw",
+        "input": [
+          "hexapod_backbone_simplified/conv19"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv20"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            528
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            528
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.3/blocks.3.3/conv_dw/Conv",
+          "/backbone/blocks.3/blocks.3.3/bn2/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            528,
+            1
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 5280.0,
+        "macs": 6336000,
+        "ops": 11404800
+      },
+      "hexapod_backbone_simplified/conv20": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/dw10"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/ew_add6"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            528
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            88
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.3/blocks.3.3/conv_pwl/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            528,
+            88
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 46552.0,
+        "macs": 55862400.0,
+        "ops": 111513600.0
+      },
+      "hexapod_backbone_simplified/ew_add6": {
+        "type": "ew_add",
+        "input": [
+          "hexapod_backbone_simplified/conv20",
+          "hexapod_backbone_simplified/ew_add5"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv21"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            88
+          ],
+          [
+            -1,
+            30,
+            40,
+            88
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            88
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.3/blocks.3.3/Add"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "activation": "linear"
+        },
+        "weights": 0,
+        "macs": 52800.0,
+        "ops": 105600.0
+      },
+      "hexapod_backbone_simplified/conv21": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/ew_add6"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/dw11"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            88
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            528
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.4/blocks.4.0/conv_pw/Conv",
+          "/backbone/blocks.4/blocks.4.0/bn1/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            88,
+            528
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 46992.0,
+        "macs": 56390400.0,
+        "ops": 111513600.0
+      },
+      "hexapod_backbone_simplified/dw11": {
+        "type": "dw",
+        "input": [
+          "hexapod_backbone_simplified/conv21"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv22"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            528
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            528
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.4/blocks.4.0/conv_dw/Conv",
+          "/backbone/blocks.4/blocks.4.0/bn2/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            528,
+            1
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 5280.0,
+        "macs": 6336000,
+        "ops": 11404800
+      },
+      "hexapod_backbone_simplified/conv22": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/dw11"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv23",
+          "hexapod_backbone_simplified/ew_add7"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            528
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            136
+          ],
+          [
+            -1,
+            30,
+            40,
+            136
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.4/blocks.4.0/conv_pwl/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            528,
+            136
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 71944.0,
+        "macs": 86332800.0,
+        "ops": 172339200.0
+      },
+      "hexapod_backbone_simplified/conv23": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/conv22"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/dw12"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            136
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            816
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.4/blocks.4.1/conv_pw/Conv",
+          "/backbone/blocks.4/blocks.4.1/bn1/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            136,
+            816
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 111792.0,
+        "macs": 134150400.0,
+        "ops": 266342400.0
+      },
+      "hexapod_backbone_simplified/dw12": {
+        "type": "dw",
+        "input": [
+          "hexapod_backbone_simplified/conv23"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv24"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            816
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            816
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.4/blocks.4.1/conv_dw/Conv",
+          "/backbone/blocks.4/blocks.4.1/bn2/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            816,
+            1
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 8160.0,
+        "macs": 9792000,
+        "ops": 17625600
+      },
+      "hexapod_backbone_simplified/conv24": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/dw12"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/ew_add7"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            816
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            136
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.4/blocks.4.1/conv_pwl/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            816,
+            136
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 111112.0,
+        "macs": 133334400.0,
+        "ops": 266342400.0
+      },
+      "hexapod_backbone_simplified/ew_add7": {
+        "type": "ew_add",
+        "input": [
+          "hexapod_backbone_simplified/conv24",
+          "hexapod_backbone_simplified/conv22"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv25",
+          "hexapod_backbone_simplified/ew_add8"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            136
+          ],
+          [
+            -1,
+            30,
+            40,
+            136
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            136
+          ],
+          [
+            -1,
+            30,
+            40,
+            136
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.4/blocks.4.1/Add"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "activation": "linear"
+        },
+        "weights": 0,
+        "macs": 81600.0,
+        "ops": 163200.0
+      },
+      "hexapod_backbone_simplified/conv25": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/ew_add7"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/dw13"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            136
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            816
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.4/blocks.4.2/conv_pw/Conv",
+          "/backbone/blocks.4/blocks.4.2/bn1/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            136,
+            816
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 111792.0,
+        "macs": 134150400.0,
+        "ops": 266342400.0
+      },
+      "hexapod_backbone_simplified/dw13": {
+        "type": "dw",
+        "input": [
+          "hexapod_backbone_simplified/conv25"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv26"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            816
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            816
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.4/blocks.4.2/conv_dw/Conv",
+          "/backbone/blocks.4/blocks.4.2/bn2/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            816,
+            1
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 8160.0,
+        "macs": 9792000,
+        "ops": 17625600
+      },
+      "hexapod_backbone_simplified/conv26": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/dw13"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/ew_add8"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            816
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            136
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.4/blocks.4.2/conv_pwl/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            816,
+            136
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 111112.0,
+        "macs": 133334400.0,
+        "ops": 266342400.0
+      },
+      "hexapod_backbone_simplified/ew_add8": {
+        "type": "ew_add",
+        "input": [
+          "hexapod_backbone_simplified/conv26",
+          "hexapod_backbone_simplified/ew_add7"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv27",
+          "hexapod_backbone_simplified/output_layer3"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            136
+          ],
+          [
+            -1,
+            30,
+            40,
+            136
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            136
+          ],
+          [
+            -1,
+            30,
+            40,
+            136
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.4/blocks.4.2/Add"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "activation": "linear"
+        },
+        "weights": 0,
+        "macs": 81600.0,
+        "ops": 163200.0
+      },
+      "hexapod_backbone_simplified/conv27": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/ew_add8"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/dw14"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            136
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            816
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.5/blocks.5.0/conv_pw/Conv",
+          "/backbone/blocks.5/blocks.5.0/bn1/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            136,
+            816
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 111792.0,
+        "macs": 134150400.0,
+        "ops": 266342400.0
+      },
+      "hexapod_backbone_simplified/dw14": {
+        "type": "dw",
+        "input": [
+          "hexapod_backbone_simplified/conv27"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv28"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            816
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            816
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.5/blocks.5.0/conv_dw/Conv",
+          "/backbone/blocks.5/blocks.5.0/bn2/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            816,
+            1
+          ],
+          "strides": [
+            1,
+            2,
+            2,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 8160.0,
+        "macs": 2448000,
+        "ops": 4406400
+      },
+      "hexapod_backbone_simplified/conv28": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/dw14"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv29",
+          "hexapod_backbone_simplified/ew_add9"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            816
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            224
+          ],
+          [
+            -1,
+            15,
+            20,
+            224
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.5/blocks.5.0/conv_pwl/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            816,
+            224
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 183008.0,
+        "macs": 54902400.0,
+        "ops": 109670400.0
+      },
+      "hexapod_backbone_simplified/conv29": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/conv28"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/dw15"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            224
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            1344
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.5/blocks.5.1/conv_pw/Conv",
+          "/backbone/blocks.5/blocks.5.1/bn1/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            224,
+            1344
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 302400.0,
+        "macs": 90720000.0,
+        "ops": 180633600.0
+      },
+      "hexapod_backbone_simplified/dw15": {
+        "type": "dw",
+        "input": [
+          "hexapod_backbone_simplified/conv29"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv30"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            1344
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            1344
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.5/blocks.5.1/conv_dw/Conv",
+          "/backbone/blocks.5/blocks.5.1/bn2/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            1344,
+            1
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 13440.0,
+        "macs": 4032000,
+        "ops": 7257600
+      },
+      "hexapod_backbone_simplified/conv30": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/dw15"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/ew_add9"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            1344
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            224
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.5/blocks.5.1/conv_pwl/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            1344,
+            224
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 301280.0,
+        "macs": 90384000.0,
+        "ops": 180633600.0
+      },
+      "hexapod_backbone_simplified/ew_add9": {
+        "type": "ew_add",
+        "input": [
+          "hexapod_backbone_simplified/conv30",
+          "hexapod_backbone_simplified/conv28"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv31",
+          "hexapod_backbone_simplified/ew_add10"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            224
+          ],
+          [
+            -1,
+            15,
+            20,
+            224
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            224
+          ],
+          [
+            -1,
+            15,
+            20,
+            224
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.5/blocks.5.1/Add"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "activation": "linear"
+        },
+        "weights": 0,
+        "macs": 33600.0,
+        "ops": 67200.0
+      },
+      "hexapod_backbone_simplified/conv31": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/ew_add9"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/dw16"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            224
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            1344
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.5/blocks.5.2/conv_pw/Conv",
+          "/backbone/blocks.5/blocks.5.2/bn1/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            224,
+            1344
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 302400.0,
+        "macs": 90720000.0,
+        "ops": 180633600.0
+      },
+      "hexapod_backbone_simplified/dw16": {
+        "type": "dw",
+        "input": [
+          "hexapod_backbone_simplified/conv31"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv32"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            1344
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            1344
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.5/blocks.5.2/conv_dw/Conv",
+          "/backbone/blocks.5/blocks.5.2/bn2/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            1344,
+            1
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 13440.0,
+        "macs": 4032000,
+        "ops": 7257600
+      },
+      "hexapod_backbone_simplified/conv32": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/dw16"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/ew_add10"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            1344
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            224
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.5/blocks.5.2/conv_pwl/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            1344,
+            224
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 301280.0,
+        "macs": 90384000.0,
+        "ops": 180633600.0
+      },
+      "hexapod_backbone_simplified/ew_add10": {
+        "type": "ew_add",
+        "input": [
+          "hexapod_backbone_simplified/conv32",
+          "hexapod_backbone_simplified/ew_add9"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv33"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            224
+          ],
+          [
+            -1,
+            15,
+            20,
+            224
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            224
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.5/blocks.5.2/Add"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "activation": "linear"
+        },
+        "weights": 0,
+        "macs": 33600.0,
+        "ops": 67200.0
+      },
+      "hexapod_backbone_simplified/conv33": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/ew_add10"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/dw17"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            224
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            1344
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.6/blocks.6.0/conv_pw/Conv",
+          "/backbone/blocks.6/blocks.6.0/bn1/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            224,
+            1344
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 302400.0,
+        "macs": 90720000.0,
+        "ops": 180633600.0
+      },
+      "hexapod_backbone_simplified/dw17": {
+        "type": "dw",
+        "input": [
+          "hexapod_backbone_simplified/conv33"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/conv34"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            1344
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            1344
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.6/blocks.6.0/conv_dw/Conv",
+          "/backbone/blocks.6/blocks.6.0/bn2/act/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            1344,
+            1
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 13440.0,
+        "macs": 4032000,
+        "ops": 7257600
+      },
+      "hexapod_backbone_simplified/conv34": {
+        "type": "conv",
+        "input": [
+          "hexapod_backbone_simplified/dw17"
+        ],
+        "output": [
+          "hexapod_backbone_simplified/output_layer4"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            1344
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            448
+          ]
+        ],
+        "original_names": [
+          "/backbone/blocks.6/blocks.6.0/conv_pwl/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            1344,
+            448
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 602560.0,
+        "macs": 180768000.0,
+        "ops": 361267200.0
+      },
+      "hexapod_backbone_simplified/output_layer1": {
+        "type": "output_layer",
+        "input": [
+          "hexapod_backbone_simplified/ew_add1"
+        ],
+        "output": [],
+        "input_shapes": [
+          [
+            -1,
+            120,
+            160,
+            32
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            120,
+            160,
+            32
+          ]
+        ],
+        "original_names": [
+          "f_s4"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "transposed": false,
+        "engine": "nn_core",
+        "io_type": "standard",
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_backbone_simplified/output_layer2": {
+        "type": "output_layer",
+        "input": [
+          "hexapod_backbone_simplified/ew_add3"
+        ],
+        "output": [],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            48
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            48
+          ]
+        ],
+        "original_names": [
+          "f_s8"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "transposed": false,
+        "engine": "nn_core",
+        "io_type": "standard",
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_backbone_simplified/output_layer3": {
+        "type": "output_layer",
+        "input": [
+          "hexapod_backbone_simplified/ew_add8"
+        ],
+        "output": [],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            136
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            136
+          ]
+        ],
+        "original_names": [
+          "f_s16"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "transposed": false,
+        "engine": "nn_core",
+        "io_type": "standard",
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_backbone_simplified/output_layer4": {
+        "type": "output_layer",
+        "input": [
+          "hexapod_backbone_simplified/conv34"
+        ],
+        "output": [],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            448
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            448
+          ]
+        ],
+        "original_names": [
+          "f_s32"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "transposed": false,
+        "engine": "nn_core",
+        "io_type": "standard",
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      }
+    }
+  }
+}
