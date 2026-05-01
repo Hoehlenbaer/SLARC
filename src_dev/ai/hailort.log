@@ -3393,3 +3393,103 @@
 [2026-05-01 14:12:24.322] [73223] [HailoRT] [error] [vdevice.cpp:939] [create_physical_core_op] CHECK_SUCCESS failed with status=HAILO_INVALID_OPERATION(6)
 [2026-05-01 14:12:24.322] [73223] [HailoRT] [error] [vdevice.cpp:967] [create_vdevice_core_op] CHECK_SUCCESS failed with status=HAILO_INVALID_OPERATION(6)
 [2026-05-01 14:12:24.322] [73223] [HailoRT] [error] [vdevice.cpp:749] [configure] CHECK_SUCCESS failed with status=HAILO_INVALID_OPERATION(6)
+[2026-05-01 16:28:46.247] [73820] [HailoRT] [info] [vdevice.cpp:535] [create] Creating vdevice with params: device_count: 1, scheduling_algorithm: NONE, multi_process_service: false
+[2026-05-01 16:28:46.258] [73820] [HailoRT] [info] [device.cpp:51] [Device] OS Version: Linux 6.12.75+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.12.75-1+rpt1 (2026-03-11) aarch64
+[2026-05-01 16:28:46.258] [73820] [HailoRT] [info] [control.cpp:113] [control__parse_identify_results] firmware_version is: 4.23.0
+[2026-05-01 16:28:46.258] [73820] [HailoRT] [info] [vdevice.cpp:682] [create] VDevice Infos: 0001:01:00.0
+[2026-05-01 16:28:46.264] [73820] [HailoRT] [info] [internal_buffer_manager.cpp:75] [print_execution_results] Default Internal buffer planner failed to meet requirements
+[2026-05-01 16:28:46.264] [73820] [HailoRT] [info] [internal_buffer_manager.cpp:86] [print_execution_results] Default Internal buffer planner executed successfully
+[2026-05-01 16:28:46.282] [73820] [HailoRT] [info] [device_internal.cpp:57] [configure] Configuring HEF took 23.425117 milliseconds
+[2026-05-01 16:28:46.282] [73820] [HailoRT] [info] [vdevice.cpp:780] [configure] Configuring HEF on VDevice took 23.704617 milliseconds
+[2026-05-01 16:28:46.282] [73820] [HailoRT] [info] [hef.cpp:1994] [get_network_group_and_network_name] No name was given. Addressing all networks of default network_group: hexapod_backbone_simplified
+[2026-05-01 16:28:46.282] [73820] [HailoRT] [info] [hef.cpp:1994] [get_network_group_and_network_name] No name was given. Addressing all networks of default network_group: hexapod_backbone_simplified
+[2026-05-01 16:28:46.300] [73820] [HailoRT] [info] [core_op.cpp:156] [activate] Activating hexapod_backbone_simplified took 0.821279 milliseconds. Note that the function is asynchronous and thus the network is not fully activated yet.
+[2026-05-01 16:28:46.300] [73820] [HailoRT] [info] [core_op.cpp:156] [activate] Activating hexapod_backbone_simplified took 0.855168 milliseconds. Note that the function is asynchronous and thus the network is not fully activated yet.
+[2026-05-01 16:28:46.300] [73820] [HailoRT] [info] [edge_elements.cpp:52] [create] Created (HwWriteEl4hexapod_backbone_simplified/input_layer1 | hw_frame_size: 307200)
+[2026-05-01 16:28:46.300] [73820] [HailoRT] [info] [vstream.cpp:754] [InputVStreamImpl] Creating hexapod_backbone_simplified/input_layer1...
+[2026-05-01 16:28:46.300] [73820] [HailoRT] [info] [vstream_builder.cpp:102] [create_inputs] Input pipeline 'hexapod_backbone_simplified/input_layer1': (HwWriteEl4hexapod_backbone_simplified/input_layer1 | hw_frame_size: 307200) >> HW
+[2026-05-01 16:28:46.300] [73820] [HailoRT] [info] [edge_elements.cpp:287] [create] Created (HwReadEl14hexapod_backbone_simplified/conv14 | hw_frame_size: 614400)
+[2026-05-01 16:28:46.301] [73820] [HailoRT] [info] [queue_elements.cpp:657] [create] Created (PullQEl_hw_read14hexapod_backbone_simplified/conv14)
+[2026-05-01 16:28:46.301] [73820] [HailoRT] [info] [filter_elements.cpp:372] [create] Created (PostInferEl14hexapod_backbone_simplified/conv14 | Quantization - src_type: UINT8, dst_type FLOAT32, limvals_min: -33.5154, limvals_max: 29.7915)
+[2026-05-01 16:28:46.301] [73820] [HailoRT] [info] [queue_elements.cpp:800] [create] Created (UserBuffQEl14hexapod_backbone_simplified/conv14 | timeout: 10s)
+[2026-05-01 16:28:46.301] [73820] [HailoRT] [info] [vstream.cpp:1114] [OutputVStreamImpl] Creating hexapod_backbone_simplified/conv14...
+[2026-05-01 16:28:46.301] [73820] [HailoRT] [info] [vstream_builder.cpp:220] [create_outputs] Output pipeline 'hexapod_backbone_simplified/conv14': HW >> (HwReadEl14hexapod_backbone_simplified/conv14 | hw_frame_size: 614400) >> (PullQEl_hw_read14hexapod_backbone_simplified/conv14) >> (PostInferEl14hexapod_backbone_simplified/conv14 | Quantization - src_type: UINT8, dst_type FLOAT32, limvals_min: -33.5154, limvals_max: 29.7915) >> (UserBuffQEl14hexapod_backbone_simplified/conv14 | timeout: 10s)
+[2026-05-01 16:28:46.301] [73820] [HailoRT] [info] [edge_elements.cpp:287] [create] Created (HwReadEl13hexapod_backbone_simplified/conv29 | hw_frame_size: 307200)
+[2026-05-01 16:28:46.301] [73820] [HailoRT] [info] [queue_elements.cpp:657] [create] Created (PullQEl_hw_read13hexapod_backbone_simplified/conv29)
+[2026-05-01 16:28:46.301] [73820] [HailoRT] [info] [filter_elements.cpp:372] [create] Created (PostInferEl13hexapod_backbone_simplified/conv29 | Quantization - src_type: UINT8, dst_type FLOAT32, limvals_min: -21.5705, limvals_max: 19.1738)
+[2026-05-01 16:28:46.301] [73820] [HailoRT] [info] [queue_elements.cpp:800] [create] Created (UserBuffQEl13hexapod_backbone_simplified/conv29 | timeout: 10s)
+[2026-05-01 16:28:46.301] [73820] [HailoRT] [info] [vstream.cpp:1114] [OutputVStreamImpl] Creating hexapod_backbone_simplified/conv29...
+[2026-05-01 16:28:46.301] [73820] [HailoRT] [info] [vstream_builder.cpp:220] [create_outputs] Output pipeline 'hexapod_backbone_simplified/conv29': HW >> (HwReadEl13hexapod_backbone_simplified/conv29 | hw_frame_size: 307200) >> (PullQEl_hw_read13hexapod_backbone_simplified/conv29) >> (PostInferEl13hexapod_backbone_simplified/conv29 | Quantization - src_type: UINT8, dst_type FLOAT32, limvals_min: -21.5705, limvals_max: 19.1738) >> (UserBuffQEl13hexapod_backbone_simplified/conv29 | timeout: 10s)
+[2026-05-01 16:28:46.301] [73820] [HailoRT] [info] [edge_elements.cpp:287] [create] Created (HwReadEl12hexapod_backbone_simplified/conv38 | hw_frame_size: 153600)
+[2026-05-01 16:28:46.301] [73820] [HailoRT] [info] [queue_elements.cpp:657] [create] Created (PullQEl_hw_read12hexapod_backbone_simplified/conv38)
+[2026-05-01 16:28:46.301] [73820] [HailoRT] [info] [filter_elements.cpp:372] [create] Created (PostInferEl12hexapod_backbone_simplified/conv38 | Quantization - src_type: UINT8, dst_type FLOAT32, limvals_min: -8.37229, limvals_max: 7.92491)
+[2026-05-01 16:28:46.301] [73820] [HailoRT] [info] [queue_elements.cpp:800] [create] Created (UserBuffQEl12hexapod_backbone_simplified/conv38 | timeout: 10s)
+[2026-05-01 16:28:46.301] [73820] [HailoRT] [info] [vstream.cpp:1114] [OutputVStreamImpl] Creating hexapod_backbone_simplified/conv38...
+[2026-05-01 16:28:46.301] [73820] [HailoRT] [info] [vstream_builder.cpp:220] [create_outputs] Output pipeline 'hexapod_backbone_simplified/conv38': HW >> (HwReadEl12hexapod_backbone_simplified/conv38 | hw_frame_size: 153600) >> (PullQEl_hw_read12hexapod_backbone_simplified/conv38) >> (PostInferEl12hexapod_backbone_simplified/conv38 | Quantization - src_type: UINT8, dst_type FLOAT32, limvals_min: -8.37229, limvals_max: 7.92491) >> (UserBuffQEl12hexapod_backbone_simplified/conv38 | timeout: 10s)
+[2026-05-01 16:28:46.301] [73820] [HailoRT] [info] [edge_elements.cpp:287] [create] Created (HwReadEl15hexapod_backbone_simplified/conv7 | hw_frame_size: 1228800)
+[2026-05-01 16:28:46.302] [73820] [HailoRT] [info] [queue_elements.cpp:657] [create] Created (PullQEl_hw_read15hexapod_backbone_simplified/conv7)
+[2026-05-01 16:28:46.302] [73820] [HailoRT] [info] [filter_elements.cpp:372] [create] Created (PostInferEl15hexapod_backbone_simplified/conv7 | Quantization - src_type: UINT8, dst_type FLOAT32, limvals_min: -36.1605, limvals_max: 28.7756)
+[2026-05-01 16:28:46.303] [73820] [HailoRT] [info] [queue_elements.cpp:800] [create] Created (UserBuffQEl15hexapod_backbone_simplified/conv7 | timeout: 10s)
+[2026-05-01 16:28:46.303] [73820] [HailoRT] [info] [vstream.cpp:1114] [OutputVStreamImpl] Creating hexapod_backbone_simplified/conv7...
+[2026-05-01 16:28:46.303] [73820] [HailoRT] [info] [vstream_builder.cpp:220] [create_outputs] Output pipeline 'hexapod_backbone_simplified/conv7': HW >> (HwReadEl15hexapod_backbone_simplified/conv7 | hw_frame_size: 1228800) >> (PullQEl_hw_read15hexapod_backbone_simplified/conv7) >> (PostInferEl15hexapod_backbone_simplified/conv7 | Quantization - src_type: UINT8, dst_type FLOAT32, limvals_min: -36.1605, limvals_max: 28.7756) >> (UserBuffQEl15hexapod_backbone_simplified/conv7 | timeout: 10s)
+[2026-05-01 16:28:46.812] [73829] [HailoRT] [info] [vdevice_native_stream.cpp:331] [read_impl] Failed read from stream HAILO_STREAM_ABORT(63) (device: 0001:01:00.0)
+[2026-05-01 16:28:46.812] [73829] [HailoRT] [info] [edge_elements.cpp:396] [run_pull] Reading from stream was aborted!
+[2026-05-01 16:28:46.812] [73829] [HailoRT] [info] [queue_elements.cpp:738] [run_in_thread] run_pull of queue element PullQEl_hw_read14hexapod_backbone_simplified/conv14 was aborted!
+[2026-05-01 16:28:46.813] [73830] [HailoRT] [info] [queue_elements.cpp:855] [run_in_thread] Shutdown event was signaled in dequeue of UserBuffQEl14hexapod_backbone_simplified/conv14!
+[2026-05-01 16:28:46.814] [73829] [HailoRT] [info] [queue_elements.cpp:68] [operator()] Thread in element PullQEl_hw_read14hexapod_backbone_simplified/conv14 is not running anymore, exiting..
+[2026-05-01 16:28:46.814] [73820] [HailoRT] [info] [queue_elements.cpp:46] [~BaseQueueElement] Queue element PullQEl_hw_read14hexapod_backbone_simplified/conv14 has 0 frames in his Queue on destruction
+[2026-05-01 16:28:46.814] [73830] [HailoRT] [info] [queue_elements.cpp:68] [operator()] Thread in element UserBuffQEl14hexapod_backbone_simplified/conv14 is not running anymore, exiting..
+[2026-05-01 16:28:46.814] [73820] [HailoRT] [info] [queue_elements.cpp:46] [~BaseQueueElement] Queue element UserBuffQEl14hexapod_backbone_simplified/conv14 has 0 frames in his Queue on destruction
+[2026-05-01 16:28:46.814] [73833] [HailoRT] [info] [queue_elements.cpp:855] [run_in_thread] Shutdown event was signaled in dequeue of UserBuffQEl13hexapod_backbone_simplified/conv29!
+[2026-05-01 16:28:46.814] [73831] [HailoRT] [info] [vdevice_native_stream.cpp:331] [read_impl] Failed read from stream HAILO_STREAM_ABORT(63) (device: 0001:01:00.0)
+[2026-05-01 16:28:46.814] [73831] [HailoRT] [info] [edge_elements.cpp:396] [run_pull] Reading from stream was aborted!
+[2026-05-01 16:28:46.814] [73831] [HailoRT] [info] [queue_elements.cpp:738] [run_in_thread] run_pull of queue element PullQEl_hw_read13hexapod_backbone_simplified/conv29 was aborted!
+[2026-05-01 16:28:46.814] [73831] [HailoRT] [info] [queue_elements.cpp:68] [operator()] Thread in element PullQEl_hw_read13hexapod_backbone_simplified/conv29 is not running anymore, exiting..
+[2026-05-01 16:28:46.814] [73820] [HailoRT] [info] [queue_elements.cpp:46] [~BaseQueueElement] Queue element PullQEl_hw_read13hexapod_backbone_simplified/conv29 has 0 frames in his Queue on destruction
+[2026-05-01 16:28:46.814] [73833] [HailoRT] [info] [queue_elements.cpp:68] [operator()] Thread in element UserBuffQEl13hexapod_backbone_simplified/conv29 is not running anymore, exiting..
+[2026-05-01 16:28:46.814] [73820] [HailoRT] [info] [queue_elements.cpp:46] [~BaseQueueElement] Queue element UserBuffQEl13hexapod_backbone_simplified/conv29 has 0 frames in his Queue on destruction
+[2026-05-01 16:28:46.814] [73834] [HailoRT] [info] [vdevice_native_stream.cpp:331] [read_impl] Failed read from stream HAILO_STREAM_ABORT(63) (device: 0001:01:00.0)
+[2026-05-01 16:28:46.814] [73834] [HailoRT] [info] [edge_elements.cpp:396] [run_pull] Reading from stream was aborted!
+[2026-05-01 16:28:46.814] [73835] [HailoRT] [info] [queue_elements.cpp:855] [run_in_thread] Shutdown event was signaled in dequeue of UserBuffQEl12hexapod_backbone_simplified/conv38!
+[2026-05-01 16:28:46.814] [73834] [HailoRT] [info] [queue_elements.cpp:738] [run_in_thread] run_pull of queue element PullQEl_hw_read12hexapod_backbone_simplified/conv38 was aborted!
+[2026-05-01 16:28:46.814] [73834] [HailoRT] [info] [queue_elements.cpp:68] [operator()] Thread in element PullQEl_hw_read12hexapod_backbone_simplified/conv38 is not running anymore, exiting..
+[2026-05-01 16:28:46.814] [73820] [HailoRT] [info] [queue_elements.cpp:46] [~BaseQueueElement] Queue element PullQEl_hw_read12hexapod_backbone_simplified/conv38 has 0 frames in his Queue on destruction
+[2026-05-01 16:28:46.814] [73835] [HailoRT] [info] [queue_elements.cpp:68] [operator()] Thread in element UserBuffQEl12hexapod_backbone_simplified/conv38 is not running anymore, exiting..
+[2026-05-01 16:28:46.814] [73820] [HailoRT] [info] [queue_elements.cpp:46] [~BaseQueueElement] Queue element UserBuffQEl12hexapod_backbone_simplified/conv38 has 0 frames in his Queue on destruction
+[2026-05-01 16:28:46.814] [73836] [HailoRT] [info] [vdevice_native_stream.cpp:331] [read_impl] Failed read from stream HAILO_STREAM_ABORT(63) (device: 0001:01:00.0)
+[2026-05-01 16:28:46.814] [73836] [HailoRT] [info] [edge_elements.cpp:396] [run_pull] Reading from stream was aborted!
+[2026-05-01 16:28:46.814] [73838] [HailoRT] [info] [queue_elements.cpp:855] [run_in_thread] Shutdown event was signaled in dequeue of UserBuffQEl15hexapod_backbone_simplified/conv7!
+[2026-05-01 16:28:46.814] [73836] [HailoRT] [info] [queue_elements.cpp:738] [run_in_thread] run_pull of queue element PullQEl_hw_read15hexapod_backbone_simplified/conv7 was aborted!
+[2026-05-01 16:28:46.814] [73836] [HailoRT] [info] [queue_elements.cpp:68] [operator()] Thread in element PullQEl_hw_read15hexapod_backbone_simplified/conv7 is not running anymore, exiting..
+[2026-05-01 16:28:46.814] [73820] [HailoRT] [info] [queue_elements.cpp:46] [~BaseQueueElement] Queue element PullQEl_hw_read15hexapod_backbone_simplified/conv7 has 0 frames in his Queue on destruction
+[2026-05-01 16:28:46.814] [73838] [HailoRT] [info] [queue_elements.cpp:68] [operator()] Thread in element UserBuffQEl15hexapod_backbone_simplified/conv7 is not running anymore, exiting..
+[2026-05-01 16:28:46.814] [73820] [HailoRT] [info] [queue_elements.cpp:46] [~BaseQueueElement] Queue element UserBuffQEl15hexapod_backbone_simplified/conv7 has 0 frames in his Queue on destruction
+[2026-05-01 16:28:46.814] [73820] [HailoRT] [info] [core_op.cpp:186] [deactivate] Deactivating took 0.397963 ms
+[2026-05-01 16:28:46.814] [73820] [HailoRT] [info] [core_op.cpp:186] [deactivate] Deactivating took 0.407538 ms
+[2026-05-01 16:28:46.882] [73820] [HailoRT] [info] [vdevice.cpp:535] [create] Creating vdevice with params: device_count: 1, scheduling_algorithm: NONE, multi_process_service: false
+[2026-05-01 16:28:46.894] [73820] [HailoRT] [info] [device.cpp:51] [Device] OS Version: Linux 6.12.75+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.12.75-1+rpt1 (2026-03-11) aarch64
+[2026-05-01 16:28:46.894] [73820] [HailoRT] [info] [control.cpp:113] [control__parse_identify_results] firmware_version is: 4.23.0
+[2026-05-01 16:28:46.894] [73820] [HailoRT] [info] [vdevice.cpp:682] [create] VDevice Infos: 0001:01:00.0
+[2026-05-01 16:28:46.902] [73820] [HailoRT] [info] [internal_buffer_manager.cpp:75] [print_execution_results] Default Internal buffer planner failed to meet requirements
+[2026-05-01 16:28:46.902] [73820] [HailoRT] [info] [internal_buffer_manager.cpp:86] [print_execution_results] Default Internal buffer planner executed successfully
+[2026-05-01 16:28:46.917] [73820] [HailoRT] [info] [device_internal.cpp:57] [configure] Configuring HEF took 22.388227 milliseconds
+[2026-05-01 16:28:46.917] [73820] [HailoRT] [info] [vdevice.cpp:780] [configure] Configuring HEF on VDevice took 22.660097 milliseconds
+[2026-05-01 16:28:46.919] [73820] [HailoRT] [info] [internal_buffer_manager.cpp:77] [print_execution_results] Planned internal buffer memory: CMA=0 CMA-Desc=917504 Pinned=4892160. memory to edge layer usage factor is 1
+[2026-05-01 16:28:46.919] [73820] [HailoRT] [info] [internal_buffer_manager.cpp:86] [print_execution_results] Default Internal buffer planner executed successfully
+[2026-05-01 16:28:46.953] [73820] [HailoRT] [info] [device_internal.cpp:57] [configure] Configuring HEF took 35.572389 milliseconds
+[2026-05-01 16:28:46.953] [73820] [HailoRT] [info] [vdevice.cpp:780] [configure] Configuring HEF on VDevice took 35.905741 milliseconds
+[2026-05-01 16:28:46.954] [73820] [HailoRT] [info] [buffer_requirements.cpp:198] [find_initial_desc_page_size] Using non-default initial_desc_page_size of 128, due to a small transfer size (128)
+[2026-05-01 16:28:46.955] [73820] [HailoRT] [info] [internal_buffer_manager.cpp:77] [print_execution_results] Planned internal buffer memory: CMA=0 CMA-Desc=393216 Pinned=406272. memory to edge layer usage factor is 1
+[2026-05-01 16:28:46.955] [73820] [HailoRT] [info] [internal_buffer_manager.cpp:86] [print_execution_results] Default Internal buffer planner executed successfully
+[2026-05-01 16:28:46.987] [73820] [HailoRT] [info] [device_internal.cpp:57] [configure] Configuring HEF took 33.527591 milliseconds
+[2026-05-01 16:28:46.987] [73820] [HailoRT] [info] [vdevice.cpp:780] [configure] Configuring HEF on VDevice took 33.940036 milliseconds
+[2026-05-01 16:28:46.987] [73820] [HailoRT] [info] [hef.cpp:1994] [get_network_group_and_network_name] No name was given. Addressing all networks of default network_group: hexapod_backbone_simplified
+[2026-05-01 16:28:46.987] [73820] [HailoRT] [info] [hef.cpp:1994] [get_network_group_and_network_name] No name was given. Addressing all networks of default network_group: hexapod_geometry_simplified
+[2026-05-01 16:28:46.987] [73820] [HailoRT] [info] [hef.cpp:1994] [get_network_group_and_network_name] No name was given. Addressing all networks of default network_group: hexapod_detection_simplified
+[2026-05-01 16:28:46.990] [73820] [HailoRT] [info] [core_op.cpp:156] [activate] Activating hexapod_backbone_simplified took 0.770279 milliseconds. Note that the function is asynchronous and thus the network is not fully activated yet.
+[2026-05-01 16:28:46.990] [73820] [HailoRT] [info] [core_op.cpp:156] [activate] Activating hexapod_backbone_simplified took 0.786686 milliseconds. Note that the function is asynchronous and thus the network is not fully activated yet.
+[2026-05-01 16:28:46.990] [73820] [HailoRT] [error] [core_op.cpp:125] [activate] CHECK failed - Cant activate network because a network is already activated
+[2026-05-01 16:28:46.990] [73820] [HailoRT] [error] [network_group.cpp:98] [ActivatedNetworkGroupImpl] Failed activate HAILO_INVALID_OPERATION(6)
+[2026-05-01 16:28:46.990] [73820] [HailoRT] [error] [network_group.cpp:49] [create] CHECK_SUCCESS failed with status=HAILO_INVALID_OPERATION(6)
+[2026-05-01 16:28:46.992] [73820] [HailoRT] [info] [core_op.cpp:186] [deactivate] Deactivating took 1.624835 ms
+[2026-05-01 16:28:46.992] [73820] [HailoRT] [info] [core_op.cpp:186] [deactivate] Deactivating took 1.653872 ms
