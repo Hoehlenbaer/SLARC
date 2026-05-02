@@ -1,0 +1,4731 @@
+{
+  "stats": {
+    "profiler_parameters": {
+      "time": "Sat, 02 May 2026 08:07:17 +0200",
+      "compiler_version": "3.33.1",
+      "profiling_mode": "Parsed",
+      "is_quantized": false
+    },
+    "model_details": {
+      "model_name": "hexapod_detection_simplified",
+      "weights": 1899789.0,
+      "hw_arch": "hailo8",
+      "total_ops_per_frame": 6820967168.0,
+      "input_shapes": [
+        "120x160x64",
+        "60x80x128",
+        "30x40x128",
+        "15x20x256",
+        "120x160x3"
+      ],
+      "output_shapes": [
+        "120x160x6",
+        "60x80x45",
+        "30x40x45",
+        "15x20x45"
+      ],
+      "post_processing": [],
+      "input_conversion": [],
+      "resize_input": [],
+      "normalization": false,
+      "transpose": false
+    },
+    "performance_details": []
+  },
+  "csv_data": [],
+  "latency_data": {
+    "runtime_data": {}
+  },
+  "accuracy_data": {},
+  "hn_model": {
+    "name": "hexapod_detection_simplified",
+    "net_params": {
+      "version": "1.0",
+      "stage": "HN",
+      "clusters_placement": [
+        []
+      ],
+      "clusters_to_skip": [],
+      "output_layers_order": [
+        "hexapod_detection_simplified/ew_add6",
+        "hexapod_detection_simplified/concat5",
+        "hexapod_detection_simplified/concat8",
+        "hexapod_detection_simplified/concat11"
+      ],
+      "is_transformer": false,
+      "transposed_net": false,
+      "net_scopes": [
+        "hexapod_detection_simplified"
+      ],
+      "lora_adapters": []
+    },
+    "layers": {
+      "hexapod_detection_simplified/const_input1": {
+        "type": "const_input",
+        "input": [],
+        "output": [
+          "hexapod_detection_simplified/concat3"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            1
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            1
+          ]
+        ],
+        "original_names": [
+          "yolo_head.head_s8.coord_conv_cls.add_coords.y_coords"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "input_tiles": [
+            [
+              1,
+              1,
+              1
+            ]
+          ]
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/const_input10": {
+        "type": "const_input",
+        "input": [],
+        "output": [
+          "hexapod_detection_simplified/concat7"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            1
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            1
+          ]
+        ],
+        "original_names": [
+          "yolo_head.head_s16.coord_conv_cls.add_coords.y_coords"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "input_tiles": [
+            [
+              1,
+              1,
+              1
+            ]
+          ]
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/const_input11": {
+        "type": "const_input",
+        "input": [],
+        "output": [
+          "hexapod_detection_simplified/concat7"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            1
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            1
+          ]
+        ],
+        "original_names": [
+          "yolo_head.head_s16.coord_conv_cls.add_coords.x_coords"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "input_tiles": [
+            [
+              1,
+              1,
+              1
+            ]
+          ]
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/const_input12": {
+        "type": "const_input",
+        "input": [],
+        "output": [
+          "hexapod_detection_simplified/concat9"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            1
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            1
+          ]
+        ],
+        "original_names": [
+          "yolo_head.head_s32.coord_conv_cls.add_coords.y_coords"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "input_tiles": [
+            [
+              1,
+              1,
+              1
+            ]
+          ]
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/const_input2": {
+        "type": "const_input",
+        "input": [],
+        "output": [
+          "hexapod_detection_simplified/concat9"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            1
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            1
+          ]
+        ],
+        "original_names": [
+          "yolo_head.head_s32.coord_conv_cls.add_coords.x_coords"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "input_tiles": [
+            [
+              1,
+              1,
+              1
+            ]
+          ]
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/const_input3": {
+        "type": "const_input",
+        "input": [],
+        "output": [
+          "hexapod_detection_simplified/concat10"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            1
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            1
+          ]
+        ],
+        "original_names": [
+          "yolo_head.head_s32.coord_conv_cls.add_coords.y_coords"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "input_tiles": [
+            [
+              1,
+              1,
+              1
+            ]
+          ]
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/const_input4": {
+        "type": "const_input",
+        "input": [],
+        "output": [
+          "hexapod_detection_simplified/concat10"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            1
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            1
+          ]
+        ],
+        "original_names": [
+          "yolo_head.head_s32.coord_conv_cls.add_coords.x_coords"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "input_tiles": [
+            [
+              1,
+              1,
+              1
+            ]
+          ]
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/const_input5": {
+        "type": "const_input",
+        "input": [],
+        "output": [
+          "hexapod_detection_simplified/concat3"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            1
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            1
+          ]
+        ],
+        "original_names": [
+          "yolo_head.head_s8.coord_conv_cls.add_coords.x_coords"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "input_tiles": [
+            [
+              1,
+              1,
+              1
+            ]
+          ]
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/const_input6": {
+        "type": "const_input",
+        "input": [],
+        "output": [
+          "hexapod_detection_simplified/concat4"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            1
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            1
+          ]
+        ],
+        "original_names": [
+          "yolo_head.head_s8.coord_conv_cls.add_coords.y_coords"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "input_tiles": [
+            [
+              1,
+              1,
+              1
+            ]
+          ]
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/const_input7": {
+        "type": "const_input",
+        "input": [],
+        "output": [
+          "hexapod_detection_simplified/concat4"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            1
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            1
+          ]
+        ],
+        "original_names": [
+          "yolo_head.head_s8.coord_conv_cls.add_coords.x_coords"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "input_tiles": [
+            [
+              1,
+              1,
+              1
+            ]
+          ]
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/const_input8": {
+        "type": "const_input",
+        "input": [],
+        "output": [
+          "hexapod_detection_simplified/concat6"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            1
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            1
+          ]
+        ],
+        "original_names": [
+          "yolo_head.head_s16.coord_conv_cls.add_coords.y_coords"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "input_tiles": [
+            [
+              1,
+              1,
+              1
+            ]
+          ]
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/const_input9": {
+        "type": "const_input",
+        "input": [],
+        "output": [
+          "hexapod_detection_simplified/concat6"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            1
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            1
+          ]
+        ],
+        "original_names": [
+          "yolo_head.head_s16.coord_conv_cls.add_coords.x_coords"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "input_tiles": [
+            [
+              1,
+              1,
+              1
+            ]
+          ]
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/input_layer1": {
+        "type": "input_layer",
+        "input": [],
+        "output": [
+          "hexapod_detection_simplified/concat1"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            120,
+            160,
+            64
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            120,
+            160,
+            64
+          ]
+        ],
+        "original_names": [
+          "f_s4_l"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "transposed": false,
+        "engine": "nn_core",
+        "io_type": "standard",
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/input_layer2": {
+        "type": "input_layer",
+        "input": [],
+        "output": [
+          "hexapod_detection_simplified/conv1"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            128
+          ]
+        ],
+        "original_names": [
+          "f_s8_l"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "transposed": false,
+        "engine": "nn_core",
+        "io_type": "standard",
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/conv1": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/input_layer2"
+        ],
+        "output": [
+          "hexapod_detection_simplified/ew_add2"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            64
+          ]
+        ],
+        "original_names": [
+          "/fpn_neck/lat_s8/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            128,
+            64
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 8256.0,
+        "macs": 39628800.0,
+        "ops": 78643200.0
+      },
+      "hexapod_detection_simplified/input_layer3": {
+        "type": "input_layer",
+        "input": [],
+        "output": [
+          "hexapod_detection_simplified/conv2",
+          "hexapod_detection_simplified/conv3",
+          "hexapod_detection_simplified/dw1"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            128
+          ],
+          [
+            -1,
+            30,
+            40,
+            128
+          ],
+          [
+            -1,
+            30,
+            40,
+            128
+          ]
+        ],
+        "original_names": [
+          "f_s16_l"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "transposed": false,
+        "engine": "nn_core",
+        "io_type": "standard",
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/conv2": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/input_layer3"
+        ],
+        "output": [
+          "hexapod_detection_simplified/ew_add1"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            64
+          ]
+        ],
+        "original_names": [
+          "/fpn_neck/lat_s16/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            128,
+            64
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 8256.0,
+        "macs": 9907200.0,
+        "ops": 19660800.0
+      },
+      "hexapod_detection_simplified/conv3": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/input_layer3"
+        ],
+        "output": [
+          "hexapod_detection_simplified/ew_mult1"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            128
+          ]
+        ],
+        "original_names": [
+          "/seg_head/cbr_high/cbr_high.0/Conv",
+          "/seg_head/cbr_high/cbr_high.2/Relu"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            128,
+            128
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "relu"
+        },
+        "weights": 16512.0,
+        "macs": 19814400.0,
+        "ops": 39321600.0
+      },
+      "hexapod_detection_simplified/dw1": {
+        "type": "dw",
+        "input": [
+          "hexapod_detection_simplified/input_layer3"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv4"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            1,
+            1,
+            128
+          ]
+        ],
+        "original_names": [
+          "/seg_head/scale_high/scale_high.0/pool/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "kernel_shape": [
+            30,
+            40,
+            128,
+            1
+          ],
+          "strides": [
+            1,
+            30,
+            40,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 153728.0,
+        "macs": 153728,
+        "ops": 307200
+      },
+      "hexapod_detection_simplified/conv4": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/dw1"
+        ],
+        "output": [
+          "hexapod_detection_simplified/resize3"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            1,
+            1,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            1,
+            1,
+            128
+          ]
+        ],
+        "original_names": [
+          "/seg_head/scale_high/scale_high.1/Conv",
+          "/seg_head/scale_high/scale_high.2/Sigmoid"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            128,
+            128
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "sigmoid"
+        },
+        "weights": 16512.0,
+        "macs": 16512.0,
+        "ops": 32768.0
+      },
+      "hexapod_detection_simplified/input_layer4": {
+        "type": "input_layer",
+        "input": [],
+        "output": [
+          "hexapod_detection_simplified/conv5"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            256
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            256
+          ]
+        ],
+        "original_names": [
+          "f_s32_l"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "transposed": false,
+        "engine": "nn_core",
+        "io_type": "standard",
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/conv5": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/input_layer4"
+        ],
+        "output": [
+          "hexapod_detection_simplified/maxpool1",
+          "hexapod_detection_simplified/concat2"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            256
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            128
+          ],
+          [
+            -1,
+            15,
+            20,
+            128
+          ]
+        ],
+        "original_names": [
+          "/sppf/cv1/cv1.0/Conv",
+          "/sppf/cv1/cv1.2/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            256,
+            128
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 32896.0,
+        "macs": 9868800.0,
+        "ops": 19660800.0
+      },
+      "hexapod_detection_simplified/input_layer5": {
+        "type": "input_layer",
+        "input": [],
+        "output": [
+          "hexapod_detection_simplified/concat1",
+          "hexapod_detection_simplified/concat12"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            120,
+            160,
+            3
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            120,
+            160,
+            3
+          ],
+          [
+            -1,
+            120,
+            160,
+            3
+          ]
+        ],
+        "original_names": [
+          "normals_s4"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "transposed": false,
+        "engine": "nn_core",
+        "io_type": "standard",
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/concat1": {
+        "type": "concat",
+        "input": [
+          "hexapod_detection_simplified/input_layer1",
+          "hexapod_detection_simplified/input_layer5"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv6"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            120,
+            160,
+            64
+          ],
+          [
+            -1,
+            120,
+            160,
+            3
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            120,
+            160,
+            67
+          ]
+        ],
+        "original_names": [
+          "/seg_head/Concat"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "concat_axis": "features"
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/conv6": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/concat1"
+        ],
+        "output": [
+          "hexapod_detection_simplified/ew_add5"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            120,
+            160,
+            67
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            120,
+            160,
+            6
+          ]
+        ],
+        "original_names": [
+          "/seg_head/low_classifier/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            67,
+            6
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 408.0,
+        "macs": 7833600.0,
+        "ops": 15436800.0
+      },
+      "hexapod_detection_simplified/maxpool1": {
+        "type": "maxpool",
+        "input": [
+          "hexapod_detection_simplified/conv5"
+        ],
+        "output": [
+          "hexapod_detection_simplified/maxpool2",
+          "hexapod_detection_simplified/concat2"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            128
+          ],
+          [
+            -1,
+            15,
+            20,
+            128
+          ]
+        ],
+        "original_names": [
+          "/sppf/m/MaxPool"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            5,
+            5,
+            1
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "activation": "linear",
+          "count_include_pad": true
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/maxpool2": {
+        "type": "maxpool",
+        "input": [
+          "hexapod_detection_simplified/maxpool1"
+        ],
+        "output": [
+          "hexapod_detection_simplified/maxpool3",
+          "hexapod_detection_simplified/concat2"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            128
+          ],
+          [
+            -1,
+            15,
+            20,
+            128
+          ]
+        ],
+        "original_names": [
+          "/sppf/m_1/MaxPool"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            5,
+            5,
+            1
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "activation": "linear",
+          "count_include_pad": true
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/maxpool3": {
+        "type": "maxpool",
+        "input": [
+          "hexapod_detection_simplified/maxpool2"
+        ],
+        "output": [
+          "hexapod_detection_simplified/concat2"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            128
+          ]
+        ],
+        "original_names": [
+          "/sppf/m_2/MaxPool"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            5,
+            5,
+            1
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "activation": "linear",
+          "count_include_pad": true
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/concat2": {
+        "type": "concat",
+        "input": [
+          "hexapod_detection_simplified/conv5",
+          "hexapod_detection_simplified/maxpool1",
+          "hexapod_detection_simplified/maxpool2",
+          "hexapod_detection_simplified/maxpool3"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv7"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            128
+          ],
+          [
+            -1,
+            15,
+            20,
+            128
+          ],
+          [
+            -1,
+            15,
+            20,
+            128
+          ],
+          [
+            -1,
+            15,
+            20,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            512
+          ]
+        ],
+        "original_names": [
+          "/sppf/Concat"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "concat_axis": "features"
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/conv7": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/concat2"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv8"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            512
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            256
+          ]
+        ],
+        "original_names": [
+          "/sppf/cv2/cv2.0/Conv",
+          "/sppf/cv2/cv2.2/Clip"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            512,
+            256
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "clip"
+        },
+        "weights": 131328.0,
+        "macs": 39398400.0,
+        "ops": 78643200.0
+      },
+      "hexapod_detection_simplified/conv8": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/conv7"
+        ],
+        "output": [
+          "hexapod_detection_simplified/resize1",
+          "hexapod_detection_simplified/ew_add4"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            256
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            64
+          ],
+          [
+            -1,
+            15,
+            20,
+            64
+          ]
+        ],
+        "original_names": [
+          "/fpn_neck/lat_s32/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            256,
+            64
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 16448.0,
+        "macs": 4934400.0,
+        "ops": 9830400.0
+      },
+      "hexapod_detection_simplified/resize1": {
+        "type": "resize",
+        "input": [
+          "hexapod_detection_simplified/conv8"
+        ],
+        "output": [
+          "hexapod_detection_simplified/ew_add1"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            64
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            64
+          ]
+        ],
+        "original_names": [
+          "/fpn_neck/Resize"
+        ],
+        "compilation_params": {
+          "hw_layer_type_list": [
+            "lcu"
+          ],
+          "resize_bilinear_streaming": "disabled"
+        },
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "resize_h_ratio_list": [
+            2.0
+          ],
+          "resize_w_ratio_list": [
+            2.0
+          ],
+          "resize_f_ratio_list": [
+            1.0
+          ],
+          "method": "nearest_neighbor",
+          "resize_bilinear_pixels_mode": "disabled"
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/ew_add1": {
+        "type": "ew_add",
+        "input": [
+          "hexapod_detection_simplified/conv2",
+          "hexapod_detection_simplified/resize1"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv9",
+          "hexapod_detection_simplified/resize2"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            64
+          ],
+          [
+            -1,
+            30,
+            40,
+            64
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            64
+          ],
+          [
+            -1,
+            30,
+            40,
+            64
+          ]
+        ],
+        "original_names": [
+          "/fpn_neck/Add"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "activation": "linear"
+        },
+        "weights": 0,
+        "macs": 38400.0,
+        "ops": 76800.0
+      },
+      "hexapod_detection_simplified/conv9": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/ew_add1"
+        ],
+        "output": [
+          "hexapod_detection_simplified/ew_add3"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            64
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            64
+          ]
+        ],
+        "original_names": [
+          "/fpn_neck/smooth_s16/rbr_reparam/Conv",
+          "/fpn_neck/smooth_s16/act/Relu"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            64,
+            64
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "relu"
+        },
+        "weights": 36928.0,
+        "macs": 44313600.0,
+        "ops": 88473600.0
+      },
+      "hexapod_detection_simplified/resize2": {
+        "type": "resize",
+        "input": [
+          "hexapod_detection_simplified/ew_add1"
+        ],
+        "output": [
+          "hexapod_detection_simplified/ew_add2"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            64
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            64
+          ]
+        ],
+        "original_names": [
+          "/fpn_neck/Resize_1"
+        ],
+        "compilation_params": {
+          "hw_layer_type_list": [
+            "lcu"
+          ],
+          "resize_bilinear_streaming": "disabled"
+        },
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "resize_h_ratio_list": [
+            2.0
+          ],
+          "resize_w_ratio_list": [
+            2.0
+          ],
+          "resize_f_ratio_list": [
+            1.0
+          ],
+          "method": "nearest_neighbor",
+          "resize_bilinear_pixels_mode": "disabled"
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/ew_add2": {
+        "type": "ew_add",
+        "input": [
+          "hexapod_detection_simplified/conv1",
+          "hexapod_detection_simplified/resize2"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv10"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            64
+          ],
+          [
+            -1,
+            60,
+            80,
+            64
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            64
+          ]
+        ],
+        "original_names": [
+          "/fpn_neck/Add_1"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "activation": "linear"
+        },
+        "weights": 0,
+        "macs": 153600.0,
+        "ops": 307200.0
+      },
+      "hexapod_detection_simplified/conv10": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/ew_add2"
+        ],
+        "output": [
+          "hexapod_detection_simplified/concat3",
+          "hexapod_detection_simplified/concat4",
+          "hexapod_detection_simplified/conv11"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            64
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            64
+          ],
+          [
+            -1,
+            60,
+            80,
+            64
+          ],
+          [
+            -1,
+            60,
+            80,
+            64
+          ]
+        ],
+        "original_names": [
+          "/fpn_neck/smooth_s8/rbr_reparam/Conv",
+          "/fpn_neck/smooth_s8/act/Relu"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            64,
+            64
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "relu"
+        },
+        "weights": 36928.0,
+        "macs": 177254400.0,
+        "ops": 353894400.0
+      },
+      "hexapod_detection_simplified/concat3": {
+        "type": "concat",
+        "input": [
+          "hexapod_detection_simplified/conv10",
+          "hexapod_detection_simplified/const_input1",
+          "hexapod_detection_simplified/const_input5"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv13"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            64
+          ],
+          [
+            -1,
+            60,
+            80,
+            1
+          ],
+          [
+            -1,
+            60,
+            80,
+            1
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            66
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s8/cls_convs/coord_conv_cls/add_coords/Concat"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "concat_axis": "features"
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/concat4": {
+        "type": "concat",
+        "input": [
+          "hexapod_detection_simplified/conv10",
+          "hexapod_detection_simplified/const_input6",
+          "hexapod_detection_simplified/const_input7"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv16"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            64
+          ],
+          [
+            -1,
+            60,
+            80,
+            1
+          ],
+          [
+            -1,
+            60,
+            80,
+            1
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            66
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s8/reg_convs/coord_conv_reg/add_coords/Concat"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "concat_axis": "features"
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/conv11": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/conv10"
+        ],
+        "output": [
+          "hexapod_detection_simplified/ew_add3"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            64
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            64
+          ]
+        ],
+        "original_names": [
+          "/fpn_neck/bu_s16/rbr_reparam/Conv",
+          "/fpn_neck/bu_s16/act/Relu"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            64,
+            64
+          ],
+          "strides": [
+            1,
+            2,
+            2,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "relu"
+        },
+        "weights": 36928.0,
+        "macs": 44313600.0,
+        "ops": 88473600.0
+      },
+      "hexapod_detection_simplified/conv13": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/concat3"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv14"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            66
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            128
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s8/cls_convs/coord_conv_cls/conv/Conv",
+          "/yolo_head/head_s8/cls_convs/cls_convs.2/Relu"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            66,
+            128
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "relu"
+        },
+        "weights": 76160.0,
+        "macs": 365568000.0,
+        "ops": 729907200.0
+      },
+      "hexapod_detection_simplified/conv14": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/conv13"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv15"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            128
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s8/cls_convs/cls_convs.3/rbr_reparam/Conv",
+          "/yolo_head/head_s8/cls_convs/cls_convs.3/act/Relu"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            128,
+            128
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "relu"
+        },
+        "weights": 147584.0,
+        "macs": 708403200.0,
+        "ops": 1415577600.0
+      },
+      "hexapod_detection_simplified/conv15": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/conv14"
+        ],
+        "output": [
+          "hexapod_detection_simplified/concat5"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            40
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s8/cls_pred/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            128,
+            40
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 5160.0,
+        "macs": 24768000.0,
+        "ops": 49152000.0
+      },
+      "hexapod_detection_simplified/conv16": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/concat4"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv17"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            66
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            128
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s8/reg_convs/coord_conv_reg/conv/Conv",
+          "/yolo_head/head_s8/reg_convs/reg_convs.2/Relu"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            66,
+            128
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "relu"
+        },
+        "weights": 76160.0,
+        "macs": 365568000.0,
+        "ops": 729907200.0
+      },
+      "hexapod_detection_simplified/conv17": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/conv16"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv18",
+          "hexapod_detection_simplified/conv19"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            128
+          ],
+          [
+            -1,
+            60,
+            80,
+            128
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s8/reg_convs/reg_convs.3/rbr_reparam/Conv",
+          "/yolo_head/head_s8/reg_convs/reg_convs.3/act/Relu"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            128,
+            128
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "relu"
+        },
+        "weights": 147584.0,
+        "macs": 708403200.0,
+        "ops": 1415577600.0
+      },
+      "hexapod_detection_simplified/conv18": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/conv17"
+        ],
+        "output": [
+          "hexapod_detection_simplified/concat5"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            1
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s8/obj_pred/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            128,
+            1
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 129.0,
+        "macs": 619200.0,
+        "ops": 1228800.0
+      },
+      "hexapod_detection_simplified/conv19": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/conv17"
+        ],
+        "output": [
+          "hexapod_detection_simplified/concat5"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            4
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s8/reg_pred/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            128,
+            4
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 516.0,
+        "macs": 2476800.0,
+        "ops": 4915200.0
+      },
+      "hexapod_detection_simplified/concat5": {
+        "type": "concat",
+        "input": [
+          "hexapod_detection_simplified/conv19",
+          "hexapod_detection_simplified/conv18",
+          "hexapod_detection_simplified/conv15"
+        ],
+        "output": [
+          "hexapod_detection_simplified/output_layer1"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            4
+          ],
+          [
+            -1,
+            60,
+            80,
+            1
+          ],
+          [
+            -1,
+            60,
+            80,
+            40
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            45
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s8/Concat"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "concat_axis": "features"
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/ew_add3": {
+        "type": "ew_add",
+        "input": [
+          "hexapod_detection_simplified/conv9",
+          "hexapod_detection_simplified/conv11"
+        ],
+        "output": [
+          "hexapod_detection_simplified/concat6",
+          "hexapod_detection_simplified/concat7",
+          "hexapod_detection_simplified/conv12"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            64
+          ],
+          [
+            -1,
+            30,
+            40,
+            64
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            64
+          ],
+          [
+            -1,
+            30,
+            40,
+            64
+          ],
+          [
+            -1,
+            30,
+            40,
+            64
+          ]
+        ],
+        "original_names": [
+          "/fpn_neck/Add_2"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "activation": "linear"
+        },
+        "weights": 0,
+        "macs": 38400.0,
+        "ops": 76800.0
+      },
+      "hexapod_detection_simplified/concat6": {
+        "type": "concat",
+        "input": [
+          "hexapod_detection_simplified/ew_add3",
+          "hexapod_detection_simplified/const_input8",
+          "hexapod_detection_simplified/const_input9"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv20"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            64
+          ],
+          [
+            -1,
+            30,
+            40,
+            1
+          ],
+          [
+            -1,
+            30,
+            40,
+            1
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            66
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s16/cls_convs/coord_conv_cls/add_coords/Concat"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "concat_axis": "features"
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/concat7": {
+        "type": "concat",
+        "input": [
+          "hexapod_detection_simplified/ew_add3",
+          "hexapod_detection_simplified/const_input10",
+          "hexapod_detection_simplified/const_input11"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv23"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            64
+          ],
+          [
+            -1,
+            30,
+            40,
+            1
+          ],
+          [
+            -1,
+            30,
+            40,
+            1
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            66
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s16/reg_convs/coord_conv_reg/add_coords/Concat"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "concat_axis": "features"
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/conv12": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/ew_add3"
+        ],
+        "output": [
+          "hexapod_detection_simplified/ew_add4"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            64
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            64
+          ]
+        ],
+        "original_names": [
+          "/fpn_neck/bu_s32/rbr_reparam/Conv",
+          "/fpn_neck/bu_s32/act/Relu"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            64,
+            64
+          ],
+          "strides": [
+            1,
+            2,
+            2,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "relu"
+        },
+        "weights": 36928.0,
+        "macs": 11078400.0,
+        "ops": 22118400.0
+      },
+      "hexapod_detection_simplified/conv20": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/concat6"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv21"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            66
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            128
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s16/cls_convs/coord_conv_cls/conv/Conv",
+          "/yolo_head/head_s16/cls_convs/cls_convs.2/Relu"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            66,
+            128
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "relu"
+        },
+        "weights": 76160.0,
+        "macs": 91392000.0,
+        "ops": 182476800.0
+      },
+      "hexapod_detection_simplified/conv21": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/conv20"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv22"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            128
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s16/cls_convs/cls_convs.3/rbr_reparam/Conv",
+          "/yolo_head/head_s16/cls_convs/cls_convs.3/act/Relu"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            128,
+            128
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "relu"
+        },
+        "weights": 147584.0,
+        "macs": 177100800.0,
+        "ops": 353894400.0
+      },
+      "hexapod_detection_simplified/conv22": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/conv21"
+        ],
+        "output": [
+          "hexapod_detection_simplified/concat8"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            40
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s16/cls_pred/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            128,
+            40
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 5160.0,
+        "macs": 6192000.0,
+        "ops": 12288000.0
+      },
+      "hexapod_detection_simplified/conv23": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/concat7"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv24"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            66
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            128
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s16/reg_convs/coord_conv_reg/conv/Conv",
+          "/yolo_head/head_s16/reg_convs/reg_convs.2/Relu"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            66,
+            128
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "relu"
+        },
+        "weights": 76160.0,
+        "macs": 91392000.0,
+        "ops": 182476800.0
+      },
+      "hexapod_detection_simplified/conv24": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/conv23"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv25",
+          "hexapod_detection_simplified/conv26"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            128
+          ],
+          [
+            -1,
+            30,
+            40,
+            128
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s16/reg_convs/reg_convs.3/rbr_reparam/Conv",
+          "/yolo_head/head_s16/reg_convs/reg_convs.3/act/Relu"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            128,
+            128
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "relu"
+        },
+        "weights": 147584.0,
+        "macs": 177100800.0,
+        "ops": 353894400.0
+      },
+      "hexapod_detection_simplified/conv25": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/conv24"
+        ],
+        "output": [
+          "hexapod_detection_simplified/concat8"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            1
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s16/obj_pred/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            128,
+            1
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 129.0,
+        "macs": 154800.0,
+        "ops": 307200.0
+      },
+      "hexapod_detection_simplified/conv26": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/conv24"
+        ],
+        "output": [
+          "hexapod_detection_simplified/concat8"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            4
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s16/reg_pred/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            128,
+            4
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 516.0,
+        "macs": 619200.0,
+        "ops": 1228800.0
+      },
+      "hexapod_detection_simplified/concat8": {
+        "type": "concat",
+        "input": [
+          "hexapod_detection_simplified/conv26",
+          "hexapod_detection_simplified/conv25",
+          "hexapod_detection_simplified/conv22"
+        ],
+        "output": [
+          "hexapod_detection_simplified/output_layer2"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            4
+          ],
+          [
+            -1,
+            30,
+            40,
+            1
+          ],
+          [
+            -1,
+            30,
+            40,
+            40
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            45
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s16/Concat"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "concat_axis": "features"
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/ew_add4": {
+        "type": "ew_add",
+        "input": [
+          "hexapod_detection_simplified/conv8",
+          "hexapod_detection_simplified/conv12"
+        ],
+        "output": [
+          "hexapod_detection_simplified/concat10",
+          "hexapod_detection_simplified/concat9"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            64
+          ],
+          [
+            -1,
+            15,
+            20,
+            64
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            64
+          ],
+          [
+            -1,
+            15,
+            20,
+            64
+          ]
+        ],
+        "original_names": [
+          "/fpn_neck/Add_3"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "activation": "linear"
+        },
+        "weights": 0,
+        "macs": 9600.0,
+        "ops": 19200.0
+      },
+      "hexapod_detection_simplified/concat10": {
+        "type": "concat",
+        "input": [
+          "hexapod_detection_simplified/ew_add4",
+          "hexapod_detection_simplified/const_input3",
+          "hexapod_detection_simplified/const_input4"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv30"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            64
+          ],
+          [
+            -1,
+            15,
+            20,
+            1
+          ],
+          [
+            -1,
+            15,
+            20,
+            1
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            66
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s32/reg_convs/coord_conv_reg/add_coords/Concat"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "concat_axis": "features"
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/concat9": {
+        "type": "concat",
+        "input": [
+          "hexapod_detection_simplified/ew_add4",
+          "hexapod_detection_simplified/const_input12",
+          "hexapod_detection_simplified/const_input2"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv27"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            64
+          ],
+          [
+            -1,
+            15,
+            20,
+            1
+          ],
+          [
+            -1,
+            15,
+            20,
+            1
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            66
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s32/cls_convs/coord_conv_cls/add_coords/Concat"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "concat_axis": "features"
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/conv27": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/concat9"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv28"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            66
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            128
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s32/cls_convs/coord_conv_cls/conv/Conv",
+          "/yolo_head/head_s32/cls_convs/cls_convs.2/Relu"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            66,
+            128
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "relu"
+        },
+        "weights": 76160.0,
+        "macs": 22848000.0,
+        "ops": 45619200.0
+      },
+      "hexapod_detection_simplified/conv28": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/conv27"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv29"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            128
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s32/cls_convs/cls_convs.3/rbr_reparam/Conv",
+          "/yolo_head/head_s32/cls_convs/cls_convs.3/act/Relu"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            128,
+            128
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "relu"
+        },
+        "weights": 147584.0,
+        "macs": 44275200.0,
+        "ops": 88473600.0
+      },
+      "hexapod_detection_simplified/conv29": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/conv28"
+        ],
+        "output": [
+          "hexapod_detection_simplified/concat11"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            40
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s32/cls_pred/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            128,
+            40
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 5160.0,
+        "macs": 1548000.0,
+        "ops": 3072000.0
+      },
+      "hexapod_detection_simplified/conv30": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/concat10"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv31"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            66
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            128
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s32/reg_convs/coord_conv_reg/conv/Conv",
+          "/yolo_head/head_s32/reg_convs/reg_convs.2/Relu"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            66,
+            128
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "relu"
+        },
+        "weights": 76160.0,
+        "macs": 22848000.0,
+        "ops": 45619200.0
+      },
+      "hexapod_detection_simplified/conv31": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/conv30"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv32",
+          "hexapod_detection_simplified/conv33"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            128
+          ],
+          [
+            -1,
+            15,
+            20,
+            128
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s32/reg_convs/reg_convs.3/rbr_reparam/Conv",
+          "/yolo_head/head_s32/reg_convs/reg_convs.3/act/Relu"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            128,
+            128
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "relu"
+        },
+        "weights": 147584.0,
+        "macs": 44275200.0,
+        "ops": 88473600.0
+      },
+      "hexapod_detection_simplified/conv32": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/conv31"
+        ],
+        "output": [
+          "hexapod_detection_simplified/concat11"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            1
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s32/obj_pred/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            128,
+            1
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 129.0,
+        "macs": 38700.0,
+        "ops": 76800.0
+      },
+      "hexapod_detection_simplified/conv33": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/conv31"
+        ],
+        "output": [
+          "hexapod_detection_simplified/concat11"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            4
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s32/reg_pred/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            128,
+            4
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 516.0,
+        "macs": 154800.0,
+        "ops": 307200.0
+      },
+      "hexapod_detection_simplified/concat11": {
+        "type": "concat",
+        "input": [
+          "hexapod_detection_simplified/conv33",
+          "hexapod_detection_simplified/conv32",
+          "hexapod_detection_simplified/conv29"
+        ],
+        "output": [
+          "hexapod_detection_simplified/output_layer3"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            4
+          ],
+          [
+            -1,
+            15,
+            20,
+            1
+          ],
+          [
+            -1,
+            15,
+            20,
+            40
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            45
+          ]
+        ],
+        "original_names": [
+          "/yolo_head/head_s32/Concat"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "concat_axis": "features"
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/output_layer1": {
+        "type": "output_layer",
+        "input": [
+          "hexapod_detection_simplified/concat5"
+        ],
+        "output": [],
+        "input_shapes": [
+          [
+            -1,
+            60,
+            80,
+            45
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            60,
+            80,
+            45
+          ]
+        ],
+        "original_names": [
+          "yolo_s8"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "transposed": false,
+        "engine": "nn_core",
+        "io_type": "standard",
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/output_layer2": {
+        "type": "output_layer",
+        "input": [
+          "hexapod_detection_simplified/concat8"
+        ],
+        "output": [],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            45
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            45
+          ]
+        ],
+        "original_names": [
+          "yolo_s16"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "transposed": false,
+        "engine": "nn_core",
+        "io_type": "standard",
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/output_layer3": {
+        "type": "output_layer",
+        "input": [
+          "hexapod_detection_simplified/concat11"
+        ],
+        "output": [],
+        "input_shapes": [
+          [
+            -1,
+            15,
+            20,
+            45
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            15,
+            20,
+            45
+          ]
+        ],
+        "original_names": [
+          "yolo_s32"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "transposed": false,
+        "engine": "nn_core",
+        "io_type": "standard",
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/resize3": {
+        "type": "resize",
+        "input": [
+          "hexapod_detection_simplified/conv4"
+        ],
+        "output": [
+          "hexapod_detection_simplified/ew_mult1"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            1,
+            1,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            128
+          ]
+        ],
+        "original_names": [
+          "/seg_head/Mul"
+        ],
+        "compilation_params": {
+          "hw_layer_type_list": [
+            "lcu"
+          ]
+        },
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "resize_h_ratio_list": [
+            30.0
+          ],
+          "resize_w_ratio_list": [
+            40.0
+          ],
+          "resize_f_ratio_list": [
+            1.0
+          ],
+          "method": "nearest_neighbor",
+          "resize_bilinear_pixels_mode": "disabled"
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/ew_mult1": {
+        "type": "ew_mult",
+        "input": [
+          "hexapod_detection_simplified/conv3",
+          "hexapod_detection_simplified/resize3"
+        ],
+        "output": [
+          "hexapod_detection_simplified/resize4"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            128
+          ],
+          [
+            -1,
+            30,
+            40,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            30,
+            40,
+            128
+          ]
+        ],
+        "original_names": [
+          "/seg_head/Mul"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "activation": "linear",
+          "is_softmax_mask": false,
+          "ew_mult_type": "on_apu"
+        },
+        "weights": 0,
+        "macs": 76800.0,
+        "ops": 153600.0
+      },
+      "hexapod_detection_simplified/resize4": {
+        "type": "resize",
+        "input": [
+          "hexapod_detection_simplified/ew_mult1"
+        ],
+        "output": [
+          "hexapod_detection_simplified/concat12",
+          "hexapod_detection_simplified/conv34"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            30,
+            40,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            120,
+            160,
+            128
+          ],
+          [
+            -1,
+            120,
+            160,
+            128
+          ]
+        ],
+        "original_names": [
+          "/seg_head/Resize"
+        ],
+        "compilation_params": {
+          "hw_layer_type_list": [
+            "lcu"
+          ],
+          "resize_bilinear_streaming": "disabled"
+        },
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "resize_h_ratio_list": [
+            4.0
+          ],
+          "resize_w_ratio_list": [
+            4.0
+          ],
+          "resize_f_ratio_list": [
+            1.0
+          ],
+          "method": "nearest_neighbor",
+          "resize_bilinear_pixels_mode": "disabled"
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/concat12": {
+        "type": "concat",
+        "input": [
+          "hexapod_detection_simplified/resize4",
+          "hexapod_detection_simplified/input_layer5"
+        ],
+        "output": [
+          "hexapod_detection_simplified/conv35"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            120,
+            160,
+            128
+          ],
+          [
+            -1,
+            120,
+            160,
+            3
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            120,
+            160,
+            131
+          ]
+        ],
+        "original_names": [
+          "/seg_head/Concat_1"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "concat_axis": "features"
+        },
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      },
+      "hexapod_detection_simplified/conv34": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/resize4"
+        ],
+        "output": [
+          "hexapod_detection_simplified/ew_add5"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            120,
+            160,
+            128
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            120,
+            160,
+            6
+          ]
+        ],
+        "original_names": [
+          "/seg_head/high_classifier/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            1,
+            1,
+            128,
+            6
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "padding": "VALID",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 774.0,
+        "macs": 14860800.0,
+        "ops": 29491200.0
+      },
+      "hexapod_detection_simplified/conv35": {
+        "type": "conv",
+        "input": [
+          "hexapod_detection_simplified/concat12"
+        ],
+        "output": [
+          "hexapod_detection_simplified/ew_add6"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            120,
+            160,
+            131
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            120,
+            160,
+            6
+          ]
+        ],
+        "original_names": [
+          "/seg_head/mid_classifier/Conv"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "params": {
+          "kernel_shape": [
+            3,
+            3,
+            131,
+            6
+          ],
+          "strides": [
+            1,
+            1,
+            1,
+            1
+          ],
+          "dilations": [
+            1,
+            2,
+            2,
+            1
+          ],
+          "padding": "SAME_TENSORFLOW",
+          "groups": 1,
+          "layer_disparity": 1,
+          "input_disparity": 1,
+          "batch_norm": false,
+          "elementwise_add": false,
+          "activation": "linear"
+        },
+        "weights": 7080.0,
+        "macs": 135936000.0,
+        "ops": 271641600.0
+      },
+      "hexapod_detection_simplified/ew_add5": {
+        "type": "ew_add",
+        "input": [
+          "hexapod_detection_simplified/conv6",
+          "hexapod_detection_simplified/conv34"
+        ],
+        "output": [
+          "hexapod_detection_simplified/ew_add6"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            120,
+            160,
+            6
+          ],
+          [
+            -1,
+            120,
+            160,
+            6
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            120,
+            160,
+            6
+          ]
+        ],
+        "original_names": [
+          "/seg_head/Add"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "activation": "linear"
+        },
+        "weights": 0,
+        "macs": 57600.0,
+        "ops": 115200.0
+      },
+      "hexapod_detection_simplified/ew_add6": {
+        "type": "ew_add",
+        "input": [
+          "hexapod_detection_simplified/ew_add5",
+          "hexapod_detection_simplified/conv35"
+        ],
+        "output": [
+          "hexapod_detection_simplified/output_layer4"
+        ],
+        "input_shapes": [
+          [
+            -1,
+            120,
+            160,
+            6
+          ],
+          [
+            -1,
+            120,
+            160,
+            6
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            120,
+            160,
+            6
+          ]
+        ],
+        "original_names": [
+          "/seg_head/Add_1"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "double_scale_initialization"
+        },
+        "params": {
+          "activation": "linear"
+        },
+        "weights": 0,
+        "macs": 57600.0,
+        "ops": 115200.0
+      },
+      "hexapod_detection_simplified/output_layer4": {
+        "type": "output_layer",
+        "input": [
+          "hexapod_detection_simplified/ew_add6"
+        ],
+        "output": [],
+        "input_shapes": [
+          [
+            -1,
+            120,
+            160,
+            6
+          ]
+        ],
+        "output_shapes": [
+          [
+            -1,
+            120,
+            160,
+            6
+          ]
+        ],
+        "original_names": [
+          "seg"
+        ],
+        "compilation_params": {},
+        "quantization_params": {
+          "quantization_groups": 1,
+          "precision_mode": "a8_w8_a8",
+          "bias_mode": "single_scale_decomposition"
+        },
+        "transposed": false,
+        "engine": "nn_core",
+        "io_type": "standard",
+        "weights": 0,
+        "macs": 0,
+        "ops": 0
+      }
+    }
+  }
+}
