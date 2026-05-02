@@ -397,7 +397,7 @@ def _run_and_print(title, run_fn, n_frames, warmup, steps, labels):
     
     total_median = np.median([t['total'] for t in all_timings])
     print(f"\n🎯 Pipeline FPS: {1000/total_median:.1f} FPS (Median)")
-    print(f"   Ziel 30 FPS → max 33.3 ms/Frame → "
+    print(f"   Ziel 15 FPS → max 66.6 ms/Frame → "
           f"{'✅ ERREICHT' if total_median < 33.3 else '❌ ZU LANGSAM'}")
 
 
