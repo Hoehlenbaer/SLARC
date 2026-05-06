@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # FusedHexapodModel V4.0 — Phase 1 Full Training
+# # FusedHexapodModel V5.0 — Phase 1 Full Training
 # 1 shared backbone: MNV2-1.4
 # 4 Heads: Stereo + YOLO (35 classes) + Seg (6 depth-derived classes) + Surface Normals
 # Single-channel grayscale input. No teacher dependencies for Seg.
@@ -30,11 +30,11 @@ if DEVICE.type == 'cuda':
     print(f"  VRAM: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB")
 
 # =====================================================================
-# V4 CONFIG
+# V5 CONFIG
 # =====================================================================
 CONFIG = {
     'img_height': 480, 'img_width': 640,
-    'num_det_classes': 40,   # ✅ V2.9: 40 robot-relevant classes   
+    'num_det_classes': 41,   # ✅ V5.0: 40 robot-relevant classes + 1 "unknown object"  
     'num_seg_classes': 6,    # ✅ V2.9: depth-derived geometric classes (was 11)
     'max_disp_pixel': 192,
     'backbone_stride': 4,
@@ -53,24 +53,43 @@ CONFIG = {
     'tartan_fy': 320.0,      # ✅ FIXED: Depth is natively 480x640, no resize → fy=fx=320
     'tartan_baseline': 0.25,
     # Seg class weights (inverse frequency, tune after first epoch)
-    'seg_class_weights': [1.0, 3.0, 1.0, 2.0, 2.0, 0.5],  # WALL 0.5× (suppress), STEP 10×, OBSTACLE/VEG 5×
+    'seg_class_weights': [1.0, 2.0, 1.0, 1.0, 0.5, 1.0],  # Index: FLR  STP  WAL  OBS  VOI  TER
     'VIS_THRESH': 0.30,
     'start_step': 0,
 }
+# =====================================================================
+# V5.0 TEST CONFIG — Architektur-Varianten für Hailo-Compile-Test
+# =====================================================================
+V5_CONFIG = {
+    'use_correlation_stereo': True,   # True = CorrelationStereoHead, False = V4.0 CostVolume
+    'channel_alignment': 'stereo_focused',      # 'none' | 'moderate' | 'wide' | 'stereo_focused'
+    # 'none':           32/48/136/448 (MNV2-1.4 raw, wie V4.0)
+    # 'moderate':       32/64/128/256 (Hailo-aligned, minimale Änderung)
+    # 'wide':           64/128/256/512 (maximale Cluster-Auslastung)
+    # 'stereo_focused': 64/128/128/256 (Stereo optimiert)
+}
 
-SEG_CLASS_NAMES = ['WALKABLE', 'STEP', 'WALL', 'OBSTACLE', 'NAV_ANCHOR', 'VOID']
+SEG_CLASS_NAMES = ['WALKABLE', 'STEP', 'WALL', 'OBSTACLE', 'VOID', 'TERRAIN']
 
 
 # 40 Robot-Relevant COCO Classes
 ROBOT_CAT_IDS = [1,2,3,4,6,8,10,11,13,14,15,16,17,18,27,28,31,33,44,47,51,
                   62,63,64,65,67,70,72,73,75,76,77,78,79,81,82,84,85,86,88]
+
+UNKNOWN_CLASS_ID = 40  # Index 40 = "da ist etwas"
+
+# Bekannte Klassen → 0-39, alles andere → 40 (UNKNOWN)
 robot_cat_to_continuous = {cid: idx for idx, cid in enumerate(ROBOT_CAT_IDS)}
 
-print(f"V2.10 Config: {CONFIG['num_det_classes']} det classes, {CONFIG['num_seg_classes']} seg classes")
+def map_coco_to_robot(coco_cat_id):
+    """Mappt COCO category ID auf Robot-Klasse 0-40."""
+    return robot_cat_to_continuous.get(coco_cat_id, UNKNOWN_CLASS_ID)
+
+print(f"V5.0 Config: {CONFIG['num_det_classes']} det classes, {CONFIG['num_seg_classes']} seg classes")
 print(f"Seg classes: {SEG_CLASS_NAMES}")
 
 
-# ## V4.0 Architecture
+# ## V5.0 Architecture
 # 1-channel input, NormalsHead, modified LRASPPHead with normals input, 35-class YOLO
 
 # In[2]:
@@ -146,46 +165,7 @@ class SPPF(nn.Module):
         y3 = self.m(y2)
         # Cat von Original + 3 MaxPool-Stufen
         return self.cv2(torch.cat((x, y1, y2, y3), 1))
-# Version 4.0 Update: Remove CBAM and related classes (ChannelAttention & SpatialAttention)
-'''
-class ChannelAttention(nn.Module):
-    def __init__(self, in_planes, ratio=16):
-        super().__init__()
-        self.avg_pool = nn.AdaptiveAvgPool2d(1)
-        self.max_pool = nn.AdaptiveMaxPool2d(1)
-        self.fc1   = nn.Conv2d(in_planes, in_planes // ratio, 1, bias=False)
-        self.relu1 = nn.ReLU()
-        self.fc2   = nn.Conv2d(in_planes // ratio, in_planes, 1, bias=False)
-        self.sigmoid = nn.Sigmoid()
 
-    def forward(self, x):
-        avg_out = self.fc2(self.relu1(self.fc1(self.avg_pool(x))))
-        max_out = self.fc2(self.relu1(self.fc1(self.max_pool(x))))
-        return self.sigmoid(avg_out + max_out)
-
-class SpatialAttention(nn.Module):
-    def __init__(self, kernel_size=7):
-        super().__init__()
-        self.conv1 = nn.Conv2d(2, 1, kernel_size, padding=kernel_size//2, bias=False)
-        self.sigmoid = nn.Sigmoid()
-
-    def forward(self, x):
-        avg_out = torch.mean(x, dim=1, keepdim=True)
-        max_out, _ = torch.max(x, dim=1, keepdim=True)
-        x_cat = torch.cat([avg_out, max_out], dim=1)
-        return self.sigmoid(self.conv1(x_cat))
-
-class CBAM(nn.Module):
-    def __init__(self, in_planes, ratio=16, kernel_size=7):
-        super().__init__()
-        self.ca = ChannelAttention(in_planes, ratio)
-        self.sa = SpatialAttention(kernel_size)
-
-    def forward(self, x):
-        x = x * self.ca(x)
-        x = x * self.sa(x)
-        return x
-'''
 
 class GeometryStem(nn.Module):
     def __init__(self, in_ch=32, out_ch=32): # MobileNetV3 s4 hat oft 24 ch
@@ -586,7 +566,173 @@ class HierarchicalStereoHead(nn.Module):
         #print("disp_s4 max:", disp_s4.abs().max().item())
         #print("final_disp max:", final_disp.abs().max().item())
         return disp_s4, disp_s8
+# =====================================================================
+# V5.0: Correlation Layer + Channel Aligner
+# =====================================================================
 
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+# (Dein CoordConv2d und RefinementStage müssen natürlich importiert bleiben)
+
+class HailoCostVolume(nn.Module):
+    """CostVolume: Nur Shift & Concat. Hailo-freundlich, da keine pixelweise Multiplikation nötig ist."""
+    def __init__(self, max_disp, deploy=False):
+        super().__init__()
+        self.max_disp = max_disp
+        self.deploy = deploy
+
+    def forward(self, feat_l, feat_r):
+        B, C, H, W = feat_l.shape
+        
+        if self.deploy:
+            volume_slices = []
+            for d in range(self.max_disp):
+                if d == 0:
+                    shifted = feat_r
+                else:
+                    shifted = F.pad(feat_r, (d, 0, 0, 0))[:, :, :, :-d]
+                
+                # Bisher: torch.sum(feat_l * shifted, dim=1)
+                # NEU: Wir kleben die linke und verschobene rechte Feature-Map einfach aneinander
+                # Output Shape pro Slice: [B, 2*C, H, W]
+                volume_slices.append(torch.cat([feat_l, shifted], dim=1))
+                
+            # Alles zu einem riesigen, flachen Tensor zusammenfügen
+            # Output Shape gesamt: [B, max_disp * 2 * C, H, W]
+            return torch.cat(volume_slices, dim=1)
+        else:
+            # Pre-Allocation für effizientes Training auf der GPU
+            volume = torch.zeros(B, self.max_disp * 2 * C, H, W, device=feat_l.device, dtype=feat_l.dtype)
+            for d in range(self.max_disp):
+                start_idx = d * 2 * C
+                end_idx = start_idx + 2 * C
+                
+                if d == 0:
+                    volume[:, start_idx:end_idx] = torch.cat([feat_l, feat_r], dim=1)
+                else:
+                    # Alternativ zu F.pad: Effiziente Slice-Zuweisung für PyTorch Autograd
+                    shifted = torch.zeros_like(feat_r)
+                    shifted[:, :, :, d:] = feat_r[:, :, :, :-d]
+                    volume[:, start_idx:end_idx] = torch.cat([feat_l, shifted], dim=1)
+            return volume
+
+
+class CorrelationStereoHead(nn.Module):
+    """V5.0 Stereo Head: Hailo-optimiertes flaches CostVolume + 1x1 Reduktion."""
+    def __init__(self, ch_s8, ch_s4, max_disp_s8, use_normals=True, deploy=False):
+        super().__init__()
+        self.max_disp_s8 = max_disp_s8
+        self.use_normals = use_normals
+        self.deploy = deploy
+
+        # reduce_s8 komprimiert auf 16 Kanäle (C=16)
+        self.reduce_s8 = CoordConv2d(ch_s8 + 32, 16, h=60, w=80, deploy=deploy, kernel_size=1, padding=0, bias=False)
+        s4_guidance_ch = ch_s4 + 32 + (3 if use_normals else 0)
+        self.reduce_s4 = CoordConv2d(s4_guidance_ch, 16, h=120, w=160, deploy=deploy, kernel_size=1, padding=0, bias=False)
+
+        # 1. Das neue "dumme" CostVolume instanziieren
+        self.cost_volume = HailoCostVolume(max_disp=max_disp_s8, deploy=deploy)
+        
+        # 2. Die Brücke: Lernt die Korrelation (ersetzt das alte Dot-Product)
+        # In-Channels = 32 (16 Kanäle links + 16 Kanäle rechts) * max_disp
+        # Out-Channels = max_disp (damit post_corr genau wie vorher arbeiten kann)
+        self.cv_reduction = nn.Conv2d(
+            in_channels=32 * max_disp_s8, 
+            out_channels=max_disp_s8, 
+            kernel_size=1, 
+            bias=False
+        )
+
+        self.post_corr = nn.Sequential(
+            nn.Conv2d(max_disp_s8, max_disp_s8, 3, padding=1),
+            nn.ReLU6(inplace=True),
+            nn.Conv2d(max_disp_s8, max_disp_s8, 3, padding=1),
+            nn.ReLU6(inplace=True),
+        )
+        self.context_weight = 0.8
+
+        self.stereo_refine_s4 = RefinementStage(guidance_channels=16, scale_factor=2.0, deploy=deploy)
+        self.register_buffer('disp_reg', torch.arange(max_disp_s8, dtype=torch.float32).view(1, -1, 1, 1))
+        self.temperature = 0.7
+        self.geo_downsample = nn.Conv2d(32, 32, kernel_size=3, stride=2, padding=1, bias=False)
+
+    def forward(self, l_s8, r_s8, l_s4, l_img_raw, normals_s4=None, geo_features_l=None, geo_features_r=None):
+        if geo_features_l is None:
+            B, _, H, W = l_s4.shape
+            geo_features_l = torch.zeros(B, 32, H, W, device=l_s4.device, dtype=l_s4.dtype)
+        if geo_features_r is None:
+            B, _, H, W = l_s4.shape
+            geo_features_r = torch.zeros(B, 32, H, W, device=l_s4.device, dtype=l_s4.dtype)
+
+        geo_l_s8 = self.geo_downsample(geo_features_l)
+        geo_r_s8 = self.geo_downsample(geo_features_r)
+        feat_l_s8 = self.reduce_s8(torch.cat([l_s8, geo_l_s8], dim=1))
+        feat_r_s8 = self.reduce_s8(torch.cat([r_s8, geo_r_s8], dim=1))
+
+        if self.use_normals:
+            norm_in = normals_s4 if normals_s4 is not None else \
+                torch.zeros(l_s4.size(0), 3, l_s4.size(2), l_s4.size(3), device=l_s4.device, dtype=l_s4.dtype)
+            l_s4_combined = torch.cat([l_s4, geo_features_l, norm_in], dim=1)
+        else:
+            l_s4_combined = torch.cat([l_s4, geo_features_l], dim=1)
+        feat_l_s4 = self.reduce_s4(l_s4_combined)
+
+        # L2-Normalisierung vor dem CostVolume
+        feat_l_norm = F.normalize(feat_l_s8, p=2, dim=1, eps=1e-4)
+        feat_r_norm = F.normalize(feat_r_s8, p=2, dim=1, eps=1e-4)
+
+        # -----------------------------------------------------------------
+        # NEU: Cost Volume aufbauen und durch die Reduktion schicken
+        # raw_volume hat die Shape: [B, 32 * max_disp, H, W]
+        raw_volume = self.cost_volume(feat_l_norm, feat_r_norm)
+        
+        # corr hat wieder die vertraute Shape: [B, max_disp, H, W]
+        corr = self.cv_reduction(raw_volume)
+        # -----------------------------------------------------------------
+
+        corr_refined = self.post_corr(corr)
+        vol_s8 = self.context_weight * corr_refined + (1.0 - self.context_weight) * corr
+
+        # Soft-Argmax
+        if self.deploy:
+            vol_scaled = vol_s8 / self.temperature
+            v_max, _ = torch.max(vol_scaled, dim=1, keepdim=True)
+            v_exp = torch.exp(vol_scaled - v_max)
+            v_sum = torch.sum(v_exp, dim=1, keepdim=True) + 1e-6
+            prob_s8 = v_exp / v_sum
+            disp_s8 = torch.sum(prob_s8 * self.disp_reg, dim=1, keepdim=True)
+        else:
+            prob_s8 = F.softmax(vol_s8 / self.temperature, dim=1)
+            disp_s8 = torch.sum(prob_s8 * self.disp_reg, dim=1, keepdim=True)
+
+        # Confidence Gate (nur bei Inferenz)
+        if not self.training:
+            confidence = prob_s8.max(dim=1, keepdim=True)[0]
+            gate = torch.clamp((confidence - 0.10) / 0.10, 0.0, 1.0)
+            disp_s8 = disp_s8 * gate
+
+        max_disp_s4 = self.max_disp_s8 * 2.0
+        disp_s4 = self.stereo_refine_s4(disp_s8, feat_l_s4, max_disp=max_disp_s4)
+        return disp_s4, disp_s8
+
+
+class ChannelAligner(nn.Module):
+    """Projiziert Backbone-Outputs auf Hailo-optimale Channel-Breiten."""
+    def __init__(self, ch_s4, ch_s8, ch_s16, ch_s32,
+                 target_s4=32, target_s8=64, target_s16=128, target_s32=256):
+        super().__init__()
+        self.align_s4 = nn.Conv2d(ch_s4, target_s4, 1, bias=False) if ch_s4 != target_s4 else nn.Identity()
+        self.align_s8 = nn.Conv2d(ch_s8, target_s8, 1, bias=False) if ch_s8 != target_s8 else nn.Identity()
+        self.align_s16 = nn.Conv2d(ch_s16, target_s16, 1, bias=False) if ch_s16 != target_s16 else nn.Identity()
+        self.align_s32 = nn.Conv2d(ch_s32, target_s32, 1, bias=False) if ch_s32 != target_s32 else nn.Identity()
+        self.out_channels = (target_s4, target_s8, target_s16, target_s32)
+
+    def forward(self, features):
+        return (self.align_s4(features[0]), self.align_s8(features[1]),
+                self.align_s16(features[2]), self.align_s32(features[3]))
+        
 # ✅ V3.0 Normals Head - Multi-Scale Fusion (s4 + s8), Up-Sampling, Image-Guided Refinement, CoordConv
 class NormalsHead(nn.Module):
     def __init__(self, ch_s4, ch_s8, deploy=False): # NEU: deploy flag
@@ -609,41 +755,7 @@ class NormalsHead(nn.Module):
         )
         self.coarse_out = nn.Conv2d(32, 3, 3, padding=1)
 
-        # Stage 3: Image-Guided Refinement
-        # Inputs: 3 (Coarse Normals) + 1 (Gray Img) + 1 (Sobel Edges) = 5
-        # Update 4.0: Remove high-res refiners to save Hailo resources
-        '''
-        self.refiner = nn.Sequential(
-            nn.Conv2d(5, 32, 3, padding=1),
-            
-            # ====================================================================
-            # 🚨 PATCH V3.0: Clean Code mit DWSepConv! 
-            # (Ersetzt die 4 manuellen Layer von vorher)
-            # ====================================================================
-            DWSepConv(32, 32, 3, padding=1),
-            nn.ReLU(inplace=True),
-            
-            DWSepConv(32, 32, 3, padding=1),
-            nn.ReLU(inplace=True),
-            
-            nn.Conv2d(32, 3, 3, padding=1)
-        )
         
-        # Fest verdrahtete Sobel-Filter (keine trainierbaren Parameter)
-        sobel_x = torch.tensor([[-1., 0., 1.], [-2., 0., 2.], [-1., 0., 1.]]).view(1, 1, 3, 3)
-        sobel_y = torch.tensor([[-1., -2., -1.], [0., 0., 0.], [1., 2., 1.]]).view(1, 1, 3, 3)
-        self.register_buffer('sobel_x', sobel_x)
-        self.register_buffer('sobel_y', sobel_y)
-
-    def get_edges(self, img):
-        gx = F.conv2d(img, self.sobel_x, padding=1)
-        gy = F.conv2d(img, self.sobel_y, padding=1)
-        # 🚨 100% Hailo-Safe: L1-Norm (Manhattan-Distanz) statt Wurzel
-        # Das löst auch das FP16 NaN-Problem automatisch, da es keine Wurzel mehr gibt!
-        return torch.abs(gx) + torch.abs(gy)
-    
-    '''
-
     def forward(self, l_s4, l_s8, gray_img, geo_features=None):
         s8_adapted = self.s8_adapt(l_s8)
         #s8_adapted = F.interpolate(s8_adapted, size=l_s4.shape[2:], 
@@ -681,44 +793,45 @@ class LRASPPHead(nn.Module):
         self.cbr_high = nn.Sequential(
             nn.Conv2d(high_ch, 128, 1, bias=False), nn.BatchNorm2d(128), nn.ReLU(inplace=True)
         )
-        # Update Version 4.0: Replace AvgPool2d with LernablePool()
         self.scale_high = nn.Sequential(
-            LearnablePool(high_ch, kernel_size=(30, 40)),  # statt nn.AvgPool2d
+            LearnablePool(high_ch, kernel_size=(30, 40)),
             nn.Conv2d(high_ch, 128, 1, bias=False),
             nn.Sigmoid()
         )
-        # ✅ V2.9: low_classifier takes backbone features + predicted normals
-        self.low_classifier = nn.Conv2d(low_ch + normals_ch, num_classes, 1)
+        
+        # Statt Concat: separate Convs die erst danach addiert werden
+        # Das vermeidet den Concat mit unterschiedlichen Zero-Points komplett!
+        self.low_feat_conv = nn.Conv2d(low_ch, num_classes, 1)
+        self.low_norm_conv = nn.Conv2d(normals_ch, num_classes, 1)
         self.high_classifier = nn.Conv2d(128, num_classes, 1)
-        # Dilated conv also gets normals (activated in Phase 2)
-        self.mid_classifier = nn.Conv2d(128 + normals_ch, num_classes, 3, padding=2, dilation=2)
+        
+        self.mid_feat_conv = nn.Conv2d(128, num_classes, 3, padding=2, dilation=2)
+        self.mid_norm_conv = nn.Conv2d(normals_ch, num_classes, 3, padding=2, dilation=2)
         self.use_mid = True
         
     def forward(self, x_low, x_high, normals_s4=None):
         out = self.cbr_high(x_high) * self.scale_high(x_high)
-        #out = F.interpolate(out, scale_factor=4.0, mode='bilinear', align_corners=False)
         out = F.interpolate(out, scale_factor=4.0, mode='nearest', align_corners=None)
         
+        # Low path: Features und Normals separat verarbeiten, dann addieren
+        result = self.low_feat_conv(x_low) + self.high_classifier(out)
+        
         if normals_s4 is not None:
-            low_in = torch.cat([x_low, normals_s4], dim=1)
+            result = result + self.low_norm_conv(normals_s4)
         else:
-            # Make it Hailo compatible (kein F.pad auf Channels):
-            dummy_normals = torch.zeros(x_low.size(0), 3, x_low.size(2), x_low.size(3), device=x_low.device)
-            low_in = torch.cat([x_low, dummy_normals], dim=1)
-            
-        result = self.low_classifier(low_in) + self.high_classifier(out)
+            dummy = torch.zeros(x_low.size(0), 3, x_low.size(2), x_low.size(3), device=x_low.device)
+            result = result + self.low_norm_conv(dummy)
         
         if self.use_mid:
+            result = result + self.mid_feat_conv(out)
             if normals_s4 is not None:
-                mid_in = torch.cat([out, normals_s4], dim=1)
+                result = result + self.mid_norm_conv(normals_s4)
             else:
-                # ✅ KORRIGIERT: Auch hier dummy_normals mit torch.cat statt F.pad
-                dummy_normals_mid = torch.zeros(out.size(0), 3, out.size(2), out.size(3), device=out.device)
-                mid_in = torch.cat([out, dummy_normals_mid], dim=1)
-                
-            result = result + self.mid_classifier(mid_in)   
-        return result
+                dummy = torch.zeros(out.size(0), 3, out.size(2), out.size(3), device=out.device)
+                result = result + self.mid_norm_conv(dummy)
         
+        return result
+
 # --- YOLO Heads (unchanged structure, 40 classes) ---
 class DecoupledHead(nn.Module):
     def __init__(self, ch_in, num_classes, h, w, deploy=False, width=128):
@@ -759,47 +872,69 @@ class YOLOHead(nn.Module):
         return [self.head_s8(x_s8), self.head_s16(x_s16), self.head_s32(x_s32)]
 
 # =====================================================================
-# ✅ V4.0: FusedHexapodModel — 1-Channel Input, 5 Outputs
+# ✅ V5.0: FusedHexapodModel — mit Correlation + optionalem Channel-Alignment
 # =====================================================================
 class FusedHexapodModel(nn.Module):
     def __init__(self, config):
         super().__init__()
         self.deploy_mode = config.get('deploy', False)
-        self.backbone = timm.create_model('mobilenetv2_140.ra_in1k', pretrained=True,
-                                   features_only=True, out_indices=(1, 2, 3, 4))
-        feat_info = self.backbone.feature_info.channels()
-        ch_s4, ch_s8, ch_s16, ch_s32 = feat_info  # 24, 32, 96, 320
+        v5 = config.get('v5', V5_CONFIG)
 
-        # ✅ V2.9: Patch first conv to 1-channel input
+        # Backbone
+        self.backbone = timm.create_model('mobilenetv2_140.ra_in1k', pretrained=True,
+                                           features_only=True, out_indices=(1, 2, 3, 4))
+        feat_info = self.backbone.feature_info.channels()
+        ch_s4, ch_s8, ch_s16, ch_s32 = feat_info  # 32, 48, 136, 448
+
+        # Patch 1ch grayscale
         old_conv = self.backbone.conv_stem
         new_conv = nn.Conv2d(1, old_conv.out_channels, kernel_size=old_conv.kernel_size,
                               stride=old_conv.stride, padding=old_conv.padding, bias=False)
-        # Merge RGB weights via luminance formula
         with torch.no_grad():
-            w = old_conv.weight.data  # [C_out, 3, kH, kW]
+            w = old_conv.weight.data
             new_conv.weight.data = w[:, 0:1]*0.299 + w[:, 1:2]*0.587 + w[:, 2:3]*0.114
         self.backbone.conv_stem = new_conv
         print(f"  ✅ Backbone first conv: 3→1 channel (luminance merge)")
-        
-        # 🚨 PATCH V3.0: SPPF initialisieren (nimmt ch_s32 dynamisch von timm!)
+
+        # Channel Alignment (optional)
+        alignment = v5.get('channel_alignment', 'none')
+        if alignment == 'moderate':
+            self.aligner = ChannelAligner(ch_s4, ch_s8, ch_s16, ch_s32, 32, 64, 128, 256)
+            ch_s4, ch_s8, ch_s16, ch_s32 = self.aligner.out_channels
+            print(f"  ✅ Channel Alignment: moderate (32/64/128/256)")
+        elif alignment == 'wide':
+            self.aligner = ChannelAligner(ch_s4, ch_s8, ch_s16, ch_s32, 64, 128, 256, 512)
+            ch_s4, ch_s8, ch_s16, ch_s32 = self.aligner.out_channels
+            print(f"  ✅ Channel Alignment: wide (64/128/256/512)")
+        # In ChannelAligner — neuer Modus 'stereo_focused':
+        # s4/s8 breit (für Stereo), s16/s32 schlank (für Detection)
+        elif alignment == 'stereo_focused':
+            self.aligner = ChannelAligner(ch_s4, ch_s8, ch_s16, ch_s32, 64, 128, 128, 256)
+            ch_s4, ch_s8, ch_s16, ch_s32 = self.aligner.out_channels  # ← FEHLT!
+            print(f"  ✅ Channel Alignment: stereo focused (64/128/128/256)")
+        else:
+            self.aligner = None
+            print(f"  ℹ️  Channel Alignment: none (raw MNV2-1.4: {ch_s4}/{ch_s8}/{ch_s16}/{ch_s32})")
+
+        # SPPF
         self.sppf = SPPF(c1=ch_s32, c2=ch_s32, k=5)
         print(f"  ✅ SPPF Module injected at s32 ({ch_s32} channels)")
-        
-        disp_steps = config.get('internal_disp_steps', 48)
-        self.stereo_head = HierarchicalStereoHead(ch_s8, ch_s4, max_disp_s8=disp_steps, deploy=self.deploy_mode)
+
+        # Stereo Head (V5.0 Correlation oder V4.0 CostVolume)
+        disp_steps = config.get('internal_disp_steps', 24)
+        if v5.get('use_correlation_stereo', False):
+            self.stereo_head = CorrelationStereoHead(ch_s8, ch_s4, max_disp_s8=disp_steps, deploy=self.deploy_mode)
+            print(f"  ✅ Stereo Head: CorrelationStereoHead (V5.0)")
+        else:
+            self.stereo_head = HierarchicalStereoHead(ch_s8, ch_s4, max_disp_s8=disp_steps, deploy=self.deploy_mode)
+            print(f"  ✅ Stereo Head: HierarchicalStereoHead (V4.0)")
+
+        # Other Heads
         self.normals_head = NormalsHead(ch_s4, ch_s8, deploy=self.deploy_mode)
         self.seg_head = LRASPPHead(ch_s4, ch_s16, config['num_seg_classes'], normals_ch=3)
         self.fpn_neck = LightFPNNeck(ch_s8, ch_s16, ch_s32, fpn_ch=FPN_CH)
-
-        # 🚨 PATCH V4.0: Remove CBAM Attention für die FPN-Outputs
-        # self.cbam_s8  = CBAM(FPN_CH)
-        # self.cbam_s16 = CBAM(FPN_CH)
-        # self.cbam_s32 = CBAM(FPN_CH)
-        # print(f"  ✅ CBAM Attention Modules injected after FPN")
-
         self.geo_stem = GeometryStem(in_ch=ch_s4, out_ch=32)
         print(f"  ✅ Geometry Stem Modules injected after Backbone")
-
         self.yolo_head = YOLOHead(fpn_ch=FPN_CH, num_classes=config['num_det_classes'], deploy=self.deploy_mode)
 
         total_params = sum(p.numel() for p in self.parameters())
@@ -807,41 +942,31 @@ class FusedHexapodModel(nn.Module):
         print(f"  Normals Head: {sum(p.numel() for p in self.normals_head.parameters()):,}")
         print(f"  Seg Head: {sum(p.numel() for p in self.seg_head.parameters()):,}")
         print(f"  YOLO Head: {sum(p.numel() for p in self.yolo_head.parameters()):,}")
+        if self.aligner:
+            print(f"  Channel Aligner: {sum(p.numel() for p in self.aligner.parameters()):,}")
+        
 
     def forward(self, x_left, x_right, use_normals_for_stereo=False):
-        # Backbone & FPN
         features_l = self.backbone(x_left)
-        # ====================================================================
-        # 🚨 NEU V3.1: GEOMETRY STEM (High-Res Pfad)
-        # Nutzt features_l[0] (s4 / 160x120), um scharfe Kanten-Features zu extrahieren
-        # ====================================================================
+        if self.aligner:
+            features_l = self.aligner(features_l)
+
         geo_feat_l = self.geo_stem(features_l[0])
-        # Beide Auflösungen vom Normals-Head abgreifen (Neu: mit s8 und gray_img)
-        # Normals bekommt jetzt die Geo-Features zusätzlich
-        normals_s4 = self.normals_head(
-            features_l[0], 
-            features_l[1], 
-            x_left, 
-            geo_features=geo_feat_l # 👈 NEU: High-Res Support
-        )
-        
+        normals_s4 = self.normals_head(features_l[0], features_l[1], x_left, geo_features=geo_feat_l)
+
         disp_s4, disp_s8 = None, None
-        
-        # ✅ FIX: Nur Stereo ausführen, wenn wir auch ein rechtes Bild haben (TartanAir)
         if x_right is not None:
             with torch.no_grad():
                 features_r = self.backbone(x_right)
-                # Auch für das rechte Bild brauchen wir die Geo-Features für das Matching!
+                if self.aligner:
+                    features_r = self.aligner(features_r)
                 geo_feat_r = self.geo_stem(features_r[0])
-            
-            # 🚨 FIX: normals_s4.detach() verhindert, dass Stereo-Gradienten den NormalsHead zerstören!
+
             if not self.deploy_mode:
                 normals_s4_for_stereo = normals_s4.detach() if (use_normals_for_stereo and normals_s4 is not None) else None
             else:
                 normals_s4_for_stereo = normals_s4
-            
-            # Stereo Head (nutzt jetzt die entkoppelten Normalen UND das Graustufenbild)
-            # Stereo Head bekommt jetzt geo_feat_l UND geo_feat_r
+
             disp_s4, disp_s8 = self.stereo_head(
                 features_l[1], features_r[1], features_l[0], x_left,
                 normals_s4=normals_s4_for_stereo,
@@ -850,43 +975,26 @@ class FusedHexapodModel(nn.Module):
             )
         else:
             disp_s4, disp_s8 = None, None
-            
-        # Seg bekommt ebenfalls die S4-Normalen (160x120)
+
         if self.deploy_mode:
             normals_for_others = normals_s4
         else:
             normals_for_others = normals_s4.detach() if (use_normals_for_stereo and normals_s4 is not None) else None
         seg = self.seg_head(features_l[0], features_l[2], normals_s4=normals_for_others)
 
-        # 🚨 PATCH V3.0: SPPF auf die tiefste Ebene anwenden
         f_s32_sppf = self.sppf(features_l[3])
-        # FPN_Neck mit der gepatchten s32-Map aufrufen
         fpn_s8, fpn_s16, fpn_s32 = self.fpn_neck(features_l[1], features_l[2], f_s32_sppf)
-        
-        # ====================================================================
-        # 🚨 PATCH V4.0: Remove CBAM Attention 
-        # ====================================================================
-        # fpn_s8_att  = self.cbam_s8(fpn_s8)
-        # fpn_s16_att = self.cbam_s16(fpn_s16)
-        # fpn_s32_att = self.cbam_s32(fpn_s32)
-
-        # YOLO bekommt jetzt die gefilterten Attention-Features!
         det = self.yolo_head(fpn_s8, fpn_s16, fpn_s32)
         yolo_s8, yolo_s16, yolo_s32 = det
-        '''
-        if not self.deploy_mode:
-            #print("training: normals_s4_for_stereo is None:", normals_s4_for_stereo is None)
-            yolo_s8, yolo_s16, yolo_s32 = det
-            return final_disp, seg, disp_s8, normals_s1, yolo_s8, yolo_s16, yolo_s32
-        else:
-            #print("deploy: normals_s4_for_stereo is None:", normals_s4_for_stereo is None)
-            yolo_s8, yolo_s16, yolo_s32 = det
-            return final_disp, seg, disp_s8, normals_s1, yolo_s8, yolo_s16, yolo_s32
-        '''
+
         return disp_s4, seg, disp_s8, normals_s4, yolo_s8, yolo_s16, yolo_s32
 
+
+
+
 model = FusedHexapodModel(CONFIG).to(DEVICE)
-print(f"\n✅ V4.00 Model created on {DEVICE}")
+print(f"\n✅ V5.0 Model created on {DEVICE}")
+
 
 
 
@@ -1427,8 +1535,8 @@ class V210HexapodLoss(nn.Module):
         self.sobel_loss = SobelEdgeLoss()
         # Priority: how IMPORTANT is each task (not scale!)
         self.priority = {
-            'stereo': 3.0,  
-            'yolo': 4.0,    
+            'stereo': 2.0,   # Stereo lernt global, braucht Geduld
+            'yolo': 3.0,     # Konvergiert schneller mit breiten Features
             'seg': 1.0,
             'normals': 1.0
         }
@@ -1502,7 +1610,7 @@ class V210HexapodLoss(nn.Module):
                         # Seg-Preds auf Stereo-Auflösung (s4) herunterskalieren
                         seg_pred_s4 = F.interpolate(seg_pred, size=disp_pred.shape[-2:], mode='bilinear', align_corners=False)
                         # Maske für Klasse 5 (Void/Far Background/Sky) erstellen
-                        sky_mask = (torch.argmax(seg_pred_s4, dim=1) == 5).unsqueeze(1) # Shape: [B, 1, H, W]
+                        sky_mask = (torch.argmax(seg_pred_s4, dim=1) == 4).unsqueeze(1) # Shape: [B, 1, H, W]
                     
                     if sky_mask.sum() > 0:
                         # 1. Wir berechnen den absoluten Abstand zu 0 (Himmel-Ziel)
@@ -1649,7 +1757,7 @@ class V210HexapodLoss(nn.Module):
         return total, logs
 
 print("\u2705 V3.0 Loss with EMA balancing loaded")
-print("  Priority: stereo=3.0, yolo=4.0, seg=1.0, normals=1.0")
+print("  Priority: stereo=2.0, yolo=3.0, seg=1.0, normals=1.0")
 print("  EMA decay=0.99 (~100 step adaptation)")
 
 
@@ -1688,7 +1796,7 @@ def parse_coco_robot35(root, ann_file=None):
     print("   Scanning COCO (40 robot classes)...")
     if ann_file is None:
         # Try pseudo-labels first, fallback to standard GT
-        pseudo_path = os.path.join(root, 'annotations', 'instances_train2017_robot35_pseudo.json')
+        pseudo_path = os.path.join(root, 'annotations', 'instances_train2017_robot41_pseudo.json')
         gt_path = os.path.join(root, 'annotations', 'instances_train2017.json')
         if os.path.exists(pseudo_path):
             ann_file = pseudo_path
@@ -1710,8 +1818,7 @@ def parse_coco_robot35(root, ann_file=None):
         boxes = []
         for ann in anns:
             cat_id = ann['category_id']
-            if cat_id not in robot_cat_to_continuous: continue
-            cls_idx = robot_cat_to_continuous[cat_id]
+            cls_idx = map_coco_to_robot(cat_id)
             x, y, w, h = ann['bbox']
             img_w, img_h = img_info['width'], img_info['height']
             cx = (x + w/2) / img_w
@@ -1800,14 +1907,11 @@ def depth_to_normals_np(depth, fx, fy):
     normals[:, ~valid] = 0.0
     return normals, valid
 
+
 def compute_seg6_from_depth_normals(depth, normals):
     ny = normals[1]
-    # Je nach Kamera-Koordinatensystem ist der Boden entweder +1 oder -1.
-    # Wenn ny beim Boden positiv ist:
-    cos_angle = np.clip(ny, -1.0, 1.0) 
-    angle = np.arccos(cos_angle) * 180.0 / np.pi 
-    # Falls dein Boden plötzlich schwarz statt grün wird, 
-    # ändere es einfach zu: cos_angle = np.clip(-ny, -1.0, 1.0) 
+    cos_angle = np.clip(ny, -1.0, 1.0)
+    angle = np.arccos(cos_angle) * 180.0 / np.pi
 
     grad_x = scipy_sobel(depth, axis=1)
     grad_y = scipy_sobel(depth, axis=0)
@@ -1816,41 +1920,38 @@ def compute_seg6_from_depth_normals(depth, normals):
 
     valid = (depth > 0.1) & (depth < 80.0)
     nvalid = np.sqrt(normals[0]**2 + normals[1]**2 + normals[2]**2) > 0.5
-    seg = np.full(depth.shape, 3, dtype=np.uint8) # Default Obstacle
+    seg = np.full(depth.shape, 3, dtype=np.uint8)  # Default: OBSTACLE
 
-    # --- WALKABLE (Grün) ---
-    # 🚨 FIX: Das physikalische Limit des Hexapods (40°)
+    # --- FLOOR (glatt, flach) ---
     walkable_mask = valid & nvalid & (angle <= 40)
-    seg[walkable_mask] = 0
+    seg[walkable_mask] = 0  # Default: FLOOR
 
-    # --- STEP (Orange) ---
-    # Stufen sind begehbare Bereiche (daher nutzen wir walkable_mask), 
-    # die aber harte Tiefenkanten (relative_grad) aufweisen.
-    # 🚨 FIX: Nur bis 5 Meter Entfernung nach Stufen suchen! 
-    # Alles dahinter bleibt bei flachem Winkel einfach grün.
-    step_mask = walkable_mask & (relative_grad > 0.12) & (depth < 5.0)
-    seg[step_mask] = 1
-
-    # --- WALL (Blau) ---
-    # Eine Wand muss fast senkrecht stehen.
-    wall_mask = valid & nvalid & (angle > 70) & (angle < 110)
-    seg[wall_mask] = 2
-
-    # --- ROUGH OBSTACLES (Gestrüpp, Geröll, extrem unebene Objekte) ---
+    # --- TERRAIN (begehbar aber rau) ---
+    # Lokale Varianz als Rauheits-Indikator
     depth_mean = uniform_filter(depth, size=3)
     depth_sq_mean = uniform_filter(depth**2, size=3)
     local_var = np.clip(depth_sq_mean - depth_mean**2, 0, None)
-    
-    # Geometrisch ist das einfach ein Hindernis (Rot). 
-    # Glatte Anchors (Kühlschrank) fallen hier eh durch (weil local_var zu klein) 
-    # und werden von der Wall- oder Obstacle-Regel oben gefangen.
-    rough_obstacle = valid & nvalid & (angle > 30) & (angle < 75) & (local_var > 0.08) & (depth > 1.0)
+
+    # Moderate Rauheit auf begehbaren Flächen → TERRAIN
+    rough_walkable = walkable_mask & (local_var > 0.04) & (local_var < 0.15)
+    seg[rough_walkable] = 5  # TERRAIN
+
+    # --- STEP (Stufen) ---
+    step_mask = walkable_mask & (relative_grad > 0.12) & (depth < 5.0)
+    seg[step_mask] = 1
+
+    # --- WALL (vertikal) ---
+    wall_mask = valid & nvalid & (angle > 70) & (angle < 110)
+    seg[wall_mask] = 2
+
+    # --- OBSTACLE (raue nicht-begehbare Flächen) ---
+    rough_obstacle = valid & nvalid & (angle > 30) & (angle < 75) & (local_var > 0.15) & (depth > 1.0)
     seg[rough_obstacle] = 3
 
-    # Unendliche Tiefe / Keine Daten = VOID (Dunkelgrau)
-    seg[~valid] = 5
-    return seg
+    # --- VOID ---
+    seg[~valid] = 4  # ⚠️ War vorher 5, jetzt 4!
 
+    return seg
 
 
 # =====================================================================
@@ -1866,75 +1967,7 @@ def compute_seg6_from_depth_normals(depth, normals):
 # 13=earth, 14=door, 15=table, 16=mountain, 17=plant, 18=curtain,
 # 19=chair, 20=car, 21=water, 22=painting, 23=sofa, 24=shelf,
 # 25=house, 26=sea, 27=mirror, 28=rug, 29=field, ...
-'''
-ADE20K_TO_SEG6 = {}
 
-# WALKABLE (0): surfaces a hexapod can walk on
-for idx in [3,    # floor
-            6,    # road
-            9,    # grass — hexapod walks on grass!
-            11,   # sidewalk
-            13,   # earth/path
-            28,   # rug
-            29,   # field
-            46,   # sand
-            52,   # platform
-            ]:
-    ADE20K_TO_SEG6[idx] = 0
-
-# STEP (1): stairs — geometry has priority, teacher confirms
-for idx in [53,   # stairway
-            96,   # escalator
-            ]:
-    ADE20K_TO_SEG6[idx] = 1
-
-# WALL (2): vertical surfaces, boundaries of the map
-for idx in [0,    # wall
-            1,    # building
-            8,    # windowpane
-            14,   # door
-            25,   # house (Bleibt Wand: Strukturelle Grenze, kein Anchor)
-            32,   # fence
-            ]:
-    ADE20K_TO_SEG6[idx] = 2
-
-# OBSTACLE (3): dynamic or moving hazards
-for idx in [12,   # person
-            15,   # table (oft bewegt)
-            19,   # chair (oft bewegt)
-            20,   # car
-            21,   # water
-            23,   # sofa
-            63,   # box
-            64,   # rock
-            97,   # vase
-            116,  # pool
-            ]:
-    ADE20K_TO_SEG6[idx] = 3
-
-# NAV_ANCHOR (4): Große, absolut statische Objekte für SLAM/Loop-Closure
-for idx in [4,    # tree
-            7,    # bed (Bettpfosten als Anker)
-            10,   # cabinet
-            24,   # shelf
-            38,   # bathtub
-            42,   # column/pillar
-            43,   # signboard
-            68,   # refrigerator
-            89,   # streetlight
-            115,  # monument/statue
-            ]:
-    ADE20K_TO_SEG6[idx] = 4
-
-# VOID (5): Unendliche Tiefe (Zwingt Stereo auf Disparität = 0)
-for idx in [2,    # sky
-            16,   # mountain (too far)
-            # 🚨 Ceiling (5) wurde hier ABSICHTLICH entfernt!
-            ]:
-    ADE20K_TO_SEG6[idx] = 5
-
-# Everything not mapped defaults to geometry label (no override)
-'''
 def teacher_to_seg6(teacher_pred_150):
     """
     Map ADE20K 150-class prediction to our 6 classes.
@@ -1983,93 +2016,51 @@ for idx in [4, 17, 66]: ade_to_seg6_map[idx] = 4 # VEGETATION
 # ADE20K zu Hexapod "Pessimistic Semantic SLAM" Mapping (GPU Tensor)
 # =====================================================================
 
-# 1. INITIALISIERUNG ALS HINDERNIS (Sicherheitsnetz)
-# Alles (Autos, Tiere, ungelistete Dinge) wird standardmäßig zur 3 (Obstacle)
+# ERSETZE das gesamte ADE20K Mapping:
+
+# =====================================================================
+# ADE20K zu Hexapod 6-Klassen Mapping (V5.0)
+# =====================================================================
+# 0 = FLOOR    (glatt, hart: Fliesen, Asphalt, Beton, Holz)
+# 1 = STEP     (Stufen, Treppen)
+# 2 = WALL     (Wände, Gebäude, Zäune, Türen)
+# 3 = OBSTACLE (alles unpassierbare)
+# 4 = VOID     (Himmel, Ferne, kein Stereo)
+# 5 = TERRAIN  (begehbar aber uneben: Gras, Sand, Erde, Kies)
+# =====================================================================
+
 ade_to_seg6_map = torch.full((256,), 3, dtype=torch.long, device=DEVICE)
 
-# 2. IGNORE BEREICHE (Für den Teacher)
-#ade_to_seg6_map[255] = 255 # Echter Ignore-Index für schwarze Bildränder
-#ade_to_seg6_map[5] = 255   # 🚨 Ceiling: Teacher schweigt, Geometrie fängt es als Hindernis (180°) ab!
+# IGNORE
+ade_to_seg6_map[255] = 255
+ade_to_seg6_map[5] = 255    # Ceiling → ignore, Geometrie fängt es ab
 
-# 0 = WALKABLE (Böden, Erde, Sand, Wege, Gras)
-for idx in [3, 6, 9, 11, 13, 28, 29, 46, 52, 110]: 
-    ade_to_seg6_map[idx] = 0 
+# 0 = FLOOR (glatte harte Flächen)
+for idx in [3, 6, 28, 52]:
+    ade_to_seg6_map[idx] = 0   # floor, road, sidewalk, platform
 
-# 1 = STEP (Treppen, Stufen)
-for idx in [53, 96]: 
-    ade_to_seg6_map[idx] = 1 
+# 1 = STEP
+for idx in [53, 96]:
+    ade_to_seg6_map[idx] = 1   # stairs, stairway
 
-# 2 = WALL (Wände, Gebäude, Zäune, Türen)
-# Info: House (25) ist hier dabei, da es eine strukturelle Grenze ist, kein Anchor!
-for idx in [0, 1, 8, 14, 25, 32]: 
-    ade_to_seg6_map[idx] = 2 
+# 2 = WALL
+for idx in [0, 1, 8, 14, 25, 32]:
+    ade_to_seg6_map[idx] = 2   # wall, building, fence, door, house, railing
 
-# 3 = OBSTACLE (Dynamische, gefährliche oder bewegliche Hindernisse)
-# Info: Viele ungelistete Dinge sind durch die Initialisierung eh schon 3. 
-# Diese Liste dient hier primär der Übersichtlichkeit für dich.
-for idx in [5, 12, 15, 19, 20, 21, 23, 63, 64, 97, 116]: 
-    ade_to_seg6_map[idx] = 3 
+# 3 = OBSTACLE (Default + explizite)
+for idx in [12, 15, 19, 20, 21, 23, 63, 64, 97, 116]:
+    ade_to_seg6_map[idx] = 3   # person, bench, sofa, table, car, ...
+# Ehem. NAV_ANCHOR → jetzt OBSTACLE
+for idx in [4, 7, 10, 24, 38, 42, 43, 68, 89, 115]:
+    ade_to_seg6_map[idx] = 3   # tree, chair, cabinet, bookshelf, column, ...
 
-# 4 = NAV_ANCHOR (Große, absolut statische Objekte für SLAM/Loop-Closure)
-# Bäume, Bettpfosten, Schränke, Regale, Badewannen, Säulen, Schilder, Kühlschränke, Laternen...
-for idx in [4, 7, 10, 24, 38, 42, 43, 68, 89, 115, 2, 16]: 
-    ade_to_seg6_map[idx] = 4 
+# 4 = VOID
+for idx in [2, 16]:
+    ade_to_seg6_map[idx] = 4   # sky, mountain
 
-# 5 = VOID / FAR BACKGROUND (Himmel, ferne Berge)
-# Zwingt den Stereo-Loss in diesen Bereichen auf Disparität = 0
-for idx in []: 
-    ade_to_seg6_map[idx] = 5
-## Ausblenden der Decke (spart Netzwerkkapazität des Teachers im Innenräumen)
-#ade_to_seg6_map[5] = 255
-
-'''
-def fuse_seg_teacher_gpu(geo_seg_tensor, teacher_input_tensor):
-    """
-    Führt SegFormer aus und mergt das Ergebnis (als reine Tensor-OP auf der GPU).
-    VRAM-optimiert: Argmax VOR dem Upsampling!
-    """
-    if geo_seg_tensor is None or teacher_input_tensor is None:
-        return geo_seg_tensor
-
-    with torch.no_grad():
-        with torch.amp.autocast('cuda', enabled=True, dtype=torch.float16):
-            # 1. Resize auf 512x512 für SegFormer
-            pixel_values = F.interpolate(teacher_input_tensor, size=(512, 512), mode='bilinear', align_corners=False)
-            
-            # 2. Inferenz
-            outputs = seg_teacher_model(pixel_values=pixel_values)
-            logits = outputs.logits # [B, 150, 128, 128]
-            
-            # 🚨 FIX: ARGMAX VOR DEM UPSAMPLING! (Spart ~1.5 GB VRAM)
-            pred_150_small = logits.argmax(dim=1) # Shape: [B, 128, 128]
-        
-        # 3. Upsampling des 1-Kanal-Bildes auf Zielauflösung
-        # Wir müssen es für F.interpolate kurz in [B, 1, H, W] als Float umwandeln
-        pred_150_small = pred_150_small.unsqueeze(1).float() 
-        pred_150 = F.interpolate(
-            pred_150_small, 
-            size=(geo_seg_tensor.shape[1], geo_seg_tensor.shape[2]), 
-            mode='nearest' # Wichtig: nearest, damit Klassen-IDs ganzzahlig bleiben!
-        ).squeeze(1).long() # Zurück zu [B, H, W]
-        
-        # 4. Map auf 6 Klassen (Blitzschnelles Tensor-Indexing)
-        teacher_seg = ade_to_seg6_map[pred_150]
-        teacher_mapped = (teacher_seg != 255)
-        
-        # 5. Merge Rules
-        merged = geo_seg_tensor.clone()
-        
-        flat_but_dangerous = teacher_mapped & (geo_seg_tensor == 0) & (teacher_seg == 3)
-        merged[flat_but_dangerous] = 3
-        
-        false_step_wall = teacher_mapped & (geo_seg_tensor == 1) & (teacher_seg == 2)
-        merged[false_step_wall] = 2
-        
-        veg_override = teacher_mapped & (teacher_seg == 4)
-        merged[veg_override] = 4
-        
-        return merged
-'''
+# 5 = TERRAIN (begehbar aber uneben/weich)
+for idx in [9, 13, 29, 46, 110]:
+    ade_to_seg6_map[idx] = 5   # grass, earth, field, sand, dirt
 
 def fuse_seg_teacher_gpu(geo_seg_tensor, teacher_input_tensor):
     """ Führt SegFormer aus und mergt das Ergebnis auf der GPU. """
@@ -2097,24 +2088,21 @@ def fuse_seg_teacher_gpu(geo_seg_tensor, teacher_input_tensor):
         
         # Merge Rules
         merged = geo_seg_tensor.clone()
-        
-        # 1. Wasser/Pfützen-Falle (Geometrie sagt Boden, Teacher sagt Obstacle)
-        merged[teacher_mapped & (geo_seg_tensor == 0) & (teacher_seg == 3)] = 3
-        
-        # 🚨 Die "Rampen-Falle" wurde entfernt! 
-        # Geometrie-Stufen (1) bleiben Stufen (1), auch wenn der Teacher "Wand" ruft.
-        # Physische Begehbarkeit hat für den Hexapod Vorrang.
-        
-        # 2. Navigation-Anchors zwingend übernehmen (SLAM Backup)
-        merged[teacher_mapped & (teacher_seg == 4)] = 4
-        
-        # 3. VOID Override: Geometrie-Decken/Himmel-Artefakte überschreiben!
-        merged[teacher_mapped & (teacher_seg == 5)] = 5
 
+        # 1. Wasser/Pfützen: Geometrie sagt FLOOR, Teacher sagt OBSTACLE → OBSTACLE
+        merged[teacher_mapped & (geo_seg_tensor == 0) & (teacher_seg == 3)] = 3
+
+        # 2. Terrain-Override: Geometrie sagt FLOOR (flach), Teacher sagt TERRAIN → TERRAIN
+        merged[teacher_mapped & (geo_seg_tensor == 0) & (teacher_seg == 5)] = 5
+
+        # 3. VOID Override: Geometrie-Artefakte überschreiben
+        merged[teacher_mapped & (teacher_seg == 4)] = 4
+
+    
         # 🚨 NEU: REGEL 4 — DER VOID-BUSTER (Jalousie-Fix)
-        # Wenn die Geometrie "VOID" (5) sagt, aber der Teacher eine reale Klasse (0,1,2,3) erkannt hat,
+        # Wenn die Geometrie "VOID" (4) sagt, aber der Teacher eine reale Klasse (0,1,2,3) erkannt hat,
         # dann überschreiben wir das Geometrie-Loch mit dem Wissen des Teachers!
-        mask_void_hole = (geo_seg_tensor == 5) & teacher_mapped & (teacher_seg < 4)
+        mask_void_hole = (geo_seg_tensor == 4) & teacher_mapped & (teacher_seg < 4)
         merged[mask_void_hole] = teacher_seg[mask_void_hole]
         
         return merged
@@ -2242,8 +2230,9 @@ SEG_COLORS = np.array([
     [200, 50, 50],  [0, 150, 0],    [50, 50, 50]
 ], dtype=np.uint8)
 '''
-# SEG_CLASS_NAMES = ['WALKABLE', 'STEP', 'WALL', 'OBSTACLE', 'NAV_ANCHOR', 'VOID']
+# SEG_CLASS_NAMES = ['WALKABLE', 'STEP', 'WALL', 'OBSTACLE', 'VOID', 'TERRAIN']
 
+'''
 SEG_COLORS = np.array([
     [0, 200, 0],    # 0: WALKABLE   (Grün)
     [255, 165, 0],  # 1: STEP       (Orange)
@@ -2252,6 +2241,15 @@ SEG_COLORS = np.array([
     [255, 0, 255],  # 4: NAV_ANCHOR (Magenta / Lila)
     [50, 50, 50]    # 5: VOID       (Dunkelgrau)
 ], dtype=np.uint8)
+'''
+SEG_COLORS = np.array([
+    [0, 200, 0],      # 0: FLOOR (grün)
+    [255, 165, 0],    # 1: STEP (orange)
+    [0, 100, 255],    # 2: WALL (blau)
+    [255, 0, 0],      # 3: OBSTACLE (rot)
+    [80, 80, 80],     # 4: VOID (dunkelgrau)
+    [139, 90, 43],    # 5: TERRAIN (braun)
+], dtype=np.uint8)
 
 from matplotlib.colors import PowerNorm, LinearSegmentedColormap
 from matplotlib.patches import Patch
@@ -2259,7 +2257,7 @@ import torchvision
 import matplotlib.pyplot as plt
 
 def visualize_v29(step, writer):
-    """V4.0 Professional Dashboard: Fixed Scoping, NMS & Class-Colored Boxes."""
+    """V5.0 Professional Dashboard: Fixed Scoping, NMS & Class-Colored Boxes."""
     was_training = model.training
     model.eval()
     TW, TH = 320, 240
@@ -2365,44 +2363,7 @@ def visualize_v29(step, writer):
                 merged_seg = fuse_seg_teacher_gpu(geo_seg, teacher_input)
                 gt_s = merged_seg[0].cpu().numpy()
                 
-                '''
-                # Debug print
-                # --- 1. GEO-SEG HOLEN ---
-                geo_s = geo_seg[0].cpu().numpy()
                 
-                # --- 2. TEACHER-SEG HOLEN (Kurze Inferenz für den Debugger) ---
-                teach_s = None
-                if teacher_input is not None:
-                    with torch.no_grad():
-                        t_pix = F.interpolate(teacher_input, size=(512, 512), mode='bilinear', align_corners=False)
-                        t_logits = seg_teacher_model(pixel_values=t_pix).logits
-                        t_pred_150 = t_logits.argmax(dim=1).unsqueeze(1).float()
-                        t_pred_150 = F.interpolate(t_pred_150, size=geo_seg.shape[-2:], mode='nearest').squeeze(1).long()
-                        teach_s = ade_to_seg6_map[t_pred_150][0].cpu().numpy()
-                
-                # --- 3. MERGED-SEG HOLEN ---
-                merged_seg = fuse_seg_teacher_gpu(geo_seg, teacher_input)
-                gt_s = merged_seg[0].cpu().numpy()
-
-                # --- 🔍 DEBUG: MULTI-LEVEL KLASSEN-ANALYSE ---
-                def print_stats(name, arr):
-                    if arr is None: return
-                    u, c = np.unique(arr, return_counts=True)
-                    stats = dict(zip(u, c))
-                    print(f"  [{name}] enthält {len(u)} IDs:")
-                    for val, count in stats.items():
-                        label = " (IGNORE/BLACK)" if val == 255 else f" (Klasse {val})"
-                        print(f"     -> ID {val:3}{label}: {count:8} Pixel")
-
-                print(f"\n=== 🔍 DEBUG [Step {global_step}]: SEGMENTATION PIPELINE ===")
-                print_stats("1. GEOMETRIE (Basis)", geo_s)
-                print_stats("2. TEACHER (Mapped)", teach_s)
-                print_stats("3. MERGED (Target)", gt_s)
-                print("========================================================\n")
-                # ---------------------------------------------
-                '''
-
-
                 show_img(axes[2, 1], cv2.resize(SEG_COLORS[np.where(gt_s==255, 5, gt_s)], (TW, TH), interpolation=cv2.INTER_NEAREST), "GT Seg (merged)")
 
             if t_seg_p is not None:
@@ -2471,13 +2432,13 @@ def visualize_v29(step, writer):
                 cp_s = torch.argmax(c_seg_p.float(), dim=1)[0].cpu().numpy()
                 show_img(axes[3, 4], cv2.resize(SEG_COLORS[cp_s], (TW, TH), interpolation=cv2.INTER_NEAREST), "COCO Pred Seg")
 
-        plt.suptitle(f"V4.00 Dashboard — Step {step}", fontsize=14, fontweight='bold')
+        plt.suptitle(f"V5.00 Dashboard — Step {step}", fontsize=14, fontweight='bold')
         plt.tight_layout(rect=[0, 0.05, 1, 0.95])
         writer.add_figure('Model_Progress/Dashboard', fig, global_step=step)
         plt.close(fig)
     if was_training: model.train()
 
-print("✅ V4.00 Visualizer loaded")
+print("✅ V5.00 Visualizer loaded")
 
 
 # ## V4.00 Phase 1 Training
@@ -2639,7 +2600,7 @@ LOSS_DROP_THRESH = 0.02
 scaler = torch.cuda.amp.GradScaler()
 
 # TensorBoard
-writer = SummaryWriter(log_dir='./logs/ver_4-0_Phase-1')
+writer = SummaryWriter(log_dir='./logs/ver_5-0_Phase-1')
 
 print("✅ Dashboard ready!")
 
@@ -2681,7 +2642,7 @@ print(f"Total steps: {total_steps} | Warmup: {int(0.1*total_steps)} | Hold Peak:
 #    'stereo_head': 8.0, 'seg_head': 3.0, 'normals_head': 5.0,
 #}
 CLIP_NORMS = {
-    'backbone': 15.0,     # Erhöht! Muss die Gradienten von 4 Köpfen aufnehmen.
+    'backbone': 20.0,     # Erhöht! Muss die Gradienten von 4 Köpfen aufnehmen.
     'fpn_neck': 10.0,      # Verteilerzentrum, braucht etwas mehr Raum als die Köpfe.
     
     'stereo_head': 10.0,  # Das Sorgenkind. Darf am stärksten ziehen, um das Cost-Volume zu formen.
@@ -2732,7 +2693,7 @@ for group in optimizer.param_groups:
 # 📦 Scheduler setup
 # =====================================================================
 class MultiHeadPlateauThenDecay:
-    def __init__(self, optimizer, warmup_steps, decay_steps, patience=2000, threshold=0.015):
+    def __init__(self, optimizer, warmup_steps, decay_steps, patience=2000, threshold=0.01):
         self.optimizer = optimizer
         self.warmup_steps = warmup_steps
         self.decay_steps = decay_steps
@@ -2812,9 +2773,9 @@ class MultiHeadPlateauThenDecay:
 scheduler = MultiHeadPlateauThenDecay(
     optimizer, 
     warmup_steps=int(2.5 * steps_per_epoch), 
-    decay_steps=int(10 * steps_per_epoch), # Wir geben ihm etwas mehr Zeit für den Auslauf
-    patience=int(2.0 * steps_per_epoch), 
-    threshold=0.015 # Etwas sensibler (1.5%)
+    decay_steps=int(20 * steps_per_epoch), # Wir geben ihm etwas mehr Zeit für den Auslauf
+    patience=int(4.0 * steps_per_epoch), 
+    threshold=0.01 # Etwas sensibler, um langsames konvergieren des flatten CV zu kompensieren (1.0%)
 )
 
 # =====================================================================
@@ -2833,7 +2794,7 @@ if RESUME_TRAINING:
     save_dir = CONFIG.get('save_dir', '')
     
     # --- 1. Die Checkpoint-Auswahl (Step vs. Best nach Alter) ---
-    search_pattern = os.path.join(save_dir, "checkpoint_v4_0_step_*.pth")
+    search_pattern = os.path.join(save_dir, "checkpoint_v5_0_step_*.pth")
     step_checkpoints = glob.glob(search_pattern)
     
     latest_to_load = None
@@ -2845,7 +2806,7 @@ if RESUME_TRAINING:
 
         latest_to_load = max(step_checkpoints, key=get_step)
 
-    best_checkpoint = os.path.join(save_dir, "checkpoint_v4_0_best.pth")
+    best_checkpoint = os.path.join(save_dir, "checkpoint_v5_0_best.pth")
     
     if os.path.exists(best_checkpoint):
         if latest_to_load is None:
@@ -2921,8 +2882,23 @@ if RESUME_TRAINING:
             scheduler.best_losses = {'stereo': old_best, 'yolo': old_best, 'normals': old_best, 'seg': old_best}
             print(f"ℹ️ Alter Checkpoint: Multi-Head Scheduler initialisiert.")
         if RESUME_RESET_EMA:
+            # EMA und Scheduler resetten wegen geänderter Priorities
+            criterion.ema_stereo.fill_(1.0)
+            criterion.ema_yolo.fill_(1.0)
+            criterion.ema_seg.fill_(1.0)
+            criterion.ema_normals.fill_(1.0)
+
+            criterion.ema_initialized = False
+
             scheduler.best_losses = {}
             scheduler.steps_without_improvement = 0
+
+            smoothed_loss = None
+            smoothed_losses = None
+            scheduler.decay_steps=int(20 * steps_per_epoch) # Wir geben ihm etwas mehr Zeit für den Auslauf
+            scheduler.patience=int(4.0 * steps_per_epoch) 
+            scheduler.threshold=0.01 # Etwas sensibler, um langsames konvergieren des flatten CV zu kompensieren (1.0%)
+            print("✅ EMA, Scheduler und Smoothed-Losses reset für V5.0 Priority-Änderung")
             print(f"EMA scheduler reset: (Patience: {scheduler.steps_without_improvement})")
 
             
@@ -2974,7 +2950,7 @@ import math
 from torch.optim.lr_scheduler import LambdaLR
 
 # Der neue adaptive pbar (ohne festes Ende, da wir auf Plateau warten)
-pbar = tqdm(total=None, desc="V4.0 Adaptive Training", unit="it")
+pbar = tqdm(total=None, desc="V5.0 Adaptive Training", unit="it")
 
 # Endlos-Schleife: Der Scheduler bricht ab, wenn der Decay durch ist
 while True:
@@ -3229,13 +3205,13 @@ while True:
             best_raw_loss = smoothed_loss
             save_checkpoint(model=model, optimizer=optimizer, 
                     scheduler=scheduler, scaler=scaler, step=global_step, loss=best_raw_loss,
-                    filename="checkpoint_v4_0_best.pth")
+                    filename="checkpoint_v5_0_best.pth")
 
     # Regelmäßiges Backup jede Epoche
     if global_step % (steps_per_epoch * 1) == 0:
         save_checkpoint(model=model, optimizer=optimizer,
                         scheduler=scheduler, scaler=scaler, step=global_step, loss=total_step_loss,
-                        filename=f"checkpoint_v4_0_step_{global_step}.pth")
+                        filename=f"checkpoint_v5_0_step_{global_step}.pth")
         print(f"\n📸 Snapshot step {global_step} | Loss: {smoothed_loss:.4f} | LR-Mult: {lr_mult:.3f}")
         visualize_v29(step=global_step, writer=writer)
         writer.flush(); torch.cuda.empty_cache()
@@ -3256,7 +3232,7 @@ while True:
     else:
         mode = f"DECAY:{lr_mult:.3f}"
 
-    pbar.set_description(f"V4.0 Step {global_step} [{mode}]")
+    pbar.set_description(f"V5.0 Step {global_step} [{mode}]")
     
     # Werte extrahieren
     s = step_logs.get('Loss_Raw/stereo', 0)
@@ -3264,7 +3240,7 @@ while True:
     y = step_logs.get('Loss_Raw/yolo', 0)
     n = step_logs.get('Loss_Raw/normals', 0)
     
-    pbar.set_description(f"V4.0 Step {global_step} [{mode}]")
+    pbar.set_description(f"V5.0 Step {global_step} [{mode}]")
     pbar.set_postfix_str(f"P:{scheduler.steps_without_improvement}/{scheduler.patience} R:{radar_str} S:{s:.1f} C:{c:.2f} Y:{y:.1f} N:{n:.2f}")
     pbar.update(1)
 
