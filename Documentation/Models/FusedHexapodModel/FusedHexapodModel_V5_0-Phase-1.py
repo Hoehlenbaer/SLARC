@@ -638,11 +638,17 @@ class CorrelationStereoHead(nn.Module):
         # 2. Die Brücke: Lernt die Korrelation (ersetzt das alte Dot-Product)
         # In-Channels = 32 (16 Kanäle links + 16 Kanäle rechts) * max_disp
         # Out-Channels = max_disp (damit post_corr genau wie vorher arbeiten kann)
-        self.cv_reduction = nn.Conv2d(
-            in_channels=32 * max_disp_s8, 
-            out_channels=max_disp_s8, 
-            kernel_size=1, 
-            bias=False
+        #self.cv_reduction = nn.Conv2d(
+        #    in_channels=32 * max_disp_s8, 
+        #    out_channels=max_disp_s8, 
+        #    kernel_size=1, 
+        #    bias=False
+        #)
+        # Introduce 2-step reduction (additional layer) to give more room for information flow 768 -> 96 -> 32
+        self.cv_reduction = nn.Sequential(
+            nn.Conv2d(32 * max_disp_s8, 4 * max_disp_s8, 1, bias=False),  # 768 → 96
+            nn.ReLU6(inplace=True),
+            nn.Conv2d(4 * max_disp_s8, max_disp_s8, 1, bias=False),       # 96 → 24
         )
 
         self.post_corr = nn.Sequential(
@@ -655,7 +661,7 @@ class CorrelationStereoHead(nn.Module):
 
         self.stereo_refine_s4 = RefinementStage(guidance_channels=16, scale_factor=2.0, deploy=deploy)
         self.register_buffer('disp_reg', torch.arange(max_disp_s8, dtype=torch.float32).view(1, -1, 1, 1))
-        self.temperature = 0.7
+        self.temperature = 0.5 #reduce from 0.7 to sharpen Soft-Argmax
         self.geo_downsample = nn.Conv2d(32, 32, kernel_size=3, stride=2, padding=1, bias=False)
 
     def forward(self, l_s8, r_s8, l_s4, l_img_raw, normals_s4=None, geo_features_l=None, geo_features_r=None):
@@ -1534,12 +1540,7 @@ class V210HexapodLoss(nn.Module):
 
         self.sobel_loss = SobelEdgeLoss()
         # Priority: how IMPORTANT is each task (not scale!)
-        self.priority = {
-            'stereo': 2.0,   # Stereo lernt global, braucht Geduld
-            'yolo': 3.0,     # Konvergiert schneller mit breiten Features
-            'seg': 1.0,
-            'normals': 1.0
-        }
+        self.priority = {'stereo': 3.0, 'yolo': 3.0, 'seg': 1.0, 'normals': 1.0}
 
     def _update_ema(self, name, value):
         ema = getattr(self, f'ema_{name}')
