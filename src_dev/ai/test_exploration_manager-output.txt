@@ -1,0 +1,110 @@
+PS H:\SLARC\src_dev\ai> & F:/Programme/Anaconda3/envs/llama-cpp/python.exe h:/SLARC/src_dev/ai/test_exploration_manager.py
+llama_context: n_ctx_per_seq (4096) < n_ctx_train (262144) -- the full capacity of the model will not be utilized
+Running benchmark...
+
+=== Benchmark Results ===
+Latency: 1.601 seconds
+Tokens in: 605
+Tokens out: 148
+Total tokens: 753
+Throughput: 470.2 tokens/sec
+
+Parsed policy object:
+{
+  "stop_conditions": [
+    "no_unknown_cells"
+  ],
+  "direction_bias": "south-east",
+  "object_name": null,
+  "location_name": "near_south_east",
+  "object_interaction": "observe",
+  "avoid_regions": [],
+  "search_strategy": "frontier_only",
+  "exploration_mode": "normal",
+  "max_distance": 10,
+  "time_limit_seconds": null,
+  "battery_threshold": null,
+  "return_home_on_stop": false,
+  "notes": "Move to the near south-east region with a maximum distance of 10m from home, then explore and stay there until all unknown cells are covered."
+}
+Running benchmark...
+
+=== Benchmark Results ===
+Latency: 0.698 seconds
+Tokens in: 594
+Tokens out: 91
+Total tokens: 685
+Throughput: 981.9 tokens/sec
+
+Parsed policy object:
+{
+  "stop_conditions": [
+    "object_found"
+  ],
+  "direction_bias": "west",
+  "object_name": "cat",
+  "object_interaction": "follow",
+  "search_strategy": "frontier_only",
+  "exploration_mode": "careful",
+  "return_home_on_stop": false,
+  "notes": "Move to the west region to search for a cat and follow it after detection."
+}
+Running benchmark...
+
+=== Benchmark Results ===
+Latency: 0.552 seconds
+Tokens in: 581
+Tokens out: 73
+Total tokens: 654
+Throughput: 1184.5 tokens/sec
+
+Parsed policy object:
+{
+  "stop_conditions": [
+    "battery_threshold"
+  ],
+  "object_name": "cat",
+  "object_interaction": "greet",
+  "battery_threshold": 50,
+  "return_home_on_stop": true,
+  "notes": "Greet the cat when battery drops below 50% and return home."
+}
+Running benchmark...
+
+=== Benchmark Results ===
+Latency: 0.588 seconds
+Tokens in: 592
+Tokens out: 76
+Total tokens: 668
+Throughput: 1136.1 tokens/sec
+
+Parsed policy object:
+{
+  "object_name": "cat",
+  "location_name": "cat:location",
+  "object_interaction": "follow",
+  "search_strategy": "spiral",
+  "exploration_mode": "careful",
+  "notes": "Move to the known location of the cat and then perform a spiral search to follow it."
+}
+Running benchmark...
+
+=== Benchmark Results ===
+Latency: 0.425 seconds
+Tokens in: 575
+Tokens out: 56
+Total tokens: 631
+Throughput: 1484.2 tokens/sec
+
+Parsed policy object:
+{
+  "stop_conditions": [
+    "time_elapsed"
+  ],
+  "time_limit_seconds": 600,
+  "return_home_on_stop": true,
+  "notes": "The robot will explore for 10 minutes and then return home."
+}
+Merged policies:
+[{'stop_conditions': ['no_unknown_cells'], 'direction_bias': 'south-east', 'object_name': None, 'location_name': 'near_south_east', 'object_interaction': 'observe', 'avoid_regions': [], 'search_strategy': 'frontier_only', 'exploration_mode': 'normal', 'max_distance': 10, 'time_limit_seconds': None, 'battery_threshold': None, 'return_home_on_stop': False, 'notes': 'Move to the near south-east region with a maximum distance of 10m from home, then explore and stay there until all unknown cells are covered.'}, {'stop_conditions': ['object_found'], 'direction_bias': 'west', 'object_name': 'cat', 'object_interaction': 'follow', 'search_strategy': 'frontier_only', 'exploration_mode': 'careful', 'return_home_on_stop': False, 'notes': 'Move to the west region to search for a cat and follow it after detection.'}, {'stop_conditions': ['battery_threshold'], 'object_name': 'cat', 'object_interaction': 'greet', 'battery_threshold': 50, 'return_home_on_stop': True, 'notes': 'Greet the cat when battery drops below 50% and return home.'}, {'object_name': 'cat', 'location_name': 'cat:location', 'object_interaction': 'follow', 'search_strategy': 'spiral', 'exploration_mode': 'careful', 'notes': 'Move to the known location of the cat and then perform a spiral search to follow it.'}, {'stop_conditions': ['time_elapsed'], 'time_limit_seconds': 600, 'return_home_on_stop': True, 'notes': 'The robot will explore for 10 minutes and then return home.'}]
+PS H:\SLARC\src_dev\ai> 

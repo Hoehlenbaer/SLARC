@@ -3,7 +3,8 @@ import json
 import re
 from llama_cpp import Llama
 
-MODEL_PATH = "/home/admin/.models/Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
+#MODEL_PATH = "/home/admin/.models/Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
+MODEL_PATH = "H:\SLARC_resources\models\Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
 
 llm = Llama(model_path=MODEL_PATH,n_ctx=4096,n_gpu_layers=-1,use_mlock=True,use_mmap=True,verbose=False)
 #llm = Llama(model_path=MODEL_PATH,n_ctx=4096,n_threads=2,n_batch=512,use_mlock=True,verbose=False)
