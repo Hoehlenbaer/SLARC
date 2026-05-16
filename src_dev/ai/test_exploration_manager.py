@@ -128,7 +128,7 @@ intention = """There are unknown regions in the south, which are far away, and i
             There're no more unknown cells in the south-east, but in the west -> Move there and carefully search and find the cat, then follow her.
             when your battery is below 50%, greet the cat and return home.
             The cat's last location is called cat:location -> move there, perform a spiral search to find it again and continue to follow it. 
-            After following for 10 minutes, return home."""
+            After following the cat for 10 minutes, return home."""
 
 policies = []
 

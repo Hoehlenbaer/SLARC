@@ -297,7 +297,7 @@ install_packages "vision" opencv-python --no-deps pyzmq moderngl glcontext posix
 
 # Custom Build zuerst, dann restliche ai-Pakete
 install_llama_cpp_custom
-install_packages "ai" opencv-python onnxruntime posix_ipc numpy tabulate ollama
+install_packages "ai" opencv-python onnxruntime posix_ipc numpy tabulate ollama py_trees
 
 install_packages "sensors" smbus2 numpy==1.24 matplotlib icm20948 scipy==1.11.4 posix_ipc
 install_packages "motion_control" RPi.GPIO posix_ipc matplotlib scipy
