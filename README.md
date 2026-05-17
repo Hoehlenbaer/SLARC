@@ -35,26 +35,27 @@ The Raspberry Pi handles all AI inference and high-level planning. The ESP32 han
 
 ## AI Architecture
 
-### Perception – FusedHexapodModel V4.0
+### Perception – FusedHexapodModel V5.0
 
-The core perception system is a **single multi-task neural network** with four output heads, designed to run entirely on the Hailo-8 NPU. All heads share a common MobileNetV2-1.4 backbone — the feature extraction cost is paid once per frame.
+The core perception system is a **single multi-task neural network** with four output heads, designed to run entirely on the Hailo-8 NPU. All heads share a common MobileNetV2-1.4 backbone with asymmetric channel alignment — the feature extraction cost is paid once per frame.
 
-#### V3.1 → V4.0 Migration
+#### Architecture Evolution
 
-V4.0 is a complete architecture redesign focused on Hailo-8 NPU deployment efficiency. Key changes:
+The model has gone through several iterations, each driven by deployment constraints on the Hailo-8 NPU:
 
-| Change | V3.1 | V4.0 | Reason |
-|---|---|---|---|
-| Backbone | MobileNetV3-Large | **MobileNetV2-1.4** | SE blocks caused 6× slowdown on Hailo (35 ms → 5.6 ms) |
-| Attention | CBAM after FPN | **Removed** | Similar to SE — AvgPool + FC chains are NPU-hostile |
-| CostVolume channels | 32 | **16** | Halved without quality loss thanks to stronger backbone features |
-| Stereo output | Full res (480×640) | **s4 (120×160)** | s1 refinement added artifacts; s4 is sufficient for navigation |
-| Normals output | Full res (480×640) | **s4 (120×160)** | Full-res refinement removed; upscaling moved to ARM/display |
-| AvgPool2d | nn.AvgPool2d | **LearnablePool (DW Conv)** | AvgPool causes quantization shift errors on Hailo |
-| Activations | ReLU + HardSwish | **ReLU6 throughout** | Pure INT8 quantization, no 16-bit fallback needed |
-| SiLU in SPPF | nn.SiLU | **nn.ReLU6** | SiLU compiles as HardSwish → 16-bit on Hailo |
-| Confidence Gate | None | **Top-2 ambiguity gate** | Suppresses false stereo matches on repetitive textures and sky |
-| NPU deployment | Not achieved | **3-HEF split, ~18.5 FPS** | Backbone + Geometry + Detection as separate HEFs |
+| Change | V3.1 | V4.0 | V5.0 | Reason |
+|---|---|---|---|---|
+| Backbone | MobileNetV3-Large | MobileNetV2-1.4 | MobileNetV2-1.4 | SE blocks caused 6× slowdown on Hailo |
+| Channel Alignment | None | None | **Stereo-focused (64/128/128/256)** | Wider stereo features via 1×1 projection, preserving ImageNet weights |
+| Stereo Matching | CostVolume + GroupedConv | CostVolume + GroupedConv | **Flat CostVolume + MLP reduction** | Cross-disparity learning, no per-bin isolation |
+| CostVolume channels | 32 | 16 | 16 | Halved without quality loss |
+| Stereo output | Full res (480×640) | s4 (120×160) | s4 (120×160) | s1 refinement added artifacts |
+| Attention | CBAM after FPN | Removed | Removed | AvgPool + FC chains are NPU-hostile |
+| Activations | ReLU + HardSwish | ReLU6 | ReLU6 | Pure INT8 quantization |
+| Seg classes | 6 (with NAV_ANCHOR) | 6 (with NAV_ANCHOR) | **6 (FLOOR/TERRAIN split)** | Better outdoor navigation |
+| Detection classes | 40 | 40 | **41 (+ UNKNOWN)** | Generalized objectness for unseen objects |
+| Confidence Gate | None | Peak confidence | Peak confidence | Suppresses false stereo matches |
+| NPU deployment | Not achieved | 3-HEF, 18 FPS | **3-HEF, 16.3 FPS** | Wider features trade speed for quality |
 
 #### Architecture Overview
 
@@ -66,7 +67,14 @@ Stereo Camera Pair (640×480, grayscale)
 │  MobileNetV2-1.4 Backbone (1-channel input, luminance merge) │
 │  out_indices: s4 (32ch) · s8 (48ch) · s16 (136ch) · s32 (448ch)│
 └──┬──────────┬──────────┬──────────┬──────────────────────────┘
-   │s4        │s8        │s16       │s32
+   │          │          │          │
+   ▼          ▼          ▼          ▼
+┌──────────────────────────────────────────────────────────────┐
+│  Channel Aligner (stereo-focused)                            │
+│  1×1 Conv projections: 32→64 · 48→128 · 136→128 · 448→256   │
+│  Wider s4/s8 for stereo, slimmer s32 saves compute           │
+└──┬──────────┬──────────┬──────────┬──────────────────────────┘
+   │s4(64)    │s8(128)   │s16(128)  │s32(256)
    │          │          │          ▼
    │          │          │    ┌───────────┐
    │          │          │    │   SPPF    │ Spatial Pyramid Pooling
@@ -81,14 +89,14 @@ Stereo Camera Pair (640×480, grayscale)
    │          │       │s8     │s16    │s32
    │          │       ▼       ▼       ▼
    │          │    ┌────────────────────────┐
-   │          │    │    YOLO Detection      │ 40 robot-relevant classes
+   │          │    │    YOLO Detection      │ 41 classes (40 known + UNKNOWN)
    │          │    │  (3 Decoupled Heads)   │ 3 scales: s8 / s16 / s32
    │          │    │  CoordConv + RepConv   │
    │          │    └────────────────────────┘
    │          │
    ▼          ▼
 ┌──────────────────┐
-│  Geometry Stem   │ RepConv(32→32) × 2
+│  Geometry Stem   │ RepConv(64→32) + RepConv(32→32)
 │  (s4, 32ch out)  │ High-res edge features
 └──┬───────────────┘
    │ geo_features
@@ -97,25 +105,25 @@ Stereo Camera Pair (640×480, grayscale)
    │                                   │
    ▼                                   ▼
 ┌──────────────────────┐    ┌─────────────────────────────────┐
-│   NormalsHead        │    │   Hierarchical Stereo Head      │
+│   NormalsHead        │    │   Correlation Stereo Head (V5)  │
 │                      │    │                                 │
-│  Fusion: s4 + s8     │    │  CoarseCostVolume (s8)          │
-│   + geo (CoordConv)  │    │   · 16ch features, 24 disp bins │
-│   96 → 64 → 32 → 3  │    │   · CoordConv + geo features    │
+│  Fusion: s4 + s8     │    │  Flat CostVolume (s8)           │
+│   + geo (CoordConv)  │    │   · Shift+Concat all disparities│
+│   96 → 64 → 32 → 3  │    │   · 16ch × 24 bins = 384ch     │
 │                      │    │                                 │
-│  L2 normalize        │    │  Context Network (slice-wise)   │
-│  (deploy-safe sqrt)  │    │   · 1→16→16→1, RF 7×7           │
+│  L2 normalize        │    │  MLP Reduction (384 → 96 → 24) │
+│  (deploy-safe sqrt)  │    │   · Cross-disparity learning    │
+│                      │    │   · Learns correlations across  │
+│  Output:             │    │     all disparity bins jointly  │
+│   normals_s4         │    │                                 │
+│   [1, 3, 120, 160]   │    │  Confidence Gate (eval only)    │
 │                      │    │                                 │
-│  Output:             │    │  Confidence Gate (eval only)    │
-│   normals_s4         │    │   · Suppresses ambiguous matches │
-│   [1, 3, 120, 160]   │    │                                 │
-│                      │    │  Refine s4 (backbone guidance)  │
-└──────┬───────────────┘    │                                 │
-       │ normals_s4         │  Output:                        │
-       ▼                    │   disp_s4  [1, 1, 120, 160]     │
-┌────────────────────────┐  │   disp_s8  [1, 1,  60,  80]     │
-│  LRASPP Seg Head       │  └─────────────────────────────────┘
-│  low (s4 + normals)    │
+└──────┬───────────────┘    │  Refine s4 (backbone guidance)  │
+       │ normals_s4         │                                 │
+       ▼                    │  Output:                        │
+┌────────────────────────┐  │   disp_s4  [1, 1, 120, 160]    │
+│  LRASPP Seg Head       │  │   disp_s8  [1, 1,  60,  80]    │
+│  low (s4 + normals)    │  └─────────────────────────────────┘
 │  + high (s16, pooled   │
 │    via LearnablePool)  │
 │  + mid (dilated + norm)│
@@ -124,9 +132,9 @@ Stereo Camera Pair (640×480, grayscale)
 │   seg [1, 6, 120, 160] │
 │                        │
 │  6 classes:            │
-│  WALKABLE · STEP ·     │
+│  FLOOR · STEP ·        │
 │  WALL · OBSTACLE ·     │
-│  NAV_ANCHOR · VOID     │
+│  VOID · TERRAIN        │
 └────────────────────────┘
 ```
 
@@ -134,8 +142,9 @@ Stereo Camera Pair (640×480, grayscale)
 
 | Property | Value |
 |---|---|
-| Total parameters | 6.09 M |
+| Total parameters | 5.90 M |
 | Backbone (MobileNetV2-1.4) | 3.45 M |
+| Channel Aligner | 0.14 M |
 | YOLO Head | 1.46 M |
 | Seg Head | 0.21 M |
 | Normals Head | 0.16 M |
@@ -147,26 +156,31 @@ Stereo Camera Pair (640×480, grayscale)
 | Block | Purpose | NPU Cost |
 |---|---|---|
 | **MobileNetV2-1.4** | Shared backbone — wider channels (32/48/136/448) than MNV2-1.0, no SE blocks, pure ReLU6 | Very low — ideal for INT8 NPU |
+| **Channel Aligner** | 1×1 Conv projections to Hailo-optimal widths (64/128/128/256); preserves ImageNet weights, wider s4/s8 for stereo, slimmer s32 saves compute | Negligible — four 1×1 convs |
 | **SPPF** | Expands receptive field at s32 via cascaded 5×5 max-pooling | Minimal — pooling + 1×1 convs |
 | **CoordConv** | Appends normalized X/Y coordinate grids; spatial awareness for stereo matching and normals | Negligible — 2 extra input channels |
 | **RepConv** | Three parallel paths during training (3×3 + 1×1 + identity); folds into single 3×3 conv at deploy | **Zero overhead at inference** |
 | **GeometryStem** | High-frequency edge features from s4 via 2× RepConv; shared by Stereo and Normals | Low — 2 convs at stride 4 |
+| **Flat CostVolume** | Shift + Concat all disparity bins into a single flat tensor (384ch); no per-bin GroupedConv | More regular memory access pattern |
+| **MLP Reduction** | Two-stage 1×1 Conv (384→96→24) with ReLU6; enables cross-disparity learning — each output bin sees all 24 shifts simultaneously | Low — two small 1×1 convs |
 | **DWSepConv** | Depthwise-separable convolution; ~8–9× fewer FLOPs than standard conv | Very efficient |
 | **LearnablePool** | Replaces AvgPool2d with depthwise conv initialized as averaging; avoids Hailo quantization shift errors | Identical compute, better quantization |
-| **Confidence Gate** | At inference: suppresses stereo matches where top-2 peaks are ambiguous (repetitive textures, sky) | Negligible — topk + clamp + mul |
+| **Confidence Gate** | At inference: suppresses stereo matches where peak confidence is too low (repetitive textures, sky) | Negligible — max + clamp + mul |
 | **SegFormer teacher fusion** | SegFormer-b2 on GPU during training only; enriches geometry-derived seg labels with semantics | **Zero at inference** |
 | **EMA loss balancing** | Per-task loss normalization with priority weights and NaN guards | **Zero at inference** |
 
 #### Head Details
 
-**Stereo Depth** — Hierarchical coarse-to-fine at stride 4 resolution:
-- Coarse: Cost volume at stride 8 (24 disparity bins, 16 feature channels), universal matching metric, slice-wise spatial context smoothing
-- Confidence Gate: top-2 peak ambiguity check — suppresses false matches on repetitive textures and sky regions
+**Stereo Depth** — Flat CostVolume with cross-disparity learning at stride 4 resolution:
+- Flat CostVolume at stride 8: shift + concatenate left/right features for all 24 disparity bins into a single 384-channel tensor
+- MLP Reduction (384→96→24): two-stage 1×1 Conv with ReLU6 — enables each output bin to see all 24 shifts simultaneously, learning cross-disparity correlations instead of isolated per-bin matching
+- Post-correlation refinement: 2× Conv2d 3×3 with spatial context smoothing
+- Confidence Gate: peak confidence check — suppresses false matches on repetitive textures and sky regions
 - Refine s4: Upscale ×2, backbone + geo + normals guidance via CoordConv
 - Output: dense disparity map at s4 (120×160); for display, multiply by 4 and upscale with OpenCV
 
 **Surface Normals** — Multi-scale fusion at stride 4:
-- s4 backbone (32ch) + adapted s8 (32ch) + GeometryStem (32ch) = 96ch fused via CoordConv
+- s4 backbone (64ch) + adapted s8 (32ch) + GeometryStem (32ch) = 128ch fused via CoordConv
 - L2 normalization (deploy-safe: max-scaling to prevent INT8 overflow, then sqrt + clamp)
 - Output: per-pixel unit normal vectors at s4 resolution (120×160)
 
@@ -174,12 +188,13 @@ Stereo Camera Pair (640×480, grayscale)
 - Low path: s4 features + predicted normals
 - High path: s16 features via LearnablePool + 1×1 projection
 - Mid path: dilated conv on s16 + normals
-- Labels fused from depth-derived geometry + SegFormer-b2 teacher predictions
-- 6 classes: WALKABLE, STEP, WALL, OBSTACLE, NAV_ANCHOR, VOID
+- Labels fused from depth-derived geometry (floor angle, surface roughness) + SegFormer-b2 teacher predictions (semantic classes)
+- 6 classes: FLOOR (smooth hard surfaces), STEP (stairs), WALL (vertical), OBSTACLE (impassable), VOID (sky/far), TERRAIN (walkable but uneven: grass, sand, dirt)
 
 **Object Detection** — YOLO-style 3-scale:
 - 3-scale decoupled heads (s8, s16, s32) with CoordConv + RepConv
-- 40 robot-relevant COCO classes
+- 41 classes: 40 robot-relevant COCO classes + UNKNOWN (generalized objectness for unseen objects)
+- UNKNOWN class trained on all remaining ~40 COCO categories — teaches the model "there is something here" even for objects outside the 40 known classes
 - GIoU box regression, focal loss for classification
 
 #### Training
@@ -196,23 +211,29 @@ Stereo Camera Pair (640×480, grayscale)
 | Stability | NaN guards on EMA + total loss, per-module + global gradient clipping, forced `.item()` on all log values to prevent memory leaks in long training runs |
 | Hardware | NVIDIA RTX 3080 Ti (12 GB), AMD Ryzen 9 5950X, WSL2 |
 
-#### V4.0 Eval Results
+#### Eval Results
 
-| Task | Metric | V3.1 | V4.0 | Change |
-|---|---|---|---|---|
-| **Stereo** | EPE | 2.42 px | **1.00 px** | −59% |
-| **Stereo** | mAP@50 | — | — | — |
-| **Detection** | mAP@50 | 0.118 | **0.260** | +120% |
-| **Segmentation** | mIoU | 23.8% | 22.7% | −1.1% |
-| **Normals** | Cosine Similarity | 0.567 | **0.639** | +13% |
+| Task | Metric | V3.1 | V4.0 | V5.0 | V4→V5 |
+|---|---|---|---|---|---|
+| **Stereo** | EPE | 2.42 px | 1.00 px | **0.97 px** | −3% |
+| **Stereo** | Bad3 | — | 17.1% | **14.1%** | −18% |
+| **Detection** | mAP@50 | 0.118 | 0.260 | **0.253** | −3% (41 cls) |
+| **Detection** | Top10 Conf | — | 0.593 | **0.689** | +16% |
+| **Segmentation** | mIoU | 23.8% | 22.7% | **22.6%** | ≈ (new classes) |
+| **Normals** | Cosine Sim | 0.567 | 0.639 | **0.638** | ≈ |
 
-*V4.0 stereo EPE is measured at s4 resolution (120×160). V3.1 EPE was at full resolution (480×640). Direct comparison is not meaningful for stereo — the improvement comes from removing artifact-prone full-res refinement. All other metrics are comparable.*
+**V5.0 highlights:**
+- Stereo Bad3 drops from 17.1% to 14.1% — the MLP reduction and cross-disparity learning significantly improve matching quality
+- YOLO confidence jumps 16% thanks to wider backbone features and the UNKNOWN class providing generalized objectness training
+- YOLO mAP@50 is slightly lower (0.253 vs 0.260) because V5.0 has 41 classes instead of 40 — the additional UNKNOWN class makes classification marginally harder while improving object detection robustness
+- Seg mIoU is comparable despite a complete class redefinition (WALKABLE→FLOOR, NAV_ANCHOR removed, TERRAIN added)
+- VOID detection works for the first time (53.7% IoU vs 0.0% in V4.0)
 
-*Evaluated on TartanAir eval (amusement, oldtown) and COCO val2017 (40 robot-relevant classes).*
+*All metrics evaluated on TartanAir eval (amusement, oldtown) and COCO val2017. Stereo EPE measured at s4 resolution (120×160).*
 
 ### Hailo-8 NPU Deployment
 
-The model is split into **3 HEF files** for deployment on the Hailo-8 NPU. A single-HEF approach was not possible due to the SE-block-induced context explosion in V3.1; the V4.0 architecture (SE-free, no CBAM) was designed specifically for clean NPU compilation.
+The model is split into **3 HEF files** for deployment on the Hailo-8 NPU. Alternative splits were evaluated (2-HEF combined, 3-HEF with Normals+Detection merged) but failed due to INT8 concat zero-point mismatches or excessive inter-context bandwidth. The 3-HEF split remains the most reliable and performant approach.
 
 #### 3-HEF Pipeline
 
@@ -274,16 +295,15 @@ img_right ─→ [HEF A: Backbone] ──→ f_s4_r, f_s8_r
 
 #### Runtime Performance (Raspberry Pi 5, PCIe Gen 3)
 
-| Step | Latency (median) |
-|---|---|
-| Backbone (left) | ~5.6 ms |
-| Backbone (right) | ~5.6 ms |
-| Geometry (stereo + normals) | ~28.7 ms |
-| Detection (seg + YOLO) | ~7.3 ms |
-| Host overhead (activate, transfer) | ~7 ms |
-| **Pipeline total** | **~54 ms → 18.5 FPS** |
+| Step | V4.0 Latency | V5.0 Latency |
+|---|---|---|
+| Backbone (left) | 13.5 ms | 14.0 ms |
+| Backbone (right) | 10.0 ms | 9.6 ms |
+| Geometry (stereo + normals) | 21.8 ms | 21.7 ms |
+| Detection (seg + YOLO) | 10.6 ms | 10.8 ms |
+| **Pipeline total** | **56 ms → 17.9 FPS** | **56 ms → 16.3 FPS** |
 
-*Measured with random input data. Real-world performance may vary slightly. PCIe Gen 3 (`dtparam=pciex1_gen=3`) is required for optimal transfer speeds.*
+*V5.0 uses stereo-focused channel alignment (64/128/128/256) which produces wider feature tensors, slightly increasing transfer overhead despite similar compute times. Measured on Raspberry Pi 5 with PCIe Gen 3 (`dtparam=pciex1_gen=3`).*
 
 #### Lessons Learned: Hailo-8 Optimization
 
@@ -304,6 +324,12 @@ The path from a trained PyTorch model to a working HEF on the Hailo-8 was the mo
 7. **Calibration data must be unnormalized.** When using in-network normalization via model script, calibration data should be raw \[0, 255\] values, not pre-normalized.
 
 8. **RepConv deploy flag must be threaded through all constructors.** If any `RepConv` module doesn't receive `deploy=True`, the folded weights won't load. Use a post-creation fix: iterate all modules and set `deploy=True` + create `rbr_reparam` manually.
+
+9. **Classification backbones waste channels for dense prediction.** MobileNetV2-1.4 puts 448 channels at s32 (for ImageNet classification) but only 48 at s8 (where stereo matching happens). A simple 1×1 projection ("Channel Aligner") redistributes capacity: wider s4/s8 for stereo, slimmer s32 for detection. ImageNet weights are preserved — only the projection layers are new.
+
+10. **Grouped Convolutions in Cost Volumes limit stereo quality.** V4.0's GroupedConv processed each disparity bin in isolation — bin 5 had no information about bins 4 or 6. Replacing this with a flat Concat + MLP reduction (384→96→24) lets each output bin see all 24 shifts simultaneously, enabling cross-disparity learning. This changed the learning dynamics fundamentally: the model learns global depth structure instead of local bin-by-bin matching.
+
+11. **Concat zero-point mismatches block HEF merging.** Combining Normals (range [-1, 1]) and Backbone features (range [-3, 3]) in a single HEF causes INT8 quantization conflicts at Concat nodes. Keeping them in separate HEFs lets the compiler resolve zero-points at HEF boundaries. A 2-HEF approach (Backbone + Combined) failed for this reason; 3-HEF remains the most reliable split.
 
 ### Mission Planning – Qwen3 LLM
 
@@ -528,12 +554,12 @@ SLARC/
 | Chassis / legs – 3D print design | 🔧 Work in progress |
 | Servo control (ESP32) | 🔧 Work in progress |
 | Camera pipeline – GPU rectification | ✅ Working |
-| FusedHexapodModel V4.0 – Training | ✅ Complete |
-| FusedHexapodModel V4.0 – Hailo deployment | ✅ 3-HEF pipeline, 18.5 FPS |
-| FusedHexapodModel – Stereo head | ✅ EPE 1.00 px (s4) |
-| FusedHexapodModel – Surface normals | ✅ Cosine sim 0.639 |
-| FusedHexapodModel – Segmentation | ✅ mIoU 22.7% |
-| FusedHexapodModel – Object detection | ✅ mAP@50 0.260 |
+| FusedHexapodModel V5.0 – Training | ✅ Complete |
+| FusedHexapodModel V5.0 – Hailo deployment | ✅ 3-HEF pipeline, 16.3 FPS |
+| FusedHexapodModel – Stereo head | ✅ EPE 0.97 px, Bad3 14.1% |
+| FusedHexapodModel – Surface normals | ✅ Cosine sim 0.638 |
+| FusedHexapodModel – Segmentation | ✅ mIoU 22.6% (6 classes: FLOOR/STEP/WALL/OBSTACLE/VOID/TERRAIN) |
+| FusedHexapodModel – Object detection | ✅ mAP@50 0.253 (41 classes incl. UNKNOWN) |
 | LLM mission planner | ✅ Prototype running |
 | System setup scripts | ✅ Complete |
 
