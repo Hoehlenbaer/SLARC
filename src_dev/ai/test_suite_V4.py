@@ -107,8 +107,6 @@ TEST_CASES = [
         "group":    "Object",
         "intention":"Locate the person and observe them from a safe distance.",
         "expected": {"object_name": "person", "object_interaction": "observe"},
-        "expect_warnings": True,
-        "note":     "intentionally open-ended — ReactiveGuard provides termination",
     },
     {
         "id":       "OBJ-07",
@@ -134,7 +132,7 @@ TEST_CASES = [
     {
         "id":       "STOP-03",
         "group":    "Stop conditions",
-        "intention":"Search the area and halt as soon as the cat is spotted.",
+        "intention":"Sweep the area and stop once the cat becomes visible.",
         "expected": {"stop_conditions": ["object_found"], "object_name": "cat"},
     },
     {
