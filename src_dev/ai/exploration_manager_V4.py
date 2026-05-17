@@ -6,7 +6,8 @@ from llama_cpp import Llama
 # ---------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------
-MODEL_PATH = "H:/SLARC_resources/models/Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
+#MODEL_PATH = "H:/SLARC_resources/models/Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
+MODEL_PATH = "/home/admin/.models/Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
 
 llm = Llama(
     model_path   = MODEL_PATH,
