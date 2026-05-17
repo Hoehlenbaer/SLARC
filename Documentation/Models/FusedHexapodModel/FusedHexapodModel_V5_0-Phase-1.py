@@ -2775,8 +2775,8 @@ scheduler = MultiHeadPlateauThenDecay(
     optimizer, 
     warmup_steps=int(2.5 * steps_per_epoch), 
     decay_steps=int(20 * steps_per_epoch), # Wir geben ihm etwas mehr Zeit für den Auslauf
-    patience=int(4.0 * steps_per_epoch), 
-    threshold=0.01 # Etwas sensibler, um langsames konvergieren des flatten CV zu kompensieren (1.0%)
+    patience=int(2.0 * steps_per_epoch), 
+    threshold=0.015 # Etwas sensibler, um langsames konvergieren des flatten CV zu kompensieren (1.0%)
 )
 
 # =====================================================================
@@ -2897,8 +2897,8 @@ if RESUME_TRAINING:
             smoothed_loss = None
             smoothed_losses = None
             scheduler.decay_steps=int(20 * steps_per_epoch) # Wir geben ihm etwas mehr Zeit für den Auslauf
-            scheduler.patience=int(4.0 * steps_per_epoch) 
-            scheduler.threshold=0.01 # Etwas sensibler, um langsames konvergieren des flatten CV zu kompensieren (1.0%)
+            scheduler.patience=int(2.0 * steps_per_epoch) 
+            scheduler.threshold=0.015 # Etwas sensibler, um langsames konvergieren des flatten CV zu kompensieren (1.0%)
             print("✅ EMA, Scheduler und Smoothed-Losses reset für V5.0 Priority-Änderung")
             print(f"EMA scheduler reset: (Patience: {scheduler.steps_without_improvement})")
 
@@ -3248,6 +3248,9 @@ while True:
     # --- ABBRUCH-BEDINGUNG ---
     if scheduler.decay_triggered and lr_mult < 0.005:
         print(f"🏁 Training beendet! Minimum LR erreicht bei Step {global_step}.")
+        save_checkpoint(model=model, optimizer=optimizer,
+                        scheduler=scheduler, scaler=scaler, step=global_step, loss=total_step_loss,
+                        filename=f"checkpoint_v5_0_step_{global_step}.pth")
         break
 
     global_step += 1
