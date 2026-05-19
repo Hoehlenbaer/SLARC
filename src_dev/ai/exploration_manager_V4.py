@@ -1,13 +1,60 @@
 import time
 import json
 import re
+import os
 from llama_cpp import Llama
 
 # ---------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------
 #MODEL_PATH = "H:/SLARC_resources/models/Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
-MODEL_PATH = "/home/admin/.models/Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
+#MODEL_PATH = "/home/admin/.models/Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
+
+
+def find_model_path(model_name):
+    """
+    Searches for a model file in a predefined list of directories.
+
+    Args:
+        model_name (str): The name of the model file to find.
+
+    Returns:
+        str: The full path to the model file if found, otherwise None.
+    """
+    # 1. Check in the same folder as the script
+    # os.path.abspath(__file__) gives the absolute path of the script
+    # os.path.dirname gets the directory of the script
+    script_directory = os.path.dirname(os.path.abspath(__file__))
+    
+    # Potential paths for the model file
+    # The list is ordered by search priority.
+    search_paths = [
+        # Priority 1: Same folder as the script
+        script_directory,
+        # Priority 2: Specified Windows path
+        "H:/SLARC_resources/models/",
+        # Priority 3: Specified Linux path
+        "/home/admin/.models/"
+    ]
+
+    print(f"Searching for model: {model_name}")
+    print("-" * 30)
+
+    for path in search_paths:
+        # os.path.join creates a valid path for the current OS
+        potential_path = os.path.join(path, model_name)
+        print(f"Checking: {potential_path}")
+        
+        # os.path.exists checks if a file or directory exists
+        if os.path.exists(potential_path):
+            print("\nModel found!")
+            return potential_path
+
+    print("\nModel not found in any of the specified locations.")
+    return None
+
+MODEL_FILENAME = "Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
+MODEL_PATH = find_model_path(MODEL_FILENAME)
 
 llm = Llama(
     model_path   = MODEL_PATH,
