@@ -1,0 +1,58 @@
+2026-05-19 20:27:08,718 - INFO - main.py:34 - Current Time: 20:27:08, 05/19/26
+2026-05-19 20:27:09,751 - INFO - main.py:46 - CPU: Architecture: x86_64, Model: AMD Ryzen 9 5950X 16-Core Processor, Number Of Cores: 32, Utilization: 7.0%
+2026-05-19 20:27:09,751 - INFO - main.py:50 - Memory: Total: 23GB, Available: 17GB
+2026-05-19 20:27:09,751 - INFO - main.py:54 - System info: OS: Linux, Kernel: 5.15.153.1-microsoft-standard-WSL2
+2026-05-19 20:27:09,752 - INFO - main.py:55 - Hailo DFC Version: 3.33.1
+2026-05-19 20:27:09,752 - INFO - main.py:60 - HailoRT Version: Not Installed
+2026-05-19 20:27:09,755 - INFO - main.py:76 - PCIe: No Hailo PCIe device was found
+2026-05-19 20:27:09,755 - INFO - main.py:109 - Running `hailo inspect hexapod_v5_backbone.hef --ops`
+2026-05-19 20:27:50,524 - INFO - main.py:34 - Current Time: 20:27:50, 05/19/26
+2026-05-19 20:27:51,536 - INFO - main.py:46 - CPU: Architecture: x86_64, Model: AMD Ryzen 9 5950X 16-Core Processor, Number Of Cores: 32, Utilization: 5.3%
+2026-05-19 20:27:51,536 - INFO - main.py:50 - Memory: Total: 23GB, Available: 17GB
+2026-05-19 20:27:51,536 - INFO - main.py:54 - System info: OS: Linux, Kernel: 5.15.153.1-microsoft-standard-WSL2
+2026-05-19 20:27:51,537 - INFO - main.py:55 - Hailo DFC Version: 3.33.1
+2026-05-19 20:27:51,537 - INFO - main.py:60 - HailoRT Version: Not Installed
+2026-05-19 20:27:51,540 - INFO - main.py:76 - PCIe: No Hailo PCIe device was found
+2026-05-19 20:27:51,540 - INFO - main.py:109 - Running `hailo dfc-studio`
+2026-05-19 20:27:51,544 - INFO - dfc_studio.py:22 - Checking requirements
+2026-05-19 20:27:51,592 - ERROR - dfc_studio.py:57 - Node.js is not installed.
+2026-05-19 20:28:32,471 - INFO - main.py:34 - Current Time: 20:28:32, 05/19/26
+2026-05-19 20:28:33,483 - INFO - main.py:46 - CPU: Architecture: x86_64, Model: AMD Ryzen 9 5950X 16-Core Processor, Number Of Cores: 32, Utilization: 5.5%
+2026-05-19 20:28:33,484 - INFO - main.py:50 - Memory: Total: 23GB, Available: 17GB
+2026-05-19 20:28:33,484 - INFO - main.py:54 - System info: OS: Linux, Kernel: 5.15.153.1-microsoft-standard-WSL2
+2026-05-19 20:28:33,484 - INFO - main.py:55 - Hailo DFC Version: 3.33.1
+2026-05-19 20:28:33,484 - INFO - main.py:60 - HailoRT Version: Not Installed
+2026-05-19 20:28:33,488 - INFO - main.py:76 - PCIe: No Hailo PCIe device was found
+2026-05-19 20:28:33,488 - INFO - main.py:109 - Running `hailo --version`
+2026-05-19 20:29:08,141 - INFO - main.py:34 - Current Time: 20:29:08, 05/19/26
+2026-05-19 20:29:09,152 - INFO - main.py:46 - CPU: Architecture: x86_64, Model: AMD Ryzen 9 5950X 16-Core Processor, Number Of Cores: 32, Utilization: 5.2%
+2026-05-19 20:29:09,153 - INFO - main.py:50 - Memory: Total: 23GB, Available: 17GB
+2026-05-19 20:29:09,153 - INFO - main.py:54 - System info: OS: Linux, Kernel: 5.15.153.1-microsoft-standard-WSL2
+2026-05-19 20:29:09,153 - INFO - main.py:55 - Hailo DFC Version: 3.33.1
+2026-05-19 20:29:09,153 - INFO - main.py:60 - HailoRT Version: Not Installed
+2026-05-19 20:29:09,156 - INFO - main.py:76 - PCIe: No Hailo PCIe device was found
+2026-05-19 20:29:09,156 - INFO - main.py:109 - Running `hailo profiler hexapod_v5_backbone.hef --ops`
+2026-05-19 20:29:18,941 - INFO - main.py:34 - Current Time: 20:29:18, 05/19/26
+2026-05-19 20:29:19,952 - INFO - main.py:46 - CPU: Architecture: x86_64, Model: AMD Ryzen 9 5950X 16-Core Processor, Number Of Cores: 32, Utilization: 5.2%
+2026-05-19 20:29:19,952 - INFO - main.py:50 - Memory: Total: 23GB, Available: 17GB
+2026-05-19 20:29:19,953 - INFO - main.py:54 - System info: OS: Linux, Kernel: 5.15.153.1-microsoft-standard-WSL2
+2026-05-19 20:29:19,953 - INFO - main.py:55 - Hailo DFC Version: 3.33.1
+2026-05-19 20:29:19,953 - INFO - main.py:60 - HailoRT Version: Not Installed
+2026-05-19 20:29:19,956 - INFO - main.py:76 - PCIe: No Hailo PCIe device was found
+2026-05-19 20:29:19,956 - INFO - main.py:109 - Running `hailo profiler hexapod_v5_backbone.hef`
+2026-05-19 20:29:41,919 - INFO - main.py:34 - Current Time: 20:29:41, 05/19/26
+2026-05-19 20:29:42,930 - INFO - main.py:46 - CPU: Architecture: x86_64, Model: AMD Ryzen 9 5950X 16-Core Processor, Number Of Cores: 32, Utilization: 5.1%
+2026-05-19 20:29:42,930 - INFO - main.py:50 - Memory: Total: 23GB, Available: 17GB
+2026-05-19 20:29:42,930 - INFO - main.py:54 - System info: OS: Linux, Kernel: 5.15.153.1-microsoft-standard-WSL2
+2026-05-19 20:29:42,931 - INFO - main.py:55 - Hailo DFC Version: 3.33.1
+2026-05-19 20:29:42,931 - INFO - main.py:60 - HailoRT Version: Not Installed
+2026-05-19 20:29:42,933 - INFO - main.py:76 - PCIe: No Hailo PCIe device was found
+2026-05-19 20:29:42,933 - INFO - main.py:109 - Running `hailo profiler hexapod_v5_backbone.har`
+2026-05-19 20:30:26,574 - INFO - main.py:34 - Current Time: 20:30:26, 05/19/26
+2026-05-19 20:30:27,586 - INFO - main.py:46 - CPU: Architecture: x86_64, Model: AMD Ryzen 9 5950X 16-Core Processor, Number Of Cores: 32, Utilization: 4.9%
+2026-05-19 20:30:27,586 - INFO - main.py:50 - Memory: Total: 23GB, Available: 17GB
+2026-05-19 20:30:27,586 - INFO - main.py:54 - System info: OS: Linux, Kernel: 5.15.153.1-microsoft-standard-WSL2
+2026-05-19 20:30:27,587 - INFO - main.py:55 - Hailo DFC Version: 3.33.1
+2026-05-19 20:30:27,587 - INFO - main.py:60 - HailoRT Version: Not Installed
+2026-05-19 20:30:27,590 - INFO - main.py:76 - PCIe: No Hailo PCIe device was found
+2026-05-19 20:30:27,590 - INFO - main.py:109 - Running `hailo optimize hexapod_v5_backbone.hef`
