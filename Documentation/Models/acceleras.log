@@ -1,0 +1,62 @@
+2026-05-19 00:33:27,392 - INFO - nvidia_smi_gpu_selector.py:39 - No GPU chosen, Selected GPU 0
+2026-05-19 01:01:52,260 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/activation3/act_op
+2026-05-19 01:02:06,250 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/ew_sub1/act_op
+2026-05-19 01:02:09,411 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/mul_and_add4/act_op
+2026-05-19 01:02:21,619 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/reduce_sum5/act_op
+2026-05-19 01:02:31,030 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/activation4/act_op
+2026-05-19 03:09:00,536 - INFO - conv_stripped_op.py:633 - No shifts available for layer hexapod_v5_detection_simplified/conv7/conv_op, using max shift instead. delta=0.3793
+2026-05-19 03:09:00,771 - INFO - conv_stripped_op.py:633 - No shifts available for layer hexapod_v5_detection_simplified/conv8/conv_op, using max shift instead. delta=1.3395
+2026-05-19 06:41:28,361 - INFO - nvidia_smi_gpu_selector.py:39 - No GPU chosen, Selected GPU 0
+2026-05-19 06:53:22,755 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/activation3/act_op
+2026-05-19 06:53:37,423 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/ew_sub1/act_op
+2026-05-19 06:53:40,639 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/mul_and_add4/act_op
+2026-05-19 06:54:01,228 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/reduce_sum5/act_op
+2026-05-19 06:54:11,982 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/activation4/act_op
+2026-05-19 07:15:32,098 - INFO - conv_stripped_op.py:633 - No shifts available for layer hexapod_v5_detection_simplified/conv7/conv_op, using max shift instead. delta=0.3793
+2026-05-19 07:15:32,322 - INFO - conv_stripped_op.py:633 - No shifts available for layer hexapod_v5_detection_simplified/conv8/conv_op, using max shift instead. delta=1.3395
+2026-05-19 07:56:53,739 - INFO - nvidia_smi_gpu_selector.py:39 - No GPU chosen, Selected GPU 0
+2026-05-19 07:57:44,761 - INFO - nvidia_smi_gpu_selector.py:39 - No GPU chosen, Selected GPU 0
+2026-05-19 07:58:43,636 - INFO - nvidia_smi_gpu_selector.py:39 - No GPU chosen, Selected GPU 0
+2026-05-19 08:26:36,049 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/activation3/act_op
+2026-05-19 08:26:55,098 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/ew_sub1/act_op
+2026-05-19 08:27:00,106 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/mul_and_add4/act_op
+2026-05-19 08:27:06,292 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/reduce_sum5/act_op
+2026-05-19 08:27:15,285 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/activation4/act_op
+2026-05-19 10:59:49,956 - INFO - nvidia_smi_gpu_selector.py:39 - No GPU chosen, Selected GPU 0
+2026-05-19 11:10:54,342 - INFO - conv_stripped_op.py:633 - No shifts available for layer hexapod_v5_detection_simplified/conv7/conv_op, using max shift instead. delta=0.3793
+2026-05-19 11:10:54,559 - INFO - conv_stripped_op.py:633 - No shifts available for layer hexapod_v5_detection_simplified/conv8/conv_op, using max shift instead. delta=1.3396
+2026-05-19 20:19:06,221 - INFO - nvidia_smi_gpu_selector.py:39 - No GPU chosen, Selected GPU 0
+2026-05-19 20:20:20,354 - INFO - conv_stripped_op.py:633 - No shifts available for layer hexapod_v5_detection_simplified/conv7/conv_op, using max shift instead. delta=0.3793
+2026-05-19 20:20:20,579 - INFO - conv_stripped_op.py:633 - No shifts available for layer hexapod_v5_detection_simplified/conv8/conv_op, using max shift instead. delta=1.3396
+2026-05-19 20:25:55,663 - INFO - nvidia_smi_gpu_selector.py:39 - No GPU chosen, Selected GPU 0
+2026-05-19 20:33:25,657 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/activation3/act_op
+2026-05-19 20:33:38,240 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/ew_sub1/act_op
+2026-05-19 20:33:41,510 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/mul_and_add4/act_op
+2026-05-19 20:34:01,280 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/reduce_sum5/act_op
+2026-05-19 20:34:11,189 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/activation4/act_op
+2026-05-19 22:33:40,228 - INFO - conv_stripped_op.py:633 - No shifts available for layer hexapod_v5_detection_simplified/conv7/conv_op, using max shift instead. delta=0.3793
+2026-05-19 22:33:55,956 - INFO - conv_stripped_op.py:633 - No shifts available for layer hexapod_v5_detection_simplified/conv8/conv_op, using max shift instead. delta=1.3395
+2026-05-19 23:02:19,750 - INFO - nvidia_smi_gpu_selector.py:39 - No GPU chosen, Selected GPU 0
+2026-05-19 23:03:12,253 - INFO - nvidia_smi_gpu_selector.py:39 - No GPU chosen, Selected GPU 0
+2026-05-19 23:03:55,482 - INFO - nvidia_smi_gpu_selector.py:39 - No GPU chosen, Selected GPU 0
+2026-05-19 23:04:26,039 - INFO - nvidia_smi_gpu_selector.py:39 - No GPU chosen, Selected GPU 0
+2026-05-19 23:35:00,948 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/activation3/act_op
+2026-05-19 23:35:14,848 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/activation4/act_op
+2026-05-19 23:35:24,920 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/activation6/act_op
+2026-05-19 23:35:38,437 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/reduce_sum1/act_op
+2026-05-19 23:35:47,712 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/activation7/act_op
+2026-05-19 23:36:03,122 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/reduce_sum2/act_op
+2026-05-19 23:36:07,715 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/activation8/act_op
+2026-05-19 23:36:23,541 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/ew_sub1/act_op
+2026-05-19 23:36:26,854 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/mul_and_add7/act_op
+2026-05-19 23:36:38,140 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/reduce_sum5/act_op
+2026-05-19 23:36:48,716 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/activation10/act_op
+2026-05-20 07:23:57,112 - INFO - nvidia_smi_gpu_selector.py:39 - No GPU chosen, Selected GPU 0
+2026-05-20 07:55:18,456 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/activation3/act_op
+2026-05-20 07:55:30,916 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/ew_sub1/act_op
+2026-05-20 07:55:34,011 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/mul_and_add4/act_op
+2026-05-20 07:55:51,879 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/reduce_sum5/act_op
+2026-05-20 07:56:01,263 - INFO - activation_op.py:1813 - activation fitting started for hexapod_v5_geometry_simplified/activation4/act_op
+2026-05-20 11:49:56,376 - INFO - nvidia_smi_gpu_selector.py:39 - No GPU chosen, Selected GPU 0
+2026-05-20 12:00:38,018 - INFO - conv_stripped_op.py:633 - No shifts available for layer hexapod_v5_detection_simplified/conv7/conv_op, using max shift instead. delta=0.3793
+2026-05-20 12:00:38,229 - INFO - conv_stripped_op.py:633 - No shifts available for layer hexapod_v5_detection_simplified/conv8/conv_op, using max shift instead. delta=1.3396

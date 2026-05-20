@@ -1,0 +1,724 @@
+2026-05-19 00:33:34,057 - INFO - parser.py:158 - Translation started on ONNX model hexapod_v5_backbone_simplified
+2026-05-19 00:33:34,119 - INFO - parser.py:193 - Restored ONNX model hexapod_v5_backbone_simplified (completion time: 00:00:00.06)
+2026-05-19 00:33:34,246 - INFO - parser.py:216 - Extracted ONNXRuntime meta-data for Hailo model (completion time: 00:00:00.19)
+2026-05-19 00:33:34,580 - INFO - onnx_translator.py:2552 - NMS structure of yolov5 (or equivalent architecture) was detected. Default values of NMS anchors were loaded to NMS config json
+2026-05-19 00:33:34,614 - INFO - parser.py:366 - Start nodes mapped from original model: 'input_layer1': 'hexapod_v5_backbone_simplified/input_layer1'.
+2026-05-19 00:33:34,614 - INFO - parser.py:367 - End nodes mapped from original model: '/aligner/align_s4/Conv', '/aligner/align_s8/Conv', '/aligner/align_s16/Conv', '/aligner/align_s32/Conv'.
+2026-05-19 00:33:34,640 - INFO - parser.py:288 - Translation completed on ONNX model hexapod_v5_backbone_simplified (completion time: 00:00:00.58)
+2026-05-19 00:33:35,217 - INFO - client_runner.py:1881 - Saved HAR to: /home/slarc/jupyter/onnx_split/hexapod_v5_backbone.har
+2026-05-19 00:33:35,654 - INFO - client_runner.py:1474 - Running profile for hexapod_v5_backbone_simplified in state hailo_model
+2026-05-19 00:34:53,407 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_backbone_simplified from onnx_split/backbone_v5_script.alls
+2026-05-19 00:34:53,412 - INFO - commands.py:4270 - ParsedPerformanceParam command, setting optimization_level(max=2)
+2026-05-19 00:34:54,380 - IMPORTANT - sdk_backend.py:1133 - Starting Model Optimization
+2026-05-19 00:34:54,472 - INFO - mo_script_parser.py:91 - Model received quantization params from the hn
+2026-05-19 00:34:59,177 - INFO - algorithm_base.py:149 - MatmulDecompose skipped
+2026-05-19 00:34:59,412 - INFO - algorithm_base.py:152 - Starting Mixed Precision
+2026-05-19 00:34:59,852 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Mixed Precision is done (completion time is 00:00:00.44)
+2026-05-19 00:35:00,314 - INFO - algorithm_base.py:149 - LayerNorm Decomposition skipped
+2026-05-19 00:35:01,324 - INFO - algorithm_base.py:152 - Starting Statistics Collector
+2026-05-19 00:35:01,327 - INFO - stats_collection.py:89 - Using dataset with 64 entries for calibration
+2026-05-19 00:35:12,228 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Statistics Collector is done (completion time is 00:00:10.90)
+2026-05-19 00:35:13,847 - INFO - algorithm_base.py:152 - Starting Fix zp_comp Encoding
+2026-05-19 00:35:13,848 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Fix zp_comp Encoding is done (completion time is 00:00:00.00)
+2026-05-19 00:35:13,848 - INFO - algorithm_base.py:149 - Matmul Equalization skipped
+2026-05-19 00:35:13,848 - INFO - algorithm_base.py:152 - Starting MatmulDecomposeFix
+2026-05-19 00:35:13,848 - INFO - algorithm_base.py:168 - Model Optimization Algorithm MatmulDecomposeFix is done (completion time is 00:00:00.00)
+2026-05-19 00:35:23,375 - INFO - algorithm_base.py:149 - Finetune encoding skipped
+2026-05-19 00:35:23,377 - INFO - algorithm_base.py:149 - Bias Correction skipped
+2026-05-19 00:35:23,383 - INFO - algorithm_base.py:149 - Adaround skipped
+2026-05-19 00:35:23,388 - INFO - algorithm_base.py:152 - Starting Quantization-Aware Fine-Tuning
+2026-05-19 00:35:23,417 - INFO - qft.py:332 - Using dataset with 1024 entries for finetune
+2026-05-19 00:42:33,834 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Quantization-Aware Fine-Tuning is done (completion time is 00:07:09.49)
+2026-05-19 00:42:39,716 - INFO - algorithm_base.py:152 - Starting Layer Noise Analysis
+2026-05-19 00:43:13,592 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Layer Noise Analysis is done (completion time is 00:00:33.87)
+2026-05-19 00:43:13,848 - INFO - quant_checker.py:125 - Output layers signal-to-noise ratio (SNR): measures the quantization noise (higher is better)
+2026-05-19 00:43:13,848 - INFO - quant_checker.py:130 - 	hexapod_v5_backbone_simplified/output_layer1 SNR:	15.22 dB
+2026-05-19 00:43:13,848 - INFO - quant_checker.py:130 - 	hexapod_v5_backbone_simplified/output_layer2 SNR:	15.6 dB
+2026-05-19 00:43:13,848 - INFO - quant_checker.py:130 - 	hexapod_v5_backbone_simplified/output_layer3 SNR:	14.08 dB
+2026-05-19 00:43:13,848 - INFO - quant_checker.py:130 - 	hexapod_v5_backbone_simplified/output_layer4 SNR:	15.45 dB
+2026-05-19 00:43:20,930 - IMPORTANT - sdk_backend.py:1145 - Model Optimization is done
+2026-05-19 00:47:09,681 - INFO - parser.py:158 - Translation started on ONNX model hexapod_v5_geometry_simplified
+2026-05-19 00:47:09,688 - INFO - parser.py:193 - Restored ONNX model hexapod_v5_geometry_simplified (completion time: 00:00:00.01)
+2026-05-19 00:47:09,707 - INFO - parser.py:216 - Extracted ONNXRuntime meta-data for Hailo model (completion time: 00:00:00.03)
+2026-05-19 00:47:09,982 - INFO - parser.py:366 - Start nodes mapped from original model: 'f_s4_l': 'hexapod_v5_geometry_simplified/input_layer1', 'f_s8_l': 'hexapod_v5_geometry_simplified/input_layer2', 'f_s4_r': 'hexapod_v5_geometry_simplified/input_layer3', 'f_s8_r': 'hexapod_v5_geometry_simplified/input_layer4'.
+2026-05-19 00:47:09,982 - INFO - parser.py:367 - End nodes mapped from original model: '/stereo_head/stereo_refine_s4/Relu', '/normals_head/Div_1', '/stereo_head/Mul_3'.
+2026-05-19 00:47:10,034 - INFO - parser.py:288 - Translation completed on ONNX model hexapod_v5_geometry_simplified (completion time: 00:00:00.35)
+2026-05-19 00:47:10,733 - INFO - client_runner.py:1881 - Saved HAR to: /home/slarc/jupyter/onnx_split/hexapod_v5_geometry.har
+2026-05-19 00:47:11,395 - INFO - client_runner.py:1474 - Running profile for hexapod_v5_geometry_simplified in state hailo_model
+2026-05-19 00:47:15,793 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_backbone_simplified from onnx_split/backbone_v5_script.alls
+2026-05-19 00:47:15,798 - INFO - commands.py:4270 - ParsedPerformanceParam command, setting optimization_level(max=2)
+2026-05-19 00:47:16,024 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 00:47:24,670 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 00:47:29,206 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 00:47:32,895 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 00:47:36,881 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 00:47:41,381 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 00:47:45,863 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 00:47:49,532 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 01:00:39,414 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_geometry_simplified from onnx_split/geometry_v5_script.alls
+2026-05-19 01:00:39,422 - INFO - commands.py:4270 - ParsedPerformanceParam command, setting optimization_level(max=2)
+2026-05-19 01:00:39,988 - IMPORTANT - sdk_backend.py:1133 - Starting Model Optimization
+2026-05-19 01:00:40,730 - INFO - mo_script_parser.py:91 - Model received quantization params from the hn
+2026-05-19 01:00:44,626 - INFO - algorithm_base.py:149 - MatmulDecompose skipped
+2026-05-19 01:00:44,970 - INFO - algorithm_base.py:152 - Starting Mixed Precision
+2026-05-19 01:00:45,273 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Mixed Precision is done (completion time is 00:00:00.30)
+2026-05-19 01:00:45,711 - INFO - algorithm_base.py:149 - LayerNorm Decomposition skipped
+2026-05-19 01:00:47,002 - INFO - algorithm_base.py:152 - Starting Statistics Collector
+2026-05-19 01:00:47,006 - INFO - stats_collection.py:89 - Using dataset with 64 entries for calibration
+2026-05-19 01:01:48,749 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Statistics Collector is done (completion time is 00:01:01.74)
+2026-05-19 01:01:50,883 - INFO - algorithm_base.py:152 - Starting Fix zp_comp Encoding
+2026-05-19 01:01:50,883 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Fix zp_comp Encoding is done (completion time is 00:00:00.00)
+2026-05-19 01:01:50,884 - INFO - algorithm_base.py:149 - Matmul Equalization skipped
+2026-05-19 01:01:50,884 - INFO - algorithm_base.py:152 - Starting MatmulDecomposeFix
+2026-05-19 01:01:50,884 - INFO - algorithm_base.py:168 - Model Optimization Algorithm MatmulDecomposeFix is done (completion time is 00:00:00.00)
+2026-05-19 01:02:47,317 - INFO - algorithm_base.py:149 - Finetune encoding skipped
+2026-05-19 01:02:47,320 - INFO - algorithm_base.py:149 - Bias Correction skipped
+2026-05-19 01:02:47,325 - INFO - algorithm_base.py:149 - Adaround skipped
+2026-05-19 01:02:47,333 - INFO - algorithm_base.py:152 - Starting Quantization-Aware Fine-Tuning
+2026-05-19 01:02:47,363 - INFO - qft.py:332 - Using dataset with 1024 entries for finetune
+2026-05-19 01:07:45,285 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Quantization-Aware Fine-Tuning is done (completion time is 00:04:56.97)
+2026-05-19 01:07:55,395 - INFO - algorithm_base.py:152 - Starting Layer Noise Analysis
+2026-05-19 01:08:44,480 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Layer Noise Analysis is done (completion time is 00:00:49.08)
+2026-05-19 01:08:44,908 - INFO - quant_checker.py:125 - Output layers signal-to-noise ratio (SNR): measures the quantization noise (higher is better)
+2026-05-19 01:08:44,909 - INFO - quant_checker.py:130 - 	hexapod_v5_geometry_simplified/output_layer3 SNR:	43.34 dB
+2026-05-19 01:08:44,909 - INFO - quant_checker.py:130 - 	hexapod_v5_geometry_simplified/output_layer2 SNR:	28.61 dB
+2026-05-19 01:08:44,909 - INFO - quant_checker.py:130 - 	hexapod_v5_geometry_simplified/output_layer1 SNR:	40.47 dB
+2026-05-19 01:08:53,480 - IMPORTANT - sdk_backend.py:1145 - Model Optimization is done
+2026-05-19 02:40:21,318 - INFO - parser.py:158 - Translation started on ONNX model hexapod_v5_detection_simplified
+2026-05-19 02:40:21,367 - INFO - parser.py:193 - Restored ONNX model hexapod_v5_detection_simplified (completion time: 00:00:00.05)
+2026-05-19 02:40:21,453 - INFO - parser.py:216 - Extracted ONNXRuntime meta-data for Hailo model (completion time: 00:00:00.14)
+2026-05-19 02:40:21,745 - INFO - parser.py:366 - Start nodes mapped from original model: 'f_s4_l': 'hexapod_v5_detection_simplified/input_layer1', 'f_s8_l': 'hexapod_v5_detection_simplified/input_layer2', 'f_s16_l': 'hexapod_v5_detection_simplified/input_layer3', 'f_s32_l': 'hexapod_v5_detection_simplified/input_layer4', 'normals_s4': 'hexapod_v5_detection_simplified/input_layer5'.
+2026-05-19 02:40:21,745 - INFO - parser.py:367 - End nodes mapped from original model: '/seg_head/Add_3', '/yolo_head/head_s8/Concat', '/yolo_head/head_s16/Concat', '/yolo_head/head_s32/Concat'.
+2026-05-19 02:40:21,803 - INFO - parser.py:288 - Translation completed on ONNX model hexapod_v5_detection_simplified (completion time: 00:00:00.49)
+2026-05-19 02:40:22,450 - INFO - client_runner.py:1881 - Saved HAR to: /home/slarc/jupyter/onnx_split/hexapod_v5_detection.har
+2026-05-19 02:40:23,046 - INFO - client_runner.py:1474 - Running profile for hexapod_v5_detection_simplified in state hailo_model
+2026-05-19 02:40:44,740 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_backbone_simplified from onnx_split/backbone_v5_script.alls
+2026-05-19 02:40:44,747 - INFO - commands.py:4270 - ParsedPerformanceParam command, setting optimization_level(max=2)
+2026-05-19 02:40:45,999 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 02:41:31,443 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 02:42:14,521 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 02:42:45,480 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 02:48:05,072 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 02:49:16,594 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 02:50:38,976 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 02:51:41,003 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 02:57:38,612 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_geometry_simplified from onnx_split/geometry_v5_script.alls
+2026-05-19 02:57:38,638 - INFO - commands.py:4270 - ParsedPerformanceParam command, setting optimization_level(max=2)
+2026-05-19 02:57:40,101 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 02:58:11,627 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 02:58:38,651 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 02:59:06,357 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 03:07:52,893 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_detection_simplified from onnx_split/detection_v5_script.alls
+2026-05-19 03:07:52,913 - INFO - commands.py:4270 - ParsedPerformanceParam command, setting optimization_level(max=2)
+2026-05-19 03:07:53,585 - IMPORTANT - sdk_backend.py:1133 - Starting Model Optimization
+2026-05-19 03:07:54,966 - INFO - mo_script_parser.py:91 - Model received quantization params from the hn
+2026-05-19 03:08:21,065 - INFO - algorithm_base.py:149 - MatmulDecompose skipped
+2026-05-19 03:08:21,387 - INFO - algorithm_base.py:152 - Starting Mixed Precision
+2026-05-19 03:08:21,710 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Mixed Precision is done (completion time is 00:00:00.32)
+2026-05-19 03:08:22,342 - INFO - algorithm_base.py:149 - LayerNorm Decomposition skipped
+2026-05-19 03:08:23,688 - INFO - algorithm_base.py:152 - Starting Statistics Collector
+2026-05-19 03:08:23,693 - INFO - stats_collection.py:89 - Using dataset with 64 entries for calibration
+2026-05-19 03:08:53,570 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Statistics Collector is done (completion time is 00:00:29.88)
+2026-05-19 03:08:54,932 - INFO - algorithm_base.py:152 - Starting Fix zp_comp Encoding
+2026-05-19 03:08:54,933 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Fix zp_comp Encoding is done (completion time is 00:00:00.00)
+2026-05-19 03:08:54,933 - INFO - algorithm_base.py:149 - Matmul Equalization skipped
+2026-05-19 03:08:54,933 - INFO - algorithm_base.py:152 - Starting MatmulDecomposeFix
+2026-05-19 03:08:54,934 - INFO - algorithm_base.py:168 - Model Optimization Algorithm MatmulDecomposeFix is done (completion time is 00:00:00.00)
+2026-05-19 03:09:12,502 - INFO - algorithm_base.py:149 - Finetune encoding skipped
+2026-05-19 03:09:12,505 - INFO - algorithm_base.py:149 - Bias Correction skipped
+2026-05-19 03:09:12,512 - INFO - algorithm_base.py:149 - Adaround skipped
+2026-05-19 03:09:12,519 - INFO - algorithm_base.py:152 - Starting Quantization-Aware Fine-Tuning
+2026-05-19 03:09:12,550 - INFO - qft.py:332 - Using dataset with 1024 entries for finetune
+2026-05-19 03:16:11,410 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Quantization-Aware Fine-Tuning is done (completion time is 00:06:57.70)
+2026-05-19 03:16:23,157 - INFO - algorithm_base.py:152 - Starting Layer Noise Analysis
+2026-05-19 03:17:14,739 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Layer Noise Analysis is done (completion time is 00:00:51.58)
+2026-05-19 03:17:15,095 - INFO - quant_checker.py:125 - Output layers signal-to-noise ratio (SNR): measures the quantization noise (higher is better)
+2026-05-19 03:17:15,095 - INFO - quant_checker.py:130 - 	hexapod_v5_detection_simplified/output_layer4 SNR:	31.06 dB
+2026-05-19 03:17:15,095 - INFO - quant_checker.py:130 - 	hexapod_v5_detection_simplified/output_layer1 SNR:	33.11 dB
+2026-05-19 03:17:15,095 - INFO - quant_checker.py:130 - 	hexapod_v5_detection_simplified/output_layer2 SNR:	32.44 dB
+2026-05-19 03:17:15,095 - INFO - quant_checker.py:130 - 	hexapod_v5_detection_simplified/output_layer3 SNR:	32.0 dB
+2026-05-19 03:17:15,096 - INFO - quant_checker.py:171 - The calibration set seems to not be normalized, because the values range is [(-0.9895894, 0.8283868), (-0.97904104, 0.97760904), (-0.6616045, 0.99999756)].
+Since the neural core works in 8-bit (between 0 to 255), a quantization will occur on the CPU of the runtime platform.
+Add a normalization layer to the model to offload the normalization to the neural core.
+Refer to the user guide Hailo Dataflow Compiler user guide / Model Optimization / Optimization Related Model Script Commands / model_modification_commands / normalization for details.
+2026-05-19 03:17:26,251 - IMPORTANT - sdk_backend.py:1145 - Model Optimization is done
+2026-05-19 03:21:59,502 - ERROR - hailo_tools_runner.py:582 - Failed to produce compiled graph
+2026-05-19 06:41:35,787 - INFO - client_runner.py:1474 - Running profile for hexapod_v5_backbone_simplified in state hailo_model
+2026-05-19 06:41:39,761 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_backbone_simplified from onnx_split/backbone_v5_script.alls
+2026-05-19 06:41:40,570 - IMPORTANT - sdk_backend.py:1133 - Starting Model Optimization
+2026-05-19 06:41:40,660 - INFO - mo_script_parser.py:91 - Model received quantization params from the hn
+2026-05-19 06:41:46,182 - INFO - algorithm_base.py:149 - MatmulDecompose skipped
+2026-05-19 06:41:46,404 - INFO - algorithm_base.py:152 - Starting Mixed Precision
+2026-05-19 06:41:46,631 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Mixed Precision is done (completion time is 00:00:00.23)
+2026-05-19 06:41:47,270 - INFO - algorithm_base.py:149 - LayerNorm Decomposition skipped
+2026-05-19 06:41:48,432 - INFO - algorithm_base.py:152 - Starting Statistics Collector
+2026-05-19 06:41:48,435 - INFO - stats_collection.py:89 - Using dataset with 64 entries for calibration
+2026-05-19 06:41:58,837 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Statistics Collector is done (completion time is 00:00:10.40)
+2026-05-19 06:42:00,630 - INFO - algorithm_base.py:152 - Starting Fix zp_comp Encoding
+2026-05-19 06:42:00,630 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Fix zp_comp Encoding is done (completion time is 00:00:00.00)
+2026-05-19 06:42:00,630 - INFO - algorithm_base.py:149 - Matmul Equalization skipped
+2026-05-19 06:42:00,631 - INFO - algorithm_base.py:152 - Starting MatmulDecomposeFix
+2026-05-19 06:42:00,631 - INFO - algorithm_base.py:168 - Model Optimization Algorithm MatmulDecomposeFix is done (completion time is 00:00:00.00)
+2026-05-19 06:42:09,859 - INFO - algorithm_base.py:149 - Finetune encoding skipped
+2026-05-19 06:42:09,860 - INFO - algorithm_base.py:149 - Bias Correction skipped
+2026-05-19 06:42:09,867 - INFO - algorithm_base.py:149 - Adaround skipped
+2026-05-19 06:42:09,875 - INFO - algorithm_base.py:152 - Starting Quantization-Aware Fine-Tuning
+2026-05-19 06:42:09,908 - INFO - qft.py:332 - Using dataset with 1024 entries for finetune
+2026-05-19 06:49:19,726 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Quantization-Aware Fine-Tuning is done (completion time is 00:07:08.95)
+2026-05-19 06:49:26,071 - INFO - algorithm_base.py:152 - Starting Layer Noise Analysis
+2026-05-19 06:49:59,671 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Layer Noise Analysis is done (completion time is 00:00:33.60)
+2026-05-19 06:49:59,918 - INFO - quant_checker.py:125 - Output layers signal-to-noise ratio (SNR): measures the quantization noise (higher is better)
+2026-05-19 06:49:59,918 - INFO - quant_checker.py:130 - 	hexapod_v5_backbone_simplified/output_layer1 SNR:	14.51 dB
+2026-05-19 06:49:59,918 - INFO - quant_checker.py:130 - 	hexapod_v5_backbone_simplified/output_layer2 SNR:	15.06 dB
+2026-05-19 06:49:59,918 - INFO - quant_checker.py:130 - 	hexapod_v5_backbone_simplified/output_layer3 SNR:	13.78 dB
+2026-05-19 06:49:59,918 - INFO - quant_checker.py:130 - 	hexapod_v5_backbone_simplified/output_layer4 SNR:	14.95 dB
+2026-05-19 06:50:05,894 - IMPORTANT - sdk_backend.py:1145 - Model Optimization is done
+2026-05-19 06:50:05,915 - INFO - hailo_tools_runner.py:510 - To achieve optimal performance, set the compiler_optimization_level to "max" by adding performance_param(compiler_optimization_level=max) to the model script. Note that this may increase compilation time.
+2026-05-19 06:51:07,394 - INFO - client_runner.py:1474 - Running profile for hexapod_v5_geometry_simplified in state hailo_model
+2026-05-19 06:52:18,817 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_geometry_simplified from onnx_split/geometry_v5_script.alls
+2026-05-19 06:52:19,355 - IMPORTANT - sdk_backend.py:1133 - Starting Model Optimization
+2026-05-19 06:52:19,560 - INFO - mo_script_parser.py:91 - Model received quantization params from the hn
+2026-05-19 06:52:24,276 - INFO - algorithm_base.py:149 - MatmulDecompose skipped
+2026-05-19 06:52:24,627 - INFO - algorithm_base.py:152 - Starting Mixed Precision
+2026-05-19 06:52:24,913 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Mixed Precision is done (completion time is 00:00:00.28)
+2026-05-19 06:52:25,354 - INFO - algorithm_base.py:149 - LayerNorm Decomposition skipped
+2026-05-19 06:52:28,354 - INFO - algorithm_base.py:152 - Starting Statistics Collector
+2026-05-19 06:52:28,356 - INFO - stats_collection.py:89 - Using dataset with 64 entries for calibration
+2026-05-19 06:53:20,501 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Statistics Collector is done (completion time is 00:00:52.14)
+2026-05-19 06:53:21,676 - INFO - algorithm_base.py:152 - Starting Fix zp_comp Encoding
+2026-05-19 06:53:21,677 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Fix zp_comp Encoding is done (completion time is 00:00:00.00)
+2026-05-19 06:53:21,677 - INFO - algorithm_base.py:149 - Matmul Equalization skipped
+2026-05-19 06:53:21,677 - INFO - algorithm_base.py:152 - Starting MatmulDecomposeFix
+2026-05-19 06:53:21,678 - INFO - algorithm_base.py:168 - Model Optimization Algorithm MatmulDecomposeFix is done (completion time is 00:00:00.00)
+2026-05-19 06:54:26,768 - INFO - algorithm_base.py:149 - Finetune encoding skipped
+2026-05-19 06:54:26,770 - INFO - algorithm_base.py:149 - Bias Correction skipped
+2026-05-19 06:54:26,774 - INFO - algorithm_base.py:149 - Adaround skipped
+2026-05-19 06:54:26,782 - INFO - algorithm_base.py:152 - Starting Quantization-Aware Fine-Tuning
+2026-05-19 06:54:26,803 - INFO - qft.py:332 - Using dataset with 1024 entries for finetune
+2026-05-19 06:59:19,047 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Quantization-Aware Fine-Tuning is done (completion time is 00:04:51.42)
+2026-05-19 06:59:27,015 - INFO - algorithm_base.py:152 - Starting Layer Noise Analysis
+2026-05-19 07:00:14,666 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Layer Noise Analysis is done (completion time is 00:00:47.65)
+2026-05-19 07:00:15,090 - INFO - quant_checker.py:125 - Output layers signal-to-noise ratio (SNR): measures the quantization noise (higher is better)
+2026-05-19 07:00:15,090 - INFO - quant_checker.py:130 - 	hexapod_v5_geometry_simplified/output_layer3 SNR:	43.35 dB
+2026-05-19 07:00:15,090 - INFO - quant_checker.py:130 - 	hexapod_v5_geometry_simplified/output_layer2 SNR:	28.62 dB
+2026-05-19 07:00:15,090 - INFO - quant_checker.py:130 - 	hexapod_v5_geometry_simplified/output_layer1 SNR:	40.35 dB
+2026-05-19 07:00:27,344 - IMPORTANT - sdk_backend.py:1145 - Model Optimization is done
+2026-05-19 07:00:27,380 - INFO - hailo_tools_runner.py:510 - To achieve optimal performance, set the compiler_optimization_level to "max" by adding performance_param(compiler_optimization_level=max) to the model script. Note that this may increase compilation time.
+2026-05-19 07:12:38,610 - INFO - client_runner.py:1474 - Running profile for hexapod_v5_detection_simplified in state hailo_model
+2026-05-19 07:14:34,949 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_detection_simplified from onnx_split/detection_v5_script.alls
+2026-05-19 07:14:35,620 - IMPORTANT - sdk_backend.py:1133 - Starting Model Optimization
+2026-05-19 07:14:37,057 - INFO - mo_script_parser.py:91 - Model received quantization params from the hn
+2026-05-19 07:14:42,381 - INFO - algorithm_base.py:149 - MatmulDecompose skipped
+2026-05-19 07:14:42,705 - INFO - algorithm_base.py:152 - Starting Mixed Precision
+2026-05-19 07:14:43,321 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Mixed Precision is done (completion time is 00:00:00.61)
+2026-05-19 07:14:44,268 - INFO - algorithm_base.py:149 - LayerNorm Decomposition skipped
+2026-05-19 07:14:45,677 - INFO - algorithm_base.py:152 - Starting Statistics Collector
+2026-05-19 07:14:45,685 - INFO - stats_collection.py:89 - Using dataset with 64 entries for calibration
+2026-05-19 07:15:26,499 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Statistics Collector is done (completion time is 00:00:40.81)
+2026-05-19 07:15:27,767 - INFO - algorithm_base.py:152 - Starting Fix zp_comp Encoding
+2026-05-19 07:15:27,767 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Fix zp_comp Encoding is done (completion time is 00:00:00.00)
+2026-05-19 07:15:27,768 - INFO - algorithm_base.py:149 - Matmul Equalization skipped
+2026-05-19 07:15:27,768 - INFO - algorithm_base.py:152 - Starting MatmulDecomposeFix
+2026-05-19 07:15:27,768 - INFO - algorithm_base.py:168 - Model Optimization Algorithm MatmulDecomposeFix is done (completion time is 00:00:00.00)
+2026-05-19 07:15:45,579 - INFO - algorithm_base.py:149 - Finetune encoding skipped
+2026-05-19 07:15:45,581 - INFO - algorithm_base.py:149 - Bias Correction skipped
+2026-05-19 07:15:45,587 - INFO - algorithm_base.py:149 - Adaround skipped
+2026-05-19 07:15:45,594 - INFO - algorithm_base.py:152 - Starting Quantization-Aware Fine-Tuning
+2026-05-19 07:15:45,618 - INFO - qft.py:332 - Using dataset with 1024 entries for finetune
+2026-05-19 07:22:34,662 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Quantization-Aware Fine-Tuning is done (completion time is 00:06:47.84)
+2026-05-19 07:22:44,708 - INFO - algorithm_base.py:152 - Starting Layer Noise Analysis
+2026-05-19 07:23:38,275 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Layer Noise Analysis is done (completion time is 00:00:53.56)
+2026-05-19 07:23:38,629 - INFO - quant_checker.py:125 - Output layers signal-to-noise ratio (SNR): measures the quantization noise (higher is better)
+2026-05-19 07:23:38,629 - INFO - quant_checker.py:130 - 	hexapod_v5_detection_simplified/output_layer4 SNR:	30.97 dB
+2026-05-19 07:23:38,629 - INFO - quant_checker.py:130 - 	hexapod_v5_detection_simplified/output_layer1 SNR:	33.28 dB
+2026-05-19 07:23:38,630 - INFO - quant_checker.py:130 - 	hexapod_v5_detection_simplified/output_layer2 SNR:	32.37 dB
+2026-05-19 07:23:38,630 - INFO - quant_checker.py:130 - 	hexapod_v5_detection_simplified/output_layer3 SNR:	32.3 dB
+2026-05-19 07:23:38,630 - INFO - quant_checker.py:171 - The calibration set seems to not be normalized, because the values range is [(-0.9895894, 0.8283868), (-0.97904104, 0.97760904), (-0.6616045, 0.99999756)].
+Since the neural core works in 8-bit (between 0 to 255), a quantization will occur on the CPU of the runtime platform.
+Add a normalization layer to the model to offload the normalization to the neural core.
+Refer to the user guide Hailo Dataflow Compiler user guide / Model Optimization / Optimization Related Model Script Commands / model_modification_commands / normalization for details.
+2026-05-19 07:23:47,435 - IMPORTANT - sdk_backend.py:1145 - Model Optimization is done
+2026-05-19 07:23:47,465 - INFO - hailo_tools_runner.py:510 - To achieve optimal performance, set the compiler_optimization_level to "max" by adding performance_param(compiler_optimization_level=max) to the model script. Note that this may increase compilation time.
+2026-05-19 07:26:04,462 - WARNING - pb_wrapper.py:344 - argument of type 'DefuseParams' is not iterable
+2026-05-19 07:57:00,841 - INFO - client_runner.py:1474 - Running profile for hexapod_v5_backbone_simplified in state hailo_model
+2026-05-19 07:57:50,632 - INFO - parser.py:158 - Translation started on ONNX model hexapod_v5_backbone_simplified
+2026-05-19 07:57:50,680 - INFO - parser.py:193 - Restored ONNX model hexapod_v5_backbone_simplified (completion time: 00:00:00.05)
+2026-05-19 07:57:50,779 - INFO - parser.py:216 - Extracted ONNXRuntime meta-data for Hailo model (completion time: 00:00:00.15)
+2026-05-19 07:57:51,107 - INFO - onnx_translator.py:2552 - NMS structure of yolov5 (or equivalent architecture) was detected. Default values of NMS anchors were loaded to NMS config json
+2026-05-19 07:57:51,141 - INFO - parser.py:366 - Start nodes mapped from original model: 'input_layer1': 'hexapod_v5_backbone_simplified/input_layer1'.
+2026-05-19 07:57:51,141 - INFO - parser.py:367 - End nodes mapped from original model: '/aligner/align_s4/Conv', '/aligner/align_s8/Conv', '/aligner/align_s16/Conv', '/aligner/align_s32/Conv'.
+2026-05-19 07:57:51,166 - INFO - parser.py:288 - Translation completed on ONNX model hexapod_v5_backbone_simplified (completion time: 00:00:00.53)
+2026-05-19 07:57:51,742 - INFO - client_runner.py:1881 - Saved HAR to: /home/slarc/jupyter/onnx_split/hexapod_v5_backbone.har
+2026-05-19 07:57:52,181 - INFO - client_runner.py:1474 - Running profile for hexapod_v5_backbone_simplified in state hailo_model
+2026-05-19 07:58:47,344 - INFO - parser.py:158 - Translation started on ONNX model hexapod_v5_backbone_simplified
+2026-05-19 07:58:47,395 - INFO - parser.py:193 - Restored ONNX model hexapod_v5_backbone_simplified (completion time: 00:00:00.05)
+2026-05-19 07:58:47,494 - INFO - parser.py:216 - Extracted ONNXRuntime meta-data for Hailo model (completion time: 00:00:00.15)
+2026-05-19 07:58:47,820 - INFO - onnx_translator.py:2552 - NMS structure of yolov5 (or equivalent architecture) was detected. Default values of NMS anchors were loaded to NMS config json
+2026-05-19 07:58:47,853 - INFO - parser.py:366 - Start nodes mapped from original model: 'input_layer1': 'hexapod_v5_backbone_simplified/input_layer1'.
+2026-05-19 07:58:47,854 - INFO - parser.py:367 - End nodes mapped from original model: '/aligner/align_s4/Conv', '/aligner/align_s8/Conv', '/aligner/align_s16/Conv', '/aligner/align_s32/Conv'.
+2026-05-19 07:58:47,878 - INFO - parser.py:288 - Translation completed on ONNX model hexapod_v5_backbone_simplified (completion time: 00:00:00.53)
+2026-05-19 07:58:48,446 - INFO - client_runner.py:1881 - Saved HAR to: /home/slarc/jupyter/onnx_split/hexapod_v5_backbone.har
+2026-05-19 07:58:48,878 - INFO - client_runner.py:1474 - Running profile for hexapod_v5_backbone_simplified in state hailo_model
+2026-05-19 08:00:05,939 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_backbone_simplified from onnx_split/backbone_v5_script.alls
+2026-05-19 08:00:06,901 - IMPORTANT - sdk_backend.py:1133 - Starting Model Optimization
+2026-05-19 08:00:06,991 - INFO - mo_script_parser.py:91 - Model received quantization params from the hn
+2026-05-19 08:00:10,860 - INFO - algorithm_base.py:149 - MatmulDecompose skipped
+2026-05-19 08:00:11,080 - INFO - algorithm_base.py:152 - Starting Mixed Precision
+2026-05-19 08:00:11,504 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Mixed Precision is done (completion time is 00:00:00.42)
+2026-05-19 08:00:11,948 - INFO - algorithm_base.py:149 - LayerNorm Decomposition skipped
+2026-05-19 08:00:12,879 - INFO - algorithm_base.py:152 - Starting Statistics Collector
+2026-05-19 08:00:12,882 - INFO - stats_collection.py:89 - Using dataset with 64 entries for calibration
+2026-05-19 08:00:25,232 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Statistics Collector is done (completion time is 00:00:12.35)
+2026-05-19 08:00:26,796 - INFO - algorithm_base.py:152 - Starting Fix zp_comp Encoding
+2026-05-19 08:00:26,796 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Fix zp_comp Encoding is done (completion time is 00:00:00.00)
+2026-05-19 08:00:26,796 - INFO - algorithm_base.py:149 - Matmul Equalization skipped
+2026-05-19 08:00:26,797 - INFO - algorithm_base.py:152 - Starting MatmulDecomposeFix
+2026-05-19 08:00:26,797 - INFO - algorithm_base.py:168 - Model Optimization Algorithm MatmulDecomposeFix is done (completion time is 00:00:00.00)
+2026-05-19 08:00:36,307 - INFO - algorithm_base.py:149 - Finetune encoding skipped
+2026-05-19 08:00:36,309 - INFO - algorithm_base.py:149 - Bias Correction skipped
+2026-05-19 08:00:36,314 - INFO - algorithm_base.py:149 - Adaround skipped
+2026-05-19 08:00:36,320 - INFO - algorithm_base.py:152 - Starting Quantization-Aware Fine-Tuning
+2026-05-19 08:00:36,349 - INFO - qft.py:332 - Using dataset with 1024 entries for finetune
+2026-05-19 08:07:41,488 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Quantization-Aware Fine-Tuning is done (completion time is 00:07:04.24)
+2026-05-19 08:07:47,167 - INFO - algorithm_base.py:152 - Starting Layer Noise Analysis
+2026-05-19 08:08:33,296 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Layer Noise Analysis is done (completion time is 00:00:46.13)
+2026-05-19 08:08:33,557 - INFO - quant_checker.py:125 - Output layers signal-to-noise ratio (SNR): measures the quantization noise (higher is better)
+2026-05-19 08:08:33,558 - INFO - quant_checker.py:130 - 	hexapod_v5_backbone_simplified/output_layer1 SNR:	15.11 dB
+2026-05-19 08:08:33,558 - INFO - quant_checker.py:130 - 	hexapod_v5_backbone_simplified/output_layer2 SNR:	15.48 dB
+2026-05-19 08:08:33,558 - INFO - quant_checker.py:130 - 	hexapod_v5_backbone_simplified/output_layer3 SNR:	13.99 dB
+2026-05-19 08:08:33,558 - INFO - quant_checker.py:130 - 	hexapod_v5_backbone_simplified/output_layer4 SNR:	15.37 dB
+2026-05-19 08:08:40,104 - IMPORTANT - sdk_backend.py:1145 - Model Optimization is done
+2026-05-19 08:08:40,125 - INFO - hailo_tools_runner.py:510 - To achieve optimal performance, set the compiler_optimization_level to "max" by adding performance_param(compiler_optimization_level=max) to the model script. Note that this may increase compilation time.
+2026-05-19 08:09:41,338 - INFO - parser.py:158 - Translation started on ONNX model hexapod_v5_geometry_simplified
+2026-05-19 08:09:41,345 - INFO - parser.py:193 - Restored ONNX model hexapod_v5_geometry_simplified (completion time: 00:00:00.01)
+2026-05-19 08:09:41,364 - INFO - parser.py:216 - Extracted ONNXRuntime meta-data for Hailo model (completion time: 00:00:00.03)
+2026-05-19 08:09:41,617 - INFO - parser.py:366 - Start nodes mapped from original model: 'f_s4_l': 'hexapod_v5_geometry_simplified/input_layer1', 'f_s8_l': 'hexapod_v5_geometry_simplified/input_layer2', 'f_s4_r': 'hexapod_v5_geometry_simplified/input_layer3', 'f_s8_r': 'hexapod_v5_geometry_simplified/input_layer4'.
+2026-05-19 08:09:41,618 - INFO - parser.py:367 - End nodes mapped from original model: '/stereo_head/stereo_refine_s4/Relu', '/normals_head/Div_1', '/stereo_head/Mul_3'.
+2026-05-19 08:09:41,668 - INFO - parser.py:288 - Translation completed on ONNX model hexapod_v5_geometry_simplified (completion time: 00:00:00.33)
+2026-05-19 08:09:42,351 - INFO - client_runner.py:1881 - Saved HAR to: /home/slarc/jupyter/onnx_split/hexapod_v5_geometry.har
+2026-05-19 08:09:43,012 - INFO - client_runner.py:1474 - Running profile for hexapod_v5_geometry_simplified in state hailo_model
+2026-05-19 08:09:49,558 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_backbone_simplified from onnx_split/backbone_v5_script.alls
+2026-05-19 08:09:49,790 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 08:10:00,587 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 08:10:04,956 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 08:10:08,629 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 08:10:12,627 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 08:10:16,330 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 08:10:20,575 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 08:10:24,230 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 08:25:22,318 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_geometry_simplified from onnx_split/geometry_v5_script.alls
+2026-05-19 08:25:22,882 - IMPORTANT - sdk_backend.py:1133 - Starting Model Optimization
+2026-05-19 08:25:23,672 - INFO - mo_script_parser.py:91 - Model received quantization params from the hn
+2026-05-19 08:25:27,463 - INFO - algorithm_base.py:149 - MatmulDecompose skipped
+2026-05-19 08:25:27,784 - INFO - algorithm_base.py:152 - Starting Mixed Precision
+2026-05-19 08:25:28,073 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Mixed Precision is done (completion time is 00:00:00.29)
+2026-05-19 08:25:28,502 - INFO - algorithm_base.py:149 - LayerNorm Decomposition skipped
+2026-05-19 08:25:29,733 - INFO - algorithm_base.py:152 - Starting Statistics Collector
+2026-05-19 08:25:29,737 - INFO - stats_collection.py:89 - Using dataset with 64 entries for calibration
+2026-05-19 08:26:32,755 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Statistics Collector is done (completion time is 00:01:03.02)
+2026-05-19 08:26:34,836 - INFO - algorithm_base.py:152 - Starting Fix zp_comp Encoding
+2026-05-19 08:26:34,837 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Fix zp_comp Encoding is done (completion time is 00:00:00.00)
+2026-05-19 08:26:34,837 - INFO - algorithm_base.py:149 - Matmul Equalization skipped
+2026-05-19 08:26:34,838 - INFO - algorithm_base.py:152 - Starting MatmulDecomposeFix
+2026-05-19 08:26:34,838 - INFO - algorithm_base.py:168 - Model Optimization Algorithm MatmulDecomposeFix is done (completion time is 00:00:00.00)
+2026-05-19 08:27:37,342 - INFO - algorithm_base.py:149 - Finetune encoding skipped
+2026-05-19 08:27:37,345 - INFO - algorithm_base.py:149 - Bias Correction skipped
+2026-05-19 08:27:37,350 - INFO - algorithm_base.py:149 - Adaround skipped
+2026-05-19 08:27:37,360 - INFO - algorithm_base.py:152 - Starting Quantization-Aware Fine-Tuning
+2026-05-19 08:27:37,395 - INFO - qft.py:332 - Using dataset with 1024 entries for finetune
+2026-05-19 08:32:30,638 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Quantization-Aware Fine-Tuning is done (completion time is 00:04:52.18)
+2026-05-19 08:32:41,840 - INFO - algorithm_base.py:152 - Starting Layer Noise Analysis
+2026-05-19 08:33:31,125 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Layer Noise Analysis is done (completion time is 00:00:49.28)
+2026-05-19 08:33:31,558 - INFO - quant_checker.py:125 - Output layers signal-to-noise ratio (SNR): measures the quantization noise (higher is better)
+2026-05-19 08:33:31,558 - INFO - quant_checker.py:130 - 	hexapod_v5_geometry_simplified/output_layer3 SNR:	42.59 dB
+2026-05-19 08:33:31,558 - INFO - quant_checker.py:130 - 	hexapod_v5_geometry_simplified/output_layer2 SNR:	27.67 dB
+2026-05-19 08:33:31,558 - INFO - quant_checker.py:130 - 	hexapod_v5_geometry_simplified/output_layer1 SNR:	40.2 dB
+2026-05-19 08:33:39,960 - IMPORTANT - sdk_backend.py:1145 - Model Optimization is done
+2026-05-19 08:33:39,993 - INFO - hailo_tools_runner.py:510 - To achieve optimal performance, set the compiler_optimization_level to "max" by adding performance_param(compiler_optimization_level=max) to the model script. Note that this may increase compilation time.
+2026-05-19 10:59:56,868 - INFO - parser.py:158 - Translation started on ONNX model hexapod_v5_detection_simplified
+2026-05-19 10:59:56,908 - INFO - parser.py:193 - Restored ONNX model hexapod_v5_detection_simplified (completion time: 00:00:00.04)
+2026-05-19 10:59:56,993 - INFO - parser.py:216 - Extracted ONNXRuntime meta-data for Hailo model (completion time: 00:00:00.13)
+2026-05-19 10:59:57,244 - INFO - parser.py:366 - Start nodes mapped from original model: 'f_s4_l': 'hexapod_v5_detection_simplified/input_layer1', 'f_s8_l': 'hexapod_v5_detection_simplified/input_layer2', 'f_s16_l': 'hexapod_v5_detection_simplified/input_layer3', 'f_s32_l': 'hexapod_v5_detection_simplified/input_layer4', 'normals_s4': 'hexapod_v5_detection_simplified/input_layer5'.
+2026-05-19 10:59:57,245 - INFO - parser.py:367 - End nodes mapped from original model: '/seg_head/Add_3', '/yolo_head/head_s8/Concat', '/yolo_head/head_s16/Concat', '/yolo_head/head_s32/Concat'.
+2026-05-19 10:59:57,289 - INFO - parser.py:288 - Translation completed on ONNX model hexapod_v5_detection_simplified (completion time: 00:00:00.42)
+2026-05-19 10:59:57,911 - INFO - client_runner.py:1881 - Saved HAR to: /home/slarc/jupyter/onnx_split/hexapod_v5_detection.har
+2026-05-19 10:59:58,497 - INFO - client_runner.py:1474 - Running profile for hexapod_v5_detection_simplified in state hailo_model
+2026-05-19 11:00:02,667 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_backbone_simplified from onnx_split/backbone_v5_script.alls
+2026-05-19 11:00:02,903 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 11:00:12,311 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 11:00:16,163 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 11:00:22,772 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 11:00:41,926 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 11:00:57,228 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 11:01:12,803 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 11:01:25,731 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 11:02:06,090 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_geometry_simplified from onnx_split/geometry_v5_script.alls
+2026-05-19 11:02:06,803 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 11:02:30,295 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 11:02:44,753 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 11:03:01,220 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 11:10:11,615 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_detection_simplified from onnx_split/detection_v5_script.alls
+2026-05-19 11:10:12,186 - IMPORTANT - sdk_backend.py:1133 - Starting Model Optimization
+2026-05-19 11:10:13,063 - INFO - mo_script_parser.py:91 - Model received quantization params from the hn
+2026-05-19 11:10:22,239 - INFO - algorithm_base.py:149 - MatmulDecompose skipped
+2026-05-19 11:10:22,546 - INFO - algorithm_base.py:152 - Starting Mixed Precision
+2026-05-19 11:10:22,845 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Mixed Precision is done (completion time is 00:00:00.30)
+2026-05-19 11:10:23,419 - INFO - algorithm_base.py:149 - LayerNorm Decomposition skipped
+2026-05-19 11:10:24,718 - INFO - algorithm_base.py:152 - Starting Statistics Collector
+2026-05-19 11:10:24,720 - INFO - stats_collection.py:89 - Using dataset with 64 entries for calibration
+2026-05-19 11:10:48,982 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Statistics Collector is done (completion time is 00:00:24.26)
+2026-05-19 11:10:50,431 - INFO - algorithm_base.py:152 - Starting Fix zp_comp Encoding
+2026-05-19 11:10:50,431 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Fix zp_comp Encoding is done (completion time is 00:00:00.00)
+2026-05-19 11:10:50,432 - INFO - algorithm_base.py:149 - Matmul Equalization skipped
+2026-05-19 11:10:50,432 - INFO - algorithm_base.py:152 - Starting MatmulDecomposeFix
+2026-05-19 11:10:50,432 - INFO - algorithm_base.py:168 - Model Optimization Algorithm MatmulDecomposeFix is done (completion time is 00:00:00.00)
+2026-05-19 11:11:04,598 - INFO - algorithm_base.py:149 - Finetune encoding skipped
+2026-05-19 11:11:04,601 - INFO - algorithm_base.py:149 - Bias Correction skipped
+2026-05-19 11:11:04,607 - INFO - algorithm_base.py:149 - Adaround skipped
+2026-05-19 11:11:04,614 - INFO - algorithm_base.py:152 - Starting Quantization-Aware Fine-Tuning
+2026-05-19 11:11:04,657 - INFO - qft.py:332 - Using dataset with 1024 entries for finetune
+2026-05-19 11:17:51,173 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Quantization-Aware Fine-Tuning is done (completion time is 00:06:45.43)
+2026-05-19 11:18:02,221 - INFO - algorithm_base.py:152 - Starting Layer Noise Analysis
+2026-05-19 11:18:53,136 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Layer Noise Analysis is done (completion time is 00:00:50.91)
+2026-05-19 11:18:53,486 - INFO - quant_checker.py:125 - Output layers signal-to-noise ratio (SNR): measures the quantization noise (higher is better)
+2026-05-19 11:18:53,486 - INFO - quant_checker.py:130 - 	hexapod_v5_detection_simplified/output_layer4 SNR:	31.1 dB
+2026-05-19 11:18:53,486 - INFO - quant_checker.py:130 - 	hexapod_v5_detection_simplified/output_layer1 SNR:	33.3 dB
+2026-05-19 11:18:53,486 - INFO - quant_checker.py:130 - 	hexapod_v5_detection_simplified/output_layer2 SNR:	32.56 dB
+2026-05-19 11:18:53,486 - INFO - quant_checker.py:130 - 	hexapod_v5_detection_simplified/output_layer3 SNR:	32.56 dB
+2026-05-19 11:18:53,487 - INFO - quant_checker.py:171 - The calibration set seems to not be normalized, because the values range is [(-0.989515, 0.8283509), (-0.9791612, 0.97760683), (-0.661567, 0.9999974)].
+Since the neural core works in 8-bit (between 0 to 255), a quantization will occur on the CPU of the runtime platform.
+Add a normalization layer to the model to offload the normalization to the neural core.
+Refer to the user guide Hailo Dataflow Compiler user guide / Model Optimization / Optimization Related Model Script Commands / model_modification_commands / normalization for details.
+2026-05-19 11:19:02,899 - IMPORTANT - sdk_backend.py:1145 - Model Optimization is done
+2026-05-19 11:19:02,929 - INFO - hailo_tools_runner.py:510 - To achieve optimal performance, set the compiler_optimization_level to "max" by adding performance_param(compiler_optimization_level=max) to the model script. Note that this may increase compilation time.
+2026-05-19 11:21:19,566 - WARNING - pb_wrapper.py:344 - argument of type 'DefuseParams' is not iterable
+2026-05-19 20:19:13,432 - INFO - parser.py:158 - Translation started on ONNX model hexapod_v5_detection_simplified
+2026-05-19 20:19:13,469 - INFO - parser.py:193 - Restored ONNX model hexapod_v5_detection_simplified (completion time: 00:00:00.04)
+2026-05-19 20:19:13,548 - INFO - parser.py:216 - Extracted ONNXRuntime meta-data for Hailo model (completion time: 00:00:00.12)
+2026-05-19 20:19:13,741 - INFO - parser.py:366 - Start nodes mapped from original model: 'f_s4_l': 'hexapod_v5_detection_simplified/input_layer1', 'f_s8_l': 'hexapod_v5_detection_simplified/input_layer2', 'f_s16_l': 'hexapod_v5_detection_simplified/input_layer3', 'f_s32_l': 'hexapod_v5_detection_simplified/input_layer4', 'normals_s4': 'hexapod_v5_detection_simplified/input_layer5'.
+2026-05-19 20:19:13,741 - INFO - parser.py:367 - End nodes mapped from original model: '/seg_head/Add_3', '/yolo_head/head_s8/Concat', '/yolo_head/head_s16/Concat', '/yolo_head/head_s32/Concat'.
+2026-05-19 20:19:13,767 - INFO - parser.py:288 - Translation completed on ONNX model hexapod_v5_detection_simplified (completion time: 00:00:00.34)
+2026-05-19 20:19:14,285 - INFO - client_runner.py:1881 - Saved HAR to: /home/slarc/jupyter/onnx_split/hexapod_v5_detection.har
+2026-05-19 20:19:14,775 - INFO - client_runner.py:1474 - Running profile for hexapod_v5_detection_simplified in state hailo_model
+2026-05-19 20:19:55,290 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_detection_simplified from onnx_split/detection_v5_script.alls
+2026-05-19 20:19:55,681 - IMPORTANT - sdk_backend.py:1133 - Starting Model Optimization
+2026-05-19 20:19:56,034 - INFO - mo_script_parser.py:91 - Model received quantization params from the hn
+2026-05-19 20:19:59,575 - INFO - algorithm_base.py:149 - MatmulDecompose skipped
+2026-05-19 20:19:59,774 - INFO - algorithm_base.py:152 - Starting Mixed Precision
+2026-05-19 20:19:59,977 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Mixed Precision is done (completion time is 00:00:00.20)
+2026-05-19 20:20:00,327 - INFO - algorithm_base.py:149 - LayerNorm Decomposition skipped
+2026-05-19 20:20:01,380 - INFO - algorithm_base.py:152 - Starting Statistics Collector
+2026-05-19 20:20:01,383 - INFO - stats_collection.py:89 - Using dataset with 64 entries for calibration
+2026-05-19 20:20:17,132 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Statistics Collector is done (completion time is 00:00:15.75)
+2026-05-19 20:20:18,021 - INFO - algorithm_base.py:152 - Starting Fix zp_comp Encoding
+2026-05-19 20:20:18,022 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Fix zp_comp Encoding is done (completion time is 00:00:00.00)
+2026-05-19 20:20:18,022 - INFO - algorithm_base.py:149 - Matmul Equalization skipped
+2026-05-19 20:20:18,022 - INFO - algorithm_base.py:152 - Starting MatmulDecomposeFix
+2026-05-19 20:20:18,022 - INFO - algorithm_base.py:168 - Model Optimization Algorithm MatmulDecomposeFix is done (completion time is 00:00:00.00)
+2026-05-19 20:20:26,855 - INFO - algorithm_base.py:149 - Finetune encoding skipped
+2026-05-19 20:20:26,856 - INFO - algorithm_base.py:149 - Bias Correction skipped
+2026-05-19 20:20:26,861 - INFO - algorithm_base.py:149 - Adaround skipped
+2026-05-19 20:20:26,867 - INFO - algorithm_base.py:152 - Starting Quantization-Aware Fine-Tuning
+2026-05-19 20:20:26,901 - INFO - qft.py:332 - Using dataset with 1024 entries for finetune
+2026-05-19 20:24:54,868 - WARNING - qft.py:527 - Training cut by the user, proceed at your own peril
+2026-05-19 20:24:55,524 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Quantization-Aware Fine-Tuning is done (completion time is 00:04:27.89)
+2026-05-19 20:26:00,464 - INFO - client_runner.py:1474 - Running profile for hexapod_v5_backbone_simplified in state hailo_model
+2026-05-19 20:26:04,656 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_backbone_simplified from onnx_split/backbone_v5_script.alls
+2026-05-19 20:26:05,504 - IMPORTANT - sdk_backend.py:1133 - Starting Model Optimization
+2026-05-19 20:26:05,602 - WARNING - mo_config.py:233 - Running model optimization with zero level of optimization is not recommended for production use and might lead to suboptimal accuracy results
+2026-05-19 20:26:05,603 - INFO - mo_script_parser.py:91 - Model received quantization params from the hn
+2026-05-19 20:26:09,287 - INFO - algorithm_base.py:149 - MatmulDecompose skipped
+2026-05-19 20:26:09,493 - INFO - algorithm_base.py:152 - Starting Mixed Precision
+2026-05-19 20:26:09,723 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Mixed Precision is done (completion time is 00:00:00.23)
+2026-05-19 20:26:10,159 - INFO - algorithm_base.py:149 - LayerNorm Decomposition skipped
+2026-05-19 20:26:11,338 - INFO - algorithm_base.py:152 - Starting Statistics Collector
+2026-05-19 20:26:11,340 - INFO - stats_collection.py:89 - Using dataset with 64 entries for calibration
+2026-05-19 20:26:22,727 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Statistics Collector is done (completion time is 00:00:11.39)
+2026-05-19 20:26:24,728 - INFO - algorithm_base.py:152 - Starting Fix zp_comp Encoding
+2026-05-19 20:26:24,729 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Fix zp_comp Encoding is done (completion time is 00:00:00.00)
+2026-05-19 20:26:24,729 - INFO - algorithm_base.py:149 - Matmul Equalization skipped
+2026-05-19 20:26:24,729 - INFO - algorithm_base.py:152 - Starting MatmulDecomposeFix
+2026-05-19 20:26:24,729 - INFO - algorithm_base.py:168 - Model Optimization Algorithm MatmulDecomposeFix is done (completion time is 00:00:00.00)
+2026-05-19 20:26:34,400 - INFO - algorithm_base.py:149 - Finetune encoding skipped
+2026-05-19 20:26:34,402 - INFO - algorithm_base.py:149 - Bias Correction skipped
+2026-05-19 20:26:34,408 - INFO - algorithm_base.py:149 - Adaround skipped
+2026-05-19 20:26:34,411 - INFO - algorithm_base.py:149 - Quantization-Aware Fine-Tuning skipped
+2026-05-19 20:26:40,647 - INFO - algorithm_base.py:149 - Layer Noise Analysis skipped
+2026-05-19 20:26:47,430 - IMPORTANT - sdk_backend.py:1145 - Model Optimization is done
+2026-05-19 20:30:39,179 - INFO - client_runner.py:1474 - Running profile for hexapod_v5_geometry_simplified in state hailo_model
+2026-05-19 20:32:23,341 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_geometry_simplified from onnx_split/geometry_v5_script.alls
+2026-05-19 20:32:23,914 - IMPORTANT - sdk_backend.py:1133 - Starting Model Optimization
+2026-05-19 20:32:24,074 - WARNING - mo_config.py:233 - Running model optimization with zero level of optimization is not recommended for production use and might lead to suboptimal accuracy results
+2026-05-19 20:32:24,074 - INFO - mo_script_parser.py:91 - Model received quantization params from the hn
+2026-05-19 20:32:27,535 - INFO - algorithm_base.py:149 - MatmulDecompose skipped
+2026-05-19 20:32:27,886 - INFO - algorithm_base.py:152 - Starting Mixed Precision
+2026-05-19 20:32:28,175 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Mixed Precision is done (completion time is 00:00:00.29)
+2026-05-19 20:32:28,609 - INFO - algorithm_base.py:149 - LayerNorm Decomposition skipped
+2026-05-19 20:32:30,141 - INFO - algorithm_base.py:152 - Starting Statistics Collector
+2026-05-19 20:32:30,142 - INFO - stats_collection.py:89 - Using dataset with 64 entries for calibration
+2026-05-19 20:33:23,143 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Statistics Collector is done (completion time is 00:00:53.00)
+2026-05-19 20:33:24,447 - INFO - algorithm_base.py:152 - Starting Fix zp_comp Encoding
+2026-05-19 20:33:24,448 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Fix zp_comp Encoding is done (completion time is 00:00:00.00)
+2026-05-19 20:33:24,449 - INFO - algorithm_base.py:149 - Matmul Equalization skipped
+2026-05-19 20:33:24,449 - INFO - algorithm_base.py:152 - Starting MatmulDecomposeFix
+2026-05-19 20:33:24,449 - INFO - algorithm_base.py:168 - Model Optimization Algorithm MatmulDecomposeFix is done (completion time is 00:00:00.00)
+2026-05-19 20:34:36,172 - INFO - algorithm_base.py:149 - Finetune encoding skipped
+2026-05-19 20:34:36,174 - INFO - algorithm_base.py:149 - Bias Correction skipped
+2026-05-19 20:34:36,179 - INFO - algorithm_base.py:149 - Adaround skipped
+2026-05-19 20:34:36,183 - INFO - algorithm_base.py:149 - Quantization-Aware Fine-Tuning skipped
+2026-05-19 20:34:45,826 - INFO - algorithm_base.py:149 - Layer Noise Analysis skipped
+2026-05-19 20:34:56,232 - IMPORTANT - sdk_backend.py:1145 - Model Optimization is done
+2026-05-19 22:29:47,040 - INFO - client_runner.py:1474 - Running profile for hexapod_v5_detection_simplified in state hailo_model
+2026-05-19 22:32:02,722 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_detection_simplified from onnx_split/detection_v5_script.alls
+2026-05-19 22:32:03,397 - IMPORTANT - sdk_backend.py:1133 - Starting Model Optimization
+2026-05-19 22:32:05,296 - WARNING - mo_config.py:233 - Running model optimization with zero level of optimization is not recommended for production use and might lead to suboptimal accuracy results
+2026-05-19 22:32:05,299 - INFO - mo_script_parser.py:91 - Model received quantization params from the hn
+2026-05-19 22:32:32,285 - INFO - algorithm_base.py:149 - MatmulDecompose skipped
+2026-05-19 22:32:32,470 - INFO - algorithm_base.py:152 - Starting Mixed Precision
+2026-05-19 22:32:32,670 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Mixed Precision is done (completion time is 00:00:00.20)
+2026-05-19 22:32:33,022 - INFO - algorithm_base.py:149 - LayerNorm Decomposition skipped
+2026-05-19 22:32:33,848 - INFO - algorithm_base.py:152 - Starting Statistics Collector
+2026-05-19 22:32:33,852 - INFO - stats_collection.py:89 - Using dataset with 64 entries for calibration
+2026-05-19 22:33:19,342 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Statistics Collector is done (completion time is 00:00:45.49)
+2026-05-19 22:33:20,232 - INFO - algorithm_base.py:152 - Starting Fix zp_comp Encoding
+2026-05-19 22:33:20,233 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Fix zp_comp Encoding is done (completion time is 00:00:00.00)
+2026-05-19 22:33:20,234 - INFO - algorithm_base.py:149 - Matmul Equalization skipped
+2026-05-19 22:33:20,234 - INFO - algorithm_base.py:152 - Starting MatmulDecomposeFix
+2026-05-19 22:33:20,235 - INFO - algorithm_base.py:168 - Model Optimization Algorithm MatmulDecomposeFix is done (completion time is 00:00:00.00)
+2026-05-19 22:35:57,649 - INFO - algorithm_base.py:149 - Finetune encoding skipped
+2026-05-19 22:35:57,653 - INFO - algorithm_base.py:149 - Bias Correction skipped
+2026-05-19 22:35:57,659 - INFO - algorithm_base.py:149 - Adaround skipped
+2026-05-19 22:35:57,662 - INFO - algorithm_base.py:149 - Quantization-Aware Fine-Tuning skipped
+2026-05-19 22:36:56,453 - INFO - algorithm_base.py:149 - Layer Noise Analysis skipped
+2026-05-19 22:36:58,654 - INFO - quant_checker.py:171 - The calibration set seems to not be normalized, because the values range is [(-0.989515, 0.8283509), (-0.9791612, 0.97760683), (-0.661567, 0.9999974)].
+Since the neural core works in 8-bit (between 0 to 255), a quantization will occur on the CPU of the runtime platform.
+Add a normalization layer to the model to offload the normalization to the neural core.
+Refer to the user guide Hailo Dataflow Compiler user guide / Model Optimization / Optimization Related Model Script Commands / model_modification_commands / normalization for details.
+2026-05-19 22:37:53,808 - IMPORTANT - sdk_backend.py:1145 - Model Optimization is done
+2026-05-19 22:42:45,825 - ERROR - hailo_tools_runner.py:582 - Failed to produce compiled graph
+2026-05-19 23:02:27,620 - INFO - client_runner.py:1474 - Running profile for hexapod_v5_backbone_simplified in state hailo_model
+2026-05-19 23:03:18,599 - INFO - parser.py:158 - Translation started on ONNX model hexapod_v5_backbone_simplified
+2026-05-19 23:03:59,658 - INFO - parser.py:158 - Translation started on ONNX model hexapod_v5_backbone_simplified
+2026-05-19 23:03:59,714 - INFO - parser.py:193 - Restored ONNX model hexapod_v5_backbone_simplified (completion time: 00:00:00.06)
+2026-05-19 23:03:59,847 - INFO - parser.py:216 - Extracted ONNXRuntime meta-data for Hailo model (completion time: 00:00:00.19)
+2026-05-19 23:04:00,221 - INFO - onnx_translator.py:2552 - NMS structure of yolov5 (or equivalent architecture) was detected. Default values of NMS anchors were loaded to NMS config json
+2026-05-19 23:04:00,257 - INFO - parser.py:366 - Start nodes mapped from original model: 'input_layer1': 'hexapod_v5_backbone_simplified/input_layer1'.
+2026-05-19 23:04:00,257 - INFO - parser.py:367 - End nodes mapped from original model: '/aligner/align_s4/Conv', '/aligner/align_s8/Conv', '/aligner/align_s16/Conv', '/aligner/align_s32/Conv'.
+2026-05-19 23:04:00,284 - INFO - parser.py:288 - Translation completed on ONNX model hexapod_v5_backbone_simplified (completion time: 00:00:00.63)
+2026-05-19 23:04:00,896 - INFO - client_runner.py:1881 - Saved HAR to: /home/slarc/jupyter/onnx_split/hexapod_v5_backbone.har
+2026-05-19 23:04:01,409 - INFO - client_runner.py:1474 - Running profile for hexapod_v5_backbone_simplified in state hailo_model
+2026-05-19 23:04:30,427 - INFO - client_runner.py:1474 - Running profile for hexapod_v5_backbone_simplified in state hailo_model
+2026-05-19 23:05:50,311 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_backbone_simplified from onnx_split/backbone_v5_script.alls
+2026-05-19 23:05:51,146 - IMPORTANT - sdk_backend.py:1133 - Starting Model Optimization
+2026-05-19 23:05:51,258 - INFO - mo_script_parser.py:91 - Model received quantization params from the hn
+2026-05-19 23:05:55,692 - INFO - algorithm_base.py:149 - MatmulDecompose skipped
+2026-05-19 23:05:55,921 - INFO - algorithm_base.py:152 - Starting Mixed Precision
+2026-05-19 23:05:56,382 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Mixed Precision is done (completion time is 00:00:00.46)
+2026-05-19 23:05:56,859 - INFO - algorithm_base.py:149 - LayerNorm Decomposition skipped
+2026-05-19 23:05:57,926 - INFO - algorithm_base.py:152 - Starting Statistics Collector
+2026-05-19 23:05:57,931 - INFO - stats_collection.py:89 - Using dataset with 64 entries for calibration
+2026-05-19 23:06:10,245 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Statistics Collector is done (completion time is 00:00:12.31)
+2026-05-19 23:06:12,163 - INFO - algorithm_base.py:152 - Starting Fix zp_comp Encoding
+2026-05-19 23:06:12,163 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Fix zp_comp Encoding is done (completion time is 00:00:00.00)
+2026-05-19 23:06:12,163 - INFO - algorithm_base.py:149 - Matmul Equalization skipped
+2026-05-19 23:06:12,164 - INFO - algorithm_base.py:152 - Starting MatmulDecomposeFix
+2026-05-19 23:06:12,164 - INFO - algorithm_base.py:168 - Model Optimization Algorithm MatmulDecomposeFix is done (completion time is 00:00:00.00)
+2026-05-19 23:06:22,454 - INFO - algorithm_base.py:149 - Finetune encoding skipped
+2026-05-19 23:06:22,456 - INFO - algorithm_base.py:149 - Bias Correction skipped
+2026-05-19 23:06:22,461 - INFO - algorithm_base.py:149 - Adaround skipped
+2026-05-19 23:06:22,467 - INFO - algorithm_base.py:152 - Starting Quantization-Aware Fine-Tuning
+2026-05-19 23:06:22,499 - INFO - qft.py:332 - Using dataset with 1024 entries for finetune
+2026-05-19 23:13:25,746 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Quantization-Aware Fine-Tuning is done (completion time is 00:07:02.19)
+2026-05-19 23:13:31,782 - INFO - algorithm_base.py:152 - Starting Layer Noise Analysis
+2026-05-19 23:14:07,106 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Layer Noise Analysis is done (completion time is 00:00:35.32)
+2026-05-19 23:14:07,369 - INFO - quant_checker.py:125 - Output layers signal-to-noise ratio (SNR): measures the quantization noise (higher is better)
+2026-05-19 23:14:07,369 - INFO - quant_checker.py:130 - 	hexapod_v5_backbone_simplified/output_layer1 SNR:	14.25 dB
+2026-05-19 23:14:07,369 - INFO - quant_checker.py:130 - 	hexapod_v5_backbone_simplified/output_layer2 SNR:	14.43 dB
+2026-05-19 23:14:07,369 - INFO - quant_checker.py:130 - 	hexapod_v5_backbone_simplified/output_layer3 SNR:	13.32 dB
+2026-05-19 23:14:07,370 - INFO - quant_checker.py:130 - 	hexapod_v5_backbone_simplified/output_layer4 SNR:	14.62 dB
+2026-05-19 23:14:14,083 - IMPORTANT - sdk_backend.py:1145 - Model Optimization is done
+2026-05-19 23:18:12,225 - INFO - parser.py:158 - Translation started on ONNX model hexapod_v5_geometry_simplified
+2026-05-19 23:18:12,240 - INFO - parser.py:193 - Restored ONNX model hexapod_v5_geometry_simplified (completion time: 00:00:00.01)
+2026-05-19 23:18:12,270 - INFO - parser.py:216 - Extracted ONNXRuntime meta-data for Hailo model (completion time: 00:00:00.04)
+2026-05-19 23:18:12,591 - INFO - parser.py:366 - Start nodes mapped from original model: 'f_s4_l': 'hexapod_v5_geometry_simplified/input_layer1', 'f_s8_l': 'hexapod_v5_geometry_simplified/input_layer2', 'f_s4_r': 'hexapod_v5_geometry_simplified/input_layer3', 'f_s8_r': 'hexapod_v5_geometry_simplified/input_layer4'.
+2026-05-19 23:18:12,591 - INFO - parser.py:367 - End nodes mapped from original model: '/stereo_head/stereo_refine_s4/Relu', '/normals_head/Div_1', '/stereo_head/Mul_7'.
+2026-05-19 23:18:12,689 - INFO - parser.py:288 - Translation completed on ONNX model hexapod_v5_geometry_simplified (completion time: 00:00:00.46)
+2026-05-19 23:18:13,461 - INFO - client_runner.py:1881 - Saved HAR to: /home/slarc/jupyter/onnx_split/hexapod_v5_geometry.har
+2026-05-19 23:18:14,264 - INFO - client_runner.py:1474 - Running profile for hexapod_v5_geometry_simplified in state hailo_model
+2026-05-19 23:18:18,070 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_backbone_simplified from onnx_split/backbone_v5_script.alls
+2026-05-19 23:18:18,352 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 23:18:29,159 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 23:18:34,056 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 23:18:39,053 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 23:18:43,702 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 23:18:47,503 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 23:18:52,970 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 23:19:04,110 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-19 23:33:13,357 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_geometry_simplified from onnx_split/geometry_v5_script.alls
+2026-05-19 23:33:14,249 - IMPORTANT - sdk_backend.py:1133 - Starting Model Optimization
+2026-05-19 23:33:15,833 - INFO - mo_script_parser.py:91 - Model received quantization params from the hn
+2026-05-19 23:33:41,797 - INFO - algorithm_base.py:149 - MatmulDecompose skipped
+2026-05-19 23:33:42,220 - INFO - algorithm_base.py:152 - Starting Mixed Precision
+2026-05-19 23:33:42,609 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Mixed Precision is done (completion time is 00:00:00.39)
+2026-05-19 23:33:43,181 - INFO - algorithm_base.py:149 - LayerNorm Decomposition skipped
+2026-05-19 23:33:44,781 - INFO - algorithm_base.py:152 - Starting Statistics Collector
+2026-05-19 23:33:44,786 - INFO - stats_collection.py:89 - Using dataset with 64 entries for calibration
+2026-05-19 23:34:56,913 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Statistics Collector is done (completion time is 00:01:12.13)
+2026-05-19 23:34:59,573 - INFO - algorithm_base.py:152 - Starting Fix zp_comp Encoding
+2026-05-19 23:34:59,574 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Fix zp_comp Encoding is done (completion time is 00:00:00.00)
+2026-05-19 23:34:59,574 - INFO - algorithm_base.py:149 - Matmul Equalization skipped
+2026-05-19 23:34:59,575 - INFO - algorithm_base.py:152 - Starting MatmulDecomposeFix
+2026-05-19 23:34:59,575 - INFO - algorithm_base.py:168 - Model Optimization Algorithm MatmulDecomposeFix is done (completion time is 00:00:00.00)
+2026-05-19 23:37:24,189 - INFO - algorithm_base.py:149 - Finetune encoding skipped
+2026-05-19 23:37:24,192 - INFO - algorithm_base.py:149 - Bias Correction skipped
+2026-05-19 23:37:24,197 - INFO - algorithm_base.py:149 - Adaround skipped
+2026-05-19 23:37:24,206 - INFO - algorithm_base.py:152 - Starting Quantization-Aware Fine-Tuning
+2026-05-19 23:37:24,239 - INFO - qft.py:332 - Using dataset with 1024 entries for finetune
+2026-05-19 23:43:37,578 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Quantization-Aware Fine-Tuning is done (completion time is 00:06:12.15)
+2026-05-19 23:43:50,521 - INFO - algorithm_base.py:152 - Starting Layer Noise Analysis
+2026-05-19 23:44:52,541 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Layer Noise Analysis is done (completion time is 00:01:02.02)
+2026-05-19 23:44:53,076 - INFO - quant_checker.py:125 - Output layers signal-to-noise ratio (SNR): measures the quantization noise (higher is better)
+2026-05-19 23:44:53,076 - INFO - quant_checker.py:130 - 	hexapod_v5_geometry_simplified/output_layer3 SNR:	43.56 dB
+2026-05-19 23:44:53,076 - INFO - quant_checker.py:130 - 	hexapod_v5_geometry_simplified/output_layer2 SNR:	27.99 dB
+2026-05-19 23:44:53,077 - INFO - quant_checker.py:130 - 	hexapod_v5_geometry_simplified/output_layer1 SNR:	40.59 dB
+2026-05-19 23:45:05,198 - IMPORTANT - sdk_backend.py:1145 - Model Optimization is done
+2026-05-20 01:00:02,647 - ERROR - hailo_tools_runner.py:582 - Failed to produce compiled graph
+2026-05-20 07:24:03,965 - INFO - parser.py:158 - Translation started on ONNX model hexapod_v5_backbone_simplified
+2026-05-20 07:24:04,028 - INFO - parser.py:193 - Restored ONNX model hexapod_v5_backbone_simplified (completion time: 00:00:00.06)
+2026-05-20 07:24:04,151 - INFO - parser.py:216 - Extracted ONNXRuntime meta-data for Hailo model (completion time: 00:00:00.19)
+2026-05-20 07:24:04,508 - INFO - onnx_translator.py:2552 - NMS structure of yolov5 (or equivalent architecture) was detected. Default values of NMS anchors were loaded to NMS config json
+2026-05-20 07:24:04,543 - INFO - parser.py:366 - Start nodes mapped from original model: 'input_layer1': 'hexapod_v5_backbone_simplified/input_layer1'.
+2026-05-20 07:24:04,544 - INFO - parser.py:367 - End nodes mapped from original model: '/aligner/align_s4/Conv', '/aligner/align_s8/Conv', '/aligner/align_s16/Conv', '/aligner/align_s32/Conv'.
+2026-05-20 07:24:04,570 - INFO - parser.py:288 - Translation completed on ONNX model hexapod_v5_backbone_simplified (completion time: 00:00:00.61)
+2026-05-20 07:24:05,150 - INFO - client_runner.py:1881 - Saved HAR to: /home/slarc/jupyter/onnx_split/hexapod_v5_backbone.har
+2026-05-20 07:24:05,599 - INFO - client_runner.py:1474 - Running profile for hexapod_v5_backbone_simplified in state hailo_model
+2026-05-20 07:25:25,498 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_backbone_simplified from onnx_split/backbone_v5_script.alls
+2026-05-20 07:25:26,618 - IMPORTANT - sdk_backend.py:1133 - Starting Model Optimization
+2026-05-20 07:25:26,744 - INFO - mo_script_parser.py:91 - Model received quantization params from the hn
+2026-05-20 07:25:30,670 - INFO - algorithm_base.py:149 - MatmulDecompose skipped
+2026-05-20 07:25:30,893 - INFO - algorithm_base.py:152 - Starting Mixed Precision
+2026-05-20 07:25:31,325 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Mixed Precision is done (completion time is 00:00:00.43)
+2026-05-20 07:25:31,780 - INFO - algorithm_base.py:149 - LayerNorm Decomposition skipped
+2026-05-20 07:25:32,759 - INFO - algorithm_base.py:152 - Starting Statistics Collector
+2026-05-20 07:25:32,762 - INFO - stats_collection.py:89 - Using dataset with 64 entries for calibration
+2026-05-20 07:25:43,634 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Statistics Collector is done (completion time is 00:00:10.87)
+2026-05-20 07:25:45,321 - INFO - algorithm_base.py:152 - Starting Fix zp_comp Encoding
+2026-05-20 07:25:45,322 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Fix zp_comp Encoding is done (completion time is 00:00:00.00)
+2026-05-20 07:25:45,322 - INFO - algorithm_base.py:149 - Matmul Equalization skipped
+2026-05-20 07:25:45,322 - INFO - algorithm_base.py:152 - Starting MatmulDecomposeFix
+2026-05-20 07:25:45,323 - INFO - algorithm_base.py:168 - Model Optimization Algorithm MatmulDecomposeFix is done (completion time is 00:00:00.00)
+2026-05-20 07:25:57,332 - INFO - algorithm_base.py:149 - Finetune encoding skipped
+2026-05-20 07:25:57,333 - INFO - algorithm_base.py:149 - Bias Correction skipped
+2026-05-20 07:25:57,340 - INFO - algorithm_base.py:149 - Adaround skipped
+2026-05-20 07:25:57,347 - INFO - algorithm_base.py:152 - Starting Quantization-Aware Fine-Tuning
+2026-05-20 07:25:57,384 - INFO - qft.py:332 - Using dataset with 1024 entries for finetune
+2026-05-20 07:33:01,126 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Quantization-Aware Fine-Tuning is done (completion time is 00:07:02.61)
+2026-05-20 07:33:07,047 - INFO - algorithm_base.py:152 - Starting Layer Noise Analysis
+2026-05-20 07:33:41,647 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Layer Noise Analysis is done (completion time is 00:00:34.60)
+2026-05-20 07:33:41,905 - INFO - quant_checker.py:125 - Output layers signal-to-noise ratio (SNR): measures the quantization noise (higher is better)
+2026-05-20 07:33:41,905 - INFO - quant_checker.py:130 - 	hexapod_v5_backbone_simplified/output_layer1 SNR:	15.37 dB
+2026-05-20 07:33:41,905 - INFO - quant_checker.py:130 - 	hexapod_v5_backbone_simplified/output_layer2 SNR:	15.58 dB
+2026-05-20 07:33:41,905 - INFO - quant_checker.py:130 - 	hexapod_v5_backbone_simplified/output_layer3 SNR:	14.13 dB
+2026-05-20 07:33:41,905 - INFO - quant_checker.py:130 - 	hexapod_v5_backbone_simplified/output_layer4 SNR:	15.47 dB
+2026-05-20 07:33:49,791 - IMPORTANT - sdk_backend.py:1145 - Model Optimization is done
+2026-05-20 07:37:38,904 - INFO - parser.py:158 - Translation started on ONNX model hexapod_v5_geometry_simplified
+2026-05-20 07:37:38,912 - INFO - parser.py:193 - Restored ONNX model hexapod_v5_geometry_simplified (completion time: 00:00:00.01)
+2026-05-20 07:37:38,933 - INFO - parser.py:216 - Extracted ONNXRuntime meta-data for Hailo model (completion time: 00:00:00.03)
+2026-05-20 07:37:39,214 - INFO - parser.py:366 - Start nodes mapped from original model: 'f_s4_l': 'hexapod_v5_geometry_simplified/input_layer1', 'f_s8_l': 'hexapod_v5_geometry_simplified/input_layer2', 'f_s4_r': 'hexapod_v5_geometry_simplified/input_layer3', 'f_s8_r': 'hexapod_v5_geometry_simplified/input_layer4'.
+2026-05-20 07:37:39,214 - INFO - parser.py:367 - End nodes mapped from original model: '/stereo_head/stereo_refine_s4/Relu', '/normals_head/Div_1', '/stereo_head/Mul_3'.
+2026-05-20 07:37:39,265 - INFO - parser.py:288 - Translation completed on ONNX model hexapod_v5_geometry_simplified (completion time: 00:00:00.36)
+2026-05-20 07:37:39,961 - INFO - client_runner.py:1881 - Saved HAR to: /home/slarc/jupyter/onnx_split/hexapod_v5_geometry.har
+2026-05-20 07:37:40,618 - INFO - client_runner.py:1474 - Running profile for hexapod_v5_geometry_simplified in state hailo_model
+2026-05-20 07:37:51,092 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_backbone_simplified from onnx_split/backbone_v5_script.alls
+2026-05-20 07:37:51,418 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-20 07:38:00,424 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-20 07:38:04,887 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-20 07:38:08,770 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-20 07:38:12,728 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-20 07:38:16,029 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-20 07:38:24,655 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-20 07:38:29,472 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-20 07:54:02,604 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_geometry_simplified from onnx_split/geometry_v5_script.alls
+2026-05-20 07:54:03,159 - IMPORTANT - sdk_backend.py:1133 - Starting Model Optimization
+2026-05-20 07:54:03,969 - INFO - mo_script_parser.py:91 - Model received quantization params from the hn
+2026-05-20 07:54:09,434 - INFO - algorithm_base.py:149 - MatmulDecompose skipped
+2026-05-20 07:54:09,772 - INFO - algorithm_base.py:152 - Starting Mixed Precision
+2026-05-20 07:54:10,069 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Mixed Precision is done (completion time is 00:00:00.30)
+2026-05-20 07:54:10,513 - INFO - algorithm_base.py:149 - LayerNorm Decomposition skipped
+2026-05-20 07:54:11,791 - INFO - algorithm_base.py:152 - Starting Statistics Collector
+2026-05-20 07:54:11,796 - INFO - stats_collection.py:89 - Using dataset with 64 entries for calibration
+2026-05-20 07:55:15,151 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Statistics Collector is done (completion time is 00:01:03.35)
+2026-05-20 07:55:17,236 - INFO - algorithm_base.py:152 - Starting Fix zp_comp Encoding
+2026-05-20 07:55:17,236 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Fix zp_comp Encoding is done (completion time is 00:00:00.00)
+2026-05-20 07:55:17,237 - INFO - algorithm_base.py:149 - Matmul Equalization skipped
+2026-05-20 07:55:17,237 - INFO - algorithm_base.py:152 - Starting MatmulDecomposeFix
+2026-05-20 07:55:17,237 - INFO - algorithm_base.py:168 - Model Optimization Algorithm MatmulDecomposeFix is done (completion time is 00:00:00.00)
+2026-05-20 07:56:23,677 - INFO - algorithm_base.py:149 - Finetune encoding skipped
+2026-05-20 07:56:23,680 - INFO - algorithm_base.py:149 - Bias Correction skipped
+2026-05-20 07:56:23,685 - INFO - algorithm_base.py:149 - Adaround skipped
+2026-05-20 07:56:23,692 - INFO - algorithm_base.py:152 - Starting Quantization-Aware Fine-Tuning
+2026-05-20 07:56:23,720 - INFO - qft.py:332 - Using dataset with 1024 entries for finetune
+2026-05-20 08:01:13,813 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Quantization-Aware Fine-Tuning is done (completion time is 00:04:49.15)
+2026-05-20 08:01:22,702 - INFO - algorithm_base.py:152 - Starting Layer Noise Analysis
+2026-05-20 08:02:13,060 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Layer Noise Analysis is done (completion time is 00:00:50.35)
+2026-05-20 08:02:13,488 - INFO - quant_checker.py:125 - Output layers signal-to-noise ratio (SNR): measures the quantization noise (higher is better)
+2026-05-20 08:02:13,488 - INFO - quant_checker.py:130 - 	hexapod_v5_geometry_simplified/output_layer3 SNR:	43.24 dB
+2026-05-20 08:02:13,488 - INFO - quant_checker.py:130 - 	hexapod_v5_geometry_simplified/output_layer2 SNR:	28.11 dB
+2026-05-20 08:02:13,488 - INFO - quant_checker.py:130 - 	hexapod_v5_geometry_simplified/output_layer1 SNR:	40.37 dB
+2026-05-20 08:02:21,844 - IMPORTANT - sdk_backend.py:1145 - Model Optimization is done
+2026-05-20 11:50:03,806 - INFO - parser.py:158 - Translation started on ONNX model hexapod_v5_detection_simplified
+2026-05-20 11:50:03,845 - INFO - parser.py:193 - Restored ONNX model hexapod_v5_detection_simplified (completion time: 00:00:00.04)
+2026-05-20 11:50:03,927 - INFO - parser.py:216 - Extracted ONNXRuntime meta-data for Hailo model (completion time: 00:00:00.12)
+2026-05-20 11:50:04,172 - INFO - parser.py:366 - Start nodes mapped from original model: 'f_s4_l': 'hexapod_v5_detection_simplified/input_layer1', 'f_s8_l': 'hexapod_v5_detection_simplified/input_layer2', 'f_s16_l': 'hexapod_v5_detection_simplified/input_layer3', 'f_s32_l': 'hexapod_v5_detection_simplified/input_layer4', 'normals_s4': 'hexapod_v5_detection_simplified/input_layer5'.
+2026-05-20 11:50:04,172 - INFO - parser.py:367 - End nodes mapped from original model: '/seg_head/Add_3', '/yolo_head/head_s8/Concat', '/yolo_head/head_s16/Concat', '/yolo_head/head_s32/Concat'.
+2026-05-20 11:50:04,210 - INFO - parser.py:288 - Translation completed on ONNX model hexapod_v5_detection_simplified (completion time: 00:00:00.40)
+2026-05-20 11:50:04,787 - INFO - client_runner.py:1881 - Saved HAR to: /home/slarc/jupyter/onnx_split/hexapod_v5_detection.har
+2026-05-20 11:50:05,330 - INFO - client_runner.py:1474 - Running profile for hexapod_v5_detection_simplified in state hailo_model
+2026-05-20 11:50:11,409 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_backbone_simplified from onnx_split/backbone_v5_script.alls
+2026-05-20 11:50:11,670 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-20 11:50:21,912 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-20 11:50:26,684 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-20 11:50:30,820 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-20 11:51:00,188 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-20 11:51:12,840 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-20 11:51:29,818 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-20 11:51:43,342 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-20 11:52:15,925 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_geometry_simplified from onnx_split/geometry_v5_script.alls
+2026-05-20 11:52:16,693 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-20 11:52:41,790 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-20 11:52:56,063 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-20 11:53:12,110 - INFO - sdk_backend.py:1278 - Using 1 GPU for inference
+2026-05-20 11:59:58,313 - INFO - client_runner.py:501 - Loading model script commands to hexapod_v5_detection_simplified from onnx_split/detection_v5_script.alls
+2026-05-20 11:59:58,917 - IMPORTANT - sdk_backend.py:1133 - Starting Model Optimization
+2026-05-20 11:59:59,828 - INFO - mo_script_parser.py:91 - Model received quantization params from the hn
+2026-05-20 12:00:04,072 - INFO - algorithm_base.py:149 - MatmulDecompose skipped
+2026-05-20 12:00:04,345 - INFO - algorithm_base.py:152 - Starting Mixed Precision
+2026-05-20 12:00:09,448 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Mixed Precision is done (completion time is 00:00:05.10)
+2026-05-20 12:00:10,137 - INFO - algorithm_base.py:149 - LayerNorm Decomposition skipped
+2026-05-20 12:00:11,334 - INFO - algorithm_base.py:152 - Starting Statistics Collector
+2026-05-20 12:00:11,337 - INFO - stats_collection.py:89 - Using dataset with 64 entries for calibration
+2026-05-20 12:00:33,618 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Statistics Collector is done (completion time is 00:00:22.28)
+2026-05-20 12:00:34,656 - INFO - algorithm_base.py:152 - Starting Fix zp_comp Encoding
+2026-05-20 12:00:34,657 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Fix zp_comp Encoding is done (completion time is 00:00:00.00)
+2026-05-20 12:00:34,657 - INFO - algorithm_base.py:149 - Matmul Equalization skipped
+2026-05-20 12:00:34,657 - INFO - algorithm_base.py:152 - Starting MatmulDecomposeFix
+2026-05-20 12:00:34,658 - INFO - algorithm_base.py:168 - Model Optimization Algorithm MatmulDecomposeFix is done (completion time is 00:00:00.00)
+2026-05-20 12:00:46,883 - INFO - algorithm_base.py:149 - Finetune encoding skipped
+2026-05-20 12:00:46,886 - INFO - algorithm_base.py:149 - Bias Correction skipped
+2026-05-20 12:00:46,892 - INFO - algorithm_base.py:149 - Adaround skipped
+2026-05-20 12:00:46,898 - INFO - algorithm_base.py:152 - Starting Quantization-Aware Fine-Tuning
+2026-05-20 12:00:46,949 - INFO - qft.py:332 - Using dataset with 1024 entries for finetune
+2026-05-20 12:07:17,304 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Quantization-Aware Fine-Tuning is done (completion time is 00:06:29.43)
+2026-05-20 12:07:29,176 - INFO - algorithm_base.py:152 - Starting Layer Noise Analysis
+2026-05-20 12:08:13,438 - INFO - algorithm_base.py:168 - Model Optimization Algorithm Layer Noise Analysis is done (completion time is 00:00:44.26)
+2026-05-20 12:08:13,755 - INFO - quant_checker.py:125 - Output layers signal-to-noise ratio (SNR): measures the quantization noise (higher is better)
+2026-05-20 12:08:13,755 - INFO - quant_checker.py:130 - 	hexapod_v5_detection_simplified/output_layer4 SNR:	30.9 dB
+2026-05-20 12:08:13,755 - INFO - quant_checker.py:130 - 	hexapod_v5_detection_simplified/output_layer1 SNR:	33.05 dB
+2026-05-20 12:08:13,755 - INFO - quant_checker.py:130 - 	hexapod_v5_detection_simplified/output_layer2 SNR:	32.48 dB
+2026-05-20 12:08:13,755 - INFO - quant_checker.py:130 - 	hexapod_v5_detection_simplified/output_layer3 SNR:	32.6 dB
+2026-05-20 12:08:13,756 - INFO - quant_checker.py:171 - The calibration set seems to not be normalized, because the values range is [(-0.989515, 0.8283509), (-0.9791612, 0.9776072), (-0.661567, 0.9999974)].
+Since the neural core works in 8-bit (between 0 to 255), a quantization will occur on the CPU of the runtime platform.
+Add a normalization layer to the model to offload the normalization to the neural core.
+Refer to the user guide Hailo Dataflow Compiler user guide / Model Optimization / Optimization Related Model Script Commands / model_modification_commands / normalization for details.
+2026-05-20 12:08:22,038 - IMPORTANT - sdk_backend.py:1145 - Model Optimization is done
+2026-05-20 12:29:06,305 - WARNING - pb_wrapper.py:344 - argument of type 'DefuseParams' is not iterable
