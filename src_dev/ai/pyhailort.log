@@ -232,3 +232,8 @@
 2026-05-01 16:48:56,215 - WARNING - pyhailort.py:1031 - Given input data dtype (float32) is different than inferred dtype (uint8). conversion for every frame will reduce performance
 2026-05-01 16:48:56,286 - WARNING - pyhailort.py:1031 - Given input data dtype (float32) is different than inferred dtype (uint8). conversion for every frame will reduce performance
 2026-05-01 16:48:56,297 - WARNING - pyhailort.py:1031 - Given input data dtype (float32) is different than inferred dtype (uint8). conversion for every frame will reduce performance
+2026-05-20 19:40:04,472 - INFO - base_utils.py:54 - (hailo) Running command 'parse-hef' with 'hailortcli'
+2026-05-20 19:40:21,866 - INFO - base_utils.py:54 - (hailo) Running command 'parse-hef' with 'hailortcli'
+2026-05-20 19:40:57,100 - INFO - base_utils.py:54 - (hailo) Running command 'parse-hef' with 'hailortcli'
+2026-05-20 19:43:29,056 - INFO - base_utils.py:54 - (hailo) Running command 'parse-hef' with 'hailortcli'
+2026-05-20 19:58:00,763 - INFO - base_utils.py:54 - (hailo) Running command 'parse-hef' with 'hailortcli'
