@@ -13,7 +13,7 @@ import matplotlib
 matplotlib.use('Agg')  # Headless auf dem Pi
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
-from hailo_platform import HEF, ConfigureParams, InferVStreams, InputVStreamParams, OutputVStreamParams, HailoStreamInterface
+from hailo_platform import HEF, VDevice, InferVStreams, InputVStreamParams, OutputVStreamParams, FormatType
 
 # =====================================================================
 # KONFIGURATION
@@ -42,8 +42,10 @@ BOX_CMAP = plt.cm.tab20
 # =====================================================================
 # BILD-VORBEREITUNG
 # =====================================================================
+'''
 def load_gray_for_hailo(path, size=(640, 480)):
     """Lädt ein Bild als Grayscale UINT8 [1, H, W, 1] für den Hailo."""
+    print(f"Reading: {path}")
     if path.endswith('.png'):
         img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
     else:
@@ -51,7 +53,20 @@ def load_gray_for_hailo(path, size=(640, 480)):
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     img = cv2.resize(img, size)
     return img.reshape(1, size[1], size[0], 1).astype(np.float32)
-
+'''
+def load_gray_for_hailo(path, size=(640, 480)):
+    """Lädt ein Bild exakt wie im PyTorch Training."""
+    print(f"Reading: {path}")
+    
+    # 1. IMMER als BGR laden (ignoriere cv2.IMREAD_GRAYSCALE)
+    img = cv2.imread(path)
+    
+    # 2. IMMER explizit konvertieren
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    # 3. Resize & Reshape
+    img = cv2.resize(img, size)
+    return img.reshape(1, size[1], size[0], 1).astype(np.float32)
 
 def load_for_display(path, size=(320, 240)):
     """Lädt ein Bild für die Darstellung."""
@@ -66,13 +81,11 @@ def load_for_display(path, size=(320, 240)):
 # HAILO PIPELINE
 # =====================================================================
 def setup_pipeline():
-    """Lädt die 3 HEFs und erstellt die Inference-Konfiguration."""
     hef_bb = HEF(os.path.join(HEF_DIR, 'hexapod_v5_backbone.hef'))
     hef_geo = HEF(os.path.join(HEF_DIR, 'hexapod_v5_geometry.hef'))
     hef_det = HEF(os.path.join(HEF_DIR, 'hexapod_v5_detection.hef'))
 
-    devices = Device.scan()
-    target = Device(devices[0])
+    target = VDevice()
 
     ng_bb = target.configure(hef_bb)[0]
     ng_geo = target.configure(hef_geo)[0]
@@ -106,6 +119,7 @@ def run_inference(pipeline, img_left, img_right=None):
     if img_right is None:
         img_right = img_left  # COCO: gleiches Bild → Disparität ≈ 0
 
+
     # Shape-basiertes Output-Matching
     shape_to_key = {
         (120, 160): 'f_s4', (60, 80): 'f_s8',
@@ -130,6 +144,8 @@ def run_inference(pipeline, img_left, img_right=None):
             feat_l[fk] = v
             feat_r[fk] = res_r[k]
 
+
+    '''
     # 2. Geometry
     geo_inputs = sorted([i.name for i in p['ng_geo'].get_input_vstream_infos()])
     geo_feed = {
@@ -138,6 +154,15 @@ def run_inference(pipeline, img_left, img_right=None):
         geo_inputs[2]: feat_r['f_s4'],
         geo_inputs[3]: feat_r['f_s8'],
     }
+    '''
+    # 2. Geometry
+    geo_feed = {
+        'hexapod_v5_geometry_simplified/input_layer1': feat_l['f_s4'],
+        'hexapod_v5_geometry_simplified/input_layer2': feat_l['f_s8'],
+        'hexapod_v5_geometry_simplified/input_layer3': feat_r['f_s4'],
+        'hexapod_v5_geometry_simplified/input_layer4': feat_r['f_s8']
+    }
+    
     
     with p['ng_geo'].activate(p['ng_geo'].create_params()):
         with InferVStreams(p['ng_geo'], p['geo_in_p'], p['geo_out_p']) as pipe:
@@ -155,6 +180,7 @@ def run_inference(pipeline, img_left, img_right=None):
             result['disp_s8'] = v
         elif v.shape[-1] == 3 and v.shape[1] == 120:
             result['normals_s4'] = v
+
 
     # 3. Detection
     det_inputs = sorted([i.name for i in p['ng_det'].get_input_vstream_infos()])
@@ -195,7 +221,18 @@ def run_inference(pipeline, img_left, img_right=None):
                 result['yolo_s16'] = v
             elif v.shape[1] == 15:
                 result['yolo_s32'] = v
-
+    
+    print(f"\n--- OUTPUT TENSOR DIAGNOSE ({img_left.shape}) ---")
+    # Zuerst die Eingangs-Features des Backbones (wie gehabt)
+    print(f"feat_l['f_s4']: min={feat_l['f_s4'].min():.3f}, max={feat_l['f_s4'].max():.3f}, mean={feat_l['f_s4'].mean():.3f}")
+    print(f"feat_r['f_s4']: min={feat_r['f_s4'].min():.3f}, max={feat_r['f_s4'].max():.3f}, mean={feat_r['f_s4'].mean():.3f}")
+    print("-" * 40)
+    
+    # Jetzt alle Ergebnisse der Heads dynamisch auslesen
+    for key, val in result.items():
+        if isinstance(val, np.ndarray):
+            print(f"{key:15s}: min={val.min():.3f}, max={val.max():.3f}, mean={val.mean():.3f}, shape={val.shape}")
+    print("--------------------------------------------------\n")
     return result
 
 
@@ -274,7 +311,10 @@ def visualize(img_display, result, title, output_path, is_stereo=True):
     if 'disp_s4' in result and is_stereo:
         disp = result['disp_s4'][0, :, :, 0]  # NHWC → HW
         disp_s1 = cv2.resize(disp * 4.0, (TW, TH))
-        vmax = np.percentile(disp_s1[disp_s1 > 0], 98) if (disp_s1 > 0).any() else 50
+        if (disp_s1 > 0).any():
+            vmax = np.percentile(disp_s1[disp_s1 > 0], 95) # 95 ist robuster als 80
+        else:
+            vmax = 192.0 # Typische Max-Disparity
         axes[1].imshow(disp_s1, cmap='magma', vmin=0, vmax=vmax)
         axes[1].set_title(f"Disparity (max={disp_s1.max():.1f}px)", fontsize=10)
     else:
@@ -337,7 +377,7 @@ if __name__ == '__main__':
     
     # TartanAir (echte Stereo-Paare)
     print("\n📸 TartanAir Bilder:")
-    tartan_files = sorted([f for f in os.listdir(TARTAN_DIR) if f.endswith('.png')])
+    tartan_files = sorted([f for f in os.listdir(TARTAN_DIR) if f.endswith('_left.png')])
     for i, fname in enumerate(tartan_files):
         left_path = os.path.join(TARTAN_DIR, fname)
         right_path = left_path.replace('_left', '_right').replace('image_left', 'image_right')
