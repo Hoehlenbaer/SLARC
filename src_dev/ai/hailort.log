@@ -526,3 +526,13 @@
 [2026-05-22 09:01:42.885] [3767] [HailoRT] [info] [device.cpp:51] [Device] OS Version: Linux 6.18.29+rpt-rpi-2712 #1 SMP PREEMPT Debian 1:6.18.29-1+rpt1 (2026-05-12) aarch64
 [2026-05-22 09:01:42.886] [3767] [HailoRT] [info] [control.cpp:113] [control__parse_identify_results] firmware_version is: 4.23.0
 [2026-05-22 09:01:42.887] [3767] [HailoRT] [info] [control.cpp:113] [control__parse_identify_results] firmware_version is: 4.23.0
+[2026-05-22 09:10:04.979] [4523] [HailoRT] [error] [file_utils.cpp:124] [open] CHECK failed - Failed opening file, path: hexapod_backbone.hef
+[2026-05-22 09:10:04.979] [4523] [HailoRT] [error] [hef.cpp:560] [parse_hef_file] CHECK_SUCCESS failed with status=HAILO_OPEN_FILE_FAILURE(13)
+[2026-05-22 09:10:04.979] [4523] [HailoRT] [error] [hef.cpp:1060] [Impl] Failed parsing HEF file
+[2026-05-22 09:10:04.979] [4523] [HailoRT] [error] [hef.cpp:333] [create] Failed creating HEF
+[2026-05-22 09:10:04.979] [4523] [HailoRT] [error] [hef.cpp:168] [create] CHECK_SUCCESS failed with status=HAILO_OPEN_FILE_FAILURE(13)
+[2026-05-22 09:11:08.180] [4564] [HailoRT] [error] [file_utils.cpp:124] [open] CHECK failed - Failed opening file, path: hexapod_backbone.hef
+[2026-05-22 09:11:08.180] [4564] [HailoRT] [error] [hef.cpp:560] [parse_hef_file] CHECK_SUCCESS failed with status=HAILO_OPEN_FILE_FAILURE(13)
+[2026-05-22 09:11:08.180] [4564] [HailoRT] [error] [hef.cpp:1060] [Impl] Failed parsing HEF file
+[2026-05-22 09:11:08.180] [4564] [HailoRT] [error] [hef.cpp:333] [create] Failed creating HEF
+[2026-05-22 09:11:08.180] [4564] [HailoRT] [error] [hef.cpp:168] [create] CHECK_SUCCESS failed with status=HAILO_OPEN_FILE_FAILURE(13)

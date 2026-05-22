@@ -237,3 +237,4 @@
 2026-05-20 19:40:57,100 - INFO - base_utils.py:54 - (hailo) Running command 'parse-hef' with 'hailortcli'
 2026-05-20 19:43:29,056 - INFO - base_utils.py:54 - (hailo) Running command 'parse-hef' with 'hailortcli'
 2026-05-20 19:58:00,763 - INFO - base_utils.py:54 - (hailo) Running command 'parse-hef' with 'hailortcli'
+2026-05-22 09:10:54,671 - INFO - base_utils.py:54 - (hailo) Running command 'scan' with 'hailortcli'
