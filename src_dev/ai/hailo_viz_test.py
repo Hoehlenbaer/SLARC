@@ -318,10 +318,10 @@ def visualize(img_display, result, title, output_path, is_stereo=True):
         disp = result['disp_s4'][0, :, :, 0]  # NHWC → HW
         disp_s1 = cv2.resize(disp * 4.0, (TW, TH))
         if (disp_s1 > 0).any():
-            vmax = np.percentile(disp_s1[disp_s1 > 0], 95) # 95 ist robuster als 80
+            vmax = 48.0 * 4.0  # = 192px@s1, fest
         else:
             vmax = 192.0 # Typische Max-Disparity
-        axes[1].imshow(disp_s1, cmap='magma', vmin=0, vmax=vmax)
+        axes[1].imshow(disp_s1, cmap='plasma', vmin=0, vmax=vmax)
         axes[1].set_title(f"Disparity (max={disp_s1.max():.1f}px)", fontsize=10)
     else:
         axes[1].set_title("Disparity (N/A)", fontsize=10)
