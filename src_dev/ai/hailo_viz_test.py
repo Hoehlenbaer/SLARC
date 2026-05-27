@@ -156,12 +156,18 @@ def run_inference(pipeline, img_left, img_right=None):
     }
     '''
     # 2. Geometry
-    geo_feed = {
-        'hexapod_v5_geometry_simplified/input_layer1': feat_l['f_s4'],
-        'hexapod_v5_geometry_simplified/input_layer2': feat_l['f_s8'],
-        'hexapod_v5_geometry_simplified/input_layer3': feat_r['f_s4'],
-        'hexapod_v5_geometry_simplified/input_layer4': feat_r['f_s8']
-    }
+    # Shape-basiertes Mapping aus HEF-Infos:
+    geo_input_infos = {i.name: i.shape for i in p['ng_geo'].get_input_vstream_infos()}
+    geo_feed = {}
+    s8_count, s4_count = 0, 0
+    for name, shape in sorted(geo_input_infos.items()):
+        h, w = shape[0], shape[1]  # NHWC ohne Batch
+        if h == 60 and w == 80:    # f_s8
+            geo_feed[name] = feat_l['f_s8'] if s8_count == 0 else feat_r['f_s8']
+            s8_count += 1
+        elif h == 120 and w == 160 and shape[-1] != 3:  # f_s4 (nicht Normals)
+            geo_feed[name] = feat_l['f_s4'] if s4_count == 0 else feat_r['f_s4']
+            s4_count += 1
     
     
     with p['ng_geo'].activate(p['ng_geo'].create_params()):
