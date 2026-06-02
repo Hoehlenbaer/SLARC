@@ -1128,6 +1128,10 @@ class SlarcController:
     def init_pybullet(self):
         generate_hexapod_urdf("slarc_primitives.urdf")
         p.connect(p.GUI)
+        # Eingebaute GUI-Tastenkürzel abschalten (w=Wireframe, g=Panels,
+        # v=Visuals aus, j/k/l, s … kollidieren sonst mit unserer Steuerung).
+        # Unsere eigene Tastenabfrage via getKeyboardEvents bleibt aktiv.
+        p.configureDebugVisualizer(p.COV_ENABLE_KEYBOARD_SHORTCUTS, 0)
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
         p.setGravity(0, 0, -9.81)
         p.setPhysicsEngineParameter(fixedTimeStep=1./240.,
@@ -1296,6 +1300,7 @@ class SlarcController:
         cx = math.cos(roll_eff);  sx = math.sin(roll_eff)
 
         for leg in self.legs:
+            step_z = 0.0   # Schwung-Hub; wird WELT-vertikal nach der Rotation addiert
             if self.gait_mode == 4 and "front" in leg.name:
                 stance_x, stance_y, stance_z = leg.base_x, leg.base_y, leg.base_z
                 y_open   = 0.14  if "left" in leg.name else -0.14
@@ -1327,9 +1332,9 @@ class SlarcController:
                     st_ratio, sw_ratio, h_mult, s_mult = 0.8, 0.2, 2.0, 1.5
                 else:  # mode 5 = Treppen-Wellengang (1 Bein schwingt, 5 tragen)
                     leg_phase = (self.gait_phase + self.phases_wave[leg.name]) % 1.0
-                    # st 5/6: jeweils nur ein Bein in Schwung; hoher Hub, um
-                    # über die Setzstufe zu kommen; moderater Vorschub.
-                    st_ratio, sw_ratio, h_mult, s_mult = 0.833, 0.167, 6.0, 0.9
+                    # st 5/6: jeweils nur ein Bein in Schwung; HOHER Hub, um
+                    # sicher über die Setzstufe zu kommen; moderater Vorschub.
+                    st_ratio, sw_ratio, h_mult, s_mult = 0.833, 0.167, 8.0, 0.9
 
                 if leg_phase < st_ratio:
                     factor = 1.0 - (2.0*(leg_phase/st_ratio))
@@ -1390,6 +1395,12 @@ class SlarcController:
                             #   und absenken → Kontaktsuche
                             LIFT = 0.45   # 45% Heben, 55% Vorwärts+Absenken
                             max_lift = self.step_height * h_mult * self.move_intent
+                            if self.gait_mode == 5:
+                                # Treppe: Fuß MUSS sicher über die Setzstufe
+                                # kommen → Hub ≥ Stufenhöhe + Sicherheit, und
+                                # NICHT mit move_intent verkleinern (sonst hängt
+                                # der Fuß bei langsamem Steigen an der Kante).
+                                max_lift = max(max_lift, self.stair_rise + 0.08)
 
                             if p_val < LIFT:
                                 t1 = p_val / LIFT             # [0..1]
@@ -1474,12 +1485,19 @@ class SlarcController:
                     leg_lift = self.mid_lift
                 else:
                     leg_lift = 0.0
-                target_z = (leg.base_z + step_z - self.body_height_offset
+                # Boden-/Aufsetzziel OHNE Schwung-Hub. Der Hub (step_z) wird
+                # nach der Lage-Rotation welt-vertikal addiert (s.u.), damit er
+                # bei angestelltem Körper (Treppe) voll als Höhe wirkt.
+                target_z = (leg.base_z - self.body_height_offset
                             + leg_cr + leg_lift)
 
             rx  = target_x*cy + target_z*sy;  ry = target_y
             rz  = -target_x*sy + target_z*cy
             ry_new = ry*cx - rz*sx;           rz_new = ry*sx + rz*cx
+            # Schwung-Hub WELT-vertikal (nach Pitch+Roll): voller Höhengewinn
+            # auch bei angestelltem Körper, symmetrisch trotz Rollen → beide
+            # Vorderbeine kommen gleich weit über die Stufe.
+            rz_new += step_z
 
             dx = rx - leg.mount_x; dy = ry_new - leg.mount_y; dz = rz_new
             local_x =  dx*math.cos(-leg.mount_yaw) - dy*math.sin(-leg.mount_yaw)
@@ -1704,24 +1722,26 @@ class SlarcController:
                         self._leg_stance_x = {n: None for n in self._leg_stance_x}
                         print("Modus 4: ZENTAUR/Greifen")
                     if key == ord('5'):
-                        self.gait_mode = 5
-                        self._leg_stance_x = {n: None for n in self._leg_stance_x}
-                        self._leg_frozen   = {n: None for n in self._leg_frozen}
-                        self._leg_descend  = {n: False for n in self._leg_descend}
-                        self.auto_balance = False
+                        if self.gait_mode == 5:
+                            # Schon im Treppenmodus → FIXED/ADAPTIV umschalten.
+                            # Eigene Taste bewusst vermieden: pybullet kapert
+                            # 'v'/'w' o.ä. trotz COV_ENABLE_KEYBOARD_SHORTCUTS=0.
+                            self.climb_kind = 1 - self.climb_kind
+                        else:
+                            self.gait_mode = 5
+                            self._leg_stance_x = {n: None for n in self._leg_stance_x}
+                            self._leg_frozen   = {n: None for n in self._leg_frozen}
+                            self._leg_descend  = {n: False for n in self._leg_descend}
+                            self.auto_balance = False
                         kind = "ADAPTIV" if self.climb_kind else "FIXED"
                         deg = math.degrees(math.atan2(self.stair_rise, self.stair_run))
-                        print(f"Modus 5: TREPPEN-WELLENGANG ({kind})")
+                        print(f"Modus 5: TREPPEN-WELLENGANG ({kind})  [5 erneut = umschalten]")
                         if self.climb_kind == 0:
                             print(f"   FIXED: rise={self.stair_rise*100:.0f} run={self.stair_run*100:.0f}"
-                                  f" → Anstellung {deg:.0f}°  (V=adaptiv, I/K=Feintrim)")
+                                  f" → Anstellung {deg:.0f}°  (I/K=Feintrim)")
                         else:
-                            print("   ADAPTIV: Anstellung regelt sich aus Fußhöhen (V=fixed)")
+                            print("   ADAPTIV: Anstellung regelt sich aus Fußhöhen")
                         print("   Pfeil↑ = langsam hochsteigen")
-                    if key == ord('v'):
-                        self.climb_kind = 1 - self.climb_kind
-                        print("Kletter-Art:", "ADAPTIV (misst Rampe)" if self.climb_kind
-                              else "FIXED (rise/run)")
                     if key == ord('n'):
                         # Alte Auto-Sequenz war zu starr → Klettermodus nutzen.
                         print("ℹ️  N-Sequenz ersetzt: bitte Modus 5 (Klettern) verwenden.")
@@ -1838,8 +1858,7 @@ def main():
     print(" A/D       : Mittelbeine anheben/absenken (bis über Schulterhöhe)")
     print(" B         : Auto-Balance an/aus (Körpernormale → Schwerkraft)")
     print(" 1/2/3/4   : Tripod / Ripple / Adaptiv(Terrain) / Zentaur")
-    print(" 5         : TREPPE — angestellter Wellengang (zieht hoch)")
-    print(" V         : Treppen-Art umschalten  FIXED (rise/run) ↔ ADAPTIV")
+    print(" 5         : TREPPE — angestellter Wellengang (5 erneut: FIXED↔ADAPTIV)")
     print(" T/G       : Greifer heben/absenken (bis -34cm)  F/H : vor/zurück")
     print(" Leertaste : Greifer Auf/Zu")
     print(" P / O     : Schritthöhe +/-0.8cm (kinematisch begrenzt)")
