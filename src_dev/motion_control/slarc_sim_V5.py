@@ -46,11 +46,18 @@ from enum import IntEnum      # SIM ONLY (PC) — StairClimber-Skript
 # ==========================================
 # 0. URDF GENERATOR
 # ==========================================
+# Gemeinsame Körper-Geometrie: hier ÄNDERN, dann passen URDF UND Controller.
+# Länge auf 200mm verkürzt (war 250): Hinterbein-Coxa/Femur saßen sonst auf
+# der 17cm-Stufenkante auf. Elektronik passt (LiPo ZEEE 9000mAh = 166mm).
+# Breiter (150mm statt 120) → seitlich stabiler.
+BODY_L = 0.200; BODY_W = 0.150; BODY_H = 0.040
+MID_Y_OFFSET = 0.040
+
 def generate_hexapod_urdf(filename="slarc_primitives.urdf"):
-    body_l = 0.250; body_w = 0.120; body_h = 0.040
+    body_l = BODY_L; body_w = BODY_W; body_h = BODY_H
     coxa_l = 0.060; femur_l = 0.175; tibia_l = 0.150
     foot_radius = 0.015
-    mid_y_offset = 0.040
+    mid_y_offset = MID_Y_OFFSET
 
     legs = [
         ("front_right",  body_l/2, -body_w/2, -math.radians(30)),
@@ -122,9 +129,18 @@ def generate_hexapod_urdf(filename="slarc_primitives.urdf"):
 # ==========================================
 # TREPPE
 # ==========================================
+# Gemeinsame Treppen-Geometrie: hier ÄNDERN, dann passen Sim-Treppe UND der
+# FIXED-Anstellwinkel automatisch zusammen. (Für 100-mm-Test: STAIR_RISE=0.10)
+STAIR_RISE = 0.170     # Stufenhöhe [m]
+STAIR_RUN  = 0.250     # Stufentiefe [m]
+
+# ST3215 Stall-Drehmoment ~30 kg·cm ≈ 2.94 Nm. Dient als realer Motor-force
+# (Sättigung) UND als 100%-Bezug der Drehmomentanzeige — eine Quelle, konsistent.
+SERVO_STALL_NM = 2.94
+
 def create_staircase():
     step_ids = []
-    step_h = 0.170; step_d = 0.250; step_w = 1.200
+    step_h = STAIR_RISE; step_d = STAIR_RUN; step_w = 1.200
     x_start = 1.0; n_up = 5
 
     for i in range(n_up):
@@ -375,8 +391,12 @@ class BalanceController:
 
     Reine math-Logik: auf dem ESP32 mit IMU-Winkeln (rad) speisen.
     """
-    PITCH_SIGN = -1.0     # bei Vorzeichenfehler auf +1.0 drehen
-    ROLL_SIGN = -1.0
+    # Die kommandierte Lage-Rotation der Fußziele ist invers zur gemessenen
+    # Euler-Lage (kommandierter Pitch>0 → Nase HOCH → Euler-Pitch wird negativ).
+    # Daher +1.0, damit der Regler die gemessene Neigung gegen 0 fährt
+    # (statt sie zu verstärken — vorher kippte der Körper nach vorne).
+    PITCH_SIGN = +1.0     # bei Vorzeichenfehler auf -1.0 drehen
+    ROLL_SIGN = +1.0
 
     def __init__(self, kp=0.9, kd=0.04, max_corr=0.45, lp=0.15, slew=0.10):
         self.kp = kp; self.kd = kd
@@ -1008,11 +1028,14 @@ class SlarcController:
         self.balance = BalanceController()
         self.auto_balance = False
         self.roll_bal = 0.0; self.pitch_bal = 0.0
+        # Wackelbrett (Balance-Test): kinematisch gekippte Plattform
+        self.wobble_id = None; self.wobble_active = False
+        self.wobble_t = 0.0; self.wobble_origin = None
         self.robot_id = None
         self.joint_map = {}
         self.cameras = None
 
-        body_l = 0.250; body_w = 0.120; mid_y_off = 0.040
+        body_l = BODY_L; body_w = BODY_W; mid_y_off = MID_Y_OFFSET
         self.legs = [
             HexapodLeg("front_right",  body_l/2, -body_w/2, -math.radians(30)),
             HexapodLeg("front_left",   body_l/2,  body_w/2,  math.radians(30)),
@@ -1046,9 +1069,14 @@ class SlarcController:
         self.climb_z = -0.02               # aktuelle Greifer-Aufsetzebene (Mode 5)
         # ── Treppen-Wellengang (Mode 5) ──────────────────────────────
         self.climb_kind = 0                # 0 = FIXED (rise/run), 1 = ADAPTIV
-        self.stair_rise = 0.17             # FIXED: Stufenhöhe [m]
-        self.stair_run  = 0.28             # FIXED: Stufentiefe [m]
+        self.stair_rise = STAIR_RISE       # FIXED: Stufenhöhe [m] (= Sim-Treppe)
+        self.stair_run  = STAIR_RUN        # FIXED: Stufentiefe [m] (= Sim-Treppe)
         self.climb_pitch = 0.0             # eingeschwungener Anstellwinkel [rad]
+        # Schwung-Hub im Treppenmodus: ABSOLUT (von step_height entkoppelt,
+        # damit eine hohe Schritthöhe das Klettern nicht sprengt) und
+        # reichweiten-sicher. Körper-Crouch verschafft Reichweiten-Reserve.
+        self.climb_lift = 0.22             # vertikaler Hub [m]
+        self.climb_crouch = 0.05           # Körper tiefer → mehr Reichweite
         self.mid_crouch = 0.0
         self.rear_crouch = 0.0
         # Manueller Heck-Höhen-Trim (unabhängig von Pitch): hebt/senkt die
@@ -1079,10 +1107,11 @@ class SlarcController:
         self.phases_quad   = {"mid_left": 0.0, "rear_right": 0.25,
                               "mid_right": 0.5, "rear_left": 0.75}
         # Wellengang (Mode 5/Treppe): NUR EIN Bein schwingt, 5 tragen.
-        # Metachronale Welle hangaufwärts: hinten → Mitte → vorne, Seite für Seite.
-        self.phases_wave   = {"rear_right": 0.0,   "mid_right": 1/6,
+        # Seiten ALTERNIEREND (R,L,R,L,R,L) → minimiert Rollen/Waddeln, das
+        # sonst eine Seite an den Reichweitenrand drückt (rechtes Bein!).
+        self.phases_wave   = {"rear_right": 0/6,  "mid_left": 1/6,
                               "front_right": 2/6,  "rear_left": 3/6,
-                              "mid_left": 4/6,     "front_left": 5/6}
+                              "mid_right": 4/6,    "front_left": 5/6}
         self.max_stride_x = 0.14
         self.max_stride_y = 0.10
         # Req 4: kollisionsfreie Schrittlängen-Obergrenze aus den
@@ -1220,17 +1249,20 @@ class SlarcController:
         target_grip  = 1.0 if self.gripper_active else 0.0
         self.grip_blend += (target_grip - self.grip_blend) * 0.05
 
-        # CG/Beinlast: Mode 4 voller Zentaur. Mode 5 (Treppe) braucht keinen
-        # CG-Versatz — der Anstellwinkel (Pitch) hält die Last über den Beinen.
-        target_cg   = -0.10 * self.zentaur_progress if self.gait_mode == 4 else 0.0
+        # CG/Beinlast: Mode 4 voller Zentaur. Mode 5 (Treppe): beim ABSTIEG
+        # (Anstellwinkel negativ) CoG nach hinten/bergauf, damit SLARC nicht
+        # nach vorne über die Stufen kippt. Aufstieg/Eben: 0.
+        target_cg   = (-0.10 * self.zentaur_progress if self.gait_mode == 4 else
+                       -0.05 if (self.gait_mode == 5 and self.climb_pitch < -0.02)
+                       else 0.0)
         target_mid  =  0.08 * self.zentaur_progress if self.gait_mode == 4 else 0.0
         target_rear = -0.05 * self.zentaur_progress
         target_m_crouch = 0.02 * self.zentaur_progress if self.gait_mode == 4 else 0.0
         target_r_crouch = 0.05 * self.zentaur_progress if self.gait_mode == 4 else 0.0
 
-        # Modus 3 + 5: Körperhöhe folgt gemessenem Boden (Probe-and-Plant) →
-        # der Körper steigt mit, während die Füße auf höhere Tritte wandern.
-        if self.gait_mode in (3, 5):
+        # Modus 3: Körperhöhe folgt gemessenem Boden (Probe-and-Plant).
+        # Mode 5 (Treppe) nutzt manuelle Körperhöhe (W/S) wie Modus 2.
+        if self.gait_mode == 3:
             avg_floor = sum(self._leg_floor_z.values()) / 6
             self.body_height_offset += (avg_floor - self.body_height_offset) * 0.015
         # Coxa-Seitwärtsschwenk NUR Modus 3 (Adaptiv-Terrain breitbeinig).
@@ -1277,11 +1309,23 @@ class SlarcController:
             # Treppe = schiefe Ebene: Körper parallel zur Rampe anstellen,
             # damit jedes tragende Bein nahezu senkrecht steht (kleiner Hebel
             # → wenig Drehmoment). Auto-Balance hier AUS (würde gegenarbeiten).
+            # Anstellwinkel bewusst NICHT voll auf den Rampenwinkel: voll-
+            # parallel spreizt die Beine vertikal so weit, dass die Hinterbeine
+            # im Schwung aus der Reichweite fallen — und ist lt. Hebelarm ohnehin
+            # nicht das Drehmoment-Optimum. 0.6× hält alle Beine erreichbar.
+            PITCH_FRAC = 0.6
             if self.climb_kind == 0:        # FIXED: aus rise/run
-                pitch_target = math.atan2(self.stair_rise, self.stair_run)
+                pitch_target = PITCH_FRAC * math.atan2(self.stair_rise, self.stair_run)
+                # Hub knapp über die Setzstufe, reichweiten-sicher gedeckelt
+                self.climb_lift = max(0.18, min(self.stair_rise + 0.06, 0.28))
             else:                            # ADAPTIV: aus gemessenen Fußhöhen
-                pitch_target = self._measure_ramp_angle()
+                pitch_target = PITCH_FRAC * self._measure_ramp_angle()
+                self.climb_lift = 0.22
             self.climb_pitch += (pitch_target - self.climb_pitch) * 0.02
+            # Auto-Crouch: je steiler angestellt, desto tiefer der Körper —
+            # sonst drückt die Pitch-Rotation die Vorderfüße aus der Reichweite
+            # (Roboter steht/hängt). Hält Stand vorne+hinten erreichbar.
+            self.climb_crouch = 0.04 + 0.14 * math.sin(abs(self.climb_pitch))
             self.roll_bal, self.pitch_bal = self.balance.decay()
             pitch_eff = self.climb_pitch + self.pitch   # I/K = Feintrim
             roll_eff  = self.roll
@@ -1330,17 +1374,19 @@ class SlarcController:
                     p_offset  = self.phases_quad.get(leg.name, 0.0)
                     leg_phase = (self.gait_phase + p_offset) % 1.0
                     st_ratio, sw_ratio, h_mult, s_mult = 0.8, 0.2, 2.0, 1.5
-                else:  # mode 5 = Treppen-Wellengang (1 Bein schwingt, 5 tragen)
-                    leg_phase = (self.gait_phase + self.phases_wave[leg.name]) % 1.0
-                    # st 5/6: jeweils nur ein Bein in Schwung; HOHER Hub, um
-                    # sicher über die Setzstufe zu kommen; moderater Vorschub.
-                    st_ratio, sw_ratio, h_mult, s_mult = 0.833, 0.167, 8.0, 0.9
+                else:  # mode 5 = Treppe: einfacher Ripple-Schwung + Auto-Pitch
+                    # Gleicher Gang wie Modus 2 (bewährt), KEIN Probe-and-Plant
+                    # (das fror den Fuß an der Stufenkante ein). Der eingestellte
+                    # Schritt-Hub (P/O) wird hier direkt umgesetzt — der Auto-
+                    # Anstellwinkel ist der einzige Unterschied zu Modus 2.
+                    leg_phase = (self.gait_phase + self.phases_ripple[leg.name]) % 1.0
+                    st_ratio, sw_ratio, h_mult, s_mult = 0.7, 0.3, 2.8, 1.0
 
                 if leg_phase < st_ratio:
                     factor = 1.0 - (2.0*(leg_phase/st_ratio))
                     step_z = 0.0
-                    # Modus 3+5 Standbein: floor_z und base_z synchron halten
-                    if self.gait_mode in (3, 5):
+                    # Modus 3 Standbein: floor_z und base_z synchron halten
+                    if self.gait_mode == 3:
                         contact, fz = self._check_foot_contact(leg.name)
                         if contact:
                             self._leg_floor_z[leg.name] = fz
@@ -1353,8 +1399,8 @@ class SlarcController:
                     p_val  = (leg_phase - st_ratio) / sw_ratio
                     factor = -1.0 + (2.0*p_val)
 
-                    if self.gait_mode in (3, 5):
-                        # ── Probe-and-Plant (Adaptiv-Terrain + Treppe) ──
+                    if self.gait_mode == 3:
+                        # ── Probe-and-Plant (nur Adaptiv-Terrain, NICHT Treppe) ──
                         # Aufwärts: Kontakt früher als erwartet → Einfrieren
                         # Abwärts:  Kein Kontakt bei p_val=1 → Extended Descent
                         # ───────────────────────────────────────────────
@@ -1395,12 +1441,6 @@ class SlarcController:
                             #   und absenken → Kontaktsuche
                             LIFT = 0.45   # 45% Heben, 55% Vorwärts+Absenken
                             max_lift = self.step_height * h_mult * self.move_intent
-                            if self.gait_mode == 5:
-                                # Treppe: Fuß MUSS sicher über die Setzstufe
-                                # kommen → Hub ≥ Stufenhöhe + Sicherheit, und
-                                # NICHT mit move_intent verkleinern (sonst hängt
-                                # der Fuß bei langsamem Steigen an der Kante).
-                                max_lift = max(max_lift, self.stair_rise + 0.08)
 
                             if p_val < LIFT:
                                 t1 = p_val / LIFT             # [0..1]
@@ -1428,8 +1468,14 @@ class SlarcController:
                                 self._leg_descend[leg.name]   = True
                                 self._leg_desc_step[leg.name] = step_z
                     else:
+                        sh = self.step_height
+                        # Treppe (Mode 5): Hinterbeine werden vom Anstellwinkel
+                        # bereits angehoben → weniger Schwung-Hub nötig. 0.6×
+                        # macht die 17-cm-Standardtreppe voll erreichbar.
+                        if self.gait_mode == 5 and "rear" in leg.name:
+                            sh *= 0.6
                         step_z = (math.sin(p_val*math.pi)
-                                  * (self.step_height*h_mult)*self.move_intent)
+                                  * (sh*h_mult)*self.move_intent)
 
                 # Req 1: Schritthub auf kinematische Hüllkurve begrenzen.
                 # Die harte Garantie erfolgt unten an target_z (Fuß-Z), hier
@@ -1488,8 +1534,9 @@ class SlarcController:
                 # Boden-/Aufsetzziel OHNE Schwung-Hub. Der Hub (step_z) wird
                 # nach der Lage-Rotation welt-vertikal addiert (s.u.), damit er
                 # bei angestelltem Körper (Treppe) voll als Höhe wirkt.
+                climb_crouch = self.climb_crouch if self.gait_mode == 5 else 0.0
                 target_z = (leg.base_z - self.body_height_offset
-                            + leg_cr + leg_lift)
+                            + leg_cr + leg_lift + climb_crouch)
 
             rx  = target_x*cy + target_z*sy;  ry = target_y
             rz  = -target_x*sy + target_z*cy
@@ -1523,7 +1570,11 @@ class SlarcController:
                 jointIndex=self.joint_map[joint_name],
                 controlMode=p.POSITION_CONTROL,
                 targetPosition=angle_rad,
-                force=4.0, maxVelocity=5.0,
+                # force = realer ST3215-Stall (NICHT mehr 4.0!). Damit kann der
+                # Sim nie mehr Drehmoment aufbringen als der echte Servo →
+                # Anzeige bleibt ≤100% und Sättigung wird als echtes Problem
+                # sichtbar (Bein sackt), statt dass der Sim 'schummelt'.
+                force=SERVO_STALL_NM, maxVelocity=4.0,
                 positionGain=0.05, velocityGain=1.0)
 
     def _refresh_contact_cache(self):
@@ -1531,6 +1582,43 @@ class SlarcController:
         import ctypes
         self._contact_cache = p.getContactPoints(bodyA=self.robot_id) or []
         self._contact_frame += 1
+
+    def toggle_wobble(self):
+        """Wackelbrett (Balance-Test) ein/aus. Plattform kippt langsam in
+        Pitch & Roll; der Roboter steht darauf und der Balancer muss
+        gegensteuern. Auto-Balance (B) sollte AN sein."""
+        if self.wobble_active:
+            if self.wobble_id is not None:
+                p.removeBody(self.wobble_id); self.wobble_id = None
+            self.wobble_active = False
+            print("Wackelbrett: AUS")
+            return
+        pos, orn = p.getBasePositionAndOrientation(self.robot_id)
+        ox, oy, oz = pos[0], pos[1], 0.07
+        col = p.createCollisionShape(p.GEOM_BOX, halfExtents=[0.6, 0.6, 0.03])
+        vis = p.createVisualShape(p.GEOM_BOX, halfExtents=[0.6, 0.6, 0.03],
+                                  rgbaColor=[0.85, 0.5, 0.1, 1.0])
+        # Masse 0 = kinematisch: wird per resetBasePositionAndOrientation
+        # gekippt und trägt/​neigt den Roboter über Reibung.
+        self.wobble_id = p.createMultiBody(0, col, vis, [ox, oy, oz])
+        p.changeDynamics(self.wobble_id, -1, lateralFriction=1.2)
+        self.wobble_origin = [ox, oy, oz]
+        self.wobble_t = 0.0; self.wobble_active = True
+        # Roboter auf das Brett heben
+        p.resetBasePositionAndOrientation(
+            self.robot_id, [pos[0], pos[1], pos[2] + 0.14], orn)
+        self.auto_balance = True; self.balance.reset()
+        print("Wackelbrett: AN  (Auto-Balance automatisch EIN) — losgehen & beobachten")
+
+    def update_wobble(self):
+        if not self.wobble_active or self.wobble_id is None:
+            return
+        self.wobble_t += 1.0 / 240.0
+        # langsame, phasenversetzte Kippung in Roll & Pitch
+        roll  = 0.14 * math.sin(2*math.pi*0.12 * self.wobble_t)
+        pitch = 0.11 * math.sin(2*math.pi*0.08 * self.wobble_t + 1.0)
+        q = p.getQuaternionFromEuler([roll, pitch, 0.0])
+        p.resetBasePositionAndOrientation(self.wobble_id, self.wobble_origin, q)
 
     def _measure_ramp_angle(self):
         """
@@ -1730,18 +1818,18 @@ class SlarcController:
                         else:
                             self.gait_mode = 5
                             self._leg_stance_x = {n: None for n in self._leg_stance_x}
-                            self._leg_frozen   = {n: None for n in self._leg_frozen}
-                            self._leg_descend  = {n: False for n in self._leg_descend}
                             self.auto_balance = False
+                            # bewährte Treppen-Schritthöhe (per P/O anpassbar)
+                            self.step_height = max(self.step_height, 0.10)
                         kind = "ADAPTIV" if self.climb_kind else "FIXED"
                         deg = math.degrees(math.atan2(self.stair_rise, self.stair_run))
-                        print(f"Modus 5: TREPPEN-WELLENGANG ({kind})  [5 erneut = umschalten]")
+                        print(f"Modus 5: TREPPE — Ripple + Auto-Pitch ({kind})  [5 erneut = umschalten]")
                         if self.climb_kind == 0:
                             print(f"   FIXED: rise={self.stair_rise*100:.0f} run={self.stair_run*100:.0f}"
                                   f" → Anstellung {deg:.0f}°  (I/K=Feintrim)")
                         else:
                             print("   ADAPTIV: Anstellung regelt sich aus Fußhöhen")
-                        print("   Pfeil↑ = langsam hochsteigen")
+                        print(f"   Schritthöhe {self.step_height*100:.0f}cm (P/O), Körperhöhe W/S, Pfeil↑ vor")
                     if key == ord('n'):
                         # Alte Auto-Sequenz war zu starr → Klettermodus nutzen.
                         print("ℹ️  N-Sequenz ersetzt: bitte Modus 5 (Klettern) verwenden.")
@@ -1768,12 +1856,12 @@ class SlarcController:
                     if key == ord('o'):
                         self.step_height = max(self.step_height - 0.008, self.kin.STEP_H_MIN)
                         print(f"Schritthöhe: {self.step_height*100:.1f} cm")
-                    if key == ord('+'):
+                    if key == ord('+') or key == ord('8'):
                         self.max_stride_x = min(self.max_stride_x+0.02, self.MAX_STRIDE)
                         print(f"Schrittweite: {self.max_stride_x*100:.0f} cm "
                               f"(max {self.MAX_STRIDE*100:.0f})")
-                    if key == ord('-'):
-                        self.max_stride_x = max(self.max_stride_x-0.02, 0.01)
+                    if key == ord('-') or key == ord('7'):
+                        self.max_stride_x = max(self.max_stride_x-0.02, 0.04)
                         print(f"Schrittweite: {self.max_stride_x*100:.0f} cm")
                     if key == ord(' '):
                         self.gripper_active = not self.gripper_active
@@ -1786,6 +1874,8 @@ class SlarcController:
                         if not self.auto_balance:
                             self.balance.reset()
                         print("Auto-Balance:", "AN" if self.auto_balance else "AUS")
+                    if key == ord('y'):
+                        self.toggle_wobble()
 
     def update_camera_debug(self):
         if not self._show_cam or self.cameras is None:
@@ -1803,39 +1893,78 @@ class SlarcController:
 
     def update_torque_display(self):
         """
-        Zeigt nur den maximalen Servo-Drehmomentwert als Text.
-        Kein per-Joint-Balken (zu teuer) — nur alle 30 Frames.
-        lifeTime statt manuelles Entfernen.
+        Gut sichtbares Drehmoment-Feedback:
+          • dicker, farbiger Balken pro Bein (Höhe ∝ Last) am jeweiligen Fuß
+          • große, persistente %-Anzeige des Maximums über dem Körper
+        Persistente Items via replaceItemUniqueId (kein Flackern), alle 8 Frames.
         """
-        if not hasattr(self, '_torque_frame'):
+        if not hasattr(self, '_torque_init'):
+            self._torque_init = True
             self._torque_frame = 0
-            # Joint-Indices gecacht (ohne foot)
-            self._torque_joints = [
-                (i, p.getJointInfo(self.robot_id, i)[1].decode('utf-8'))
-                for i in range(p.getNumJoints(self.robot_id))
-                if 'foot' not in p.getJointInfo(self.robot_id, i)[1].decode('utf-8')
-            ]
+            # Joint-Indices pro Bein gruppieren (coxa/femur/tibia, ohne foot)
+            self._leg_joint_idx = {}
+            for i in range(p.getNumJoints(self.robot_id)):
+                nm = p.getJointInfo(self.robot_id, i)[1].decode('utf-8')
+                if 'foot' in nm:
+                    continue
+                for leg in self.legs:
+                    if nm.startswith(leg.name):
+                        self._leg_joint_idx.setdefault(leg.name, []).append(i)
+                        break
+            self._bar_ids = {}     # leg_name -> debug line id
+            self._txt_id = None
+            self._tau_lp = {}      # leg_name -> tiefpassgefiltertes Verhältnis
+
         self._torque_frame += 1
-        if self._torque_frame % 30 != 0:
+        if self._torque_frame % 8 != 0:
             return
 
-        TAU_MAX = 2.94; WARN = 0.50; CRIT = 0.80
+        TAU_MAX = SERVO_STALL_NM; WARN = 0.50; CRIT = 0.80
 
-        max_tau = 0.0; max_joint = ""
-        for idx, jname in self._torque_joints:
-            tau = abs(p.getJointState(self.robot_id, idx)[3])
-            if tau > max_tau:
-                max_tau = tau; max_joint = jname
+        def col(r):
+            return ([0.1, 0.9, 0.1] if r < WARN else
+                    [1.0, 0.75, 0.0] if r < CRIT else [1.0, 0.1, 0.1])
 
-        ratio = max_tau / TAU_MAX
-        color = ([0.1,0.9,0.1] if ratio < WARN else
-                 [1.0,0.8,0.0] if ratio < CRIT else [1.0,0.1,0.1])
+        overall = 0.0; overall_leg = ""
+        for leg in self.legs:
+            idxs = self._leg_joint_idx.get(leg.name, [])
+            if not idxs:
+                continue
+            raw = max(abs(p.getJointState(self.robot_id, i)[3]) for i in idxs) / TAU_MAX
+            # Tiefpass: anhaltende Last statt Aufprall-/Beschleunigungsspitzen
+            lp = self._tau_lp.get(leg.name, raw)
+            lp += (raw - lp) * 0.20
+            self._tau_lp[leg.name] = lp
+            ratio = min(lp, 1.0)
+            if ratio > overall:
+                overall = ratio; overall_leg = leg.name
+            # Balken am Fuß: senkrecht, Höhe ∝ Last, dick & farbig
+            fidx = self._foot_link_idx.get(leg.name, -1)
+            if fidx < 0:
+                continue
+            fp = p.getLinkState(self.robot_id, fidx)[0]
+            base = [fp[0], fp[1], fp[2] + 0.02]
+            top  = [fp[0], fp[1], fp[2] + 0.02 + 0.06 + ratio * 0.32]
+            c = col(ratio)
+            if leg.name in self._bar_ids:
+                self._bar_ids[leg.name] = p.addUserDebugLine(
+                    base, top, lineColorRGB=c, lineWidth=14,
+                    replaceItemUniqueId=self._bar_ids[leg.name])
+            else:
+                self._bar_ids[leg.name] = p.addUserDebugLine(
+                    base, top, lineColorRGB=c, lineWidth=14)
+
         pos, _ = p.getBasePositionAndOrientation(self.robot_id)
-        p.addUserDebugText(
-            f"τ={max_tau:.2f}Nm ({ratio*100:.0f}%)  "
-            f"[{max_joint.replace('_joint','')}]",
-            [pos[0], pos[1], pos[2]+0.42],
-            textColorRGB=color, lifeTime=0.15, textSize=1.0)
+        txt = f"{overall*100:.0f}%  tau (Dauerlast)  [{overall_leg.replace('_',' ')}]"
+        tpos = [pos[0], pos[1], pos[2] + 0.55]
+        c = col(overall)
+        if self._txt_id is not None:
+            self._txt_id = p.addUserDebugText(
+                txt, tpos, textColorRGB=c, textSize=2.6,
+                replaceItemUniqueId=self._txt_id)
+        else:
+            self._txt_id = p.addUserDebugText(
+                txt, tpos, textColorRGB=c, textSize=2.6)
 
 
 # ==========================================
@@ -1857,12 +1986,13 @@ def main():
     print(" Z/U       : Heck heben/senken (Hinterbeine, unabhängig von Pitch)")
     print(" A/D       : Mittelbeine anheben/absenken (bis über Schulterhöhe)")
     print(" B         : Auto-Balance an/aus (Körpernormale → Schwerkraft)")
+    print(" Y         : Wackelbrett ein/aus (Balance im Gehen testen)")
     print(" 1/2/3/4   : Tripod / Ripple / Adaptiv(Terrain) / Zentaur")
     print(" 5         : TREPPE — angestellter Wellengang (5 erneut: FIXED↔ADAPTIV)")
     print(" T/G       : Greifer heben/absenken (bis -34cm)  F/H : vor/zurück")
     print(" Leertaste : Greifer Auf/Zu")
     print(" P / O     : Schritthöhe +/-0.8cm (kinematisch begrenzt)")
-    print(" + / -     : Schrittlänge +/-2cm  (kollisionsfrei begrenzt)")
+    print(" + / -  o. 8/7: Schrittlänge +/-2cm (kollisionsfrei begrenzt)")
     print(" C         : Kamera-Debug an/aus")
     print(" R         : Reset (auch Treppen-Abbruch + Balance)")
     print(" ─────────────────────────────────────────────")
@@ -1875,8 +2005,10 @@ def main():
     print("   3) V wählt: FIXED (Winkel aus rise/run) oder ADAPTIV (misst Rampe)")
     print("   4) Pfeil ↑ langsam halten → SLARC steigt Stufe für Stufe hoch")
     print("      FIXED: bei Bedarf I/K = Anstellung feintrimmen")
+    print("   ABWÄRTS: ADAPTIV nutzen (5 erneut) — misst die Rampe, kippt die")
+    print("      Nase automatisch nach unten, CoG verlagert sich nach hinten.")
     print(" ─────────────────────────────────────────────")
-    print(" Drehmomente: grün <50%  gelb <80%  rot >80%")
+    print(" Drehmoment: Balken je Bein + %-Anzeige  grün<50% gelb<80% rot>80%")
     print(" I / K     : Pitch ±0.6 rad (±34°)")
     print(" ─────────────────────────────────────────────")
     print(" M         : Leg Tuner an/aus")
@@ -1889,6 +2021,7 @@ def main():
         while True:
             robot.process_keyboard()
             robot.update_gait()
+            robot.update_wobble()
             robot.update_camera_debug()
             robot.update_torque_display()
             robot.tuner.update_display()
