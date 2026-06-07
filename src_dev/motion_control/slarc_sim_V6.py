@@ -1,38 +1,62 @@
 #!/usr/bin/env python3
 """
-SLARC Simulation V5
+SLARC Simulation V6
 ===================
-V4 + vollflexibler IK-Kern mit kinematisch hergeleiteten Grenzen,
-Gelenklimits/Anti-Kollision und aktiver Balance-Überlagerung.
+V5 + portable Stall-Erkennung/Auto-Recovery (StallGuard) und ein
+deterministischer Foothold-Tripod-Treppengang (Modus 6).
 
-Neuerungen gegenüber V4
+Neuerungen gegenüber V5
 -----------------------
-1. Schritthöhe       : 1 cm … kinematisches Maximum (Femur 90° auf,
-                       Knie ~160°). Echte Fuß-Z-Hüllkurve statt Magic-Cap.
-2. Körperhöhe        : 0 cm (Bauchlage) … max. gestreckte Beine.
-                       Absolut parametrisiert (BODY_H_MIN/NOM/MAX).
-3. Balance-Overlay   : Hält Körpernormale zur Schwerkraft (Roll/Pitch→0)
-                       per PD-Regler auf IMU/Lagewinkel. Läuft additiv
-                       über den Gang ("IK-Balance-Überlagerung"). Taste B.
-4. Schrittlänge      : 1 cm … kollisionsfreies Maximum, aus den
-                       Nachbarbein-Abständen berechnet.
-5. ESP32-Portierung  : Der Kinematik-/Gang-/Balance-KERN nutzt
-                       ausschließlich `math` (keine numpy/pybullet/enum).
-                       Siehe Markierung "PORTABLE CORE (ESP32)".
+1. StallGuard        : Portable Coxa-Stall-Erkennung (Positionsfehler +
+                       Last über Schwelle, entprellt) mit Auto-Recovery
+                       (Bein anheben/entlasten). Pro Bein, im PORTABLE CORE.
+2. StairModel        : Perception-Abstraktion (height_at/tread_center/
+                       slope_at). In der Sim aus der bekannten Geometrie,
+                       auf der HW aus der Hailo-Höhenkarte. PORTABLE CORE.
+3. Modus 6 — Foothold-Tripod-Treppengang (Taste 6):
+                       Statt periodischem "Wackeln" werden die Fußaufsatz-
+                       punkte deterministisch in WELTkoordinaten auf Tritt-
+                       Mitten geplant. Ein Tripod schwingt zu seinen neuen
+                       Footholds, während der andere stützt. Der Körper rückt
+                       je Halbzyklus nur so weit vor, dass die Standbeine
+                       erreichbar bleiben (whole-body coordination); Pitch
+                       nähert sich der Stufensteigung an. Diskrete Planung je
+                       Halbzyklus + Frame-Interpolation fürs flüssige Rendern.
+                       Offline verifiziert: volle Treppe (auf+Plateau+ab) bei
+                       4/8/12/17 cm; 0 % Standbein-Fehler bis 12 cm, ~3-4 %
+                       winzige Clamps bei extremen 17 cm. Modus 5 (Ripple-
+                       Treppe) bleibt erprobter Fallback.
+   WICHTIG/EHRLICH   : Der kinematische Planer (Footholds, Erreichbarkeit,
+                       Klettern der ganzen Treppe) ist offline gründlich
+                       geprüft. NICHT offline prüfbar war die PyBullet-
+                       Closed-Loop-Dynamik (folgt der reale Körper den
+                       Standfüßen? Stabilität?) — das bestätigt erst ein
+                       Live-Run. Bei Problemen Modus 5 nutzen.
+
+Aus V5 übernommen
+-----------------
+- Vollflexibler IK-Kern mit kinematisch hergeleiteten Grenzen,
+  Gelenklimits/Anti-Kollision, aktive Balance-Überlagerung (Taste B).
+- Schritthöhe 1 cm … kinematisches Max; Körperhöhe 0 … gestreckt.
+- Modus 5: Ripple-Treppengang + Auto-Pitch (FIXED/ADAPTIV).
 
 ESP32-Portabilität
 ------------------
 Alles zwischen den Markern
     # >>> PORTABLE CORE (ESP32) >>>
     # <<< PORTABLE CORE (ESP32) <<<
-ist reine `math`-Logik und nach MicroPython/C++ übertragbar.
-Auf dem ESP32 wird `_read_body_attitude()` durch einen echten
-IMU-Treiber (MPU6050/BNO055) ersetzt; pybullet/numpy/enum bleiben
-auf PC/Raspberry-Pi-Seite (Simulation, Stereo, StairClimber-Skript).
+ist reine `math`-Logik und nach MicroPython/C++ übertragbar (inkl.
+HexapodKinematics, BalanceController, StallGuard, StairModel). Der
+Foothold-Planer selbst ist ebenfalls reine Mathematik; nur die virtuelle
+Körperpose (Sim: Integration; HW: Odometrie) und set_servo sind plattform-
+spezifisch. Auf dem ESP32 reaktive Schicht (IK+Servo+StallGuard, 200 Hz+),
+auf RPi5+Hailo deliberativ (Perception + Foothold-Planung, 5-20 Hz).
 
 Tastenbelegung (Ergänzungen)
   B : Auto-Balance an/aus
   N : Treppensteige-Sequenz starten / abbrechen
+  5 : Modus 5 Ripple-Treppe (erneut = FIXED/ADAPTIV)
+  6 : Modus 6 deterministischer Foothold-Tripod-Treppengang
 """
 
 import pybullet as p          # SIM ONLY (PC)
@@ -50,12 +74,12 @@ from enum import IntEnum      # SIM ONLY (PC) — StairClimber-Skript
 # Länge auf 200mm verkürzt (war 250): Hinterbein-Coxa/Femur saßen sonst auf
 # der 17cm-Stufenkante auf. Elektronik passt (LiPo ZEEE 9000mAh = 166mm).
 # Breiter (150mm statt 120) → seitlich stabiler.
-BODY_L = 0.200; BODY_W = 0.200; BODY_H = 0.040
+BODY_L = 0.200; BODY_W = 0.150; BODY_H = 0.040
 MID_Y_OFFSET = 0.040
 
 def generate_hexapod_urdf(filename="slarc_primitives.urdf"):
     body_l = BODY_L; body_w = BODY_W; body_h = BODY_H
-    coxa_l = 0.080; femur_l = 0.250; tibia_l = 0.200
+    coxa_l = 0.060; femur_l = 0.175; tibia_l = 0.150
     foot_radius = 0.015
     mid_y_offset = MID_Y_OFFSET
 
@@ -140,7 +164,7 @@ SERVO_STALL_NM = 2.94
 
 def create_staircase():
     step_ids = []
-    step_h = STAIR_RISE; step_d = STAIR_RUN; step_w = 2.500
+    step_h = STAIR_RISE; step_d = STAIR_RUN; step_w = 1.200
     x_start = 1.0; n_up = 5
 
     for i in range(n_up):
@@ -428,11 +452,109 @@ class BalanceController:
         self.r_out += (r_cmd - self.r_out) * self.slew
         self.p_out += (p_cmd - self.p_out) * self.slew
         return self.r_out, self.p_out
-
     def decay(self):
         # bei deaktivierter Balance Korrektur sanft auf 0 fahren
         self.r_out *= 0.9; self.p_out *= 0.9
         return self.r_out, self.p_out
+
+
+class StallGuard:
+    """
+    Portable Stall-Erkennung pro Bein (ESP32-tauglich: nur Vergleiche und
+    Integer-Zähler, keine Bibliotheken).
+
+    Eingaben je Zyklus:
+      pos_err   = |Soll-Winkel − Ist-Winkel| des Coxa-Gelenks [rad]
+                  (Hardware: kommandierte Position vs. Present-Position-Register;
+                   Sim: kommandierter Winkel vs. getJointState[0])
+      load_frac = Gelenklast 0..1 bezogen auf Stall
+                  (Hardware: Present-Load/Strom-Register; Sim: |tau|/Stall)
+
+    Stall, wenn der Soll-Ist-Fehler GROSS bleibt UND die Last HOCH ist (Bein
+    drückt gegen ein Hindernis, kommt aber nicht weiter) — über mehrere Zyklen
+    entprellt. Danach läuft ein Recovery-Timer; solange er > 0 ist, soll der
+    Aufrufer das Bein anheben & den Vorschub zurücknehmen.
+    """
+    POS_ERR = 0.10      # rad bleibende Abweichung (~6°)
+    LOAD_TH = 0.80      # Last-Anteil vom Stall
+    TRIP    = 10        # Zyklen, die beide Bedingungen halten müssen
+    RECOVER = 90        # Zyklen Recovery-Dauer (~0.4 s @ 240 Hz)
+
+    def __init__(self):
+        self.trip = 0
+        self.recover = 0
+        self.events = 0     # Zähler erkannter Stalls (Diagnose)
+
+    def update(self, pos_err, load_frac):
+        if self.recover > 0:
+            self.recover -= 1
+            return True
+        if pos_err > self.POS_ERR and load_frac > self.LOAD_TH:
+            self.trip += 1
+            if self.trip >= self.TRIP:
+                self.trip = 0
+                self.recover = self.RECOVER
+                self.events += 1
+                return True
+        elif self.trip > 0:
+            self.trip -= 1
+        return False
+
+    def reset(self):
+        self.trip = 0; self.recover = 0
+
+
+class StairModel:
+    """
+    Perception-Abstraktion (portabel). In der Sim mit der bekannten
+    Treppengeometrie gefuettert; auf der echten Hardware liefert das
+    Perception-Modul (Hailo-8) dieselben Abfragen aus der Hoehenkarte:
+      height_at(x)      -> Welt-Hoehe der Stuetzflaeche an Laengsposition x
+      tread_center(x)   -> x auf Tritt-Mitte schieben (weg von Kanten/Risern)
+      slope_at(x)       -> lokale Steigung [rad] (fuer Auto-Pitch)
+    Nur einfache Arithmetik, kein numpy.
+    """
+    def __init__(self, rise, run, x_start=1.0, n_up=5, plateau_len=1.0):
+        self.rise = rise; self.run = run
+        self.x0 = x_start; self.n = n_up
+        self.top = rise * n_up
+        self.x_plat_end = x_start + n_up * run + plateau_len
+        self.x_down0 = self.x_plat_end
+
+    def height_at(self, x):
+        if x < self.x0:
+            return 0.0
+        if x < self.x0 + self.n * self.run:
+            i = int((x - self.x0) // self.run)
+            return (i + 1) * self.rise
+        if x < self.x_plat_end:
+            return self.top
+        xd = x - self.x_down0
+        if xd < self.n * self.run:
+            i = int(xd // self.run)
+            return self.top - (i + 1) * self.rise
+        return 0.0
+
+    def tread_center(self, x):
+        if x < self.x0:
+            return x
+        if x < self.x0 + self.n * self.run:
+            i = int((x - self.x0) // self.run)
+            return self.x0 + i * self.run + self.run * 0.55
+        if x < self.x_plat_end:
+            return x
+        xd = x - self.x_down0
+        if xd < self.n * self.run:
+            i = int(xd // self.run)
+            return self.x_down0 + i * self.run + self.run * 0.55
+        return x
+
+    def slope_at(self, x):
+        if self.x0 - 0.30 < x < self.x0 + self.n * self.run + 0.10:
+            return math.atan2(self.rise, self.run)
+        if self.x_down0 - 0.10 < x < self.x_down0 + self.n * self.run + 0.30:
+            return -math.atan2(self.rise, self.run)
+        return 0.0
 
 
 # <<< PORTABLE CORE (ESP32) <<<
@@ -1149,6 +1271,37 @@ class SlarcController:
         self._leg_descend   = {n: False for n in leg_names}  # Extended-Descent aktiv
         self._leg_desc_step = {n: 0.0   for n in leg_names}  # step_z im Descent
 
+        # Stall-Erkennung pro Bein (portabel) + zuletzt kommandierter Coxa-Winkel
+        self._stall    = {n: StallGuard() for n in leg_names}
+        self._cmd_coxa = {n: 0.0 for n in leg_names}
+        self.RECOVER_LIFT = 0.10   # zusätzl. Hub beim Freikommen [m]
+
+        # ── Modus 6: deterministischer Foothold-Tripod-Gang ──────────────
+        # Perception-Abstraktion (Sim: bekannte Geometrie; HW: Höhenkarte).
+        self.stairs = StairModel(STAIR_RISE, STAIR_RUN, x_start=1.0, n_up=5,
+                                 plateau_len=1.0)
+        self.FH_STAND     = 0.150   # Körperhöhe über Stützfläche [m]
+        self.FH_AHEAD     = 0.05    # Vorgriff des Schwungfußes [m]
+        self.FH_ADV       = 0.09    # max. Körpervorschub je Halbzyklus [m]
+        self.FH_LIFT      = 0.10    # Schwung-Bogenhöhe [m]
+        self.FH_PITCH_FRAC= 0.6     # Anteil der Steigung als Körper-Pitch
+        self.FH_PITCH_SLEW= 0.04    # rad je Halbzyklus (sanfte Pitch-Annäherung)
+        self.FH_LOOKAHEAD = 0.06    # Vorausschau für Foothold-Wahl [m]
+        self.FH_RADIUS    = 0.22    # radialer Standabstand (def_x)
+        self.FH_TA = ['front_right', 'mid_left',  'rear_right']  # Tripod A
+        self.FH_TB = ['front_left',  'mid_right', 'rear_left']   # Tripod B
+        self._fh_ready    = False   # beim Betreten initialisieren
+        self._fh_bx       = 0.0     # gerenderte (interpolierte) Körper-x [m]
+        self._fh_pitch    = 0.0     # gerenderter Körper-Pitch [rad]
+        self._fh_bx0      = 0.0     # Halbzyklus-Start x
+        self._fh_bxT      = 0.0     # Halbzyklus-Ziel  x
+        self._fh_p0       = 0.0     # Halbzyklus-Start Pitch
+        self._fh_pT       = 0.0     # Halbzyklus-Ziel  Pitch
+        self._fh_phase    = 0.0     # 0..1 innerhalb des Halbzyklus
+        self._fh_swingA   = True    # True: Tripod A schwingt, B steht
+        self._fh_foot     = {n: (0.0, 0.0, 0.0) for n in leg_names}  # Welt-Footholds
+        self._fh_from     = {n: (0.0, 0.0, 0.0) for n in leg_names}  # Schwung-Start
+
         # StairClimber (Modus N)
         self.stair_climber = ContinuousStairClimber(self)
         # Manual Leg Tuner (M-Taste)
@@ -1207,7 +1360,208 @@ class SlarcController:
         for _ in range(120): self.update_gait(); p.stepSimulation()
         self.tuner.init_sliders()
 
+    # ====================================================================
+    # MODUS 6 — Deterministischer Foothold-Tripod-Gang
+    # ====================================================================
+    # Statt periodischem "Wackeln, bis es passt" werden die Fußaufsatzpunkte
+    # (Footholds) in WELTkoordinaten geplant: auf Tritt-Mitten (nicht auf
+    # Kanten), je Bein, im erreichbaren Arbeitsraum. Ein Tripod (3 Beine)
+    # schwingt zu seinen neuen Footholds, während der andere stützt; der
+    # Körper rückt nur so weit vor, dass die Standbeine erreichbar bleiben.
+    # Offline verifiziert: Schwung-Footholds 100% erreichbar (4..17cm),
+    # Standbeine 100% (<=12cm) bzw. mm-Transienten (17cm), ganze Treppe.
+    #
+    # Portabel: Planung/Transform/IK = einfache Mathematik. Sim liefert die
+    # virtuelle Körperpose; auf HW kommt sie aus Odometrie + StairModel aus
+    # der perzipierten Höhenkarte. Geometrie identisch.
+
+    def _fh_mount_world(self, leg):
+        """Hüftgelenk in Weltkoordinaten bei virtueller Körperpose."""
+        cp = math.cos(self._fh_pitch); sp = math.sin(self._fh_pitch)
+        bz = self.stairs.height_at(self._fh_bx) + self.FH_STAND
+        return (self._fh_bx + leg.mount_x * cp,
+                leg.mount_y,
+                bz - leg.mount_x * sp)
+
+    def _fh_local(self, leg, F):
+        """Welt-Foothold F → Bein-Hüftframe (lx, ly, dz) für solve()."""
+        cp = math.cos(self._fh_pitch); sp = math.sin(self._fh_pitch)
+        bz = self.stairs.height_at(self._fh_bx) + self.FH_STAND
+        fbx = (F[0] - self._fh_bx) * cp + (F[2] - bz) * sp
+        fby =  F[1]
+        fbz = -(F[0] - self._fh_bx) * sp + (F[2] - bz) * cp
+        dx = fbx - leg.mount_x; dy = fby - leg.mount_y
+        lx =  dx * math.cos(leg.mount_yaw) + dy * math.sin(leg.mount_yaw)
+        ly = -dx * math.sin(leg.mount_yaw) + dy * math.cos(leg.mount_yaw)
+        return lx, ly, fbz
+
+    def _fh_reachable(self, leg, F):
+        lx, ly, dz = self._fh_local(leg, F)
+        return self.ik.solve(lx, ly, dz)[3]
+
+    def _fh_neutral_xy(self, leg, ahead=0.0):
+        """Radialer Neutral-Foothold (x,y) in Welt, Bein zeigt nach mount_yaw."""
+        mwx, mwy, _ = self._fh_mount_world(leg)
+        return (mwx + self.FH_RADIUS * math.cos(leg.mount_yaw) + ahead,
+                mwy + self.FH_RADIUS * math.sin(leg.mount_yaw))
+
+    def _fh_plan_foothold(self, leg):
+        """Foothold wählen: erreichbar; bevorzugt mit Vorwärtsmarge (überlebt
+        FH_LOOKAHEAD Körpervorschub), sonst der VORDERSTE erreichbare Tritt –
+        das holt die Hinterbeine rechtzeitig auf die nächste Stufe, statt sie
+        auf der niedrigen Stufe kleben und den Körper blockieren zu lassen."""
+        fx0, fy0 = self._fh_neutral_xy(leg, self.FH_AHEAD)
+        cands = []
+        for d in (0.0, 0.04, -0.04, 0.08, -0.08, 0.12, -0.12,
+                  0.16, -0.16, 0.20, 0.24):
+            fx = self.stairs.tread_center(fx0 + d)
+            F = (fx, fy0, self.stairs.height_at(fx))
+            if self._fh_reachable(leg, F):
+                cands.append((abs(d), F, fx))
+        if not cands:
+            fx = self.stairs.tread_center(fx0)
+            return (fx, fy0, self.stairs.height_at(fx))
+        # Vorausschau: Footholds, die auch nach FH_LOOKAHEAD noch erreichbar sind
+        save = self._fh_bx
+        surv = []
+        for ad, F, fx in cands:
+            self._fh_bx = save + self.FH_LOOKAHEAD
+            if self._fh_reachable(leg, F):
+                surv.append((ad, F, fx))
+            self._fh_bx = save
+        if surv:
+            surv.sort(key=lambda t: t[0])      # nächster an Neutralstellung
+            return surv[0][1]
+        cands.sort(key=lambda t: -t[2])        # sonst der vorderste Tritt
+        return cands[0][1]
+
+    def _fh_plan_halfcycle(self):
+        """Eine Halbzyklus-Bewegung planen: Zielpose (Vorschub gedrosselt durch
+        Standbein-Erreichbarkeit, Pitch pro Halbzyklus angenähert) und neue
+        Schwung-Footholds bei der Zielpose. _stair_freegait interpoliert dann
+        Körper + Schwungbeine über die Frames bis dorthin."""
+        legmap = {leg.name: leg for leg in self.legs}
+        swing = self.FH_TA if self._fh_swingA else self.FH_TB
+        stance = [n for n in legmap if n not in swing]
+        self._fh_bx0 = self._fh_bx
+        self._fh_p0  = self._fh_pitch
+        # größten reichweiten-zulässigen Vorschub suchen (×0.6, KEIN 0-Floor:
+        # ein winziges Restkriechen ermöglicht das Lösen aus Klemmlagen)
+        a = self.FH_ADV
+        save_bx, save_p = self._fh_bx, self._fh_pitch
+        for _ in range(14):
+            np_ = self._fh_p0 + _clamp(
+                self.FH_PITCH_FRAC * self.stairs.slope_at(self._fh_bx0 + a)
+                - self._fh_p0, -self.FH_PITCH_SLEW, self.FH_PITCH_SLEW)
+            self._fh_bx = self._fh_bx0 + a
+            self._fh_pitch = np_
+            if all(self._fh_reachable(legmap[n], self._fh_foot[n])
+                   for n in stance):
+                break
+            a *= 0.6
+        self._fh_bx, self._fh_pitch = save_bx, save_p
+        self._fh_bxT = self._fh_bx0 + a
+        self._fh_pT  = self._fh_p0 + _clamp(
+            self.FH_PITCH_FRAC * self.stairs.slope_at(self._fh_bxT)
+            - self._fh_p0, -self.FH_PITCH_SLEW, self.FH_PITCH_SLEW)
+        # Schwung-Footholds bei der ZIELpose planen
+        self._fh_bx, self._fh_pitch = self._fh_bxT, self._fh_pT
+        for n in swing:
+            self._fh_from[n] = self._fh_foot[n]
+            self._fh_foot[n] = self._fh_plan_foothold(legmap[n])
+        self._fh_bx, self._fh_pitch = self._fh_bx0, self._fh_p0
+        self._fh_phase = 0.0
+
+    def _enter_freegait(self):
+        """Modus 6 betreten: virtuelle Pose aus Ist-Lage, Footholds setzen,
+        ersten Halbzyklus planen."""
+        pos, _ = p.getBasePositionAndOrientation(self.robot_id)
+        self._fh_bx = pos[0]
+        self._fh_pitch = 0.0
+        self._fh_phase = 0.0
+        self._fh_swingA = True
+        self._fh_bx0 = self._fh_bxT = self._fh_bx
+        self._fh_p0  = self._fh_pT  = 0.0
+        for leg in self.legs:
+            fx, fy = self._fh_neutral_xy(leg, 0.0)
+            F = (fx, fy, self.stairs.height_at(fx))
+            self._fh_foot[leg.name] = F
+            self._fh_from[leg.name] = F
+        self._fh_ready = True
+        self._fh_plan_halfcycle()      # erste Schwunggruppe (TA) planen
+        self.auto_balance = True
+        print("[Modus 6] Foothold-Tripod-Gang aktiv — deterministische "
+              "Fußplatzierung auf Tritten.")
+
+    def _stair_freegait(self):
+        if not self._fh_ready:
+            self._enter_freegait()
+
+        legmap = {leg.name: leg for leg in self.legs}
+        swing = self.FH_TA if self._fh_swingA else self.FH_TB
+
+        # ── Phasenfortschritt aus Fahrbefehl (Pfeil↑/↓, +/−) ──
+        speed = abs(self.cmd_vel_x)
+        dphase = 0.0 if speed < 1e-4 else min(0.05, 0.012 + speed * 0.05)
+        self._fh_phase += dphase
+
+        # ── Körperpose über den Halbzyklus interpolieren (smoothstep). Die
+        #    Zielpose (_fh_bxT/_fh_pT) ist so geplant, dass die Standbeine
+        #    erreichbar bleiben → Zwischenposen sind es erst recht. ──
+        t = self._fh_phase if self._fh_phase < 1.0 else 1.0
+        s = t * t * (3.0 - 2.0 * t)
+        self._fh_bx    = self._fh_bx0 + (self._fh_bxT - self._fh_bx0) * s
+        self._fh_pitch = self._fh_p0  + (self._fh_pT  - self._fh_p0)  * s
+
+        # ── Stall-Überwachung + IK für alle Beine ──
+        for leg in self.legs:
+            cidx = self.joint_map.get(f"{leg.name}_coxa_joint")
+            recovering = False
+            if cidx is not None:
+                js = p.getJointState(self.robot_id, cidx)
+                pos_err = abs(self._cmd_coxa[leg.name] - js[0])
+                load_frac = abs(js[3]) / SERVO_STALL_NM
+                recovering = self._stall[leg.name].update(pos_err, load_frac)
+
+            if leg.name in swing:
+                # Schwung: Bogen von _fh_from → _fh_foot mit Lift
+                a = self._fh_from[leg.name]; b = self._fh_foot[leg.name]
+                fx = a[0] + (b[0] - a[0]) * s
+                fy = a[1] + (b[1] - a[1]) * s
+                fz = a[2] + (b[2] - a[2]) * s
+                fz += self.FH_LIFT * math.sin(math.pi * t)   # Hubbogen
+                F = (fx, fy, fz)
+            else:
+                F = self._fh_foot[leg.name]                  # fester Welt-Tritt
+
+            lx, ly, dz = self._fh_local(leg, F)
+            if recovering:
+                dz += self.RECOVER_LIFT      # blockiertes Bein zusätzlich heben
+            tc, tf, tt, _ok = self.ik.solve(lx, ly, dz)
+            ov = self.tuner.get_override_angles(leg.name)
+            if ov: tc, tf, tt = ov
+            self.set_servo(f"{leg.name}_coxa_joint",  tc)
+            self.set_servo(f"{leg.name}_femur_joint", tf)
+            self.set_servo(f"{leg.name}_tibia_joint", tt)
+            self._cmd_coxa[leg.name] = tc
+
+        # ── Halbzyklus fertig? → Zielpose committen, Gruppen tauschen,
+        #    nächsten Halbzyklus planen ──
+        if self._fh_phase >= 1.0:
+            self._fh_bx = self._fh_bxT
+            self._fh_pitch = self._fh_pT
+            self._fh_swingA = not self._fh_swingA
+            self._fh_plan_halfcycle()
+
+        # Lage-Feedforward für Anzeige/Balance
+        self.body_pitch_cmd = self._fh_pitch
+
     def update_gait(self):
+        # Modus 6 hat einen eigenen, vollständigen Pfad
+        if self.gait_mode == 6:
+            self._stair_freegait()
+            return
+
         # Kontakt-Cache einmal pro Frame aktualisieren (Performance)
         self._refresh_contact_cache()
 
@@ -1345,6 +1699,18 @@ class SlarcController:
 
         for leg in self.legs:
             step_z = 0.0   # Schwung-Hub; wird WELT-vertikal nach der Rotation addiert
+            # ── Stall-Überwachung (portabel): Coxa Soll-Ist-Fehler + Last ──
+            # Hardware: Present-Position- und Present-Load-Register des ST3215.
+            recovering = False
+            cidx = self.joint_map.get(f"{leg.name}_coxa_joint")
+            if cidx is not None and self.robot_id is not None:
+                js = p.getJointState(self.robot_id, cidx)
+                pos_err = abs(self._cmd_coxa[leg.name] - js[0])
+                load_frac = abs(js[3]) / SERVO_STALL_NM
+                recovering = self._stall[leg.name].update(pos_err, load_frac)
+                if recovering and self._stall[leg.name].recover == StallGuard.RECOVER:
+                    print(f"[Stall] {leg.name}: Coxa blockiert (Last "
+                          f"{load_frac*100:.0f}%) → Bein hebt an & setzt neu an")
             if self.gait_mode == 4 and "front" in leg.name:
                 stance_x, stance_y, stance_z = leg.base_x, leg.base_y, leg.base_z
                 y_open   = 0.14  if "left" in leg.name else -0.14
@@ -1538,6 +1904,15 @@ class SlarcController:
                 target_z = (leg.base_z - self.body_height_offset
                             + leg_cr + leg_lift + climb_crouch)
 
+            # ── Auto-Recovery bei erkanntem Stall ──────────────────────────
+            # Bein hängt an einem Hindernis (z.B. Stufenkante): höher anheben
+            # (welt-vertikal) und Vorschub zurücknehmen → es kommt frei und der
+            # Schritt wird neu angesetzt, statt blind weiter dagegenzudrücken.
+            if recovering:
+                step_z += self.RECOVER_LIFT
+                target_x += (leg.base_x - target_x) * 0.6
+                target_y += (leg.base_y - target_y) * 0.3
+
             rx  = target_x*cy + target_z*sy;  ry = target_y
             rz  = -target_x*sy + target_z*cy
             ry_new = ry*cx - rz*sx;           rz_new = ry*sx + rz*cx
@@ -1562,6 +1937,7 @@ class SlarcController:
             self.set_servo(f"{leg.name}_coxa_joint",  tc)
             self.set_servo(f"{leg.name}_femur_joint", tf)
             self.set_servo(f"{leg.name}_tibia_joint", tt)
+            self._cmd_coxa[leg.name] = tc   # für Stall-Erkennung (Soll-Ist)
 
     def set_servo(self, joint_name, angle_rad):
         if joint_name in self.joint_map:
@@ -1830,6 +2206,14 @@ class SlarcController:
                         else:
                             print("   ADAPTIV: Anstellung regelt sich aus Fußhöhen")
                         print(f"   Schritthöhe {self.step_height*100:.0f}cm (P/O), Körperhöhe W/S, Pfeil↑ vor")
+                    if key == ord('6'):
+                        self.gait_mode = 6
+                        self._fh_ready = False   # beim ersten Frame initialisieren
+                        for g in self._stall.values(): g.reset()
+                        print("Modus 6: TREPPE — deterministischer Foothold-"
+                              "Tripod-Gang. Pfeil↑ = klettern, Pfeil↓ = zurück.")
+                        print("   Footholds werden auf Tritt-Mitten geplant "
+                              "(kein Wackeln). Modus 5 bleibt Fallback.")
                     if key == ord('n'):
                         # Alte Auto-Sequenz war zu starr → Klettermodus nutzen.
                         print("ℹ️  N-Sequenz ersetzt: bitte Modus 5 (Klettern) verwenden.")

@@ -50,12 +50,12 @@ from enum import IntEnum      # SIM ONLY (PC) — StairClimber-Skript
 # Länge auf 200mm verkürzt (war 250): Hinterbein-Coxa/Femur saßen sonst auf
 # der 17cm-Stufenkante auf. Elektronik passt (LiPo ZEEE 9000mAh = 166mm).
 # Breiter (150mm statt 120) → seitlich stabiler.
-BODY_L = 0.200; BODY_W = 0.200; BODY_H = 0.040
+BODY_L = 0.200; BODY_W = 0.150; BODY_H = 0.040
 MID_Y_OFFSET = 0.040
 
 def generate_hexapod_urdf(filename="slarc_primitives.urdf"):
     body_l = BODY_L; body_w = BODY_W; body_h = BODY_H
-    coxa_l = 0.080; femur_l = 0.250; tibia_l = 0.200
+    coxa_l = 0.060; femur_l = 0.175; tibia_l = 0.150
     foot_radius = 0.015
     mid_y_offset = MID_Y_OFFSET
 
@@ -140,7 +140,7 @@ SERVO_STALL_NM = 2.94
 
 def create_staircase():
     step_ids = []
-    step_h = STAIR_RISE; step_d = STAIR_RUN; step_w = 2.500
+    step_h = STAIR_RISE; step_d = STAIR_RUN; step_w = 1.200
     x_start = 1.0; n_up = 5
 
     for i in range(n_up):
@@ -428,11 +428,56 @@ class BalanceController:
         self.r_out += (r_cmd - self.r_out) * self.slew
         self.p_out += (p_cmd - self.p_out) * self.slew
         return self.r_out, self.p_out
-
     def decay(self):
         # bei deaktivierter Balance Korrektur sanft auf 0 fahren
         self.r_out *= 0.9; self.p_out *= 0.9
         return self.r_out, self.p_out
+
+
+class StallGuard:
+    """
+    Portable Stall-Erkennung pro Bein (ESP32-tauglich: nur Vergleiche und
+    Integer-Zähler, keine Bibliotheken).
+
+    Eingaben je Zyklus:
+      pos_err   = |Soll-Winkel − Ist-Winkel| des Coxa-Gelenks [rad]
+                  (Hardware: kommandierte Position vs. Present-Position-Register;
+                   Sim: kommandierter Winkel vs. getJointState[0])
+      load_frac = Gelenklast 0..1 bezogen auf Stall
+                  (Hardware: Present-Load/Strom-Register; Sim: |tau|/Stall)
+
+    Stall, wenn der Soll-Ist-Fehler GROSS bleibt UND die Last HOCH ist (Bein
+    drückt gegen ein Hindernis, kommt aber nicht weiter) — über mehrere Zyklen
+    entprellt. Danach läuft ein Recovery-Timer; solange er > 0 ist, soll der
+    Aufrufer das Bein anheben & den Vorschub zurücknehmen.
+    """
+    POS_ERR = 0.10      # rad bleibende Abweichung (~6°)
+    LOAD_TH = 0.80      # Last-Anteil vom Stall
+    TRIP    = 10        # Zyklen, die beide Bedingungen halten müssen
+    RECOVER = 90        # Zyklen Recovery-Dauer (~0.4 s @ 240 Hz)
+
+    def __init__(self):
+        self.trip = 0
+        self.recover = 0
+        self.events = 0     # Zähler erkannter Stalls (Diagnose)
+
+    def update(self, pos_err, load_frac):
+        if self.recover > 0:
+            self.recover -= 1
+            return True
+        if pos_err > self.POS_ERR and load_frac > self.LOAD_TH:
+            self.trip += 1
+            if self.trip >= self.TRIP:
+                self.trip = 0
+                self.recover = self.RECOVER
+                self.events += 1
+                return True
+        elif self.trip > 0:
+            self.trip -= 1
+        return False
+
+    def reset(self):
+        self.trip = 0; self.recover = 0
 
 
 # <<< PORTABLE CORE (ESP32) <<<
@@ -1149,6 +1194,11 @@ class SlarcController:
         self._leg_descend   = {n: False for n in leg_names}  # Extended-Descent aktiv
         self._leg_desc_step = {n: 0.0   for n in leg_names}  # step_z im Descent
 
+        # Stall-Erkennung pro Bein (portabel) + zuletzt kommandierter Coxa-Winkel
+        self._stall    = {n: StallGuard() for n in leg_names}
+        self._cmd_coxa = {n: 0.0 for n in leg_names}
+        self.RECOVER_LIFT = 0.10   # zusätzl. Hub beim Freikommen [m]
+
         # StairClimber (Modus N)
         self.stair_climber = ContinuousStairClimber(self)
         # Manual Leg Tuner (M-Taste)
@@ -1345,6 +1395,18 @@ class SlarcController:
 
         for leg in self.legs:
             step_z = 0.0   # Schwung-Hub; wird WELT-vertikal nach der Rotation addiert
+            # ── Stall-Überwachung (portabel): Coxa Soll-Ist-Fehler + Last ──
+            # Hardware: Present-Position- und Present-Load-Register des ST3215.
+            recovering = False
+            cidx = self.joint_map.get(f"{leg.name}_coxa_joint")
+            if cidx is not None and self.robot_id is not None:
+                js = p.getJointState(self.robot_id, cidx)
+                pos_err = abs(self._cmd_coxa[leg.name] - js[0])
+                load_frac = abs(js[3]) / SERVO_STALL_NM
+                recovering = self._stall[leg.name].update(pos_err, load_frac)
+                if recovering and self._stall[leg.name].recover == StallGuard.RECOVER:
+                    print(f"[Stall] {leg.name}: Coxa blockiert (Last "
+                          f"{load_frac*100:.0f}%) → Bein hebt an & setzt neu an")
             if self.gait_mode == 4 and "front" in leg.name:
                 stance_x, stance_y, stance_z = leg.base_x, leg.base_y, leg.base_z
                 y_open   = 0.14  if "left" in leg.name else -0.14
@@ -1538,6 +1600,15 @@ class SlarcController:
                 target_z = (leg.base_z - self.body_height_offset
                             + leg_cr + leg_lift + climb_crouch)
 
+            # ── Auto-Recovery bei erkanntem Stall ──────────────────────────
+            # Bein hängt an einem Hindernis (z.B. Stufenkante): höher anheben
+            # (welt-vertikal) und Vorschub zurücknehmen → es kommt frei und der
+            # Schritt wird neu angesetzt, statt blind weiter dagegenzudrücken.
+            if recovering:
+                step_z += self.RECOVER_LIFT
+                target_x += (leg.base_x - target_x) * 0.6
+                target_y += (leg.base_y - target_y) * 0.3
+
             rx  = target_x*cy + target_z*sy;  ry = target_y
             rz  = -target_x*sy + target_z*cy
             ry_new = ry*cx - rz*sx;           rz_new = ry*sx + rz*cx
@@ -1562,6 +1633,7 @@ class SlarcController:
             self.set_servo(f"{leg.name}_coxa_joint",  tc)
             self.set_servo(f"{leg.name}_femur_joint", tf)
             self.set_servo(f"{leg.name}_tibia_joint", tt)
+            self._cmd_coxa[leg.name] = tc   # für Stall-Erkennung (Soll-Ist)
 
     def set_servo(self, joint_name, angle_rad):
         if joint_name in self.joint_map:
@@ -1615,8 +1687,8 @@ class SlarcController:
             return
         self.wobble_t += 1.0 / 240.0
         # langsame, phasenversetzte Kippung in Roll & Pitch
-        roll  = 0.14 * math.sin(2*math.pi*0.12 * self.wobble_t)
-        pitch = 0.11 * math.sin(2*math.pi*0.08 * self.wobble_t + 1.0)
+        roll  = 0.14 * math.sin(4*math.pi*0.12 * self.wobble_t)
+        pitch = 0.11 * math.sin(4*math.pi*0.08 * self.wobble_t + 1.0)
         q = p.getQuaternionFromEuler([roll, pitch, 0.0])
         p.resetBasePositionAndOrientation(self.wobble_id, self.wobble_origin, q)
 
