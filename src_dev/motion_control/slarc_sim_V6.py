@@ -155,16 +155,24 @@ def generate_hexapod_urdf(filename="slarc_primitives.urdf"):
 # ==========================================
 # Gemeinsame Treppen-Geometrie: hier ÄNDERN, dann passen Sim-Treppe UND der
 # FIXED-Anstellwinkel automatisch zusammen. (Für 100-mm-Test: STAIR_RISE=0.10)
-STAIR_RISE = 0.170     # Stufenhöhe [m]
+STAIR_RISE = 0.100     # Stufenhöhe [m]
 STAIR_RUN  = 0.250     # Stufentiefe [m]
 
 # ST3215 Stall-Drehmoment ~30 kg·cm ≈ 2.94 Nm. Dient als realer Motor-force
 # (Sättigung) UND als 100%-Bezug der Drehmomentanzeige — eine Quelle, konsistent.
 SERVO_STALL_NM = 2.94
 
+# Positions-Regelsteifigkeit des Servos (PyBullet Kp). 0.05 war für ein
+# realistisch "weiches" Bein gedacht, ist aber so nachgiebig, dass der Servo
+# (a) den Fuß kaum zügig auf Coxa-Höhe hebt und (b) den Stand-Sweep nicht in
+# Körpervortrieb überträgt → Rutschen + Kriechtempo. Der echte ST3215 ist
+# deutlich steifer; das Stall-Drehmoment (force) bleibt die Sättigungsgrenze,
+# die Drehmomentanzeige also weiter ≤100%. Bei Oszillation Wert senken.
+SERVO_POS_GAIN = 0.30
+
 def create_staircase():
     step_ids = []
-    step_h = STAIR_RISE; step_d = STAIR_RUN; step_w = 1.200
+    step_h = STAIR_RISE; step_d = STAIR_RUN; step_w = 3.200
     x_start = 1.0; n_up = 5
 
     for i in range(n_up):
@@ -452,9 +460,16 @@ class BalanceController:
         self.r_out += (r_cmd - self.r_out) * self.slew
         self.p_out += (p_cmd - self.p_out) * self.slew
         return self.r_out, self.p_out
+
     def decay(self):
-        # bei deaktivierter Balance Korrektur sanft auf 0 fahren
-        self.r_out *= 0.9; self.p_out *= 0.9
+        """Korrekturen sanft gegen 0 abklingen lassen, wenn der Balancer
+        inaktiv ist (Auto-Balance aus / Treppen-Climber aktiv). Hält die
+        Messzustände konsistent, damit das Wiedereinschalten ruckfrei ist."""
+        self.r_out += (0.0 - self.r_out) * self.slew
+        self.p_out += (0.0 - self.p_out) * self.slew
+        # gefilterte Messung mitziehen, damit update() später nicht springt
+        self._r_prev = self._r_f
+        self._p_prev = self._p_f
         return self.r_out, self.p_out
 
 
@@ -1302,10 +1317,64 @@ class SlarcController:
         self._fh_foot     = {n: (0.0, 0.0, 0.0) for n in leg_names}  # Welt-Footholds
         self._fh_from     = {n: (0.0, 0.0, 0.0) for n in leg_names}  # Schwung-Start
 
+        # ── Modus 7: empirischer Tast-Treppengang (blind, reaktiv) ────────
+        self.M7_RADIUS    = 0.22    # radialer Neutral-Standabstand
+        self.M7_Z_STAND   = -0.160  # Fuß-z unter Körper im Stand [m]
+        self.M7_Z_TOP     = -0.020  # höchste Fußlage (Workspace-nah) [m]
+        self.M7_LIFT0     = 0.07    # Grund-Anhebung beim Schwung [m]
+        self.M7_LIFT_STEP = 0.035   # Höher-Heben bei ertastetem Riser [m]
+        self.M7_STRIDE    = 0.10    # halbe fore-aft-Spanne (Vor/Zurück) [m]
+        self.M7_REACH_V   = 0.007   # Vorwärts-Tastgeschw. [m/Frame]
+        self.M7_PROBE_V   = 0.005   # Absenk-/Anhebegeschw. [m/Frame]
+        self.M7_SWEEP_V   = 0.0025  # Stand-Rückschwung [m/Frame] (5 Beine → langsamer)
+        self.M7_FOLLOW_MAX= 0.16    # max. Boden-Nachführen unter Nennstand [m]
+        self.M7_SETTLE    = 200     # Frames: erst Stand sichern, dann gehen
+        self.M7_SEEK_DB   = 8       # Frames Kontaktverlust bevor Fuß nachfasst
+        self.M7_YAW_RATE  = 0.012   # Drehrate: rad/Frame je Einheit cmd_yaw
+        self.M7_LOAD_TH   = 0.70    # Servo-Last-Schwelle = Riser/Blockade
+        self.M7_BODY_H    = 0.16    # Ziel-Körperhöhe über der Referenzstufe (Mittelbeine) [m]
+        self.M7_HREG      = 0.010   # Regler-Schritt: Mittelbeine ziehen Körper auf Zielhöhe [m/Frame]
+        self.M7_Z_CLIMB   = 0.0     # Hub-Ziel = Coxa-Höhe (Fußspitze auf Gelenkebene)
+        self.M7_STRIDE_CLIMB = 0.10 # Vorwärts-Schwenk auf Coxa-Höhe [m] (Reichweite max)
+        self.M7_LIFT_CLEAR = 0.05   # Fuß gilt als "oben", wenn < CLEAR unter Coxa
+        self.M7_LIFT_RISE  = 0.17   # ODER: Fuß um diesen Betrag über Aufsetzhöhe gehoben
+        self.M7_MAX_DEFLECT= 0.15   # max. Fußauslenkung aus Neutrallage [m] (gegen Bein-Kreuzen)
+        self.M7_LIFT_CAP   = 150    # Sicherheits-Timeout für die Hub-Phase [Frames]
+        self.M7_SHIFT_V    = 0.006  # Körper-Schub je Frame in der SHIFT-Phase [m]
+        self.M7_HEAD_KP    = 0.06   # Kursregler: Yaw-Korrektur je rad Kursfehler
+        self.M7_YAW_MAX    = 0.006  # max. Yaw-Korrektur je Frame [rad] (sanft → kein Kreuzen)
+        self.M7_YAW_SHIFT_CAP = 0.10  # max. kumulierte Yaw-Drehung je SHIFT [rad] (~5.7°)
+        # WELLENGANG-Reihenfolge der REPOS-Phase: IMMER mit dem VORDEREN Paar
+        # beginnen, dann Mitte, dann hinten. Beim Steigen setzen die Vorderbeine
+        # zuerst auf die nächste Stufe (noch Platz, kein Drücken gegen die Kante),
+        # während Mittel-/Hinterbeine die breite Stützbasis halten und zuletzt
+        # nachziehen. Hinten-zuerst schrumpfte die hintere Stütze zu früh und
+        # warf SLARC beim Vorderbein-Umsetzen nach hinten um.
+        self.M7_WAVE = ['front_right', 'front_left', 'mid_right',
+                        'mid_left', 'rear_right', 'rear_left']
+        self._m7_ready    = False
+        self._m7_state    = {n: 'STANCE' for n in leg_names}
+        self._m7_foot     = {n: [0.0, 0.0, 0.0] for n in leg_names}  # Körperframe
+        self._m7_liftz    = {n: 0.0 for n in leg_names}  # akt. Schwung-Zielhöhe
+        self._m7_wave_i   = 0       # Index des aktuell schwingenden Beins
+        self._m7_settle_left = 0    # Frames Settle-Phase übrig
+        self._m7_nocontact   = {n: 0 for n in leg_names}  # Kontaktverlust-Zähler
+        self._m7_planted_z   = {n: self.M7_Z_STAND for n in leg_names}  # gemerkte Aufsetzhöhe
+        self._m7_onstep      = {n: False for n in leg_names}  # Fuß auf einer Stufe (Regler aus)
+        self._m7_swing_n     = {n: 0 for n in leg_names}  # Frames in der Hub-Phase
+        self._m7_lift_z0     = {n: 0.0 for n in leg_names}  # Fuß-Welt-z bei Hub-Beginn
+        self._m7_phase       = 'REPOS'   # 'REPOS' (Füße umsetzen) | 'SHIFT' (Körper schieben)
+        self._m7_repos_count = 0         # wie viele Füße in dieser REPOS-Runde umgesetzt
+        self._m7_shift_prog  = 0.0       # Fortschritt der SHIFT-Phase [m]
+        self._m7_shift_yaw   = 0.0       # kumulierte Yaw-Drehung in dieser SHIFT [rad]
+        self._m7_yaw_target  = None      # zu haltender Kurs [rad] (beim Losgehen gesetzt)
+
         # StairClimber (Modus N)
         self.stair_climber = ContinuousStairClimber(self)
         # Manual Leg Tuner (M-Taste)
         self.tuner = ManualLegTuner(self)
+        # Bewegungslogger (V-Taste) — CSV für Offline-Analyse
+        self.logger = MotionLogger(self)
 
     def init_pybullet(self):
         generate_hexapod_urdf("slarc_primitives.urdf")
@@ -1556,10 +1625,322 @@ class SlarcController:
         # Lage-Feedforward für Anzeige/Balance
         self.body_pitch_cmd = self._fh_pitch
 
+    # ====================================================================
+    # MODUS 7 — Empirischer Tast-Treppengang (blind, rein reaktiv)
+    # ====================================================================
+    # KEIN Geländemodell. Jedes Schwungbein TASTET sich:
+    #   1. anheben,
+    #   2. nach vorne schwingen; spürt es einen Riser (Vorwärts-Kontakt mit
+    #      waagerechter Normale ODER Servo-Last über Schwelle), hebt es höher
+    #      und schwingt weiter — bis es über der Stufe ist,
+    #   3. weiter vor bis zum Bewegungsraum-Ende, dann absenken bis Tritt-
+    #      Kontakt (senkrechte Normale) → aufsetzen.
+    # Standbeine schieben den Körper vor (fore-aft-Sweep) und folgen per
+    # Kontakt dem Boden. Tripod-Wechsel, sobald alle Schwungbeine stehen →
+    # immer 3 Beine unten.
+    #
+    # Vollständig closed-loop über Kontakt/Last — daher NUR in der laufenden
+    # Sim bzw. auf der HW prüfbar, nicht offline. Alle Schwellen oben als
+    # M7_* gut tunebar. Auf HW: _m7_foot_contact ← Fußkraftsensor/Load,
+    # _m7_servo_load ← Present-Load-Register der ST3215.
+
+    def _m7_neutral(self, leg):
+        return (leg.mount_x + self.M7_RADIUS * math.cos(leg.mount_yaw),
+                leg.mount_y + self.M7_RADIUS * math.sin(leg.mount_yaw))
+
+    def _m7_set_leg(self, leg, fx, fy, fz):
+        """Körperframe-Fußziel → Lage-Rotation (Balancer) → IK → Servos."""
+        cidx = self.joint_map.get(f"{leg.name}_coxa_joint")
+        recovering = False
+        if cidx is not None:
+            js = p.getJointState(self.robot_id, cidx)
+            pos_err = abs(self._cmd_coxa[leg.name] - js[0])
+            load_frac = abs(js[3]) / SERVO_STALL_NM
+            recovering = self._stall[leg.name].update(pos_err, load_frac)
+        if recovering:
+            fz += self.RECOVER_LIFT
+        # ── Lage-Überlagerung (Balancer + I/K/J/L-Trim) wie im Hauptpfad ──
+        pe = getattr(self, '_m7_pitch_eff', 0.0)
+        re = getattr(self, '_m7_roll_eff', 0.0)
+        cy = math.cos(pe); sy = math.sin(pe)
+        cx = math.cos(re); sx = math.sin(re)
+        rx = fx * cy + fz * sy
+        rz = -fx * sy + fz * cy
+        ry_new = fy * cx - rz * sx
+        rz_new = fy * sx + rz * cx
+        dx = rx - leg.mount_x; dy = ry_new - leg.mount_y
+        lx =  dx * math.cos(-leg.mount_yaw) - dy * math.sin(-leg.mount_yaw)
+        ly =  dx * math.sin(-leg.mount_yaw) + dy * math.cos(-leg.mount_yaw)
+        tc, tf, tt, _ok = self.ik.solve(lx, ly, rz_new)
+        ov = self.tuner.get_override_angles(leg.name)
+        if ov: tc, tf, tt = ov
+        self.set_servo(f"{leg.name}_coxa_joint",  tc)
+        self.set_servo(f"{leg.name}_femur_joint", tf)
+        self.set_servo(f"{leg.name}_tibia_joint", tt)
+        self._cmd_coxa[leg.name] = tc
+
+    def _m7_foot_world_z(self, leg):
+        """Welt-z der Fußspitze (SIM: getLinkState; ESP32: FK aus Present-Position)."""
+        idx = self._foot_link_idx.get(leg.name, -1)
+        if idx < 0:
+            return 0.0
+        return p.getLinkState(self.robot_id, idx)[0][2]
+
+    def _m7_foot_up(self, leg):
+        """True, wenn der Fuß PHYSISCH nahe Coxa-Höhe ist. Closed-loop auf die
+        echte Beinstellung statt blindes Vertrauen ins Kommando — der weiche
+        Positionsservo hinkt dem Sollwert deutlich nach. ESP32: gleiche Prüfung
+        aus Present-Position der Femur-/Tibia-Servos."""
+        idx = self._foot_link_idx.get(leg.name, -1)
+        if idx < 0:
+            return True
+        bz = p.getBasePositionAndOrientation(self.robot_id)[0][2]
+        return (self._m7_foot_world_z(leg) - bz) >= -self.M7_LIFT_CLEAR
+
+    def _m7_foot_contact(self, leg):
+        """(touch, |nz|, horiz) aus dem Kontakt-Cache. nz=senkrecht (Tritt),
+        horiz=waagerecht (Riser)."""
+        idx = self._foot_link_idx.get(leg.name, -1)
+        if idx < 0:
+            return (False, 0.0, 0.0)
+        for c in self._contact_cache:
+            if c[3] != idx:   continue
+            if c[9] < 0.5:    continue
+            n = c[7]
+            return (True, abs(n[2]), math.hypot(n[0], n[1]))
+        return (False, 0.0, 0.0)
+
+    def _m7_servo_load(self, leg):
+        """max Last über die 3 Servos (Riser/Blockade-Erkennung), normiert."""
+        mx = 0.0
+        for j in ('coxa', 'femur', 'tibia'):
+            idx = self.joint_map.get(f"{leg.name}_{j}_joint")
+            if idx is None: continue
+            mx = max(mx, abs(p.getJointState(self.robot_id, idx)[3]))
+        return mx / SERVO_STALL_NM
+
+    def _enter_feeler(self):
+        for leg in self.legs:
+            nx, ny = self._m7_neutral(leg)
+            self._m7_foot[leg.name] = [nx, ny, self.M7_Z_STAND]
+            self._m7_state[leg.name] = 'STANCE'
+            self._m7_liftz[leg.name] = self.M7_Z_STAND + self.M7_LIFT0
+            self._m7_nocontact[leg.name] = 0
+        self._m7_wave_i = 0
+        self.body_height_offset = 0.0     # Mode 7 startet auf M7_BODY_H; W/S verstellt
+        self._m7_phase = 'REPOS'; self._m7_repos_count = 0
+        self._m7_yaw_target = None        # Kurs wird beim Losgehen erfasst
+        self._m7_onstep = {leg.name: False for leg in self.legs}
+        # NOCH NICHT schwingen — erst stabilen 6-Fuß-Stand herstellen (Settle).
+        self._m7_settle_left = self.M7_SETTLE
+        self._m7_ready = True
+        self.auto_balance = True
+        for g in self._stall.values():
+            g.reset()
+        print("[Modus 7] Tast-Gang: stelle erst stabilen Stand her "
+              "(alle Füße zum Boden), dann Pfeil↑ zum Losgehen.")
+
+    def _feeler_gait(self):
+        if not self._m7_ready:
+            self._enter_feeler()
+        self._refresh_contact_cache()
+        legmap = {leg.name: leg for leg in self.legs}
+        speed = abs(self.cmd_vel_x)
+        yaw_user = abs(self.cmd_yaw) > 1e-4
+        moving = (speed > 1e-4) or yaw_user
+        # ── KURSREGELUNG: Anfangskurs halten (IMU-Yaw), ohne die Treppe zu
+        #    "sehen". Q/E übersteuert manuell und setzt den Zielkurs neu. ──
+        yaw_now = self._read_body_yaw()
+        if self._m7_yaw_target is None:
+            self._m7_yaw_target = yaw_now
+        if yaw_user:
+            self._m7_yaw_target = yaw_now           # manuelles Lenken → neuer Sollkurs
+            dyaw = self.cmd_yaw * self.M7_YAW_RATE
+        else:
+            err = math.atan2(math.sin(yaw_now - self._m7_yaw_target),
+                             math.cos(yaw_now - self._m7_yaw_target))  # [-pi,pi]
+            dyaw = _clamp(-self.M7_HEAD_KP * err, -self.M7_YAW_MAX, self.M7_YAW_MAX)
+        yawing = abs(dyaw) > 1e-6
+
+        # ── Balancer zuerst berechnen (gilt auch für Settle + alle Beine) ──
+        if self.auto_balance:
+            roll_m, pitch_m = self._read_body_attitude()
+            self.roll_bal, self.pitch_bal = self.balance.update(
+                roll_m, pitch_m, 1.0 / 240.0)
+        else:
+            self.roll_bal, self.pitch_bal = self.balance.decay()
+        self._m7_pitch_eff = self.pitch_bal + self.pitch
+        self._m7_roll_eff  = self.roll_bal + self.roll
+
+        # ── SETTLE: erst stabilen Stand herstellen. ALLE Füße fahren nach
+        #    unten, bis sie Boden spüren → geplanteter 6-Fuß-Stand, bevor
+        #    überhaupt ein Bein schwingt. Behebt das Hochbocken auf 2 Beinen. ──
+        if self._m7_settle_left > 0:
+            self._m7_settle_left -= 1
+            self._m7_pitch_eff = 0.0; self._m7_roll_eff = 0.0  # Balance aus im Settle
+            floor = self.M7_Z_STAND - self.M7_FOLLOW_MAX
+            ncon = 0
+            for leg in self.legs:
+                f = self._m7_foot[leg.name]
+                touch, nz, horiz = self._m7_foot_contact(leg)
+                if touch:
+                    ncon += 1
+                    self._m7_planted_z[leg.name] = f[2]    # Aufsetzhöhe merken
+                elif f[2] > floor:
+                    f[2] -= self.M7_PROBE_V                # zum Boden ausfahren
+                self._m7_set_leg(leg, f[0], f[1], f[2])
+            # Sobald genug Füße tragen, Settle früh beenden und Stand merken
+            if ncon >= 5 and self._m7_settle_left > 6:
+                self._m7_settle_left = 6
+            if self._m7_settle_left == 0:
+                self._m7_phase = 'REPOS'; self._m7_repos_count = 0
+                self._m7_yaw_target = self._read_body_yaw()   # Kurs jetzt halten
+                self._m7_wave_i = 0
+                n0 = self.M7_WAVE[self._m7_wave_i]     # erstes Schwungbein lösen
+                self._m7_state[n0] = 'LIFT'
+                self._m7_liftz[n0] = self.M7_Z_STAND + self.M7_LIFT0
+                self._m7_swing_n[n0] = 0
+            return
+
+        # Gemeinsamer Stand-Halter mit ZWINGENDEM Bodenkontakt je Bein:
+        # Hat ein Bein KEINEN Kontakt → fährt es nach unten aus, bis es greift
+        # (gegated durch den Kontakt → kein Überstrecken). So bleibt kein Fuß in
+        # der Luft hängen, egal auf welcher Ebene er steht. Die Körperhöhe regelt
+        # danach separat über die Mittelbein-Referenz (verschiebt ALLE Beine).
+        floor = -(self.M7_BODY_H + self.body_height_offset) - self.M7_FOLLOW_MAX
+        def _hold(n):
+            f = self._m7_foot[n]
+            touch, nz, horiz = self._m7_foot_contact(legmap[n])
+            if not touch and self._m7_planted_z[n] > floor:
+                self._m7_planted_z[n] -= self.M7_PROBE_V   # Boden suchen bis Kontakt
+            f[2] = self._m7_planted_z[n]
+            self._m7_nocontact[n] = 0 if touch else self._m7_nocontact[n] + 1
+
+        if not moving:
+            for n in legmap:
+                _hold(n)
+        elif self._m7_phase == 'REPOS':
+            # ── PHASE 1: Füße EINZELN nach vorn umsetzen (Körper steht still) ──
+            swing_leg = self.M7_WAVE[self._m7_wave_i]
+            for n in legmap:
+                if n != swing_leg:
+                    _hold(n)
+                    continue
+                f = self._m7_foot[n]; nx, ny = self._m7_neutral(legmap[n])
+                st = self._m7_state[n]
+                if st == 'LIFT':
+                    # Femur hoch: Fußspitze auf COXA-HÖHE, dabei einklappen.
+                    # Weiter, sobald der Fuß PHYSISCH genug gestiegen ist:
+                    # relativer Hub (klärt die Stufe, unabhängig von der
+                    # Körperhöhe) ODER absolute Coxa-Höhe — was zuerst kommt.
+                    # Behebt das endlose Warten beim Klettern (hoher Körper →
+                    # absolute Coxa-Höhe kinematisch unerreichbar).
+                    if self._m7_swing_n[n] == 0:
+                        self._m7_lift_z0[n] = self._m7_foot_world_z(legmap[n])
+                    f[2] = min(f[2] + self.M7_LIFT_STEP, self.M7_Z_CLIMB)
+                    f[0] += (nx - f[0]) * 0.30
+                    self._m7_swing_n[n] += 1
+                    risen = self._m7_foot_world_z(legmap[n]) - self._m7_lift_z0[n]
+                    if (risen >= self.M7_LIFT_RISE or self._m7_foot_up(legmap[n])
+                            or self._m7_swing_n[n] > self.M7_LIFT_CAP):
+                        self._m7_state[n] = 'REACH'
+                elif st == 'REACH':
+                    # Coxa auf Coxa-Höhe nach vorn schwenken (über jede Kante).
+                    f[0] += self.M7_REACH_V
+                    if f[0] >= nx + self.M7_STRIDE:
+                        self._m7_state[n] = 'PROBE'
+                elif st == 'PROBE':
+                    f[2] -= self.M7_PROBE_V
+                    touch, nz, horiz = self._m7_foot_contact(legmap[n])
+                    planted = (touch and nz >= horiz) or (f[2] <= -0.30)
+                    if planted:
+                        self._m7_state[n] = 'STANCE'
+                        self._m7_planted_z[n] = f[2]
+                        self._m7_nocontact[n] = 0
+                        self._m7_onstep[n] = (f[2] > self.M7_Z_STAND + 0.05)
+                        # nächsten Fuß umsetzen, oder wenn alle umgesetzt → SHIFT
+                        self._m7_repos_count += 1
+                        if self._m7_repos_count >= len(self.M7_WAVE):
+                            self._m7_phase = 'SHIFT'
+                            self._m7_shift_prog = 0.0
+                            self._m7_shift_yaw = 0.0
+                        else:
+                            self._m7_wave_i = (self._m7_wave_i + 1) % len(self.M7_WAVE)
+                            n0 = self.M7_WAVE[self._m7_wave_i]
+                            self._m7_state[n0] = 'LIFT'
+                            self._m7_swing_n[n0] = 0
+                            self._m7_onstep[n0] = False
+                            ox, oy = self._m7_neutral(legmap[n0])
+                            self._m7_foot[n0][0] = ox; self._m7_foot[n0][1] = oy
+        else:
+            # ── PHASE 2: Körper mit ALLEN sechs Beinen gleichzeitig schieben ──
+            # Alle Standfüße schwenken zusammen rückwärts (nx+STRIDE → nx-STRIDE)
+            # → der Körper wird als Ganzes nach vorn getragen. Alle greifen,
+            #   kein Bein arbeitet gegen ein anderes → echter Vortrieb, kein Rutsch.
+            # Fortschritt über einen Zähler messen, nicht über die Ist-Position
+            # der Füße — die Auslenkungs-Begrenzung/Yaw verschiebt f[0] sonst so,
+            # dass die "alle am Ziel"-Bedingung nie sicher greift.
+            self._m7_shift_prog += self.M7_SHIFT_V
+            # Yaw-Drehung dieses Frames, gedeckelt auf die pro-SHIFT-Grenze,
+            # damit die Kurskorrektur die Füße nicht in Kreuzungslage schwenkt.
+            d = dyaw if yawing else 0.0
+            if d:
+                d = _clamp(d, -self.M7_YAW_SHIFT_CAP - self._m7_shift_yaw,
+                              self.M7_YAW_SHIFT_CAP - self._m7_shift_yaw)
+                self._m7_shift_yaw += d
+            for n in legmap:
+                f = self._m7_foot[n]; nx, ny = self._m7_neutral(legmap[n])
+                target = nx - self.M7_STRIDE
+                f[0] = max(f[0] - self.M7_SHIFT_V, target)   # zusammen rückwärts
+                if d:                            # Kurskorrektur (gedeckelt)
+                    c2, s2 = math.cos(-d), math.sin(-d)
+                    f[0], f[1] = f[0] * c2 - f[1] * s2, f[0] * s2 + f[1] * c2
+                _hold(n)                          # Höhe halten
+            if self._m7_shift_prog >= 2.0 * self.M7_STRIDE:   # Schub fertig
+                self._m7_phase = 'REPOS'
+                self._m7_repos_count = 0
+                self._m7_wave_i = 0
+                n0 = self.M7_WAVE[0]
+                self._m7_state[n0] = 'LIFT'; self._m7_swing_n[n0] = 0
+                self._m7_onstep[n0] = False
+                ox, oy = self._m7_neutral(legmap[n0])
+                self._m7_foot[n0][0] = ox; self._m7_foot[n0][1] = oy
+
+        # ── Körperhöhen-Regelung: Referenz = MITTELBEINE (Lage der Referenzstufe) ──
+        # Gegated auf BODENKONTAKT der Mittelbeine (= die Referenz). Der GANZE
+        # Körper wird so verschoben, dass die Mittelbeine auf Zielhöhe
+        # -(BODY_H + W/S-Offset) stehen — ALLE Standbeine gemeinsam, damit
+        # Gelände-Differenzen (vorn höher, hinten tiefer) erhalten bleiben und der
+        # einzelne Mittelfuß NICHT von seiner Stufe gezogen wird (Hänge-Oszill.).
+        # WICHTIG: NICHT auf "alle Beine Kontakt" gaten — beim Klettern erreichen
+        # die Hinterbeine die tiefere Ebene erst, wenn der Körper (auf Mittelbein-
+        # Referenz) sinkt. "Alle Kontakt" ist das Ergebnis, nicht die Bedingung.
+        mids = [n for n in ('mid_right', 'mid_left')
+                if self._m7_state[n] == 'STANCE'
+                and self._m7_foot_contact(legmap[n])[0]]
+        if mids:
+            mid_depth = sum(self._m7_planted_z[n] for n in mids) / len(mids)
+            target = -(self.M7_BODY_H + self.body_height_offset)
+            shift = _clamp(target - mid_depth, -self.M7_HREG, self.M7_HREG)
+            for n in legmap:
+                if self._m7_state[n] == 'STANCE':
+                    self._m7_planted_z[n] += shift
+                    self._m7_foot[n][2] = self._m7_planted_z[n]
+
+        # ── IK für alle Beine ──
+        for leg in self.legs:
+            fx, fy, fz = self._m7_foot[leg.name]
+            self._m7_set_leg(leg, fx, fy, fz)
+
     def update_gait(self):
         # Modus 6 hat einen eigenen, vollständigen Pfad
         if self.gait_mode == 6:
             self._stair_freegait()
+            return
+
+        # Modus 7: empirischer Tast-Treppengang (eigener Pfad)
+        if self.gait_mode == 7:
+            self._feeler_gait()
             return
 
         # Kontakt-Cache einmal pro Frame aktualisieren (Performance)
@@ -1951,7 +2332,7 @@ class SlarcController:
                 # Anzeige bleibt ≤100% und Sättigung wird als echtes Problem
                 # sichtbar (Bein sackt), statt dass der Sim 'schummelt'.
                 force=SERVO_STALL_NM, maxVelocity=4.0,
-                positionGain=0.05, velocityGain=1.0)
+                positionGain=SERVO_POS_GAIN, velocityGain=1.0)
 
     def _refresh_contact_cache(self):
         """Kontaktpunkte einmal pro Frame cachen — spart 6× getContactPoints()."""
@@ -2077,6 +2458,16 @@ class SlarcController:
         roll, pitch, _ = p.getEulerFromQuaternion(orn)
         return roll, pitch
 
+    def _read_body_yaw(self):
+        """Körper-Gierwinkel [rad] (Kurs). SIM: aus der Basis-Orientierung.
+        ESP32: IMU-Yaw (BNO055 liefert ihn fusioniert; MPU6050 per Magnetometer/
+        Gyro-Integration). Nur für die Kurshaltung in Modus 7 nötig."""
+        if self.robot_id is None:
+            return 0.0
+        _, orn = p.getBasePositionAndOrientation(self.robot_id)
+        _, _, yaw = p.getEulerFromQuaternion(orn)
+        return yaw
+
     def set_gait_from_perception(self, seg_dominant, normal_variance):
         """
         Kopplung an AI Perception-System.
@@ -2149,7 +2540,7 @@ class SlarcController:
                 if self.tuner.active:
                     # ── Tuner-Modus: 1-6 = Bein wählen ─────────────────
                     for i, k in enumerate([ord('1'),ord('2'),ord('3'),
-                                           ord('4'),ord('5'),ord('6')]):
+                                           ord('4'),ord('5'),ord('6'),ord('7')]):
                         if key == k:
                             self.tuner.select_leg(i)
                     if key == ord(' '): self.tuner.log_current()
@@ -2214,6 +2605,14 @@ class SlarcController:
                               "Tripod-Gang. Pfeil↑ = klettern, Pfeil↓ = zurück.")
                         print("   Footholds werden auf Tritt-Mitten geplant "
                               "(kein Wackeln). Modus 5 bleibt Fallback.")
+                    if key == ord('9'):
+                        self.gait_mode = 7
+                        self._m7_ready = False   # beim ersten Frame initialisieren
+                        for g in self._stall.values(): g.reset()
+                        print("Modus 7 (Taste 9): TREPPE — empirischer TAST-Gang "
+                              "(blind). Pfeil↑ = losgehen. Beine ertasten die Stufen.")
+                        print("   Kein Geländemodell — Kontakt + Servo-Last. "
+                              "Schwellen M7_* tunebar. Modus 5 bleibt Fallback.")
                     if key == ord('n'):
                         # Alte Auto-Sequenz war zu starr → Klettermodus nutzen.
                         print("ℹ️  N-Sequenz ersetzt: bitte Modus 5 (Klettern) verwenden.")
@@ -2260,6 +2659,8 @@ class SlarcController:
                         print("Auto-Balance:", "AN" if self.auto_balance else "AUS")
                     if key == ord('y'):
                         self.toggle_wobble()
+                    if key == ord('v'):
+                        self.logger.toggle()
 
     def update_camera_debug(self):
         if not self._show_cam or self.cameras is None:
@@ -2277,59 +2678,78 @@ class SlarcController:
 
     def update_torque_display(self):
         """
-        Gut sichtbares Drehmoment-Feedback:
-          • dicker, farbiger Balken pro Bein (Höhe ∝ Last) am jeweiligen Fuß
-          • große, persistente %-Anzeige des Maximums über dem Körper
-        Persistente Items via replaceItemUniqueId (kein Flackern), alle 8 Frames.
+        Per-SERVO-Drehmomentfeedback (Coxa/Femur/Tibia getrennt):
+          • ein Balken pro Bein am Fuß, Höhe ∝ Last, Farbe = welcher Servo-Typ
+            dominiert (Coxa=cyan, Femur=gelb, Tibia=magenta)
+          • zwei persistente Textzeilen über dem Körper:
+              WORST: <SERVO> <%>  [<bein>]
+              max   Coxa <%> | Femur <%> | Tibia <%>
+            → zeigt direkt, ob die Coxa-Gelenke das Problem sind.
+        Persistente Items via replaceItemUniqueId, alle 8 Frames.
         """
         if not hasattr(self, '_torque_init'):
             self._torque_init = True
             self._torque_frame = 0
-            # Joint-Indices pro Bein gruppieren (coxa/femur/tibia, ohne foot)
-            self._leg_joint_idx = {}
+            # Joint-Indices pro Bein NACH TYP (coxa/femur/tibia)
+            self._leg_servo_idx = {}   # leg -> {'coxa':i,'femur':i,'tibia':i}
             for i in range(p.getNumJoints(self.robot_id)):
                 nm = p.getJointInfo(self.robot_id, i)[1].decode('utf-8')
                 if 'foot' in nm:
                     continue
                 for leg in self.legs:
                     if nm.startswith(leg.name):
-                        self._leg_joint_idx.setdefault(leg.name, []).append(i)
+                        d = self._leg_servo_idx.setdefault(leg.name, {})
+                        if   'coxa'  in nm: d['coxa']  = i
+                        elif 'femur' in nm: d['femur'] = i
+                        elif 'tibia' in nm: d['tibia'] = i
                         break
-            self._bar_ids = {}     # leg_name -> debug line id
-            self._txt_id = None
-            self._tau_lp = {}      # leg_name -> tiefpassgefiltertes Verhältnis
+            self._bar_ids = {}
+            self._txt_id = None; self._txt2_id = None
+            self._tau_lp = {}      # (leg, typ) -> tiefpassgefiltertes Verhältnis
 
         self._torque_frame += 1
         if self._torque_frame % 8 != 0:
             return
 
         TAU_MAX = SERVO_STALL_NM; WARN = 0.50; CRIT = 0.80
+        TYPE_COL = {'coxa': [0.1, 0.8, 0.9],     # cyan
+                    'femur': [1.0, 0.8, 0.0],    # gelb
+                    'tibia': [0.9, 0.2, 0.9]}    # magenta
 
         def col(r):
             return ([0.1, 0.9, 0.1] if r < WARN else
                     [1.0, 0.75, 0.0] if r < CRIT else [1.0, 0.1, 0.1])
 
-        overall = 0.0; overall_leg = ""
+        type_max = {'coxa': 0.0, 'femur': 0.0, 'tibia': 0.0}
+        type_max_leg = {'coxa': '', 'femur': '', 'tibia': ''}
+        worst = 0.0; worst_type = ''; worst_leg = ''
+
         for leg in self.legs:
-            idxs = self._leg_joint_idx.get(leg.name, [])
-            if not idxs:
+            servos = self._leg_servo_idx.get(leg.name, {})
+            if not servos:
                 continue
-            raw = max(abs(p.getJointState(self.robot_id, i)[3]) for i in idxs) / TAU_MAX
-            # Tiefpass: anhaltende Last statt Aufprall-/Beschleunigungsspitzen
-            lp = self._tau_lp.get(leg.name, raw)
-            lp += (raw - lp) * 0.20
-            self._tau_lp[leg.name] = lp
-            ratio = min(lp, 1.0)
-            if ratio > overall:
-                overall = ratio; overall_leg = leg.name
-            # Balken am Fuß: senkrecht, Höhe ∝ Last, dick & farbig
+            leg_max = 0.0; leg_dom = 'femur'
+            for typ, idx in servos.items():
+                raw = abs(p.getJointState(self.robot_id, idx)[3]) / TAU_MAX
+                key = (leg.name, typ)
+                lp = self._tau_lp.get(key, raw)
+                lp += (raw - lp) * 0.20
+                self._tau_lp[key] = lp
+                r = min(lp, 1.0)
+                if r > type_max[typ]:
+                    type_max[typ] = r; type_max_leg[typ] = leg.name
+                if r > leg_max:
+                    leg_max = r; leg_dom = typ
+                if r > worst:
+                    worst = r; worst_type = typ; worst_leg = leg.name
+            # Balken am Fuß, gefärbt nach dominierendem Servo-Typ
             fidx = self._foot_link_idx.get(leg.name, -1)
             if fidx < 0:
                 continue
             fp = p.getLinkState(self.robot_id, fidx)[0]
             base = [fp[0], fp[1], fp[2] + 0.02]
-            top  = [fp[0], fp[1], fp[2] + 0.02 + 0.06 + ratio * 0.32]
-            c = col(ratio)
+            top  = [fp[0], fp[1], fp[2] + 0.02 + 0.06 + leg_max * 0.32]
+            c = TYPE_COL[leg_dom]
             if leg.name in self._bar_ids:
                 self._bar_ids[leg.name] = p.addUserDebugLine(
                     base, top, lineColorRGB=c, lineWidth=14,
@@ -2339,16 +2759,143 @@ class SlarcController:
                     base, top, lineColorRGB=c, lineWidth=14)
 
         pos, _ = p.getBasePositionAndOrientation(self.robot_id)
-        txt = f"{overall*100:.0f}%  tau (Dauerlast)  [{overall_leg.replace('_',' ')}]"
-        tpos = [pos[0], pos[1], pos[2] + 0.55]
-        c = col(overall)
+        line1 = (f"WORST: {worst_type.upper()} {worst*100:.0f}%  "
+                 f"[{worst_leg.replace('_',' ')}]")
+        line2 = (f"max  Coxa {type_max['coxa']*100:.0f}% | "
+                 f"Femur {type_max['femur']*100:.0f}% | "
+                 f"Tibia {type_max['tibia']*100:.0f}%")
+        c = col(worst)
+        t1 = [pos[0], pos[1], pos[2] + 0.60]
+        t2 = [pos[0], pos[1], pos[2] + 0.50]
         if self._txt_id is not None:
-            self._txt_id = p.addUserDebugText(
-                txt, tpos, textColorRGB=c, textSize=2.6,
-                replaceItemUniqueId=self._txt_id)
+            self._txt_id = p.addUserDebugText(line1, t1, textColorRGB=c,
+                                textSize=2.4, replaceItemUniqueId=self._txt_id)
         else:
-            self._txt_id = p.addUserDebugText(
-                txt, tpos, textColorRGB=c, textSize=2.6)
+            self._txt_id = p.addUserDebugText(line1, t1, textColorRGB=c,
+                                textSize=2.4)
+        if self._txt2_id is not None:
+            self._txt2_id = p.addUserDebugText(line2, t2,
+                                textColorRGB=[0.85, 0.85, 0.85], textSize=1.8,
+                                replaceItemUniqueId=self._txt2_id)
+        else:
+            self._txt2_id = p.addUserDebugText(line2, t2,
+                                textColorRGB=[0.85, 0.85, 0.85], textSize=1.8)
+
+
+# ==========================================
+# Bewegungslogger (Sim-only) — Taste V
+# ==========================================
+class MotionLogger:
+    """
+    Schreibt pro N Frames eine CSV-Zeile mit dem REALEN Closed-Loop-Zustand:
+      Körperpose (x/y/z, roll/pitch/yaw), Körpergeschwindigkeit (lin/ang),
+      Balancer (roll_bal/pitch_bal), Fahrbefehl (cmd_vx/cmd_yaw) und je Bein
+      Fuß-Weltposition, Bodenkontakt, die drei Servo-Drehmomente sowie den
+      Mode-7-Tastzustand.
+    Zweck: Test live laufen lassen → CSV hochladen → Verhalten an Messdaten
+    analysieren (z.B. wann/warum Pitch wegkippt, welche Füße dann Kontakt
+    haben, welche Servos sättigen, ob der Balancer greift).
+    Taste V startet/stoppt. Datei landet im Arbeitsverzeichnis.
+    """
+    LEG_ORDER = ['front_right', 'front_left', 'mid_right',
+                 'mid_left', 'rear_right', 'rear_left']
+
+    def __init__(self, ctrl, decimate=4):
+        self.ctrl = ctrl
+        self.decimate = max(1, int(decimate))   # 240 Hz / 4 = 60 Hz
+        self.active = False
+        self.f = None
+        self.path = None
+        self.frame = 0
+        self.rows = 0
+        self.t0 = None
+
+    def _legs(self):
+        names = {l.name for l in self.ctrl.legs}
+        return [n for n in self.LEG_ORDER if n in names]
+
+    def _header(self):
+        cols = ["t", "frame", "mode", "bx", "by", "bz",
+                "roll", "pitch", "yaw", "vx", "vy", "vz",
+                "wx", "wy", "wz", "cmd_vx", "cmd_yaw",
+                "roll_bal", "pitch_bal"]
+        for n in self._legs():
+            cols += [f"{n}_fx", f"{n}_fy", f"{n}_fz", f"{n}_contact",
+                     f"{n}_tau_coxa", f"{n}_tau_femur", f"{n}_tau_tibia",
+                     f"{n}_state"]
+        return cols
+
+    def toggle(self):
+        self.stop() if self.active else self.start()
+
+    def start(self):
+        import os, time, csv
+        if self.ctrl.robot_id is None:
+            print("[Logger] Roboter noch nicht bereit."); return
+        ts = time.strftime("%Y%m%d_%H%M%S")
+        self.path = os.path.join(os.getcwd(), f"slarc_log_{ts}.csv")
+        self.f = open(self.path, "w", newline="")
+        self.writer = csv.writer(self.f)
+        self.writer.writerow(self._header())
+        self.active = True; self.frame = 0; self.rows = 0; self.t0 = None
+        print(f"[Logger] AUFNAHME gestartet → {self.path}  (Taste V stoppt)")
+
+    def stop(self):
+        if not self.active: return
+        self.active = False
+        try:
+            self.f.flush(); self.f.close()
+        except Exception:
+            pass
+        print(f"[Logger] gestoppt. {self.rows} Zeilen → {self.path}")
+
+    def tick(self):
+        if not self.active or self.ctrl.robot_id is None:
+            return
+        self.frame += 1
+        if self.frame % self.decimate != 0:
+            return
+        import time
+        c = self.ctrl; rid = c.robot_id
+        if self.t0 is None:
+            self.t0 = time.time()
+        t = time.time() - self.t0
+        pos, orn = p.getBasePositionAndOrientation(rid)
+        roll, pitch, yaw = p.getEulerFromQuaternion(orn)
+        lin, ang = p.getBaseVelocity(rid)
+        # Bodenkontakte einsammeln (Fuß-Link-Index → True)
+        contacts = {}
+        for ct in (p.getContactPoints(bodyA=rid) or []):
+            if ct[9] >= 0.5:
+                contacts[ct[3]] = True
+        row = [f"{t:.3f}", self.frame, c.gait_mode,
+               f"{pos[0]:.4f}", f"{pos[1]:.4f}", f"{pos[2]:.4f}",
+               f"{roll:.4f}", f"{pitch:.4f}", f"{yaw:.4f}",
+               f"{lin[0]:.4f}", f"{lin[1]:.4f}", f"{lin[2]:.4f}",
+               f"{ang[0]:.4f}", f"{ang[1]:.4f}", f"{ang[2]:.4f}",
+               f"{c.cmd_vel_x:.3f}", f"{getattr(c,'cmd_yaw',0.0):.3f}",
+               f"{getattr(c,'roll_bal',0.0):.4f}",
+               f"{getattr(c,'pitch_bal',0.0):.4f}"]
+        for n in self._legs():
+            fidx = c._foot_link_idx.get(n, -1)
+            if fidx >= 0:
+                fp = p.getLinkState(rid, fidx)[0]
+                fx, fy, fz = fp[0], fp[1], fp[2]
+                con = 1 if fidx in contacts else 0
+            else:
+                fx = fy = fz = 0.0; con = 0
+            taus = []
+            for j in ('coxa', 'femur', 'tibia'):
+                jidx = c.joint_map.get(f"{n}_{j}_joint")
+                taus.append(abs(p.getJointState(rid, jidx)[3])
+                            if jidx is not None else 0.0)
+            state = c._m7_state.get(n, '') if c.gait_mode == 7 else ''
+            row += [f"{fx:.4f}", f"{fy:.4f}", f"{fz:.4f}", con,
+                    f"{taus[0]:.3f}", f"{taus[1]:.3f}", f"{taus[2]:.3f}", state]
+        self.writer.writerow(row)
+        self.rows += 1
+        if self.rows % 120 == 0:      # ~alle 2 s sichern
+            self.f.flush()
 
 
 # ==========================================
@@ -2358,7 +2905,7 @@ def main():
     robot = SlarcController()
     robot.init_pybullet()
 
-    print("\n=== SLARC V5 — Flex-IK + Balance-Overlay + StairClimber ===")
+    print("\n=== SLARC V6 — Flex-IK + Balance + StallGuard + Treppen-Modi ===")
     print(f" Schritthöhe max : {robot.STEP_H_MAX*100:.0f} cm  (Femur 90°/Knie 160°)")
     print(f" Körperhöhe      : 0 … {robot.kin.BODY_H_MAX*100:.0f} cm")
     print(f" Schrittlänge max: {robot.MAX_STRIDE*100:.0f} cm  (kollisionsfrei)")
@@ -2373,12 +2920,17 @@ def main():
     print(" Y         : Wackelbrett ein/aus (Balance im Gehen testen)")
     print(" 1/2/3/4   : Tripod / Ripple / Adaptiv(Terrain) / Zentaur")
     print(" 5         : TREPPE — angestellter Wellengang (5 erneut: FIXED↔ADAPTIV)")
+    print(" 6         : TREPPE — deterministischer Foothold-Tripod-Gang")
+    print(" 7         : TREPPE — empirischer TAST-Gang (blind, Kontakt/Last)")
     print(" T/G       : Greifer heben/absenken (bis -34cm)  F/H : vor/zurück")
     print(" Leertaste : Greifer Auf/Zu")
     print(" P / O     : Schritthöhe +/-0.8cm (kinematisch begrenzt)")
     print(" + / -  o. 8/7: Schrittlänge +/-2cm (kollisionsfrei begrenzt)")
     print(" C         : Kamera-Debug an/aus")
+    print(" V         : Bewegungslogger an/aus (CSV → Arbeitsverzeichnis)")
     print(" R         : Reset (auch Treppen-Abbruch + Balance)")
+    print(" Drehmoment-Anzeige: Balkenfarbe = dominierender Servo")
+    print("   (Coxa=cyan, Femur=gelb, Tibia=magenta); Text zeigt max je Typ.")
     print(" ─────────────────────────────────────────────")
     print(" Treppen steigen (Modus 5 — Treppe als schiefe Ebene):")
     print("   • Prinzip: Körper wird in den Stufenwinkel angestellt, dann")
@@ -2410,6 +2962,7 @@ def main():
             robot.update_torque_display()
             robot.tuner.update_display()
             p.stepSimulation()
+            robot.logger.tick()
             time.sleep(1. / 240.)
     except KeyboardInterrupt:
         p.disconnect()
