@@ -1,0 +1,9 @@
+# Gesamtscore 7.214  (Gen 44)
+self.G_CLIMB_REAR_FWD = 0.01376
+self.G_COM_SHIFT = 0.03358
+self.G_COM_RAMP = 0.00031
+self.G_CLIMB_CLEAR = 0.06997
+self.G_CLIMB_LIFT = 0.06037
+self.G_CLIMB_H_KP = 0.02492
+self.G_H_LOW_LP = 0.02000
+self.G_CLIMB_DIR_DB = 0.07247

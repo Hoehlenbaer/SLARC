@@ -1,0 +1,241 @@
+<?xml version="1.0"?>
+<robot name="slarc">
+    <link name="base_link">
+        <visual><geometry><box size="0.4 0.15 0.04"/></geometry><material name="grey"><color rgba="0.5 0.5 0.5 1"/></material></visual>
+        <collision><geometry><box size="0.4 0.15 0.04"/></geometry></collision>
+        <inertial><mass value="1.29"/><inertia ixx="0.015" ixy="0" ixz="0" iyy="0.015" iyz="0" izz="0.015"/></inertial>
+    </link>
+    <joint name="front_right_coxa_joint" type="revolute">
+        <parent link="base_link"/><child link="front_right_coxa"/>
+        <origin xyz="0.2 -0.075 0" rpy="0 0 -0.5235987755982988"/><axis xyz="0 0 1"/>
+        <limit lower="-3.14" upper="3.14" effort="3.0" velocity="3.14"/>
+    </joint>
+    <link name="front_right_coxa">
+        <visual><origin xyz="0.03 0 0"/><geometry><box size="0.06 0.02 0.02"/></geometry><material name="red"><color rgba="0.8 0.2 0.2 1"/></material></visual>
+        <collision><origin xyz="0.03 0 0"/><geometry><box size="0.06 0.02 0.02"/></geometry></collision>
+        <inertial><mass value="0.080"/><inertia ixx="0.0002" ixy="0" ixz="0" iyy="0.0002" iyz="0" izz="0.0002"/></inertial>
+    </link>
+    <joint name="front_right_femur_joint" type="revolute">
+        <parent link="front_right_coxa"/><child link="front_right_femur"/>
+        <origin xyz="0.06 0 0" rpy="0 0 0"/><axis xyz="0 1 0"/>
+        <limit lower="-3.14" upper="3.14" effort="3.0" velocity="3.14"/>
+    </joint>
+    <link name="front_right_femur">
+        <visual><origin xyz="0.0875 0 0"/><geometry><box size="0.175 0.02 0.02"/></geometry><material name="green"><color rgba="0.2 0.8 0.2 1"/></material></visual>
+        <collision><origin xyz="0.0875 0 0"/><geometry><box size="0.175 0.02 0.02"/></geometry></collision>
+        <inertial><mass value="0.095"/><inertia ixx="0.0003" ixy="0" ixz="0" iyy="0.0003" iyz="0" izz="0.0003"/></inertial>
+    </link>
+    <joint name="front_right_tibia_joint" type="revolute">
+        <parent link="front_right_femur"/><child link="front_right_tibia"/>
+        <origin xyz="0.175 0 0" rpy="0 0 0"/><axis xyz="0 1 0"/>
+        <limit lower="-3.14" upper="3.14" effort="3.0" velocity="3.14"/>
+    </joint>
+    <link name="front_right_tibia">
+        <visual><origin xyz="0.075 0 0"/><geometry><box size="0.15 0.015 0.015"/></geometry><material name="blue"><color rgba="0.2 0.2 0.8 1"/></material></visual>
+        <collision><origin xyz="0.075 0 0"/><geometry><box size="0.15 0.015 0.015"/></geometry></collision>
+        <inertial><mass value="0.025"/><inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/></inertial>
+    </link>
+    <joint name="front_right_foot_joint" type="fixed">
+        <parent link="front_right_tibia"/><child link="front_right_foot"/>
+        <origin xyz="0.15 0 0" rpy="0 0 0"/>
+    </joint>
+    <link name="front_right_foot">
+        <visual><geometry><sphere radius="0.015"/></geometry><material name="black"><color rgba="0 0 0 1"/></material></visual>
+        <collision><geometry><sphere radius="0.015"/></geometry></collision>
+        <inertial><mass value="0.015"/><inertia ixx="0.00002" ixy="0" ixz="0" iyy="0.00002" iyz="0" izz="0.00002"/></inertial>
+    </link>
+    <joint name="front_left_coxa_joint" type="revolute">
+        <parent link="base_link"/><child link="front_left_coxa"/>
+        <origin xyz="0.2 0.075 0" rpy="0 0 0.5235987755982988"/><axis xyz="0 0 1"/>
+        <limit lower="-3.14" upper="3.14" effort="3.0" velocity="3.14"/>
+    </joint>
+    <link name="front_left_coxa">
+        <visual><origin xyz="0.03 0 0"/><geometry><box size="0.06 0.02 0.02"/></geometry><material name="red"><color rgba="0.8 0.2 0.2 1"/></material></visual>
+        <collision><origin xyz="0.03 0 0"/><geometry><box size="0.06 0.02 0.02"/></geometry></collision>
+        <inertial><mass value="0.080"/><inertia ixx="0.0002" ixy="0" ixz="0" iyy="0.0002" iyz="0" izz="0.0002"/></inertial>
+    </link>
+    <joint name="front_left_femur_joint" type="revolute">
+        <parent link="front_left_coxa"/><child link="front_left_femur"/>
+        <origin xyz="0.06 0 0" rpy="0 0 0"/><axis xyz="0 1 0"/>
+        <limit lower="-3.14" upper="3.14" effort="3.0" velocity="3.14"/>
+    </joint>
+    <link name="front_left_femur">
+        <visual><origin xyz="0.0875 0 0"/><geometry><box size="0.175 0.02 0.02"/></geometry><material name="green"><color rgba="0.2 0.8 0.2 1"/></material></visual>
+        <collision><origin xyz="0.0875 0 0"/><geometry><box size="0.175 0.02 0.02"/></geometry></collision>
+        <inertial><mass value="0.095"/><inertia ixx="0.0003" ixy="0" ixz="0" iyy="0.0003" iyz="0" izz="0.0003"/></inertial>
+    </link>
+    <joint name="front_left_tibia_joint" type="revolute">
+        <parent link="front_left_femur"/><child link="front_left_tibia"/>
+        <origin xyz="0.175 0 0" rpy="0 0 0"/><axis xyz="0 1 0"/>
+        <limit lower="-3.14" upper="3.14" effort="3.0" velocity="3.14"/>
+    </joint>
+    <link name="front_left_tibia">
+        <visual><origin xyz="0.075 0 0"/><geometry><box size="0.15 0.015 0.015"/></geometry><material name="blue"><color rgba="0.2 0.2 0.8 1"/></material></visual>
+        <collision><origin xyz="0.075 0 0"/><geometry><box size="0.15 0.015 0.015"/></geometry></collision>
+        <inertial><mass value="0.025"/><inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/></inertial>
+    </link>
+    <joint name="front_left_foot_joint" type="fixed">
+        <parent link="front_left_tibia"/><child link="front_left_foot"/>
+        <origin xyz="0.15 0 0" rpy="0 0 0"/>
+    </joint>
+    <link name="front_left_foot">
+        <visual><geometry><sphere radius="0.015"/></geometry><material name="black"><color rgba="0 0 0 1"/></material></visual>
+        <collision><geometry><sphere radius="0.015"/></geometry></collision>
+        <inertial><mass value="0.015"/><inertia ixx="0.00002" ixy="0" ixz="0" iyy="0.00002" iyz="0" izz="0.00002"/></inertial>
+    </link>
+    <joint name="mid_right_coxa_joint" type="revolute">
+        <parent link="base_link"/><child link="mid_right_coxa"/>
+        <origin xyz="0 -0.11499999999999999 0" rpy="0 0 -1.5707963267948966"/><axis xyz="0 0 1"/>
+        <limit lower="-3.14" upper="3.14" effort="3.0" velocity="3.14"/>
+    </joint>
+    <link name="mid_right_coxa">
+        <visual><origin xyz="0.03 0 0"/><geometry><box size="0.06 0.02 0.02"/></geometry><material name="red"><color rgba="0.8 0.2 0.2 1"/></material></visual>
+        <collision><origin xyz="0.03 0 0"/><geometry><box size="0.06 0.02 0.02"/></geometry></collision>
+        <inertial><mass value="0.080"/><inertia ixx="0.0002" ixy="0" ixz="0" iyy="0.0002" iyz="0" izz="0.0002"/></inertial>
+    </link>
+    <joint name="mid_right_femur_joint" type="revolute">
+        <parent link="mid_right_coxa"/><child link="mid_right_femur"/>
+        <origin xyz="0.06 0 0" rpy="0 0 0"/><axis xyz="0 1 0"/>
+        <limit lower="-3.14" upper="3.14" effort="3.0" velocity="3.14"/>
+    </joint>
+    <link name="mid_right_femur">
+        <visual><origin xyz="0.0875 0 0"/><geometry><box size="0.175 0.02 0.02"/></geometry><material name="green"><color rgba="0.2 0.8 0.2 1"/></material></visual>
+        <collision><origin xyz="0.0875 0 0"/><geometry><box size="0.175 0.02 0.02"/></geometry></collision>
+        <inertial><mass value="0.095"/><inertia ixx="0.0003" ixy="0" ixz="0" iyy="0.0003" iyz="0" izz="0.0003"/></inertial>
+    </link>
+    <joint name="mid_right_tibia_joint" type="revolute">
+        <parent link="mid_right_femur"/><child link="mid_right_tibia"/>
+        <origin xyz="0.175 0 0" rpy="0 0 0"/><axis xyz="0 1 0"/>
+        <limit lower="-3.14" upper="3.14" effort="3.0" velocity="3.14"/>
+    </joint>
+    <link name="mid_right_tibia">
+        <visual><origin xyz="0.075 0 0"/><geometry><box size="0.15 0.015 0.015"/></geometry><material name="blue"><color rgba="0.2 0.2 0.8 1"/></material></visual>
+        <collision><origin xyz="0.075 0 0"/><geometry><box size="0.15 0.015 0.015"/></geometry></collision>
+        <inertial><mass value="0.025"/><inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/></inertial>
+    </link>
+    <joint name="mid_right_foot_joint" type="fixed">
+        <parent link="mid_right_tibia"/><child link="mid_right_foot"/>
+        <origin xyz="0.15 0 0" rpy="0 0 0"/>
+    </joint>
+    <link name="mid_right_foot">
+        <visual><geometry><sphere radius="0.015"/></geometry><material name="black"><color rgba="0 0 0 1"/></material></visual>
+        <collision><geometry><sphere radius="0.015"/></geometry></collision>
+        <inertial><mass value="0.015"/><inertia ixx="0.00002" ixy="0" ixz="0" iyy="0.00002" iyz="0" izz="0.00002"/></inertial>
+    </link>
+    <joint name="mid_left_coxa_joint" type="revolute">
+        <parent link="base_link"/><child link="mid_left_coxa"/>
+        <origin xyz="0 0.11499999999999999 0" rpy="0 0 1.5707963267948966"/><axis xyz="0 0 1"/>
+        <limit lower="-3.14" upper="3.14" effort="3.0" velocity="3.14"/>
+    </joint>
+    <link name="mid_left_coxa">
+        <visual><origin xyz="0.03 0 0"/><geometry><box size="0.06 0.02 0.02"/></geometry><material name="red"><color rgba="0.8 0.2 0.2 1"/></material></visual>
+        <collision><origin xyz="0.03 0 0"/><geometry><box size="0.06 0.02 0.02"/></geometry></collision>
+        <inertial><mass value="0.080"/><inertia ixx="0.0002" ixy="0" ixz="0" iyy="0.0002" iyz="0" izz="0.0002"/></inertial>
+    </link>
+    <joint name="mid_left_femur_joint" type="revolute">
+        <parent link="mid_left_coxa"/><child link="mid_left_femur"/>
+        <origin xyz="0.06 0 0" rpy="0 0 0"/><axis xyz="0 1 0"/>
+        <limit lower="-3.14" upper="3.14" effort="3.0" velocity="3.14"/>
+    </joint>
+    <link name="mid_left_femur">
+        <visual><origin xyz="0.0875 0 0"/><geometry><box size="0.175 0.02 0.02"/></geometry><material name="green"><color rgba="0.2 0.8 0.2 1"/></material></visual>
+        <collision><origin xyz="0.0875 0 0"/><geometry><box size="0.175 0.02 0.02"/></geometry></collision>
+        <inertial><mass value="0.095"/><inertia ixx="0.0003" ixy="0" ixz="0" iyy="0.0003" iyz="0" izz="0.0003"/></inertial>
+    </link>
+    <joint name="mid_left_tibia_joint" type="revolute">
+        <parent link="mid_left_femur"/><child link="mid_left_tibia"/>
+        <origin xyz="0.175 0 0" rpy="0 0 0"/><axis xyz="0 1 0"/>
+        <limit lower="-3.14" upper="3.14" effort="3.0" velocity="3.14"/>
+    </joint>
+    <link name="mid_left_tibia">
+        <visual><origin xyz="0.075 0 0"/><geometry><box size="0.15 0.015 0.015"/></geometry><material name="blue"><color rgba="0.2 0.2 0.8 1"/></material></visual>
+        <collision><origin xyz="0.075 0 0"/><geometry><box size="0.15 0.015 0.015"/></geometry></collision>
+        <inertial><mass value="0.025"/><inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/></inertial>
+    </link>
+    <joint name="mid_left_foot_joint" type="fixed">
+        <parent link="mid_left_tibia"/><child link="mid_left_foot"/>
+        <origin xyz="0.15 0 0" rpy="0 0 0"/>
+    </joint>
+    <link name="mid_left_foot">
+        <visual><geometry><sphere radius="0.015"/></geometry><material name="black"><color rgba="0 0 0 1"/></material></visual>
+        <collision><geometry><sphere radius="0.015"/></geometry></collision>
+        <inertial><mass value="0.015"/><inertia ixx="0.00002" ixy="0" ixz="0" iyy="0.00002" iyz="0" izz="0.00002"/></inertial>
+    </link>
+    <joint name="rear_right_coxa_joint" type="revolute">
+        <parent link="base_link"/><child link="rear_right_coxa"/>
+        <origin xyz="-0.2 -0.075 0" rpy="0 0 -2.6179938779914944"/><axis xyz="0 0 1"/>
+        <limit lower="-3.14" upper="3.14" effort="3.0" velocity="3.14"/>
+    </joint>
+    <link name="rear_right_coxa">
+        <visual><origin xyz="0.03 0 0"/><geometry><box size="0.06 0.02 0.02"/></geometry><material name="red"><color rgba="0.8 0.2 0.2 1"/></material></visual>
+        <collision><origin xyz="0.03 0 0"/><geometry><box size="0.06 0.02 0.02"/></geometry></collision>
+        <inertial><mass value="0.080"/><inertia ixx="0.0002" ixy="0" ixz="0" iyy="0.0002" iyz="0" izz="0.0002"/></inertial>
+    </link>
+    <joint name="rear_right_femur_joint" type="revolute">
+        <parent link="rear_right_coxa"/><child link="rear_right_femur"/>
+        <origin xyz="0.06 0 0" rpy="0 0 0"/><axis xyz="0 1 0"/>
+        <limit lower="-3.14" upper="3.14" effort="3.0" velocity="3.14"/>
+    </joint>
+    <link name="rear_right_femur">
+        <visual><origin xyz="0.0875 0 0"/><geometry><box size="0.175 0.02 0.02"/></geometry><material name="green"><color rgba="0.2 0.8 0.2 1"/></material></visual>
+        <collision><origin xyz="0.0875 0 0"/><geometry><box size="0.175 0.02 0.02"/></geometry></collision>
+        <inertial><mass value="0.095"/><inertia ixx="0.0003" ixy="0" ixz="0" iyy="0.0003" iyz="0" izz="0.0003"/></inertial>
+    </link>
+    <joint name="rear_right_tibia_joint" type="revolute">
+        <parent link="rear_right_femur"/><child link="rear_right_tibia"/>
+        <origin xyz="0.175 0 0" rpy="0 0 0"/><axis xyz="0 1 0"/>
+        <limit lower="-3.14" upper="3.14" effort="3.0" velocity="3.14"/>
+    </joint>
+    <link name="rear_right_tibia">
+        <visual><origin xyz="0.075 0 0"/><geometry><box size="0.15 0.015 0.015"/></geometry><material name="blue"><color rgba="0.2 0.2 0.8 1"/></material></visual>
+        <collision><origin xyz="0.075 0 0"/><geometry><box size="0.15 0.015 0.015"/></geometry></collision>
+        <inertial><mass value="0.025"/><inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/></inertial>
+    </link>
+    <joint name="rear_right_foot_joint" type="fixed">
+        <parent link="rear_right_tibia"/><child link="rear_right_foot"/>
+        <origin xyz="0.15 0 0" rpy="0 0 0"/>
+    </joint>
+    <link name="rear_right_foot">
+        <visual><geometry><sphere radius="0.015"/></geometry><material name="black"><color rgba="0 0 0 1"/></material></visual>
+        <collision><geometry><sphere radius="0.015"/></geometry></collision>
+        <inertial><mass value="0.015"/><inertia ixx="0.00002" ixy="0" ixz="0" iyy="0.00002" iyz="0" izz="0.00002"/></inertial>
+    </link>
+    <joint name="rear_left_coxa_joint" type="revolute">
+        <parent link="base_link"/><child link="rear_left_coxa"/>
+        <origin xyz="-0.2 0.075 0" rpy="0 0 2.6179938779914944"/><axis xyz="0 0 1"/>
+        <limit lower="-3.14" upper="3.14" effort="3.0" velocity="3.14"/>
+    </joint>
+    <link name="rear_left_coxa">
+        <visual><origin xyz="0.03 0 0"/><geometry><box size="0.06 0.02 0.02"/></geometry><material name="red"><color rgba="0.8 0.2 0.2 1"/></material></visual>
+        <collision><origin xyz="0.03 0 0"/><geometry><box size="0.06 0.02 0.02"/></geometry></collision>
+        <inertial><mass value="0.080"/><inertia ixx="0.0002" ixy="0" ixz="0" iyy="0.0002" iyz="0" izz="0.0002"/></inertial>
+    </link>
+    <joint name="rear_left_femur_joint" type="revolute">
+        <parent link="rear_left_coxa"/><child link="rear_left_femur"/>
+        <origin xyz="0.06 0 0" rpy="0 0 0"/><axis xyz="0 1 0"/>
+        <limit lower="-3.14" upper="3.14" effort="3.0" velocity="3.14"/>
+    </joint>
+    <link name="rear_left_femur">
+        <visual><origin xyz="0.0875 0 0"/><geometry><box size="0.175 0.02 0.02"/></geometry><material name="green"><color rgba="0.2 0.8 0.2 1"/></material></visual>
+        <collision><origin xyz="0.0875 0 0"/><geometry><box size="0.175 0.02 0.02"/></geometry></collision>
+        <inertial><mass value="0.095"/><inertia ixx="0.0003" ixy="0" ixz="0" iyy="0.0003" iyz="0" izz="0.0003"/></inertial>
+    </link>
+    <joint name="rear_left_tibia_joint" type="revolute">
+        <parent link="rear_left_femur"/><child link="rear_left_tibia"/>
+        <origin xyz="0.175 0 0" rpy="0 0 0"/><axis xyz="0 1 0"/>
+        <limit lower="-3.14" upper="3.14" effort="3.0" velocity="3.14"/>
+    </joint>
+    <link name="rear_left_tibia">
+        <visual><origin xyz="0.075 0 0"/><geometry><box size="0.15 0.015 0.015"/></geometry><material name="blue"><color rgba="0.2 0.2 0.8 1"/></material></visual>
+        <collision><origin xyz="0.075 0 0"/><geometry><box size="0.15 0.015 0.015"/></geometry></collision>
+        <inertial><mass value="0.025"/><inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/></inertial>
+    </link>
+    <joint name="rear_left_foot_joint" type="fixed">
+        <parent link="rear_left_tibia"/><child link="rear_left_foot"/>
+        <origin xyz="0.15 0 0" rpy="0 0 0"/>
+    </joint>
+    <link name="rear_left_foot">
+        <visual><geometry><sphere radius="0.015"/></geometry><material name="black"><color rgba="0 0 0 1"/></material></visual>
+        <collision><geometry><sphere radius="0.015"/></geometry></collision>
+        <inertial><mass value="0.015"/><inertia ixx="0.00002" ixy="0" ixz="0" iyy="0.00002" iyz="0" izz="0.00002"/></inertial>
+    </link></robot>
