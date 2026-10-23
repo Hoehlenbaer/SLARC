@@ -1,12 +1,21 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – obere + untere Baseplate inkl. Coxa-Servo-Aufnahme, Elektronik und Energieversorgung.   V2.4 (Senkungen für die 2x5-Servoschrauben in beiden Platten)
+SLARC – obere + untere Baseplate inkl. Coxa-Servo-Aufnahme, Elektronik und Energieversorgung.   V2.5 (DC-DC-Wandler + Modulplätze für IO-Expander/Multiplexer)
 FreeCAD 0.21 / 1.0: Makro ausführen. Parameter in P (unten) ändern und Makro neu ausführen
 (die Plattenkontur mit den Schwenkfreigängen ist hier bewusst als Python-Geometrie gebaut,
 nicht über Spreadsheet-Ausdrücke).
 
 Koordinaten (wie slarc_sim_V10): X = vorn, Y = links, Z = oben, Ursprung = Körpermitte,
 Z = 0 = Oberkante Hüllmaß der Coxa-Servos (ST3215 liegt mit Horn nach oben zwischen den Platten).
+
+V2.5
+- Obere Platte hinten: DC-DC-Wandler 12 V -> 5 V für den Pi 5 (Fulree F35J5V5A1S-C, 46.2 x 27.5 x 14,
+  Laschen an den kurzen Seiten, Spitze-Spitze 63.2, offene Schlitze 4 mm). Befestigung 2x M3 + Mutter,
+  Langlöcher in der Platte (scr_in ± adj) gleichen die unbekannte Schlitztiefe aus.
+- Zwei Modulplätze (je 2x M3 im Abstand 2*mod_dx): "MCP" für den IO-Expander MCP23017 (Fußkontakte,
+  Status-LEDs) und "MUX" als Reserve (I2C-Multiplexer/Hub). Die Module sitzen auf eigenen kleinen
+  Trägern (separat gedruckt, sobald die Platinenmaße feststehen) -> die Platte muss dafür nicht neu gedruckt werden.
+- Der hintere Plattenteil wird kopfüber gedruckt: deshalb nur Bohrungen, keine Aufbauten oben.
 
 V2
 - Untere Platte: gleiche Kontur, Freischnitte für die untere Gabelwange, Öffnung für die Servostecker
@@ -70,6 +79,13 @@ P = dict(
                (-40.0, 48.0), (-40.0, -48.0), (-125.0, 55.0), (-125.0, -55.0)],
     # hinten keine Säulen: Batterie-Ausbauweg + Schwenkbereich der hinteren Coxas; die 6 Servos tragen mit
     so_hole_d=3.2,
+    # V2.5: DC-DC 12 V -> 5 V (Pi 5) und Modulplätze, alle auf dem hinteren Teil der oberen Platte
+    dcdc=dict(x=-115.0, y=-35.0, L=46.2, W=27.5, H=14.0, tip=63.2, tab_t=4.0, tab_w=12.0,
+              scr_in=3.5,       # Schraubenmitte ab Laschenspitze (Schlitz offen nach außen; PRÜFEN)
+              adj=1.5),         # Langloch ± entlang X
+    mod_dx=21.0,                # Modulträger: M3-Bohrungen bei ±mod_dx (entlang X)
+    mods=[("MCP", -115.0, 35.0), ("MUX", -115.0, 0.0)],   # MUX liegt über der Batterie: Mutter max. 4 mm hoch
+    m3_d=3.4,
     split_x=-40.0, lap=24.0, lap_screws=[-65.0, -32.0, 32.0, 65.0],   # Vorderteil 252 x 209 mm
 )
 STEP_DIR = r""
@@ -269,6 +285,24 @@ def relay_holes():
     return [(P["relay_x"] + dx, dy) for dx in (-66.1, 66.1) for dy in (-25.4, 25.4)]
 
 
+def dcdc_screws():
+    d = P["dcdc"]; e = d["tip"] / 2 - d["scr_in"]
+    return [(d["x"] - e, d["y"]), (d["x"] + e, d["y"])]
+
+
+def dcdc_holes(z0, h):
+    """Langlöcher M3 unter den offenen Laschenschlitzen."""
+    r, a = P["m3_d"] / 2, P["dcdc"]["adj"]
+    out = []
+    for sx, sy in dcdc_screws():
+        out += [cyl(sx - a, sy, z0, r, h), cyl(sx + a, sy, z0, r, h), box(sx - a, sy - r, z0, 2 * a, 2 * r, h)]
+    return out
+
+
+def mod_holes():
+    return [(x + s * P["mod_dx"], y) for _, x, y in P["mods"] for s in (-1, 1)]
+
+
 def PEDESTALS(dims):
     """(y0, Breite) der Sockel: unter den Laschen (innen verkürzt -> Servoschraube bleibt frei) + Mitte."""
     e = dims["ear_y"]
@@ -308,6 +342,9 @@ def build():
         neg.append(cyl(sx, sy, zb - 1, P["so_hole_d"] / 2, t + 2))
     for sy in P["lap_screws"]:
         neg.append(cyl(P["split_x"], sy, zb - 1, 1.6, t + 2))
+    neg += dcdc_holes(zb - 1, t + 2)
+    for hx, hy in mod_holes():
+        neg.append(cyl(hx, hy, zb - 1, P["m3_d"] / 2, t + 2))
     plate = cut(fuse(pos), neg)
     # V2.1: Hinterteil trägt die obere Stoßhälfte -> wird kopfüber gedruckt (oben flach), Vorderteil normal
     front, rear = split(plate, zb, upper_front=False)
@@ -377,7 +414,23 @@ def payload_boxes():
     bx0, bx1, bw = P["bat_x0"], P["bat_x1"], P["bat_w"]
     m0, m1, mw, mh = P["bms"]
     return [("Battery_3S_9000", box(bx0 + 1, -25, Z_LT - P["bat_pocket"], 170, 50, P["bat_h"]), (0.85, 0.75, 0.1)),
-            ("BMS_Daly_3S", box(m0, -mw / 2, Z_LT, m1 - m0, mw, mh), (0.2, 0.2, 0.8))]
+            ("BMS_Daly_3S", box(m0, -mw / 2, Z_LT, m1 - m0, mw, mh), (0.2, 0.2, 0.8)),
+            ("DCDC_5V_Fulree", dcdc_shape(), (0.75, 0.75, 0.78))] + \
+           [("Modulplatz_" + n, box(x - P["mod_dx"] - 4, y - 12, Z_T, 2 * P["mod_dx"] + 8, 24, 0.6), (0.9, 0.2, 0.2))
+            for n, x, y in P["mods"]]
+
+
+def dcdc_shape():
+    """Platzhalter Wandler: Gehäuse + Laschen mit offenen 4-mm-Schlitzen."""
+    d = P["dcdc"]
+    body = box(d["x"] - d["L"] / 2, d["y"] - d["W"] / 2, Z_T, d["L"], d["W"], d["H"])
+    tabs = [box(d["x"] - d["tip"] / 2, d["y"] - d["tab_w"] / 2, Z_T, d["tip"], d["tab_w"], d["tab_t"])]
+    slots = []
+    for sx, sy in dcdc_screws():
+        out = 1 if sx > d["x"] else -1
+        slots += [cyl(sx, sy, Z_T - 1, 2.0, d["tab_t"] + 2),
+                  box(min(sx, sx + out * 10), sy - 2.0, Z_T - 1, 10, 4.0, d["tab_t"] + 2)]
+    return cut(fuse([body] + tabs), slots)
 
 
 # ============================================================ Platzierung der STEP-Modelle
