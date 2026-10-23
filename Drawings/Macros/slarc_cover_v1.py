@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – Rückenpanzer (Cover) über der oberen Baseplate.   V1
+SLARC – Rückenpanzer (Cover) über der oberen Baseplate.   V1.1
+(V1.1: leichter – Wand 2.4 mm, Waben 9 mm / Steg 2.4 mm, Rautenfenster in den Seitenwänden, schmalere
+ Zwischenspanten, hohle Säulen, Kamm 3 mm)
 FreeCAD 0.21 / 1.0: Makro ausführen. Parameter in C (unten) ändern und neu ausführen.
 
 Idee: Käfer-Rückenschild. Querschnitt = Satteldach mit Firstlinie (wie die Naht zwischen den Deckflügeln),
@@ -8,7 +10,7 @@ Seitenwände senkrecht, Draufsicht vorn breit und eckig (Halsschild über Pi/Tre
 Die Dachflächen und Seitenwände sind als Wabengitter durchbrochen, Firstband, Traufband und Spanten bleiben voll.
 
 Aufgaben
-- Schutz der Elektronik bei Stürzen: Last geht über die Dachflächen in 8 Säulen, die genau auf den
+- Schutz der Elektronik bei Stürzen: Last geht über die Dachflächen in 6 Säulen, die genau auf den
   Säulenpositionen der Baseplates stehen -> Kraftfluss Panzer -> Säule -> Platte -> Säule -> untere Platte.
 - Selbstaufrichten: Auf dem Rücken liegt SLARC nur auf der schmalen Firstlinie, der Schwerpunkt liegt
   rund 100 mm darüber -> keine stabile Rückenlage, er kippt zur Seite auf eine Dachfläche (Dachneigung roof_a).
@@ -17,7 +19,7 @@ Aufgaben
 Befestigung
 - Die Säulen der Baseplates (M3) werden umgedreht: Schraube M3x50 (statt M3x45) von unten durch untere Platte,
   Säule und obere Platte (zusammen 42 mm) in einen Gewindeeinsatz M3 (Einschmelzmutter) unten in der Panzersäule.
-  Ohne Panzer: weiter M3x45 + Mutter.
+  Gilt für die 6 Panzersäulen; die Säulen bei x = -40 und ohne Panzer: weiter M3x45 + Mutter.
 
 Druck
 - Zwei Teile, Teilung bei x = split_x (Spant mit 3x M3x12 + Mutter). Grundfläche aufs Bett, keine Stützen
@@ -42,17 +44,18 @@ C = dict(
     a_front=230.0, n_front=6.0,         # vorn fast eckig (Halsschild)
     roof_a=40.0,                        # Dachneigung [deg]
     ridge=[(-190.0, 34.0), (-170.0, 52.0), (-130.0, 66.0), (-60.0, 74.0), (20.0, 80.0), (90.0, 88.0), (158.0, 88.0)],
-    t=3.0,                   # Wandstärke
+    t=2.4,                   # Wandstärke (V1.1: 3.0 -> 2.4, leichter)
     split_x=-15.0,           # Teilung (Spant mit Flansch)
-    span_dx=[-160.0, -70.0, 40.0, 83.0],   # nicht über DC-DC/Modulplätzen (x -147..-83)   # weitere Spanten (innen, volle Rippe)
-    span_w=4.0, flange=9.0,  # Spantbreite (X), Flanschtiefe nach innen
+    span_dx=[-160.0, -70.0, 83.0],   # nicht über DC-DC/Modulplätzen (x -147..-83)   # weitere Spanten (innen, volle Rippe)
+    span_w=4.0, flange=8.0,  # Teilungs-/Frontspant: Breite (X), Flanschtiefe nach innen (trägt die Schrauben)
+    rib_w=3.0, rib_flange=5.0,   # Zwischenspanten (V1.1: schmaler)
     posts=[(155.0, 35.0), (155.0, -35.0), (60.0, 45.0), (60.0, -45.0),
-           (-40.0, 48.0), (-40.0, -48.0), (-125.0, 55.0), (-125.0, -55.0)],
-    post_d=10.0, insert_d=4.0, insert_h=9.0,   # Gewindeeinsatz M3 (5.7 lang, 4.6 außen -> Bohrung 4.0); Bohrung tiefer für M3x50
-    hex_r=6.5, rib=3.0,      # Waben: Umkreisradius, Stegbreite
+           (-125.0, 55.0), (-125.0, -55.0)],   # V1.1: 6 statt 8 (bei x -40 trägt der Teilungsspant)
+    post_d=10.0, post_id=6.0, insert_d=4.0, insert_h=9.0,   # Gewindeeinsatz M3 (5.7 lang, 4.6 außen -> Bohrung 4.0); Bohrung tiefer für M3x50
+    hex_r=9.0, rib=2.4,      # Waben: Umkreisradius, Stegbreite (V1.1: offener, 6.5/3.0 -> 9.0/2.4)
     band_ridge=6.0, band_eave=4.0,
-    wall_r=5.5, wall_min=17.0,          # Seitenfenster (spitz nach oben) nur wo die Wand hoch genug ist
-    crest_w=4.0, crest_h=5.0,           # Firstkamm (Naht der Deckflügel): Auflagelinie in Rückenlage
+    wall_r=7.0,              # Seitenwand-Rauten: max. halbe Breite
+    crest_w=3.0, crest_h=5.0,           # Firstkamm (Naht der Deckflügel): Auflagelinie in Rückenlage
     port_win=(92.0, 140.0),             # großes Seitenfenster für die Pi-Anschlüsse (beidseitig)
     notch=[(-150.0, 16.0), (-95.0, 16.0), (-15.0, 0.0), (30.0, 18.0)],   # Kabeldurchlässe unten (x, Breite; 0 = aus)
     bolt_d=3.4,
@@ -118,17 +121,24 @@ def build():
     outer = loft(xr + 0.5, xf, 64)
     inner = loft(xr + 0.5 + t + 2, xf + 1, 64, off=t, zbot=-1.0)
     shell = outer.cut(inner)
+    skin = shell
     # 1) Waben + Fenster über die ganze Fläche schneiden
     shell = shell.cut(Part.makeCompound(roof_windows() + wall_windows() + notches()))
     # 2) danach Spanten, Säulen und Firstkamm einsetzen (laufen als Rippen über die Waben)
     inner2 = loft(xr + 4.0, xf + 1, 64, off=t + c["flange"], zbot=-1.0)   # Endflächen nicht deckungsgleich mit outer
     ring = outer.cut(inner2)
     sp = [slab(c["split_x"] - c["span_w"], c["split_x"] + c["span_w"]), slab(xf - c["span_w"], xf + 1)]
-    sp += [slab(x - c["span_w"] / 2, x + c["span_w"] / 2) for x in c["span_dx"]]
+    ring3 = outer.cut(loft(xr + 4.0, xf + 1, 64, off=t + c["rib_flange"], zbot=-1.0))
+    ribs = [ring3.common(slab(x - c["rib_w"] / 2, x + c["rib_w"] / 2)) for x in c["span_dx"]]
     posts = [Part.makeCylinder(c["post_d"] / 2, 200, V(px, py, c["Z_T"])).common(outer) for px, py in c["posts"]]
-    shell = shell.fuse([ring.common(s) for s in sp] + posts + [crest()])
-    # 3) Gewindeeinsätze unten in den Säulen
+    pads = [Part.makeCylinder(c["post_d"] / 2 + 5.0, 300, V(px, py, c["Z_T"] - 1)).common(skin) for px, py in c["posts"]]
+    shell = shell.fuse([ring.common(s) for s in sp] + ribs + posts + pads + [crest()])   # Dachhaut um jede Säule bleibt geschlossen
+    # 3) Gewindeeinsätze unten in den Säulen, darüber hohl (Rohr), oben bleibt das Dach geschlossen
     neg = [Part.makeCylinder(c["insert_d"] / 2, c["insert_h"], V(px, py, c["Z_T"] - 1)) for px, py in c["posts"]]
+    inner_t = loft(xr + 0.5 + t + 2, xf - 2, 64, off=t + 1.5, zbot=-1.0)   # Rohr endet 1.5 mm unter der Dachinnenseite
+    for px, py in c["posts"]:
+        z0 = c["Z_T"] + c["insert_h"] + 2
+        neg.append(Part.makeCylinder(c["post_id"] / 2, 200, V(px, py, z0)).common(inner_t))
     shell = shell.cut(Part.makeCompound(neg)).removeSplitter()
     # Teilungsspant: 3 Schrauben M3 entlang X (First, beide Traufen)
     bolts = []
@@ -221,23 +231,23 @@ def ywin(sgn, w):
 
 
 def wall_windows():
-    """Spitz nach oben stehende Sechsecke in den Seitenwänden + große Pi-Anschlussfenster."""
+    """Seitenwände: steile Rauten (V1.1, druckbar ohne Stützen) + große Pi-Anschlussfenster."""
     c = C
-    r = c["wall_r"]
     out = []
-    x = c["x_rear"] + 20
+    x = c["x_rear"] + 16
     while x < c["x_front"] - 10:
         w, H = halfwidth(x), ridge(x)
         ze = H - w * TAN
-        inport = c["port_win"][0] - r < x < c["port_win"][1] + r
-        if ze >= c["wall_min"] and not keep_out_x(x, r) and not inport:
-            zc = c["Z_T"] + max(ze / 2 + 1, r + 4)
-            if zc + r > c["Z_T"] + ze - 3:
-                x += math.sqrt(3) * r + c["rib"] + 1
-                continue
+        z0, z1 = c["Z_T"] + 4.0, c["Z_T"] + ze - 3.0         # Fußband 4 mm, Traufband 3 mm
+        h = z1 - z0
+        b = min(0.5 * h, c["wall_r"] * 2)
+        inport = c["port_win"][0] - b < x < c["port_win"][1] + b
+        if h >= 10 and not keep_out_x(x, b / 2) and not inport:
             for sgn in (1, -1):
-                out.append(hexagon(x, zc, r, "y", ywin(sgn, w), 14))
-        x += math.sqrt(3) * r + c["rib"] + 1
+                yb = ywin(sgn, w)
+                P = [V(x - b / 2, yb, (z0 + z1) / 2), V(x, yb, z0), V(x + b / 2, yb, (z0 + z1) / 2), V(x, yb, z1)]
+                out.append(Part.Face(Part.makePolygon(P + [P[0]])).extrude(V(0, 14, 0)))
+        x += b + c["rib"] + 0.4 if h >= 10 else 4.0
     # Pi-Anschlussfenster: Rechteck mit Spitzbogen oben
     x0, x1 = c["port_win"]
     for sgn in (1, -1):
