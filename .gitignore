@@ -4,3 +4,9 @@ venvs/
 icm20948-python/
 old_structure/
 /Resources/SLARC-brain model
+
+# Windows alternate data streams / temp files
+*Zone.Identifier
+*mshield
+__pycache__/
+*.pyc
