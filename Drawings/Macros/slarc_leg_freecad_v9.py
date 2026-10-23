@@ -130,10 +130,10 @@ PARAMS = [
     ("link_h",     28.0,  "Glied-Querschnitt entlang Gelenkachse"),
     ("link_wall",   2.0,  "Wandstärke Hohlprofil"),
     ("coxa_len",   60.0,  "Coxa: Achse-Achse"),
-    ("femur_len", 175.0,  "Femur: Achse-Achse"),
-    ("tibia_len", 150.0,  "Tibia: Knieachse -> Fußspitze (Sehne, = Sim-Wert)"),
-    ("tib_bend",   60.0,  "Knick Tibia -> Fußsegment [deg], nach unten"),
-    ("foot_seg",   90.0,  "Fußsegment: Knick -> Fußspitze"),
+    ("femur_len", 150.0,  "Femur: Achse-Achse"),
+    ("tibia_len", 175.0,  "Tibia: Knieachse -> Fußspitze (Sehne, = Sim-Wert)"),
+    ("tib_bend",   38.6,  "Knick Tibia -> Fußsegment [deg], nach unten"),
+    ("foot_seg",  140.0,  "Fußsegment: Knick -> Fußspitze"),
     ("foot_r",     16.0,  "TPU-Fußkugel Radius"),
     ("boot_l",     30.0,  "TPU-Fuß: Hülsenlänge über dem Glied"),
     ("boot_t",      2.0,  "TPU-Fuß: Wandstärke Hülse"),
@@ -160,7 +160,7 @@ PARAMS = [
     ("deco_m",      4.0,  "PLA-Zierleiste Randabstand"),
     ("q_coxa",      0.0,  "Gelenkwinkel Coxa [deg]"),
     ("q_femur",   -15.0,  "Gelenkwinkel Femur [deg], + = nach unten"),
-    ("q_tibia",    45.0,  "Gelenkwinkel Tibia [deg], + = nach unten (bezogen auf Segment 1)"),
+    ("q_tibia",   100.0,  "Gelenkwinkel Tibia [deg], + = nach unten (bezogen auf Segment 1)"),
 ]
 DERIVED = [
     ("zb",    "=-servo_H - rear_t - boss_h - cheek_b_t",          "Unterseite untere Wange"),
