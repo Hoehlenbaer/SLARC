@@ -28,6 +28,7 @@ MACRO_DIR = r""          # leer = Ordner dieses Makros bzw. FreeCAD-Makro-Ordner
 STEP_DIR = r""           # leer = MACRO_DIR
 LEG_MODE = "links"       # "links" oder "independent"
 MIRROR_LEFT = True       # linke Beine gespiegelt (benötigt Bein-Makro >= V9)
+COVER = True             # Rückenpanzer (slarc_cover_v1.py) mit einsetzen, falls vorhanden
 LEG_FILE = ""            # leer = neueste slarc_leg_freecad_vN.py im Makro-Ordner (z.B. v8), sonst Dateiname
 
 COXA = [("FR", 200.0, -75.0, -30.0), ("FL", 200.0, 75.0, 30.0),
@@ -123,6 +124,10 @@ try:
                 lk = asm.addObject("App::Link", "Leg_" + n)
                 lk.LinkedObject = masters[side]
                 legs.append(lk)
+    COVER_SRC = os.path.join(MDIR, "slarc_cover_v1.py")
+    if COVER and os.path.isfile(COVER_SRC):
+        App.setActiveDocument(asm.Name)
+        _run(COVER_SRC)
 finally:
     App.newDocument = _orig_new
 
