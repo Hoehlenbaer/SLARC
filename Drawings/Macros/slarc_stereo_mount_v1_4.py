@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 SLARC – Stereo-Kamerahalterung für 2x IMX296-Modul mit M12-Objektiv (39x39 mm Board).   V1.4
-(V1.4: Platz für die Zusatz-IMU ICM20948 (Pimoroni-Breakout 19x19, 2 Bohrungen 13 mm) mittig auf dem oberen
+(V1.4: Platz für die Zusatz-IMU ICM20948 (Pimoroni-Breakout 19x19, 2x M2.5 im Abstand 13.6 mm, 2.7 mm von den Kanten) mittig auf dem oberen
  Rahmen -> starr zum Stereo-Paar, nahe der Mitte zwischen den optischen Achsen; per IMU_MOUNT abschaltbar)
 (V1.3: Trigger-Schlitze per TRIG_SLOTS abschaltbar, Standard aus – die Kabel laufen nach hinten weg)
 (V1.2: Kabelschlitz oben für Trigger/Strobe-Stiftleisten, Tasche für Trigger-Verteilerplatine zwischen
@@ -61,14 +61,14 @@ PARAMS = [
     ("tpcb_d",     0.5, "Tiefe Platinentasche (Lage für Klebeband)"),
     ("ear_l",     10.0, "Befestigungslasche Länge"),
     ("ear_hole",   3.2, "Befestigungslasche Bohrung (M3)"),
-    ("imu_hs",    13.0, "ICM20948-Breakout: Lochabstand (quer, X)"),
+    ("imu_hs",    13.6, "ICM20948-Breakout: Lochabstand (quer, X), Löcher M2.5"),
     ("imu_hz",     2.0, "ICM20948: Lochreihe hinter der Frontfläche (Lochmitte in der Frontplatte)"),
-    ("imu_pd",     1.7, "ICM20948: Kernloch M2 selbstschneidend"),
+    ("imu_pd",     2.1, "ICM20948: Kernloch M2.5 selbstschneidend in PETG"),
     ("imu_depth",  6.0, "ICM20948: Kernlochtiefe ab Rahmenoberkante"),
     ("imu_so",     1.5, "ICM20948: Distanzbund unter dem Board (Lötstellen der Stiftleiste)"),
     ("imu_sod",    4.5, "ICM20948: Distanzbund Ø"),
     ("imu_b",     19.0, "ICM20948: Boardkante (quadratisch, Platzhalter)"),
-    ("imu_e",      3.0, "ICM20948: Lochmitte -> vordere Boardkante (Platzhalter, PRÜFEN)"),
+    ("imu_e",      2.7, "ICM20948: Lochmitte -> vordere Boardkante"),
 ]
 DERIVED = [
     ("x_half",  "=baseline/2 + pcb/2 + rim_c + rim_t", "halbe Außenbreite Rahmen"),

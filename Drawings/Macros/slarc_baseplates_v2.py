@@ -79,7 +79,7 @@ CAM = dict(pcb=39, hole_s=34, pilot_d=1.7, so_d=5, so_h=2, plate_t=4, holder_w=2
            win_c=.8, rim_c=.6, rim_t=3, bot_t=4, rim_d=12, fpc_w=20, fpc_off=.5, ear_l=10, ear_hole=3.2,
            trig_w=0.0, trig_off=0.0,   # trig_w > 0: Kabelschlitze oben für Trigger/Strobe (z.B. 28.5)
            tpcb_w=20.0, tpcb_h=22.0, tpcb_c=0.3, tpcb_d=0.5,
-           imu=True, imu_hs=13.0, imu_hz=2.0, imu_pd=1.7, imu_depth=6.0, imu_so=1.5, imu_sod=4.5)   # V1.4: ICM20948 oben
+           imu=True, imu_hs=13.6, imu_hz=2.0, imu_pd=2.1, imu_depth=6.0, imu_so=1.5, imu_sod=4.5)   # V1.4: ICM20948 oben
 
 # ============================================================ Geometrie-Backend
 try:
