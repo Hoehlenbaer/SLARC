@@ -60,7 +60,7 @@ The model has gone through several iterations, each driven by deployment constra
 | Seg classes | 6 (with NAV_ANCHOR) | 6 (with NAV_ANCHOR) | **6 (FLOOR/TERRAIN split)** | Better outdoor navigation |
 | Detection classes | 40 | 40 | **41 (+ UNKNOWN)** | Generalized objectness for unseen objects |
 | Confidence Gate | None | Peak confidence | Peak confidence | Suppresses false stereo matches |
-| NPU deployment | Not achieved | 3-HEF, 18 FPS | **3-HEF, 16.3 FPS** | Wider features trade speed for quality |
+| NPU deployment | Not achieved | 3-HEF, 18 FPS | **3-HEF (1+3+1 ctx), 16.5 FPS** | Wider features trade speed for quality |
 
 #### Architecture Overview
 
@@ -257,8 +257,8 @@ img_right ─→ [HEF A: Backbone] ──→ f_s4_r, f_s8_r
 |---|---|---|---|---|---|
 | **A: Backbone** | 1 | 3.0 M | 2.57 | 0 MB | 14–18 |
 | **B: Geometry** | 3 | 0.3 M | ~12 | 73.9 MB | 28–39 |
-| **C: Detection** | 2 | 3.9 M | ~8 | 10.8 MB | 40–44 |
-| **Total** | **6** | **7.2 M** | **~23** | — | — |
+| **C: Detection** | 1 | 3.9 M | ~8 | 0 MB | 40–44 |
+| **Total** | **5** | **7.2 M** | **~23** | — | — |
 
 #### Cluster Utilization
 
@@ -274,7 +274,7 @@ img_right ─→ [HEF A: Backbone] ──→ f_s4_r, f_s8_r
 |---|---|---|---|
 | Total (ctx 1) | 71.9% | 28.1% | 26.4% |
 
-**Detection** (2 contexts, highest utilization context shown):
+**Detection** (earlier 2-context build, context 0 shown; the final build fits into a single context):
 
 | Cluster | Control | Compute | Memory |
 |---|---|---|---|
@@ -300,15 +300,26 @@ img_right ─→ [HEF A: Backbone] ──→ f_s4_r, f_s8_r
 
 #### Runtime Performance (Raspberry Pi 5, PCIe Gen 3)
 
-| Step | V4.0 Latency | V5.0 Latency |
+| Step | V4.0 Latency | V5.0 Latency (median) |
 |---|---|---|
-| Backbone (left) | 13.5 ms | 14.0 ms |
-| Backbone (right) | 10.0 ms | 9.6 ms |
-| Geometry (stereo + normals) | 21.8 ms | 21.7 ms |
-| Detection (seg + YOLO) | 10.6 ms | 10.8 ms |
-| **Pipeline total** | **56 ms → 17.9 FPS** | **56 ms → 16.3 FPS** |
+| Backbone (left) | 13.5 ms | 14.1 ms |
+| Backbone (right) | 10.0 ms | 10.0 ms |
+| Geometry (stereo + normals) | 21.8 ms | 25.9 ms |
+| Detection (seg + YOLO) | 10.6 ms | 10.4 ms |
+| **Pipeline total** | **56 ms → 17.9 FPS** | **60.5 ms → 16.5 FPS** |
 
-*V5.0 uses stereo-focused channel alignment (64/128/128/256) which produces wider feature tensors, slightly increasing transfer overhead despite similar compute times. Measured on Raspberry Pi 5 with PCIe Gen 3 (`dtparam=pciex1_gen=3`).*
+*V5.0 final HEFs (1+3+1 contexts), pure inference time from raw image to head outputs, no I/O or post-processing; min/max 59.9 / 62.5 ms. V5.0 uses stereo-focused channel alignment (64/128/128/256) which produces wider feature tensors, slightly increasing transfer overhead. Measured on Raspberry Pi 5 with PCIe Gen 3 (`dtparam=pciex1_gen=3`).*
+
+#### Quantization check FP32 → INT8 (TartanAir oldtown sample)
+
+| | EPE | Max disparity |
+|---|---|---|
+| FP32 (PyTorch) | 1.134 px | 20.12 px |
+| INT8 (Hailo-8) | 1.121 px | 20.47 px |
+
+Mean FP32 → INT8 difference: 0.20 px — INT8 quantization costs no measurable stereo accuracy. Normals, segmentation and detection also match the FP32 outputs visually.
+
+**Known limitation – sky:** the largest remaining stereo error is in sky regions (the network outputs disparity where the ground truth is ~0). This is a training-data artifact, not an architecture problem; fixing it needs fine-tuning on real images from SLARC's own cameras.
 
 #### Lessons Learned: Hailo-8 Optimization
 
@@ -681,7 +692,7 @@ SLARC/
 | Pi ↔ ESP32 protocol | 🔧 Spec v0.1 |
 | Camera pipeline – GPU rectification | ✅ Working |
 | FusedHexapodModel V5.0 – Training | ✅ Complete |
-| FusedHexapodModel V5.0 – Hailo deployment | ✅ 3-HEF pipeline, 16.3 FPS |
+| FusedHexapodModel V5.0 – Hailo deployment | ✅ 3-HEF pipeline (1+3+1 contexts), 16.5 FPS |
 | FusedHexapodModel – Stereo head | ✅ EPE 0.97 px, Bad3 14.1% |
 | FusedHexapodModel – Surface normals | ✅ Cosine sim 0.638 |
 | FusedHexapodModel – Segmentation | ✅ mIoU 22.6% (6 classes: FLOOR/STEP/WALL/OBSTACLE/VOID/TERRAIN) |
