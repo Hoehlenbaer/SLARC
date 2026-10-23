@@ -74,11 +74,12 @@ P = dict(
 )
 STEP_DIR = r""
 
-# Stereo-Halterung (identisch zu slarc_stereo_mount_v1_3.py)
+# Stereo-Halterung (identisch zu slarc_stereo_mount_v1_4.py)
 CAM = dict(pcb=39, hole_s=34, pilot_d=1.7, so_d=5, so_h=2, plate_t=4, holder_w=24.4, holder_h=16.3,
            win_c=.8, rim_c=.6, rim_t=3, bot_t=4, rim_d=12, fpc_w=20, fpc_off=.5, ear_l=10, ear_hole=3.2,
            trig_w=0.0, trig_off=0.0,   # trig_w > 0: Kabelschlitze oben für Trigger/Strobe (z.B. 28.5)
-           tpcb_w=20.0, tpcb_h=22.0, tpcb_c=0.3, tpcb_d=0.5)
+           tpcb_w=20.0, tpcb_h=22.0, tpcb_c=0.3, tpcb_d=0.5,
+           imu=True, imu_hs=13.0, imu_hz=2.0, imu_pd=1.7, imu_depth=6.0, imu_so=1.5, imu_sod=4.5)   # V1.4: ICM20948 oben
 
 # ============================================================ Geometrie-Backend
 try:
@@ -229,6 +230,10 @@ def cam_bracket():
             pos.append(cyl(cx + hx * g.hole_s / 2, hy * g.hole_s / 2, 0, g.so_d / 2, g.so_h + .5))
             neg.append(cyl(cx + hx * g.hole_s / 2, hy * g.hole_s / 2, -.1, g.pilot_d / 2, g.so_h + g.plate_t - .9))
         neg.append(cyly(sx * (W2 + g.ear_l / 2), -H2b - 1, (ZB + ZF) / 2, g.ear_hole / 2, g.bot_t + 2))
+        if g.imu:
+            ix, iz = sx * g.imu_hs / 2, ZF - g.imu_hz
+            pos.append(cyly(ix, H2 - 0.5, iz, g.imu_sod / 2, g.imu_so + 0.5))
+            neg.append(cyly(ix, H2 - g.imu_depth, iz, g.imu_pd / 2, g.imu_depth + g.imu_so + 0.2))
     neg.append(box(-g.tpcb_w / 2 - g.tpcb_c, -g.tpcb_h / 2 - g.tpcb_c, g.so_h - 0.01,
                    g.tpcb_w + 2 * g.tpcb_c, g.tpcb_h + 2 * g.tpcb_c, g.tpcb_d + 0.01))
     return cut(fuse(pos), neg), dict(W2=W2, H2=H2, H2b=H2b, ZF=ZF, ZB=ZB, ear_y=W2 + g.ear_l / 2, D=D)
