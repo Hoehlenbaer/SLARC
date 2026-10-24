@@ -1,12 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – obere + untere Baseplate inkl. Coxa-Servo-Aufnahme, Elektronik und Energieversorgung.   V2.5 (DC-DC-Wandler + Modulplätze für IO-Expander/Multiplexer)
+SLARC – obere + untere Baseplate inkl. Coxa-Servo-Aufnahme, Elektronik und Energieversorgung.   V2.6 (Steckerhalter Akku: Deans + Balancer an der unteren Platte)
 FreeCAD 0.21 / 1.0: Makro ausführen. Parameter in P (unten) ändern und Makro neu ausführen
 (die Plattenkontur mit den Schwenkfreigängen ist hier bewusst als Python-Geometrie gebaut,
 nicht über Spreadsheet-Ausdrücke).
 
 Koordinaten (wie slarc_sim_V10): X = vorn, Y = links, Z = oben, Ursprung = Körpermitte,
 Z = 0 = Oberkante Hüllmaß der Coxa-Servos (ST3215 liegt mit Horn nach oben zwischen den Platten).
+
+V2.6
+- Untere Platte hinten links (neben dem Akku-Ausgang): Halter für die Robot-Seite der Akkustecker, separat gedruckt,
+  2x M3 + Mutter. Unten Deans-Stecker (Stifte, Robot-Seite), darüber der Balancer-Adapter zum BMS-Messkabel.
+  Stecköffnungen zeigen nach hinten (Abziehrichtung = Ausziehrichtung des Akkus). Rückwand mit Kabelschlitzen
+  (Gehäuse kann beim Einstecken nicht nach vorn rutschen), Kabelbinderschlitze für den Halt beim Abziehen.
+  Reihenfolge laut Daly: zuerst Hauptstecker (B-) verbinden, dann Balancer; trennen umgekehrt.
+  Steckermaße sind Startwerte (Deans-Gehäuse 13 x 7.5 x 19, Balancer-Adapter wie JST-XH 4-pol.) -> nachmessen.
 
 V2.5
 - Obere Platte hinten: DC-DC-Wandler 12 V -> 5 V für den Pi 5 (Fulree F35J5V5A1S-C, 46.2 x 27.5 x 14,
@@ -86,6 +94,12 @@ P = dict(
     mod_dx=21.0,                # Modulträger: M3-Bohrungen bei ±mod_dx (entlang X)
     mods=[("MCP", -115.0, 35.0), ("MUX", -115.0, 0.0)],   # MUX liegt über der Batterie: Mutter max. 4 mm hoch
     m3_d=3.4,
+    # V2.6: Steckerhalter Akku (Robot-Seite), sitzt auf der unteren Platte; Stecker zeigen nach -X (hinten)
+    conn=dict(x_front=-190.0, y0=28.0,          # Stirnseite (Stecköffnungen) und Innenkante (Akku-Schiene endet bei y 29)
+              deans=(19.0, 13.0, 7.5),          # Deans-Stecker Robot-Seite: Länge (X), Breite (Y), Höhe (Z) – NACHMESSEN
+              bal=(10.0, 12.4, 5.8),            # Balancer-Adapter (JST-XH 4-pol. als Startwert): L, B, H – NACHMESSEN
+              clr=0.25, wall=1.6, floor=2.0, back=3.0, slot=(6.0, 3.0),   # Spiel, Wände, Rückwand, Kabelschlitz B x H
+              flange=8.0, holes=(-194.0, -164.0)),                         # Laschen vorn/hinten mit M3
     split_x=-40.0, lap=24.0, lap_screws=[-65.0, -32.0, 32.0, 65.0],   # Vorderteil 252 x 209 mm
 )
 STEP_DIR = r""
@@ -366,6 +380,38 @@ def relay_holes_low():
     return [(P["relay_low_x"] + dx, dy) for dx in (-25.4, 25.4) for dy in (-66.1, 66.1)]
 
 
+def conn_dims():
+    c = P["conn"]
+    dl, dw, dh = c["deans"]; bl, bw_, bh = c["bal"]; k, wl = c["clr"], c["wall"]
+    W = max(dw, bw_) + 2 * k + 2 * wl                              # Breite (Y)
+    L = max(dl, bl) + c["back"]                                     # Länge (X) ohne Laschen
+    z1 = c["floor"] + dh + 2 * k                                    # Oberkante Deans-Tasche
+    z2 = z1 + wl + bh + 2 * k                                       # Oberkante Balancer-Tasche
+    H = z2 + wl
+    yc = c["y0"] + W / 2
+    return dict(W=W, L=L, H=H, z1=z1, z2=z2, yc=yc)
+
+
+def conn_holder():
+    """Steckerhalter (Platte-Koordinaten, steht auf Z_LT). Zwei übereinanderliegende Tunnel, offen nach -X."""
+    c, d = P["conn"], conn_dims()
+    x0, zt, yc = c["x_front"], Z_LT, d["yc"]
+    dl, dw, dh = c["deans"]; bl, bw_, bh = c["bal"]; k = c["clr"]
+    body = box(x0, c["y0"], zt, d["L"], d["W"], d["H"])
+    fl = box(x0 - c["flange"], c["y0"] + d["W"] / 2 - 5.0, zt, d["L"] + 2 * c["flange"], 10.0, 3.0)   # Laschen
+    pos = [body, fl]
+    neg = [box(x0 - 1, yc - dw / 2 - k, zt + c["floor"], dl + 1, dw + 2 * k, dh + 2 * k),          # Deans-Tunnel
+           box(x0 - 1, yc - bw_ / 2 - k, zt + d["z1"] + c["wall"], bl + 1, bw_ + 2 * k, bh + 2 * k)]  # Balancer-Tunnel
+    sw, sh = c["slot"]
+    neg.append(box(x0 + dl - 1, yc - sw / 2, zt + c["floor"] + (dh - sh) / 2, d["L"], sw, sh + 2 * k))   # Kabel Deans
+    neg.append(box(x0 + bl - 1, yc - sw / 2, zt + d["z1"] + c["wall"], d["L"], sw, bh + 2 * k))          # Kabel Balancer
+    for xh in c["holes"]:
+        neg.append(cyl(xh, yc, zt - 1, P["m3_d"] / 2, 10))
+    for xs in (x0 + 5.0, x0 + 12.0):                                 # Kabelbinder quer über beide Tunnel (2.5er)
+        neg.append(box(xs - 1.5, c["y0"] - 1, zt + d["H"] - 1.4, 3.0, d["W"] + 2, 1.4))
+    return cut(fuse(pos), neg)
+
+
 def build_bottom():
     t, zb, zt = P["t"], Z_LB, Z_LT
     col_h = Z_B - zt                                   # Säule bis Unterseite obere Platte
@@ -404,6 +450,8 @@ def build_bottom():
         neg.append(cyl(hx, hy, zb - 1, P["relay_hole_d"] / 2, t + P["relay_so"] + 2))
     for sy in P["lap_screws"]:
         neg.append(cyl(P["split_x"], sy, zb - 1, 1.6, t + 2))
+    for xh in P["conn"]["holes"]:                      # V2.6: Steckerhalter
+        neg.append(cyl(xh, conn_dims()["yc"], zb - 1, P["m3_d"] / 2, t + 2))
     plate = cut(fuse(pos), neg)
     front, rear = split(plate, zb, upper_front=False)   # Säulen stehen auf der oberen Stoßhälfte -> hinteres Teil
     return dict(plate=plate, front=front, rear=rear)
@@ -504,6 +552,7 @@ def run_freecad():
     add("Baseplate_Bottom_Rear", gb["rear"], (0.12, 0.12, 0.12))
     for n, shp, col in payload_boxes():
         add(n, shp, col)
+    add("Connector_Holder", conn_holder(), (0.08, 0.08, 0.08))      # V2.6
     cache = {}
     for name, files, m in placements() + cam_placements(g["dims"]):
         p = find_step(files)
