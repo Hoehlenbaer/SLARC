@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 SLARC – Stereo-Kamerahalterung für 2x IMX296-Modul mit M12-Objektiv (39x39 mm Board).   V1.4
+(V1.4.1: Bunde der IMU-Kernlöcher 0.5 mm nach hinten (imu_hz 2.5) – standen 0.25 mm über die Frontfläche, Druck auf der Front ging nicht)
 (V1.4: Platz für die Zusatz-IMU ICM20948 (Pimoroni-Breakout 19x19, 2x M2.5 im Abstand 13.6 mm, 2.7 mm von den Kanten) mittig auf dem oberen
  Rahmen -> starr zum Stereo-Paar, nahe der Mitte zwischen den optischen Achsen; per IMU_MOUNT abschaltbar)
 (V1.3: Trigger-Schlitze per TRIG_SLOTS abschaltbar, Standard aus – die Kabel laufen nach hinten weg)
@@ -62,7 +63,7 @@ PARAMS = [
     ("ear_l",     10.0, "Befestigungslasche Länge"),
     ("ear_hole",   3.2, "Befestigungslasche Bohrung (M3)"),
     ("imu_hs",    13.6, "ICM20948-Breakout: Lochabstand (quer, X), Löcher M2.5"),
-    ("imu_hz",     2.0, "ICM20948: Lochreihe hinter der Frontfläche (Lochmitte in der Frontplatte)"),
+    ("imu_hz",     2.5, "ICM20948: Lochreihe hinter der Frontfläche (Lochmitte in der Frontplatte; Bund Ø4.5 endet 0.25 hinter der Front -> Frontfläche bleibt eben)"),
     ("imu_pd",     2.1, "ICM20948: Kernloch M2.5 selbstschneidend in PETG"),
     ("imu_depth",  6.0, "ICM20948: Kernlochtiefe ab Rahmenoberkante"),
     ("imu_so",     1.5, "ICM20948: Distanzbund unter dem Board (Lötstellen der Stiftleiste)"),
