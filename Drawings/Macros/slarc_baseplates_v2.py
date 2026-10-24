@@ -10,10 +10,12 @@ Z = 0 = Oberkante Hüllmaß der Coxa-Servos (ST3215 liegt mit Horn nach oben zwi
 
 V2.7
 - Akku-Riegel ohne Zukaufteile: zwei gedruckte Stifte (Ø8) hinter dem Akku, von unten durch die untere Platte
-  gesteckt, Bajonett wie eine Glühbirne: Stift mit der Nase nach hinten (Rille im Kopf längs X) einstecken,
-  hochdrücken, 90° drehen -> Nase rastet in eine Kerbe oben auf der Halbschale (Rille quer = zu).
+  bis in eine Führungsbohrung der oberen Platte gesteckt (beidseitig gelagert). Bajonett wie eine Glühbirne:
+  Stift mit der Nase nach hinten (Rille im Kopf längs X) einstecken, hochdrücken, 90° drehen -> Nase rastet in
+  eine Kerbe oben in der unteren Platte (Rille quer = zu).
   Zum Akkuwechsel: hochdrücken, zurückdrehen, Stift nach unten herausziehen, Akku nach hinten herausziehen.
-  Die Halbschalen (12 mm hoch, nur hinter dem Stift) nehmen die Last auf; die obere Platte bleibt unverändert.
+  Auf der Platte bleibt nichts stehen; das hintere Taschenende ist eine Rampe (Akku gleitet die 2 mm hoch).
+  Obere Platte hinten: 2 Führungsbohrungen (neu drucken).
   Ein Stück Moosgummi zwischen Kopf und Plattenunterseite (lat foam, 5 mm -> 3 mm) zieht die Nase in die Kerbe,
   damit sich der Stift auch in Rückenlage nicht losvibriert.
 
@@ -112,11 +114,11 @@ P = dict(
     # V2.7: Akku-Riegel (Bajonett-Stifte hinter dem Akku, Kopf unter der unteren Platte)
     lat=dict(x=-171.0, ys=(16.0, -16.0),        # Stiftachsen; Stiftvorderkante x + d/2 = -167 = Akku-Ende (bat_x0)
              d=8.0, clr=0.25,                    # Stift Ø, radiales Spiel in Bohrung/Schale
-             so=15.0, sh=12.0, arc=(70.0, 290.0),   # Halbschale: Außen-Ø, Höhe über Platte, Winkelbereich (nur hinten)
              lug_w=3.0, lug_r=7.0, lug_h=2.5,    # Nase: Breite, Außenradius, Höhe
              notch=0.8, key_clr=0.3,             # Rastkerbe-Tiefe, Spiel Nase/Schlitz
              foam=3.0,                           # Abstand Kopf - Plattenunterseite (Moosgummi 5 mm gepresst)
-             top=-8.0,                           # Stiftende (Akku-Oberkante -5)
+             top=2.5,                            # Stiftende: so tief steckt der Stift in der oberen Platte (Führung)
+             ramp=4.0,                           # Rampe am hinteren Taschenende (2 mm hoch auf 4 mm)
              head_d=20.0, head_h=5.0),           # Griffkopf (gerändelt, Rille zeigt die Nasenrichtung)
     split_x=-40.0, lap=24.0, lap_screws=[-65.0, -32.0, 32.0, 65.0],   # Vorderteil 252 x 209 mm
 )
@@ -375,6 +377,7 @@ def build():
     for sy in P["lap_screws"]:
         neg.append(cyl(P["split_x"], sy, zb - 1, 1.6, t + 2))
     neg += dcdc_holes(zb - 1, t + 2)
+    neg += latch_top_neg(zb, t)                         # V2.7: Führung Akku-Riegel
     for hx, hy in mod_holes():
         neg.append(cyl(hx, hy, zb - 1, P["m3_d"] / 2, t + 2))
     plate = cut(fuse(pos), neg)
@@ -430,35 +433,52 @@ def conn_holder():
     return cut(fuse(pos), neg)
 
 
-def latch_neg_pos():
-    """V2.7: Halbschalen (pos) und Bohrung/Schlitz/Rastkerben (neg) für die Akku-Riegel in der unteren Platte."""
+def latch_bottom_neg():
+    """V2.7: Bohrung, Schlitz nach hinten und Rastkerben für die Akku-Riegel in der unteren Platte.
+    Keine Aufbauten: nach dem Ziehen der Stifte ist der Ausziehweg des Akkus frei."""
     L, zb, zt = P["lat"], Z_LB, Z_LT
-    ri, ro = L["d"] / 2 + L["clr"], L["so"] / 2
-    a0, a1 = L["arc"]
+    ri = L["d"] / 2 + L["clr"]
     kw, kr = L["lug_w"] + 2 * L["key_clr"], L["lug_r"] + L["key_clr"] + 0.2
-    pos, neg = [], []
+    neg = []
     for y in L["ys"]:
         x = L["x"]
-        pos.append(cyl(x, y, zt - 0.5, ro, L["sh"] + 0.5, a1 - a0, a0))
-        neg.append(cyl(x, y, zb - 1, ri, P["t"] + L["sh"] + 2))
-        neg.append(rbox(x, y, 180.0, 0, -kw / 2, zb - 1, kr, kw, P["t"] + L["sh"] + 2))      # Schlitz nach hinten
+        neg.append(cyl(x, y, zb - 1, ri, P["t"] + 2))
+        neg.append(rbox(x, y, 180.0, 0, -kw / 2, zb - 1, kr, kw, P["t"] + 2))               # Schlitz nach hinten
         for a in (90.0, 270.0):                                                              # Rastkerben (beide Drehrichtungen)
-            neg.append(rbox(x, y, a, 0, -kw / 2, zt + L["sh"] - L["notch"], kr, kw, L["notch"] + 1))
-    return pos, neg
+            neg.append(rbox(x, y, a, 0, -kw / 2, zt - L["notch"], kr, kw, L["notch"] + 1))
+    # Rampe statt Stufe am hinteren Taschenende: Akku gleitet beim Herausziehen die 2 mm hoch
+    pk, x0 = P["bat_pocket"], P["bat_x0"]
+    if FC:
+        w = P["bat_w"]
+        pr = Part.makePolygon([V(x0 + 0.01, -w / 2, zt - pk), V(x0 - L["ramp"], -w / 2, zt + 0.01),
+                               V(x0 + 0.01, -w / 2, zt + 0.01), V(x0 + 0.01, -w / 2, zt - pk)])
+        neg.append(Part.Face(pr).extrude(V(0, w, 0)))
+    return neg
+
+
+def latch_top_neg(zb, t):
+    """V2.7: Führungsbohrungen in der oberen Platte (Stiftende), unten angefast (Platte hinten wird kopfüber gedruckt)."""
+    L = P["lat"]; ri = L["d"] / 2 + L["clr"]
+    neg = []
+    for y in L["ys"]:
+        neg.append(cyl(L["x"], y, zb - 1, ri, t + 2))
+        if FC:
+            neg.append(Part.makeCone(ri + 1.5, ri, 1.5, V(L["x"], y, zb - 0.01)))
+    return neg
 
 
 def latch_pin(x=0.0, y=0.0, lock=90.0, world=True):
     """V2.7: Riegelstift. world=True: Einbaulage (Nase in der Kerbe bei Winkel lock), sonst Drucklage (Kopf auf z=0)."""
     L = P["lat"]
     zh = Z_LB - L["foam"]                                   # Oberseite Kopf
-    zl = Z_LT + L["sh"] - L["notch"]                         # Unterseite Nase (liegt in der Kerbe)
+    zl = Z_LT - L["notch"]                                   # Unterseite Nase (liegt in der Kerbe der unteren Platte)
     if not world:
         x, y, dz = 0.0, 0.0, -(zh - L["head_h"])
     else:
         dz = 0.0
     r = L["d"] / 2
     head = cyl(x, y, zh - L["head_h"] + dz, L["head_d"] / 2, L["head_h"])
-    shaft = cyl(x, y, zh - 0.01 + dz, r, L["top"] - zh + 0.01)
+    shaft = cyl(x, y, zh - 0.01 + dz, r, Z_B + L["top"] - zh + 0.01)
     lug = rbox(x, y, lock, r - 0.5, -L["lug_w"] / 2, zl + dz, L["lug_r"] - r + 0.5, L["lug_w"], L["lug_h"])
     neg = []
     n = 16                                                   # Rändel
@@ -484,8 +504,6 @@ def build_bottom():
     pos.append(box(bx1, -bw / 2 - 3.0, zt - 0.5, 3.0, bw + 6.0, rh + 0.5))   # Anschlag vorn
     for hx, hy in relay_holes_low():
         pos.append(cyl(hx, hy, zt - 0.5, 3.5, P["relay_so"] + 0.5))
-    lpos, lneg = latch_neg_pos()                       # V2.7: Akku-Riegel
-    pos += lpos
     neg = []
     for name, x, y, yaw in P["coxa"]:
         neg.append(sweep_2d(x, y, yaw, zb - 1, t + 2))
@@ -511,7 +529,7 @@ def build_bottom():
         neg.append(cyl(P["split_x"], sy, zb - 1, 1.6, t + 2))
     for xh in P["conn"]["holes"]:                      # V2.6: Steckerhalter
         neg.append(cyl(xh, conn_dims()["yc"], zb - 1, P["m3_d"] / 2, t + 2))
-    neg += lneg
+    neg += latch_bottom_neg()                          # V2.7: Akku-Riegel
     plate = cut(fuse(pos), neg)
     front, rear = split(plate, zb, upper_front=False)   # Säulen stehen auf der oberen Stoßhälfte -> hinteres Teil
     return dict(plate=plate, front=front, rear=rear)
