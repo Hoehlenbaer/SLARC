@@ -1,0 +1,259 @@
+<?xml version="1.0"?>
+<!-- SLARC aus dem FreeCAD-Modell (SLARC.FCStd): Femur 150 / Tibia-Sehne 175 / Knick 38.6°, Masse 3786 g.
+     Generiert, nicht von Hand ändern. Gelenk-Namen und Vorzeichen wie slarc_sim_V10 (+ = nach unten). -->
+<robot name="slarc">
+  <link name="base_link">
+    <visual><geometry><mesh filename="meshes/base.stl" scale="0.001 0.001 0.001"/></geometry><material name="petg"><color rgba="0.12 0.12 0.13 1"/></material></visual>
+    <collision><origin xyz="0 0 -0.01795" rpy="0 0 0"/><geometry><box size="0.4 0.15 0.0421"/></geometry></collision>
+    <collision><origin xyz="0 0 -0.01795" rpy="0 0 0"/><geometry><box size="0.04 0.2 0.0421"/></geometry></collision>
+    <collision><geometry><mesh filename="meshes/cover_hull.stl" scale="0.001 0.001 0.001"/></geometry></collision>
+    <collision><origin xyz="0.173125 0 0.03745" rpy="0 0 0"/><geometry><box size="0.01825 0.1312 0.0487"/></geometry></collision>
+    <inertial><origin xyz="-0.00522437 -0.000395862 -0.00914557"/><mass value="2.26489"/><inertia ixx="0.00574905" ixy="-0.00013486" ixz="-0.00139472" iyy="0.0313669" iyz="1.77457e-05" izz="0.0344486"/></inertial>
+  </link>
+  <joint name="front_right_coxa_joint" type="revolute">
+    <parent link="base_link"/><child link="front_right_coxa"/>
+    <origin xyz="0.2 -0.075 0" rpy="0 0 -0.523599"/><axis xyz="0 0 1"/>
+    <limit lower="-1.65806" upper="1.65806" effort="2.94" velocity="4.71"/>
+  </joint>
+  <link name="front_right_coxa">
+    <visual><geometry><mesh filename="meshes/coxa_R.stl" scale="0.001 0.001 0.001"/></geometry><material name="petg"><color rgba="0.12 0.12 0.13 1"/></material></visual>
+    <collision><origin xyz="0.02965 -0.000925 -0.017025"/><geometry><box size="0.0853 0.0401 0.04625"/></geometry></collision>
+    <inertial><origin xyz="0.0427482 -7.02102e-06 -0.0170758"/><mass value="0.0770531"/><inertia ixx="1.64905e-05" ixy="-1.5774e-07" ixz="-1.67396e-07" iyy="3.35645e-05" iyz="2.74958e-11" izz="3.39713e-05"/></inertial>
+  </link>
+  <joint name="front_right_femur_joint" type="revolute">
+    <parent link="front_right_coxa"/><child link="front_right_femur"/>
+    <origin xyz="0.06 0 -0.017025"/><axis xyz="0 1 0"/>
+    <limit lower="-1.95477" upper="1.95477" effort="2.94" velocity="4.71"/>
+  </joint>
+  <link name="front_right_femur">
+    <visual><geometry><mesh filename="meshes/femur_R.stl" scale="0.001 0.001 0.001"/></geometry><material name="petg"><color rgba="0.12 0.12 0.13 1"/></material></visual>
+    <collision><origin xyz="0.07465 -8.88178e-18 3.55271e-18"/><geometry><box size="0.1753 0.04625 0.0297"/></geometry></collision>
+    <inertial><origin xyz="0.106117 -4.36011e-05 -8.58779e-06"/><mass value="0.102219"/><inertia ixx="2.12046e-05" ixy="-5.58873e-07" ixz="-2.74521e-08" iyy="0.00025022" iyz="3.82769e-11" izz="0.000258654"/></inertial>
+  </link>
+  <joint name="front_right_tibia_joint" type="revolute">
+    <parent link="front_right_femur"/><child link="front_right_tibia"/>
+    <origin xyz="0.15 0 0"/><axis xyz="0 1 0"/>
+    <limit lower="-1.95477" upper="1.95477" effort="2.94" velocity="4.71"/>
+  </joint>
+  <link name="front_right_tibia">
+    <visual><geometry><mesh filename="meshes/tibia_R.stl" scale="0.001 0.001 0.001"/></geometry><material name="petg"><color rgba="0.12 0.12 0.13 1"/></material></visual>
+    <collision><origin xyz="0.0065 0 0" rpy="0 0 0"/><geometry><box size="0.039 0.046 0.026"/></geometry></collision>
+    <collision><origin xyz="0.034116 0 0" rpy="0 0 0"/><geometry><box size="0.026232 0.028 0.02"/></geometry></collision>
+    <collision><origin xyz="0.0906863 0 -0.0386805" rpy="0 0.673697 0"/><geometry><box size="0.116 0.028 0.02"/></geometry></collision>
+    <inertial><origin xyz="0.0739933 -6.79299e-05 -0.0310953"/><mass value="0.0576457"/><inertia ixx="5.9581e-05" ixy="-2.89747e-07" ixz="7.36333e-05" iyy="0.000170393" iyz="1.21765e-07" izz="0.00012782"/></inertial>
+  </link>
+  <joint name="front_right_foot_joint" type="fixed">
+    <parent link="front_right_tibia"/><child link="front_right_foot"/>
+    <origin xyz="0.139141 0 -0.0773611"/>
+  </joint>
+  <link name="front_right_foot">
+    <visual><geometry><mesh filename="meshes/foot_R.stl" scale="0.001 0.001 0.001"/></geometry><material name="tpu"><color rgba="0.30 0.31 0.34 1"/></material></visual>
+    <collision><geometry><sphere radius="0.016"/></geometry></collision>
+    <inertial><origin xyz="-0.00259296 -5.28152e-12 0.00206994"/><mass value="0.0166797"/><inertia ixx="3.16438e-06" ixy="3.33361e-16" ixz="5.23388e-07" iyy="3.48927e-06" iyz="-7.71074e-16" izz="3.40221e-06"/></inertial>
+  </link>
+  <joint name="front_left_coxa_joint" type="revolute">
+    <parent link="base_link"/><child link="front_left_coxa"/>
+    <origin xyz="0.2 0.075 0" rpy="0 0 0.523599"/><axis xyz="0 0 1"/>
+    <limit lower="-1.65806" upper="1.65806" effort="2.94" velocity="4.71"/>
+  </joint>
+  <link name="front_left_coxa">
+    <visual><geometry><mesh filename="meshes/coxa_L.stl" scale="0.001 0.001 0.001"/></geometry><material name="petg"><color rgba="0.12 0.12 0.13 1"/></material></visual>
+    <collision><origin xyz="0.02965 0.000925 -0.017025"/><geometry><box size="0.0853 0.0401 0.04625"/></geometry></collision>
+    <inertial><origin xyz="0.0427482 7.02102e-06 -0.0170758"/><mass value="0.0770531"/><inertia ixx="1.64905e-05" ixy="1.5774e-07" ixz="-1.67396e-07" iyy="3.35645e-05" iyz="-2.7491e-11" izz="3.39713e-05"/></inertial>
+  </link>
+  <joint name="front_left_femur_joint" type="revolute">
+    <parent link="front_left_coxa"/><child link="front_left_femur"/>
+    <origin xyz="0.06 0 -0.017025"/><axis xyz="0 1 0"/>
+    <limit lower="-1.95477" upper="1.95477" effort="2.94" velocity="4.71"/>
+  </joint>
+  <link name="front_left_femur">
+    <visual><geometry><mesh filename="meshes/femur_L.stl" scale="0.001 0.001 0.001"/></geometry><material name="petg"><color rgba="0.12 0.12 0.13 1"/></material></visual>
+    <collision><origin xyz="0.07465 8.88178e-18 -3.55271e-18"/><geometry><box size="0.1753 0.04625 0.0297"/></geometry></collision>
+    <inertial><origin xyz="0.106117 4.36011e-05 -8.58759e-06"/><mass value="0.102219"/><inertia ixx="2.12046e-05" ixy="5.58873e-07" ixz="-2.74528e-08" iyy="0.00025022" iyz="-3.82713e-11" izz="0.000258654"/></inertial>
+  </link>
+  <joint name="front_left_tibia_joint" type="revolute">
+    <parent link="front_left_femur"/><child link="front_left_tibia"/>
+    <origin xyz="0.15 0 0"/><axis xyz="0 1 0"/>
+    <limit lower="-1.95477" upper="1.95477" effort="2.94" velocity="4.71"/>
+  </joint>
+  <link name="front_left_tibia">
+    <visual><geometry><mesh filename="meshes/tibia_L.stl" scale="0.001 0.001 0.001"/></geometry><material name="petg"><color rgba="0.12 0.12 0.13 1"/></material></visual>
+    <collision><origin xyz="0.0065 0 0" rpy="0 0 0"/><geometry><box size="0.039 0.046 0.026"/></geometry></collision>
+    <collision><origin xyz="0.034116 0 0" rpy="0 0 0"/><geometry><box size="0.026232 0.028 0.02"/></geometry></collision>
+    <collision><origin xyz="0.0906863 0 -0.0386805" rpy="0 0.673697 0"/><geometry><box size="0.116 0.028 0.02"/></geometry></collision>
+    <inertial><origin xyz="0.0739933 6.79299e-05 -0.0310953"/><mass value="0.0576457"/><inertia ixx="5.9581e-05" ixy="2.89747e-07" ixz="7.36333e-05" iyy="0.000170393" iyz="-1.21765e-07" izz="0.00012782"/></inertial>
+  </link>
+  <joint name="front_left_foot_joint" type="fixed">
+    <parent link="front_left_tibia"/><child link="front_left_foot"/>
+    <origin xyz="0.139141 0 -0.0773611"/>
+  </joint>
+  <link name="front_left_foot">
+    <visual><geometry><mesh filename="meshes/foot_L.stl" scale="0.001 0.001 0.001"/></geometry><material name="tpu"><color rgba="0.30 0.31 0.34 1"/></material></visual>
+    <collision><geometry><sphere radius="0.016"/></geometry></collision>
+    <inertial><origin xyz="-0.00259296 2.14703e-12 0.00206994"/><mass value="0.0166797"/><inertia ixx="3.16438e-06" ixy="-3.45931e-16" ixz="5.23388e-07" iyy="3.48927e-06" iyz="-2.28773e-16" izz="3.40221e-06"/></inertial>
+  </link>
+  <joint name="mid_right_coxa_joint" type="revolute">
+    <parent link="base_link"/><child link="mid_right_coxa"/>
+    <origin xyz="0 -0.115 0" rpy="0 0 -1.5708"/><axis xyz="0 0 1"/>
+    <limit lower="-1.65806" upper="1.65806" effort="2.94" velocity="4.71"/>
+  </joint>
+  <link name="mid_right_coxa">
+    <visual><geometry><mesh filename="meshes/coxa_R.stl" scale="0.001 0.001 0.001"/></geometry><material name="petg"><color rgba="0.12 0.12 0.13 1"/></material></visual>
+    <collision><origin xyz="0.02965 -0.000925 -0.017025"/><geometry><box size="0.0853 0.0401 0.04625"/></geometry></collision>
+    <inertial><origin xyz="0.0427482 -7.02102e-06 -0.0170758"/><mass value="0.0770531"/><inertia ixx="1.64905e-05" ixy="-1.5774e-07" ixz="-1.67396e-07" iyy="3.35645e-05" iyz="2.74958e-11" izz="3.39713e-05"/></inertial>
+  </link>
+  <joint name="mid_right_femur_joint" type="revolute">
+    <parent link="mid_right_coxa"/><child link="mid_right_femur"/>
+    <origin xyz="0.06 0 -0.017025"/><axis xyz="0 1 0"/>
+    <limit lower="-1.95477" upper="1.95477" effort="2.94" velocity="4.71"/>
+  </joint>
+  <link name="mid_right_femur">
+    <visual><geometry><mesh filename="meshes/femur_R.stl" scale="0.001 0.001 0.001"/></geometry><material name="petg"><color rgba="0.12 0.12 0.13 1"/></material></visual>
+    <collision><origin xyz="0.07465 -8.88178e-18 3.55271e-18"/><geometry><box size="0.1753 0.04625 0.0297"/></geometry></collision>
+    <inertial><origin xyz="0.106117 -4.36011e-05 -8.58779e-06"/><mass value="0.102219"/><inertia ixx="2.12046e-05" ixy="-5.58873e-07" ixz="-2.74521e-08" iyy="0.00025022" iyz="3.82769e-11" izz="0.000258654"/></inertial>
+  </link>
+  <joint name="mid_right_tibia_joint" type="revolute">
+    <parent link="mid_right_femur"/><child link="mid_right_tibia"/>
+    <origin xyz="0.15 0 0"/><axis xyz="0 1 0"/>
+    <limit lower="-1.95477" upper="1.95477" effort="2.94" velocity="4.71"/>
+  </joint>
+  <link name="mid_right_tibia">
+    <visual><geometry><mesh filename="meshes/tibia_R.stl" scale="0.001 0.001 0.001"/></geometry><material name="petg"><color rgba="0.12 0.12 0.13 1"/></material></visual>
+    <collision><origin xyz="0.0065 0 0" rpy="0 0 0"/><geometry><box size="0.039 0.046 0.026"/></geometry></collision>
+    <collision><origin xyz="0.034116 0 0" rpy="0 0 0"/><geometry><box size="0.026232 0.028 0.02"/></geometry></collision>
+    <collision><origin xyz="0.0906863 0 -0.0386805" rpy="0 0.673697 0"/><geometry><box size="0.116 0.028 0.02"/></geometry></collision>
+    <inertial><origin xyz="0.0739933 -6.79299e-05 -0.0310953"/><mass value="0.0576457"/><inertia ixx="5.9581e-05" ixy="-2.89747e-07" ixz="7.36333e-05" iyy="0.000170393" iyz="1.21765e-07" izz="0.00012782"/></inertial>
+  </link>
+  <joint name="mid_right_foot_joint" type="fixed">
+    <parent link="mid_right_tibia"/><child link="mid_right_foot"/>
+    <origin xyz="0.139141 0 -0.0773611"/>
+  </joint>
+  <link name="mid_right_foot">
+    <visual><geometry><mesh filename="meshes/foot_R.stl" scale="0.001 0.001 0.001"/></geometry><material name="tpu"><color rgba="0.30 0.31 0.34 1"/></material></visual>
+    <collision><geometry><sphere radius="0.016"/></geometry></collision>
+    <inertial><origin xyz="-0.00259296 -5.28152e-12 0.00206994"/><mass value="0.0166797"/><inertia ixx="3.16438e-06" ixy="3.33361e-16" ixz="5.23388e-07" iyy="3.48927e-06" iyz="-7.71074e-16" izz="3.40221e-06"/></inertial>
+  </link>
+  <joint name="mid_left_coxa_joint" type="revolute">
+    <parent link="base_link"/><child link="mid_left_coxa"/>
+    <origin xyz="0 0.115 0" rpy="0 0 1.5708"/><axis xyz="0 0 1"/>
+    <limit lower="-1.65806" upper="1.65806" effort="2.94" velocity="4.71"/>
+  </joint>
+  <link name="mid_left_coxa">
+    <visual><geometry><mesh filename="meshes/coxa_L.stl" scale="0.001 0.001 0.001"/></geometry><material name="petg"><color rgba="0.12 0.12 0.13 1"/></material></visual>
+    <collision><origin xyz="0.02965 0.000925 -0.017025"/><geometry><box size="0.0853 0.0401 0.04625"/></geometry></collision>
+    <inertial><origin xyz="0.0427482 7.02102e-06 -0.0170758"/><mass value="0.0770531"/><inertia ixx="1.64905e-05" ixy="1.5774e-07" ixz="-1.67396e-07" iyy="3.35645e-05" iyz="-2.7491e-11" izz="3.39713e-05"/></inertial>
+  </link>
+  <joint name="mid_left_femur_joint" type="revolute">
+    <parent link="mid_left_coxa"/><child link="mid_left_femur"/>
+    <origin xyz="0.06 0 -0.017025"/><axis xyz="0 1 0"/>
+    <limit lower="-1.95477" upper="1.95477" effort="2.94" velocity="4.71"/>
+  </joint>
+  <link name="mid_left_femur">
+    <visual><geometry><mesh filename="meshes/femur_L.stl" scale="0.001 0.001 0.001"/></geometry><material name="petg"><color rgba="0.12 0.12 0.13 1"/></material></visual>
+    <collision><origin xyz="0.07465 8.88178e-18 -3.55271e-18"/><geometry><box size="0.1753 0.04625 0.0297"/></geometry></collision>
+    <inertial><origin xyz="0.106117 4.36011e-05 -8.58759e-06"/><mass value="0.102219"/><inertia ixx="2.12046e-05" ixy="5.58873e-07" ixz="-2.74528e-08" iyy="0.00025022" iyz="-3.82713e-11" izz="0.000258654"/></inertial>
+  </link>
+  <joint name="mid_left_tibia_joint" type="revolute">
+    <parent link="mid_left_femur"/><child link="mid_left_tibia"/>
+    <origin xyz="0.15 0 0"/><axis xyz="0 1 0"/>
+    <limit lower="-1.95477" upper="1.95477" effort="2.94" velocity="4.71"/>
+  </joint>
+  <link name="mid_left_tibia">
+    <visual><geometry><mesh filename="meshes/tibia_L.stl" scale="0.001 0.001 0.001"/></geometry><material name="petg"><color rgba="0.12 0.12 0.13 1"/></material></visual>
+    <collision><origin xyz="0.0065 0 0" rpy="0 0 0"/><geometry><box size="0.039 0.046 0.026"/></geometry></collision>
+    <collision><origin xyz="0.034116 0 0" rpy="0 0 0"/><geometry><box size="0.026232 0.028 0.02"/></geometry></collision>
+    <collision><origin xyz="0.0906863 0 -0.0386805" rpy="0 0.673697 0"/><geometry><box size="0.116 0.028 0.02"/></geometry></collision>
+    <inertial><origin xyz="0.0739933 6.79299e-05 -0.0310953"/><mass value="0.0576457"/><inertia ixx="5.9581e-05" ixy="2.89747e-07" ixz="7.36333e-05" iyy="0.000170393" iyz="-1.21765e-07" izz="0.00012782"/></inertial>
+  </link>
+  <joint name="mid_left_foot_joint" type="fixed">
+    <parent link="mid_left_tibia"/><child link="mid_left_foot"/>
+    <origin xyz="0.139141 0 -0.0773611"/>
+  </joint>
+  <link name="mid_left_foot">
+    <visual><geometry><mesh filename="meshes/foot_L.stl" scale="0.001 0.001 0.001"/></geometry><material name="tpu"><color rgba="0.30 0.31 0.34 1"/></material></visual>
+    <collision><geometry><sphere radius="0.016"/></geometry></collision>
+    <inertial><origin xyz="-0.00259296 2.14703e-12 0.00206994"/><mass value="0.0166797"/><inertia ixx="3.16438e-06" ixy="-3.45931e-16" ixz="5.23388e-07" iyy="3.48927e-06" iyz="-2.28773e-16" izz="3.40221e-06"/></inertial>
+  </link>
+  <joint name="rear_right_coxa_joint" type="revolute">
+    <parent link="base_link"/><child link="rear_right_coxa"/>
+    <origin xyz="-0.2 -0.075 0" rpy="0 0 -2.61799"/><axis xyz="0 0 1"/>
+    <limit lower="-1.65806" upper="1.65806" effort="2.94" velocity="4.71"/>
+  </joint>
+  <link name="rear_right_coxa">
+    <visual><geometry><mesh filename="meshes/coxa_R.stl" scale="0.001 0.001 0.001"/></geometry><material name="petg"><color rgba="0.12 0.12 0.13 1"/></material></visual>
+    <collision><origin xyz="0.02965 -0.000925 -0.017025"/><geometry><box size="0.0853 0.0401 0.04625"/></geometry></collision>
+    <inertial><origin xyz="0.0427482 -7.02102e-06 -0.0170758"/><mass value="0.0770531"/><inertia ixx="1.64905e-05" ixy="-1.5774e-07" ixz="-1.67396e-07" iyy="3.35645e-05" iyz="2.74958e-11" izz="3.39713e-05"/></inertial>
+  </link>
+  <joint name="rear_right_femur_joint" type="revolute">
+    <parent link="rear_right_coxa"/><child link="rear_right_femur"/>
+    <origin xyz="0.06 0 -0.017025"/><axis xyz="0 1 0"/>
+    <limit lower="-1.95477" upper="1.95477" effort="2.94" velocity="4.71"/>
+  </joint>
+  <link name="rear_right_femur">
+    <visual><geometry><mesh filename="meshes/femur_R.stl" scale="0.001 0.001 0.001"/></geometry><material name="petg"><color rgba="0.12 0.12 0.13 1"/></material></visual>
+    <collision><origin xyz="0.07465 -8.88178e-18 3.55271e-18"/><geometry><box size="0.1753 0.04625 0.0297"/></geometry></collision>
+    <inertial><origin xyz="0.106117 -4.36011e-05 -8.58779e-06"/><mass value="0.102219"/><inertia ixx="2.12046e-05" ixy="-5.58873e-07" ixz="-2.74521e-08" iyy="0.00025022" iyz="3.82769e-11" izz="0.000258654"/></inertial>
+  </link>
+  <joint name="rear_right_tibia_joint" type="revolute">
+    <parent link="rear_right_femur"/><child link="rear_right_tibia"/>
+    <origin xyz="0.15 0 0"/><axis xyz="0 1 0"/>
+    <limit lower="-1.95477" upper="1.95477" effort="2.94" velocity="4.71"/>
+  </joint>
+  <link name="rear_right_tibia">
+    <visual><geometry><mesh filename="meshes/tibia_R.stl" scale="0.001 0.001 0.001"/></geometry><material name="petg"><color rgba="0.12 0.12 0.13 1"/></material></visual>
+    <collision><origin xyz="0.0065 0 0" rpy="0 0 0"/><geometry><box size="0.039 0.046 0.026"/></geometry></collision>
+    <collision><origin xyz="0.034116 0 0" rpy="0 0 0"/><geometry><box size="0.026232 0.028 0.02"/></geometry></collision>
+    <collision><origin xyz="0.0906863 0 -0.0386805" rpy="0 0.673697 0"/><geometry><box size="0.116 0.028 0.02"/></geometry></collision>
+    <inertial><origin xyz="0.0739933 -6.79299e-05 -0.0310953"/><mass value="0.0576457"/><inertia ixx="5.9581e-05" ixy="-2.89747e-07" ixz="7.36333e-05" iyy="0.000170393" iyz="1.21765e-07" izz="0.00012782"/></inertial>
+  </link>
+  <joint name="rear_right_foot_joint" type="fixed">
+    <parent link="rear_right_tibia"/><child link="rear_right_foot"/>
+    <origin xyz="0.139141 0 -0.0773611"/>
+  </joint>
+  <link name="rear_right_foot">
+    <visual><geometry><mesh filename="meshes/foot_R.stl" scale="0.001 0.001 0.001"/></geometry><material name="tpu"><color rgba="0.30 0.31 0.34 1"/></material></visual>
+    <collision><geometry><sphere radius="0.016"/></geometry></collision>
+    <inertial><origin xyz="-0.00259296 -5.28152e-12 0.00206994"/><mass value="0.0166797"/><inertia ixx="3.16438e-06" ixy="3.33361e-16" ixz="5.23388e-07" iyy="3.48927e-06" iyz="-7.71074e-16" izz="3.40221e-06"/></inertial>
+  </link>
+  <joint name="rear_left_coxa_joint" type="revolute">
+    <parent link="base_link"/><child link="rear_left_coxa"/>
+    <origin xyz="-0.2 0.075 0" rpy="0 0 2.61799"/><axis xyz="0 0 1"/>
+    <limit lower="-1.65806" upper="1.65806" effort="2.94" velocity="4.71"/>
+  </joint>
+  <link name="rear_left_coxa">
+    <visual><geometry><mesh filename="meshes/coxa_L.stl" scale="0.001 0.001 0.001"/></geometry><material name="petg"><color rgba="0.12 0.12 0.13 1"/></material></visual>
+    <collision><origin xyz="0.02965 0.000925 -0.017025"/><geometry><box size="0.0853 0.0401 0.04625"/></geometry></collision>
+    <inertial><origin xyz="0.0427482 7.02102e-06 -0.0170758"/><mass value="0.0770531"/><inertia ixx="1.64905e-05" ixy="1.5774e-07" ixz="-1.67396e-07" iyy="3.35645e-05" iyz="-2.7491e-11" izz="3.39713e-05"/></inertial>
+  </link>
+  <joint name="rear_left_femur_joint" type="revolute">
+    <parent link="rear_left_coxa"/><child link="rear_left_femur"/>
+    <origin xyz="0.06 0 -0.017025"/><axis xyz="0 1 0"/>
+    <limit lower="-1.95477" upper="1.95477" effort="2.94" velocity="4.71"/>
+  </joint>
+  <link name="rear_left_femur">
+    <visual><geometry><mesh filename="meshes/femur_L.stl" scale="0.001 0.001 0.001"/></geometry><material name="petg"><color rgba="0.12 0.12 0.13 1"/></material></visual>
+    <collision><origin xyz="0.07465 8.88178e-18 -3.55271e-18"/><geometry><box size="0.1753 0.04625 0.0297"/></geometry></collision>
+    <inertial><origin xyz="0.106117 4.36011e-05 -8.58759e-06"/><mass value="0.102219"/><inertia ixx="2.12046e-05" ixy="5.58873e-07" ixz="-2.74528e-08" iyy="0.00025022" iyz="-3.82713e-11" izz="0.000258654"/></inertial>
+  </link>
+  <joint name="rear_left_tibia_joint" type="revolute">
+    <parent link="rear_left_femur"/><child link="rear_left_tibia"/>
+    <origin xyz="0.15 0 0"/><axis xyz="0 1 0"/>
+    <limit lower="-1.95477" upper="1.95477" effort="2.94" velocity="4.71"/>
+  </joint>
+  <link name="rear_left_tibia">
+    <visual><geometry><mesh filename="meshes/tibia_L.stl" scale="0.001 0.001 0.001"/></geometry><material name="petg"><color rgba="0.12 0.12 0.13 1"/></material></visual>
+    <collision><origin xyz="0.0065 0 0" rpy="0 0 0"/><geometry><box size="0.039 0.046 0.026"/></geometry></collision>
+    <collision><origin xyz="0.034116 0 0" rpy="0 0 0"/><geometry><box size="0.026232 0.028 0.02"/></geometry></collision>
+    <collision><origin xyz="0.0906863 0 -0.0386805" rpy="0 0.673697 0"/><geometry><box size="0.116 0.028 0.02"/></geometry></collision>
+    <inertial><origin xyz="0.0739933 6.79299e-05 -0.0310953"/><mass value="0.0576457"/><inertia ixx="5.9581e-05" ixy="2.89747e-07" ixz="7.36333e-05" iyy="0.000170393" iyz="-1.21765e-07" izz="0.00012782"/></inertial>
+  </link>
+  <joint name="rear_left_foot_joint" type="fixed">
+    <parent link="rear_left_tibia"/><child link="rear_left_foot"/>
+    <origin xyz="0.139141 0 -0.0773611"/>
+  </joint>
+  <link name="rear_left_foot">
+    <visual><geometry><mesh filename="meshes/foot_L.stl" scale="0.001 0.001 0.001"/></geometry><material name="tpu"><color rgba="0.30 0.31 0.34 1"/></material></visual>
+    <collision><geometry><sphere radius="0.016"/></geometry></collision>
+    <inertial><origin xyz="-0.00259296 2.14703e-12 0.00206994"/><mass value="0.0166797"/><inertia ixx="3.16438e-06" ixy="-3.45931e-16" ixz="5.23388e-07" iyy="3.48927e-06" iyz="-2.28773e-16" izz="3.40221e-06"/></inertial>
+  </link>
+</robot>

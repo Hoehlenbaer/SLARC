@@ -436,7 +436,7 @@ A **centaur mode** (walking on the middle and rear pairs, front legs used as gri
 
 ### Stair climbing
 
-The current development line is **V10.16** (`slarc_sim_V10.py`). Climbing a real 17 cm step is kinematically feasible with this leg geometry (max. climbable step ≈ 28–32 cm); the open work is foot placement. Key findings so far:
+The current development line is **V10.17** (`slarc_sim_V10.py`): leg geometry, masses and inertias come from the CAD model (`urdf/slarc_cad.urdf`, 3.79 kg), the IK handles the bent tibia and the lowered femur axis, and joint limits are the real mechanical ones (coxa ±90°, femur/tibia ±112°) — a target outside them is pulled back along the line to the neutral foot position instead of clipping single joints. Climbing a real 17 cm step was shown to be kinematically feasible for the earlier 175/150 mm legs (to be rechecked for 150/175 with the bent tibia); the open work is foot placement. Key findings so far:
 
 - Body length matters: with the coxa joints 400 mm apart, one leg pair lands per step on a 250 mm tread instead of several pairs crowding one step
 - Height regulation while climbing uses a dedicated small gain — this brought body bounce down from ~5 cm to ~1 cm
@@ -691,7 +691,7 @@ SLARC/
 | Chassis / legs – parametric CAD (FreeCAD) | ✅ Complete design, collision-checked; test prints starting |
 | Bill of materials | ✅ First version |
 | Simulation – walking (tripod / ripple / placemove) | ✅ Working, R1–R3 regulators integrated |
-| Simulation – stair climbing (17 cm) | 🔧 Work in progress (V10.16, CMA-ES tuning) |
+| Simulation – stair climbing (17 cm) | 🔧 Work in progress (V10.17, CMA-ES tuning) |
 | ESP32 firmware – framework, safety, pose control | 🔧 In development (not yet in this repository) |
 | Pi ↔ ESP32 protocol | 🔧 Spec v0.1 |
 | Camera pipeline – GPU rectification | ✅ Working |
