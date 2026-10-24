@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – obere + untere Baseplate inkl. Coxa-Servo-Aufnahme, Elektronik und Energieversorgung.   V2.7 (Akku-Riegel: 2 Bajonett-Stifte, werkzeuglos)
+SLARC – obere + untere Baseplate inkl. Coxa-Servo-Aufnahme, Elektronik und Energieversorgung.   V2.7 (Akku-Riegel: Bajonett-Stift mittig, werkzeuglos)
 FreeCAD 0.21 / 1.0: Makro ausführen. Parameter in P (unten) ändern und Makro neu ausführen
 (die Plattenkontur mit den Schwenkfreigängen ist hier bewusst als Python-Geometrie gebaut,
 nicht über Spreadsheet-Ausdrücke).
@@ -9,7 +9,7 @@ Koordinaten (wie slarc_sim_V10): X = vorn, Y = links, Z = oben, Ursprung = Körp
 Z = 0 = Oberkante Hüllmaß der Coxa-Servos (ST3215 liegt mit Horn nach oben zwischen den Platten).
 
 V2.7
-- Akku-Riegel ohne Zukaufteile: zwei gedruckte Stifte (Ø8) hinter dem Akku, von unten durch die untere Platte
+- Akku-Riegel ohne Zukaufteile: ein gedruckter Stift (Ø8) mittig hinter dem Akku (zwischen Balancer- und Hauptkabel), von unten durch die untere Platte
   bis in eine Führungsbohrung der oberen Platte gesteckt (beidseitig gelagert). Bajonett wie eine Glühbirne:
   Stift mit der Nase nach hinten (Rille im Kopf längs X) einstecken, hochdrücken, 90° drehen -> Nase rastet in
   eine Kerbe oben in der unteren Platte (Rille quer = zu).
@@ -112,7 +112,7 @@ P = dict(
               clr=0.25, wall=1.6, floor=2.0, back=3.0, slot=(6.0, 3.0),   # Spiel, Wände, Rückwand, Kabelschlitz B x H
               flange=8.0, holes=(-194.0, -164.0)),                         # Laschen vorn/hinten mit M3
     # V2.7: Akku-Riegel (Bajonett-Stifte hinter dem Akku, Kopf unter der unteren Platte)
-    lat=dict(x=-171.0, ys=(16.0, -16.0),        # Stiftachsen; Stiftvorderkante x + d/2 = -167 = Akku-Ende (bat_x0)
+    lat=dict(x=-171.0, ys=(0.0,),               # Stiftachse(n), ein Stift mittig zwischen den Kabelabgängen; Vorderkante x + d/2 = -167 = Akku-Ende
              d=8.0, clr=0.25,                    # Stift Ø, radiales Spiel in Bohrung/Schale
              lug_w=3.0, lug_r=7.0, lug_h=2.5,    # Nase: Breite, Außenradius, Höhe
              notch=0.8, key_clr=0.3,             # Rastkerbe-Tiefe, Spiel Nase/Schlitz
