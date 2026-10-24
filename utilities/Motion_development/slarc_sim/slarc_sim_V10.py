@@ -40,10 +40,30 @@ from enum import IntEnum      # SIM ONLY (PC) - StairClimber-Skript
 BODY_L = 0.400; BODY_W = 0.150; BODY_H = 0.040
 MID_Y_OFFSET = 0.040
 
+# [V10.17] Beingeometrie aus dem CAD (Bein-Makro V9.1, Drawings/Macros). EINE Quelle für URDF + IK.
+#   Coxa-Achse -> Femur-Achse: COXA_L waagerecht, FEMUR_DZ senkrecht (Femurachse liegt tiefer)
+#   Femur-Achse -> Knie: FEMUR_L
+#   Tibia geknickt: Kontaktpunkt = Fußkugelmitte, TIBIA_L vom Knie, TIBIA_OFF unter Segment 1.
+#   Servo-/URDF-Gelenkwinkel Tibia = Winkel der geraden Ersatz-Tibia (Knie->Kugel) - TIBIA_OFF.
+LEG_COXA_L   = 0.060
+LEG_FEMUR_DZ = -0.017025
+LEG_FEMUR_L  = 0.150
+LEG_TIBIA_L  = 0.1592
+LEG_TIBIA_OFF = math.radians(29.07)
+LEG_FOOT_R   = 0.016
+# Mechanische Grenzen in GELENK-Konvention (= Servowinkel, + = nach unten), mit Abstand zum Anschlag:
+#   Coxa: Freischnitt Baseplate ±95°; Femur/Tibia: Bein V9.1, erste Berührung ±117°.
+LEG_LIM_DEG = {"coxa": 90.0, "femur": 112.0, "tibia": 112.0}
+# CAD-URDF (Meshes, Massen und Trägheiten aus SLARC.FCStd). Fehlt sie, wird die Primitiv-URDF erzeugt.
+import os as _os
+CAD_URDF = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "urdf", "slarc_cad.urdf")
+USE_CAD_URDF = True
+
 def generate_hexapod_urdf(filename="slarc_primitives.urdf"):
     body_l = BODY_L; body_w = BODY_W; body_h = BODY_H
-    coxa_l = 0.060; femur_l = 0.175; tibia_l = 0.150
-    foot_radius = 0.015
+    coxa_l = LEG_COXA_L; femur_l = LEG_FEMUR_L; tibia_l = LEG_TIBIA_L   # [V10.17] wie CAD
+    femur_dz = LEG_FEMUR_DZ; t_off = LEG_TIBIA_OFF
+    foot_radius = LEG_FOOT_R
     mid_y_offset = MID_Y_OFFSET
 
     legs = [
@@ -82,7 +102,7 @@ def generate_hexapod_urdf(filename="slarc_primitives.urdf"):
     </link>
     <joint name="{name}_femur_joint" type="revolute">
         <parent link="{name}_coxa"/><child link="{name}_femur"/>
-        <origin xyz="{coxa_l} 0 0" rpy="0 0 0"/><axis xyz="0 1 0"/>
+        <origin xyz="{coxa_l} 0 {femur_dz}" rpy="0 0 0"/><axis xyz="0 1 0"/>
         <limit lower="-3.14" upper="3.14" effort="3.0" velocity="3.14"/>
     </joint>
     <link name="{name}_femur">
@@ -96,13 +116,13 @@ def generate_hexapod_urdf(filename="slarc_primitives.urdf"):
         <limit lower="-3.14" upper="3.14" effort="3.0" velocity="3.14"/>
     </joint>
     <link name="{name}_tibia">
-        <visual><origin xyz="{tibia_l/2} 0 0"/><geometry><box size="{tibia_l} 0.015 0.015"/></geometry><material name="blue"><color rgba="0.2 0.2 0.8 1"/></material></visual>
-        <collision><origin xyz="{tibia_l/2} 0 0"/><geometry><box size="{tibia_l} 0.015 0.015"/></geometry></collision>
+        <visual><origin xyz="{tibia_l/2*math.cos(t_off)} 0 {-tibia_l/2*math.sin(t_off)}" rpy="0 {t_off} 0"/><geometry><box size="{tibia_l} 0.015 0.015"/></geometry><material name="blue"><color rgba="0.2 0.2 0.8 1"/></material></visual>
+        <collision><origin xyz="{tibia_l/2*math.cos(t_off)} 0 {-tibia_l/2*math.sin(t_off)}" rpy="0 {t_off} 0"/><geometry><box size="{tibia_l} 0.015 0.015"/></geometry></collision>
         <inertial><mass value="0.025"/><inertia ixx="0.0001" ixy="0" ixz="0" iyy="0.0001" iyz="0" izz="0.0001"/></inertial>
     </link>
     <joint name="{name}_foot_joint" type="fixed">
         <parent link="{name}_tibia"/><child link="{name}_foot"/>
-        <origin xyz="{tibia_l} 0 0" rpy="0 0 0"/>
+        <origin xyz="{tibia_l*math.cos(t_off)} 0 {-tibia_l*math.sin(t_off)}" rpy="0 0 0"/>
     </joint>
     <link name="{name}_foot">
         <visual><geometry><sphere radius="{foot_radius}"/></geometry><material name="black"><color rgba="0 0 0 1"/></material></visual>
@@ -118,7 +138,9 @@ def generate_hexapod_urdf(filename="slarc_primitives.urdf"):
 # ==========================================
 # Gemeinsame Treppen-Geometrie: hier ÄNDERN, dann passen Sim-Treppe UND der
 # FIXED-Anstellwinkel automatisch zusammen. (Für 100-mm-Test: STAIR_RISE=0.10)
-SLARC_VERSION = "V10.16-rear-fwd"   # V10.16: Hinterbein-Ziel beim Klettern nach VORN (statt G_REAR_REACH
+SLARC_VERSION = "V10.17-cad-legs"   # V10.17: Beingeometrie aus dem CAD (Femur 150, geknickte Tibia, Femurachse
+                                    # 17 mm tiefer), CAD-URDF, echte Gelenkgrenzen mit Ziel-Rücknahme, G_RADIUS 0.18.
+                                    # V10.16: V10.16: Hinterbein-Ziel beim Klettern nach VORN (statt G_REAR_REACH
                                     # zurück) -> Coxa schwenkt vor auf die Stufe; CoM-Wippe trägt die Stabilität.
 STAIR_RISE = 0.05      # Stufenhöhe [m] (5-cm-Einstiegstest; 10-cm später: 0.10)
 STAIR_RUN  = 0.250     # Stufentiefe [m]
@@ -353,10 +375,12 @@ class HexapodKinematics:
       Coxa-Achse +z (Yaw), Femur/Tibia-Achse +y. Positiver Femurwinkel
       senkt die Beinspitze (down-positiv) -> negativer Femurwinkel = aufwärts.
     """
-    # Segmentlängen [m]
-    L_C = 0.060
-    L_F = 0.175
-    L_T = 0.150
+    # Segmentlängen [m] - [V10.17] aus dem CAD (siehe LEG_* oben). L_T = gerade Ersatz-Tibia Knie->Fußkugel.
+    L_C = LEG_COXA_L
+    L_F = LEG_FEMUR_L
+    L_T = LEG_TIBIA_L
+    DZ  = LEG_FEMUR_DZ          # Femurachse unter der Coxa-Achse
+    T_OFF = LEG_TIBIA_OFF       # Gelenkwinkel Tibia = Ersatzwinkel - T_OFF
 
     # --- Req 1: maximale Schritthöhe ----------------------------------
     # Extrempose: Femur 90° aufwärts, Knie-Innenwinkel ~160°.
@@ -376,16 +400,15 @@ class HexapodKinematics:
     # max. Standhöhe = vertikale Komponente bei fast gestrecktem Bein:
     BODY_H_MAX = math.sqrt((L_F + L_T) ** 2 - L_REACH_STAND ** 2)  # ≈ 0.302 m
 
-    # --- Gelenklimits [rad] ------------------------------------------
-    # Die ST3215 drehen kontinuierlich, mechanische Anschläge ergeben sich
-    # erst aus der Beinkonstruktion und sind aktuell KEINE harte Grenze.
-    # Daher bewusst WEIT gesetzt, damit die Limits die gewünschten Tuck-/
-    # Streck-Posen nicht künstlich abschneiden. Die EINZIGE echte Grenze ist
-    # die Beinreichweite D ∈ [|L_F-L_T|, L_F+L_T] = [25 mm, 325 mm].
-    # Werte später an die reale Beinkonstruktion anpassen (Selbstkollision).
-    COXA_MIN, COXA_MAX = -math.radians(110), math.radians(110)
-    FEMUR_MIN, FEMUR_MAX = -math.radians(160), math.radians(130)  # neg = auf
-    TIBIA_MIN, TIBIA_MAX = -math.radians(20), math.radians(175)
+    # --- Gelenklimits [rad] in GELENK-Konvention (= Servowinkel) -------
+    # [V10.17] Echte mechanische Grenzen aus dem CAD (LEG_LIM_DEG). Verletzt ein Ziel sie, wird es in
+    # solve() entlang der Linie zur Neutralposition zurückgenommen (Fuß bleibt auf der geplanten Linie),
+    # statt einzelne Gelenke abzuschneiden. Per-Gelenk-Clamp nur noch als letzte Sicherung.
+    COXA_MIN, COXA_MAX = -math.radians(LEG_LIM_DEG["coxa"]), math.radians(LEG_LIM_DEG["coxa"])
+    FEMUR_MIN, FEMUR_MAX = -math.radians(LEG_LIM_DEG["femur"]), math.radians(LEG_LIM_DEG["femur"])  # neg = auf
+    TIBIA_MIN, TIBIA_MAX = -math.radians(LEG_LIM_DEG["tibia"]), math.radians(LEG_LIM_DEG["tibia"])
+    REF_POINT = (0.180, 0.0, -0.120)   # sicher erreichbarer Rückzugspunkt im Hüft-Frame (Neutralstand)
+    lim_hits = 0                        # Zähler: Ziele, die zurückgenommen/geclampt wurden
 
     def femur_torque(self, r, F_leg):
         """Statisches Femur-Moment [Nm] bei horizontalem Fußabstand r vom Hüftgelenk
@@ -447,60 +470,56 @@ class HexapodKinematics:
         """
         return self.FOOT_Z_MAX - stance_z
 
-    def solve(self, x, y, z):
-        """
-        Liefert (theta_c, theta_f, theta_t, ok).
-        `ok` = False, wenn Ziel außerhalb Workspace oder Gelenklimits
-        lag und geclampt werden musste (für Logging/Sicherheit).
-        Eingabe: Fuß im Hüft-Koordinatensystem des Beins (nach mount_yaw).
-        """
+    def _raw(self, x, y, z):
+        """[V10.17] Reine IK ohne Gelenkgrenzen. Liefert Gelenkwinkel (Servo-Konvention) + Reichweiten-ok.
+        z ist relativ zur Coxa-Achse; die Femurachse liegt DZ tiefer."""
         ok = True
-
-        # Hinweis: kein künstlicher Höhen-Cap mehr. Die physikalische Grenze
-        # ist allein die Reichweite D (unten geclampt). Der Fuß darf also bis
-        # nahe an die volle Streckung (325 mm) in JEDE Richtung - inkl. weit
-        # über Schulterhöhe (Mittelbein-Tuck) und tief abgesenkt (Greifer).
-
-        # --- Coxa (Yaw) ---
         theta_c = math.atan2(y, x)
-
-        # --- horizontale Reichweite ab Femurgelenk ---
+        z = z - self.DZ
         L = math.sqrt(x * x + y * y) - self.L_C
         if L < 0.02:
-            L = 0.02
-            ok = False
-
-        # --- Geradlinige Distanz Femurgelenk->Fuß, auf Reichweite clampen ---
+            L = 0.02; ok = False
         D = math.sqrt(L * L + z * z)
         reach_max = self.L_F + self.L_T - 0.002
         reach_min = abs(self.L_F - self.L_T) + 0.002
         if D > reach_max:
-            D = reach_max
-            ok = False
+            D = reach_max; ok = False
         if D < reach_min:
-            D = reach_min
-            ok = False
-
-        # --- Femur/Tibia (Kosinussatz, einheitlicher stetiger Ast) ---
-        # phi = Elevationswinkel der Fußrichtung (z<0 ⇒ phi<0)
+            D = reach_min; ok = False
         phi = math.atan2(z, L)
-        val_f = _clamp((self.L_F * self.L_F + D * D - self.L_T * self.L_T)
-                       / (2 * self.L_F * D), -1.0, 1.0)
-        alpha = math.acos(val_f)
-        # down-positiv ⇒ theta_f = -(phi + alpha)  (Knie-oben-Lösung)
+        alpha = math.acos(_clamp((self.L_F**2 + D*D - self.L_T**2) / (2 * self.L_F * D), -1.0, 1.0))
         theta_f = -(phi + alpha)
+        theta_t = math.pi - math.acos(_clamp((self.L_F**2 + self.L_T**2 - D*D) / (2 * self.L_F * self.L_T), -1.0, 1.0))
+        return theta_c, theta_f, theta_t - self.T_OFF, ok
 
-        val_t = _clamp((self.L_F * self.L_F + self.L_T * self.L_T - D * D)
-                       / (2 * self.L_F * self.L_T), -1.0, 1.0)
-        theta_t = math.pi - math.acos(val_t)
+    def _in_limits(self, tc, tf, tt):
+        return (self.COXA_MIN <= tc <= self.COXA_MAX and self.FEMUR_MIN <= tf <= self.FEMUR_MAX
+                and self.TIBIA_MIN <= tt <= self.TIBIA_MAX)
 
-        # --- Gelenklimits anwenden (Servo-/Kollisionsschutz) ---
-        tc = _clamp(theta_c, self.COXA_MIN, self.COXA_MAX)
-        tf = _clamp(theta_f, self.FEMUR_MIN, self.FEMUR_MAX)
-        tt = _clamp(theta_t, self.TIBIA_MIN, self.TIBIA_MAX)
-        if (tc != theta_c) or (tf != theta_f) or (tt != theta_t):
-            ok = False
-        return tc, tf, tt, ok
+    def solve(self, x, y, z):
+        """[V10.17] IK mit echten Gelenkgrenzen. Liefert (theta_c, theta_f, theta_t, ok) in Servo-Konvention.
+        Liegt das Ziel außerhalb der Grenzen, wird es per Bisektion entlang der Linie Ziel -> REF_POINT
+        zurückgenommen (ok=False, lim_hits+1). Nur wenn selbst REF_POINT nicht passt: Per-Gelenk-Clamp."""
+        tc, tf, tt, ok = self._raw(x, y, z)
+        if self._in_limits(tc, tf, tt):
+            return tc, tf, tt, ok
+        HexapodKinematics.lim_hits += 1
+        rx, ry, rz = self.REF_POINT
+        rr = math.hypot(x, y)
+        if rr > 1e-6:                                     # Rückzugspunkt in Zielrichtung (gleicher Azimut)
+            rx, ry = self.REF_POINT[0] * x / rr, self.REF_POINT[0] * y / rr
+        if not self._in_limits(*self._raw(rx, ry, rz)[:3]):
+            return (_clamp(tc, self.COXA_MIN, self.COXA_MAX), _clamp(tf, self.FEMUR_MIN, self.FEMUR_MAX),
+                    _clamp(tt, self.TIBIA_MIN, self.TIBIA_MAX), False)
+        lo, hi = 0.0, 1.0                                 # lo: zulässig, hi: unzulässig
+        for _ in range(10):
+            m = (lo + hi) / 2
+            if self._in_limits(*self._raw(rx + (x - rx) * m, ry + (y - ry) * m, rz + (z - rz) * m)[:3]):
+                lo = m
+            else:
+                hi = m
+        tc, tf, tt, _ = self._raw(rx + (x - rx) * lo, ry + (y - ry) * lo, rz + (z - rz) * lo)
+        return tc, tf, tt, False
 
     def forward(self, theta_c, theta_f, theta_t):
         """FK - Umkehrung von solve(). Aus den drei Servowinkeln den Fuß im
@@ -511,9 +530,9 @@ class HexapodKinematics:
           beta_f = -theta_f                 (geom. Femur-Aufwärtswinkel gg. L-Achse)
           beta_t = -theta_f - theta_t       (geom. Tibia-Winkel gg. L-Achse)"""
         beta_f = -theta_f
-        beta_t = -theta_f - theta_t
+        beta_t = -theta_f - (theta_t + self.T_OFF)        # [V10.17] Servowinkel -> Ersatz-Tibia
         L = self.L_C + self.L_F*math.cos(beta_f) + self.L_T*math.cos(beta_t)
-        z = self.L_F*math.sin(beta_f) + self.L_T*math.sin(beta_t)
+        z = self.L_F*math.sin(beta_f) + self.L_T*math.sin(beta_t) + self.DZ
         x = L*math.cos(theta_c)
         y = L*math.sin(theta_c)
         return x, y, z
@@ -995,7 +1014,7 @@ class SlarcController:
                           'advance': 'when_planted', 'splay': 0.5, 'splay_rear': 0.0},
         }
         # Kern-Konstanten (ESP32-reaktiv)
-        self.G_RADIUS   = 0.229    # Neutral-Radius vom Hüftgelenk [m]
+        self.G_RADIUS   = 0.180    # Neutral-Radius vom Hüftgelenk [m]  [V10.17] 0.229 -> 0.18: Femur -26 % (CAD-Sim)
         self.G_CLIMB_RADIUS_SCALE = 1.0    # [V10.13 zurückgenommen] Narrow zog Hinterfüße nach innen/unter
         self.G_REAR_REACH = 0.13   # Hinterbein-Offset nach hinten pro rad Nase-hoch-Pitch [m/rad] (flach-nah)
         self.G_CLIMB_REAR_FWD = 0.06   # [V10.16] Klettern: Hinterbein-Trittpunkt nach VORN Richtung Stufe [m]
@@ -1299,6 +1318,10 @@ class SlarcController:
                       terrain='stairs', hills_n=6, hills_seed=0, hills_style='scatter',
                       hills_len=2.5, step_h=0.06):
         generate_hexapod_urdf("slarc_primitives.urdf")
+        urdf, flags = "slarc_primitives.urdf", 0
+        if USE_CAD_URDF and _os.path.isfile(CAD_URDF):     # [V10.17] CAD-Modell (Massen/Trägheiten aus Datei)
+            urdf, flags = CAD_URDF, p.URDF_USE_INERTIA_FROM_FILE
+        print("  URDF:", urdf)
         p.connect(p.GUI if gui else p.DIRECT)
         if gui:
             p.configureDebugVisualizer(p.COV_ENABLE_KEYBOARD_SHORTCUTS, 0)
@@ -1311,7 +1334,7 @@ class SlarcController:
         p.setPhysicsEngineParameter(fixedTimeStep=1./240., numSolverIterations=150, numSubSteps=2,
                                     useSplitImpulse=1, splitImpulsePenetrationThreshold=-0.02)
         planeId = p.loadURDF("plane.urdf"); _set_contact(planeId)
-        self.robot_id = p.loadURDF("slarc_primitives.urdf", [spawn_x, 0, 0.20])
+        self.robot_id = p.loadURDF(urdf, [spawn_x, 0, 0.20], flags=flags)
         for i in range(p.getNumJoints(self.robot_id)):
             info = p.getJointInfo(self.robot_id, i)
             jn = info[1].decode('utf-8'); self.joint_map[jn] = i
@@ -2114,12 +2137,12 @@ def main():
     ap.add_argument('--tag', default='', help="Kürzel im Log-Dateinamen (z.B. balance_off)")
     # --- Servo-Stellwinkel-Grenzen [Grad] zum Live-Testen des IK-Pfads ---
     # Default = None -> Klassenwert der IK behalten. Femur: neg = auf.
-    ap.add_argument('--coxa-min',  type=float, default=None, help="Coxa min [deg]  (Default -110)")
-    ap.add_argument('--coxa-max',  type=float, default=None, help="Coxa max [deg]  (Default +110)")
-    ap.add_argument('--femur-min', type=float, default=None, help="Femur min [deg] neg=auf (Default -160)")
-    ap.add_argument('--femur-max', type=float, default=None, help="Femur max [deg] (Default +130)")
-    ap.add_argument('--tibia-min', type=float, default=None, help="Tibia min [deg] (Default -20)")
-    ap.add_argument('--tibia-max', type=float, default=None, help="Tibia max [deg] (Default +175)")
+    ap.add_argument('--coxa-min',  type=float, default=None, help="Coxa min [deg]  (Default -90)")
+    ap.add_argument('--coxa-max',  type=float, default=None, help="Coxa max [deg]  (Default +90)")
+    ap.add_argument('--femur-min', type=float, default=None, help="Femur min [deg] neg=auf (Default -112)")
+    ap.add_argument('--femur-max', type=float, default=None, help="Femur max [deg] (Default +112)")
+    ap.add_argument('--tibia-min', type=float, default=None, help="Tibia min [deg] Servo-Konvention (Default -112)")
+    ap.add_argument('--tibia-max', type=float, default=None, help="Tibia max [deg] Servo-Konvention (Default +112)")
     args = ap.parse_args()
     STAIR_RISE = args.rise; STAIR_RUN = args.run; STAIR_X = args.stair_x
     print("  Treppe: rise=%.0fmm run=%.0fmm | GUI=%s Treppe=%s Dose=%s"
@@ -2209,7 +2232,7 @@ def main():
             robot._update_progress(); robot.logger.tick()
             if not args.no_gui: time.sleep(1./240.)
         robot.logger.stop()
-        print("  [AUTO] Lauf fertig -> %s" % robot.logger.path)
+        print("  [AUTO] Lauf fertig -> %s | IK-Zielrücknahmen: %d" % (robot.logger.path, HexapodKinematics.lim_hits))
         return
 
     print("\n=== SLARC V8 - Unified omnidirektionaler Gait-Kern ===")
@@ -2280,7 +2303,8 @@ class MotionLogger:
                 # [V10.9-Diag] R3-Kletter-Innenleben: h_ref_raw/h_ref_f (roh/gefiltert), climb_err,
                 # climb_over (Overstretch-Term), n_ref (Referenzbeine), climbing (0/1)
                 "h_ref_raw", "h_ref_f", "climb_err", "climb_over", "n_ref", "climbing",
-                "com_fwd"]   # [V10.14] CoM-Wippe fore-aft-Offset
+                "com_fwd",   # [V10.14] CoM-Wippe fore-aft-Offset
+                "ik_lim"]    # [V10.17] kumulierte IK-Zielrücknahmen (Gelenkgrenzen)
         for n in self._legs():
             cols += [f"{n}_fx", f"{n}_fy", f"{n}_fz", f"{n}_contact", f"{n}_force",
                      f"{n}_tau_coxa", f"{n}_tau_femur", f"{n}_tau_tibia",
@@ -2371,7 +2395,7 @@ class MotionLogger:
                f"{getattr(c,'_g_h_ref_raw',0.0):.4f}", f"{getattr(c,'_g_h_ref_f',0.0):.4f}",
                f"{getattr(c,'_g_climb_err',0.0):.4f}", f"{getattr(c,'_g_climb_over',0.0):.4f}",
                getattr(c,'_g_n_ref',0), int(getattr(c,'_g_climbing',False)),
-               f"{getattr(c,'_g_com_fwd',0.0):.4f}"]
+               f"{getattr(c,'_g_com_fwd',0.0):.4f}", HexapodKinematics.lim_hits]
         for n in self._legs():
             fidx = c._foot_link_idx.get(n, -1)
             if fidx >= 0:
