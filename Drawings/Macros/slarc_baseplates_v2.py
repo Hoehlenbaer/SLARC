@@ -124,12 +124,13 @@ P = dict(
 )
 STEP_DIR = r""
 
-# Stereo-Halterung (identisch zu slarc_stereo_mount_v1_4.py)
+# Stereo-Halterung (identisch zu slarc_stereo_mount_v1_4.py, V1.5)
 CAM = dict(pcb=39, hole_s=34, pilot_d=1.7, so_d=5, so_h=2, plate_t=4, holder_w=24.4, holder_h=16.3,
            win_c=.8, rim_c=.6, rim_t=3, bot_t=4, rim_d=12, fpc_w=20, fpc_off=.5, ear_l=10, ear_hole=3.2,
            trig_w=0.0, trig_off=0.0,   # trig_w > 0: Kabelschlitze oben für Trigger/Strobe (z.B. 28.5)
            tpcb_w=20.0, tpcb_h=22.0, tpcb_c=0.3, tpcb_d=0.5,
-           imu=True, imu_hs=13.6, imu_hz=2.5, imu_pd=2.1, imu_depth=6.0, imu_so=1.5, imu_sod=4.5)   # V1.4: ICM20948 oben
+           imu=True, imu_hs=13.6, imu_hz=2.5, imu_pd=2.1, imu_depth=6.0, imu_so=1.5, imu_sod=4.5,   # V1.4: ICM20948 oben
+           corner_r=6.0, ear_r=2.0, ear_fil=2.5)   # V1.5: gerundete Ecken
 
 # ============================================================ Geometrie-Backend
 try:
@@ -284,6 +285,14 @@ def cam_bracket():
             ix, iz = sx * g.imu_hs / 2, ZF - g.imu_hz
             pos.append(cyly(ix, H2 - 0.5, iz, g.imu_sod / 2, g.imu_so + 0.5))
             neg.append(cyly(ix, H2 - g.imu_depth, iz, g.imu_pd / 2, g.imu_depth + g.imu_so + 0.2))
+    def rc(x, y, sx, sy, r, z0, h):          # V1.5: Eckstück/Kehle (Box - Zylinder), Richtung wie im Stereo-Makro
+        return cut(box(x - r if sx < 0 else x, y - r if sy < 0 else y, z0, r, r, h), [cyl(x + sx * r, y + sy * r, z0 - 1, r, h + 2)])
+    for sx in (-1, 1):
+        ex = sx * (W2 + g.ear_l)
+        neg.append(rc(sx * W2, H2, -sx, -1, g.corner_r, ZB - 1, D + 2))
+        neg.append(rc(ex, -H2b + g.bot_t, -sx, -1, g.ear_r, ZB - 1, D + 2))
+        neg.append(rc(ex, -H2b, -sx, 1, g.ear_r, ZB - 1, D + 2))
+        pos.append(rc(sx * W2, -H2b + g.bot_t, sx, 1, g.ear_fil, ZB, D))
     neg.append(box(-g.tpcb_w / 2 - g.tpcb_c, -g.tpcb_h / 2 - g.tpcb_c, g.so_h - 0.01,
                    g.tpcb_w + 2 * g.tpcb_c, g.tpcb_h + 2 * g.tpcb_c, g.tpcb_d + 0.01))
     return cut(fuse(pos), neg), dict(W2=W2, H2=H2, H2b=H2b, ZF=ZF, ZB=ZB, ear_y=W2 + g.ear_l / 2, D=D)

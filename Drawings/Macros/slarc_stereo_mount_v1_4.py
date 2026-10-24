@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – Stereo-Kamerahalterung für 2x IMX296-Modul mit M12-Objektiv (39x39 mm Board).   V1.4
+SLARC – Stereo-Kamerahalterung für 2x IMX296-Modul mit M12-Objektiv (39x39 mm Board).   V1.5
+(V1.5: Ecken gerundet – obere Rahmenecken R corner_r, Laschenenden rund (ear_r), Kehle zwischen Rahmen und Lasche
+ (ear_fil). Sieht weniger kastig aus und die runden Ecken der Frontfläche heben sich beim Druck kaum ab.)
 (V1.4.1: Bunde der IMU-Kernlöcher 0.5 mm nach hinten (imu_hz 2.5) – standen 0.25 mm über die Frontfläche, Druck auf der Front ging nicht)
 (V1.4: Platz für die Zusatz-IMU ICM20948 (Pimoroni-Breakout 19x19, 2x M2.5 im Abstand 13.6 mm, 2.7 mm von den Kanten) mittig auf dem oberen
  Rahmen -> starr zum Stereo-Paar, nahe der Mitte zwischen den optischen Achsen; per IMU_MOUNT abschaltbar)
@@ -62,6 +64,9 @@ PARAMS = [
     ("tpcb_d",     0.5, "Tiefe Platinentasche (Lage für Klebeband)"),
     ("ear_l",     10.0, "Befestigungslasche Länge"),
     ("ear_hole",   3.2, "Befestigungslasche Bohrung (M3)"),
+    ("corner_r",   6.0, "V1.5: Radius obere Rahmenecken (Ansicht von vorn); innen bleibt die Ecke für das Board eckig -> min. Wand 1.76"),
+    ("ear_r",      2.0, "V1.5: Radius Laschenenden (2.0 = halbrund bei bot_t 4)"),
+    ("ear_fil",    2.5, "V1.5: Kehle Rahmen -> Lasche (Material dazu, Schraubenkopf M3 bleibt frei)"),
     ("imu_hs",    13.6, "ICM20948-Breakout: Lochabstand (quer, X), Löcher M2.5"),
     ("imu_hz",     2.5, "ICM20948: Lochreihe hinter der Frontfläche (Lochmitte in der Frontplatte; Bund Ø4.5 endet 0.25 hinter der Front -> Frontfläche bleibt eben)"),
     ("imu_pd",     2.1, "ICM20948: Kernloch M2.5 selbstschneidend in PETG"),
@@ -134,6 +139,20 @@ def cyly(n, x, y0, z, d, h):
     return o
 
 
+def round_corner(n, x, y, sx, sy, r, z0, h, convex=True):
+    """V1.5: Ecke (x, y) in der XY-Ansicht runden. Konvex: (sx, sy) zeigt von der Ecke ins Material, das Eckstück
+    wird abgezogen. Konkav: (sx, sy) zeigt in den freien Raum, die Kehle wird ergänzt. Rückgabe: Part::Cut (Box - Zylinder)."""
+    bx = f"({x}) - ({r})" if sx < 0 else f"({x})"
+    by = f"({y}) - ({r})" if sy < 0 else f"({y})"
+    cx, cy = f"({x}) + ({sx})*({r})", f"({y}) + ({sy})*({r})"
+    b = box(n + "_box", bx, by, z0, r, r, h)
+    c = cylz(n + "_cyl", cx, cy, f"({z0}) - 1", f"2*({r})", f"({h}) + 2")
+    o = doc.addObject("Part::Cut", n); grp.addObject(o)
+    o.Base, o.Tool = b, c
+    _hide(b); _hide(c)
+    return o
+
+
 def fuse(n, shapes):
     o = doc.addObject("Part::MultiFuse", n); grp.addObject(o)
     o.Shapes = shapes
@@ -179,6 +198,15 @@ if IMU_MOUNT:                       # Zusatz-IMU oben mittig, Board flach auf zw
         ix = f"({sx})*imu_hs/2"
         pos.append(cyly(f"IMU_so{i}", ix, "y_top - 0.5", IZ, "imu_sod", "imu_so + 0.5"))
         neg.append(cyly(f"IMU_pilot{i}", ix, "y_top - imu_depth", IZ, "imu_pd", "imu_depth + imu_so + 0.2"))
+# V1.5: Ecken runden (Ansicht von vorn). Material liegt von der Ecke aus in Richtung (-sx, -sy) -> konvex
+ZH = f"({DEPTH}) + 2"
+for c, sx in (("L", -1), ("R", 1)):
+    neg.append(round_corner(f"Round_top_{c}", f"({sx})*x_half", "y_top", -sx, -1, "corner_r", f"({ZB}) - 1", ZH))
+    ex = f"({sx})*(x_half + ear_l)"
+    neg.append(round_corner(f"Round_ear_top_{c}", ex, "-y_bot + bot_t", -sx, -1, "ear_r", f"({ZB}) - 1", ZH))
+    neg.append(round_corner(f"Round_ear_bot_{c}", ex, "-y_bot", -sx, 1, "ear_r", f"({ZB}) - 1", ZH))
+    # Kehle: Ecke bei (±x_half, -y_bot + bot_t), freier Raum liegt in Richtung (+sx, +1)
+    pos.append(round_corner(f"Fillet_ear_{c}", f"({sx})*x_half", "-y_bot + bot_t", sx, 1, "ear_fil", ZB, DEPTH, convex=False))
 for c, sx in (("L", -1), ("R", 1)):
     neg.append(cyly(f"EarHole_{c}", f"({sx})*(x_half + ear_l/2)", "-y_bot - 1",
                     f"(({ZB}) + ({ZF}))/2", "ear_hole", "bot_t + 2"))
