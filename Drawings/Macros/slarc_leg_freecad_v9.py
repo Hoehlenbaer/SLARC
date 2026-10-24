@@ -1,8 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – parametrisches Bein (Coxa/Femur/Tibia) mit 3x ST3215, doppelt gelagert.   V9
+SLARC – parametrisches Bein (Coxa/Femur/Tibia) mit 3x ST3215, doppelt gelagert.   V9.1
 FreeCAD 0.21 / 1.0 – Makro ausführen oder in der Python-Konsole:
     exec(open(r"PFAD/slarc_leg_freecad_v8.py", encoding="utf-8").read())
+
+V9.1 (mehr Gelenkwinkel an Knie und Femur)
+- Fase fork_ch an den beiden Innenkanten des Gabelstegs (Femur- und Tibia-Gelenk), nur zwischen den Wangen.
+  Bisher lief die Stegecke bei ±109° gegen die Seitenwand der Servo-Einhausung im Vorgängerglied;
+  die Wand bleibt (sie hält den Servo), stattdessen weicht die Ecke aus. Mit fork_ch = 6 (Fase bis zur Außenkante
+  des 6-mm-Stegs) erste Berührung erst bei ±117° (geprüft, auch gespiegelt). fork_ch = 0 schaltet die Fase ab.
 
 V9 (gespiegelte Beine)
 - MIRROR = True erzeugt das Spiegelbild des Beins (Spiegelebene = senkrechte Ebene durch die Coxa-Achse in Beinrichtung).
@@ -109,6 +115,7 @@ PARAMS = [
     ("cheek_t",     4.0,  "Dicke obere Wange (Hornseite)"),
     ("cheek_b_t",   4.0,  "Dicke untere Wange (Rückscheibe)"),
     ("bridge_t2",    6.0,  "Gabelsteg Femur/Tibia (Coxa: bridge_t)"),
+    ("fork_ch",      6.0,  "V9.1: Fase an den Innenkanten des Gabelstegs (Femur/Tibia) -> mehr Gelenkwinkel, 0 = aus"),
     ("ramp_l",     15.0,  "Rampe Gabelsteg -> Träger, Länge"),
     ("bridge_t",    4.0,  "Dicke Gabelsteg"),
     ("fork_w",     26.0,  "Breite Gabelwangen"),
@@ -434,6 +441,16 @@ def ties(g, n, xs):
     return out
 
 
+def fork_chamfer(g, n):
+    """V9.1: 45°-Fasen an den beiden Innenkanten (x = r_clr, y = ±fork_w/2) des Gabelstegs, nur zwischen
+    den Wangen (z von Oberkante untere Wange bis Unterkante obere Wange) -> Wangenanschluss bleibt voll."""
+    z0 = "zb + cheek_b_t"
+    h = f"horn_t - ({z0})"
+    L = "fork_ch*1.4143 + 4"
+    return [rbox(g, n + "_ch_p", "r_clr", "fork_w/2 - fork_ch", 45, -2, 0, z0, L, "fork_ch + 2", h),
+            rbox(g, n + "_ch_n", "r_clr", "-(fork_w/2 - fork_ch)", -45, -2, "-(fork_ch + 2)", z0, L, "fork_ch + 2", h)]
+
+
 def fork_neg(g, n, fr):
     """4x M3 durch obere Wange (Horn) und untere Wange+Bund (Rückscheibe), Mittelbohrungen."""
     t = []
@@ -530,7 +547,7 @@ servo(j1, "Femur", F)
 j2b = part(j1, "J2_base", fixed_fr=F)
 j2 = part(j2b, "J2_Femur", angle="q_femur")
 T = Fr("femur_len", "0", "0")
-pos = fork_pos(j2, "Femur", I, "bridge_t2") + ramps(j2, "Femur", X1); neg = fork_neg(j2, "Femur", I)
+pos = fork_pos(j2, "Femur", I, "bridge_t2") + ramps(j2, "Femur", X1); neg = fork_neg(j2, "Femur", I) + fork_chamfer(j2, "Femur")
 b_p, b_n = beam(j2, "Femur", I, X1, "femur_len - back + 0.5", hollow=True)
 b_n += ties(j2, "Femur", [f"({X1}) + ramp_l + 8", "(femur_len - back + ramp_l + r_clr)/2", "femur_len - back - 10"])
 c_p, c_n, lp, ln = cradle(j2, "TibiaSrv", T)
@@ -561,7 +578,7 @@ def s2cyl(n, lx, ly, z0, r, h):
     return cyl(j3, n, I, px, py, z0, r, h)
 
 
-pos = fork_pos(j3, "Tibia", I, "bridge_t2") + ramps(j3, "Tibia", X1); neg = fork_neg(j3, "Tibia", I)
+pos = fork_pos(j3, "Tibia", I, "bridge_t2") + ramps(j3, "Tibia", X1); neg = fork_neg(j3, "Tibia", I) + fork_chamfer(j3, "Tibia")
 seg1 = box(j3, "Tibia_seg1", I, X1, "-link_w/2", "zc - link_h/2",
            f"tib_a - ({X1})", "link_w", "link_h")
 seg1_in = box(j3, "Tibia_seg1_in", I, f"({X1}) + link_wall", "-link_w/2 + link_wall",
