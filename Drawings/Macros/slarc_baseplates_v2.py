@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – obere + untere Baseplate inkl. Coxa-Servo-Aufnahme, Elektronik und Energieversorgung.   V2.8 (Plätze für die Lochraster-Platinen der Verkabelung)
+SLARC – obere + untere Baseplate inkl. Coxa-Servo-Aufnahme, Elektronik und Energieversorgung.   V2.9 (gedruckte Distanzhülsen für den Pi, Treiber auf 16-mm-Hülsen)
 FreeCAD 0.21 / 1.0: Makro ausführen. Parameter in P (unten) ändern und Makro neu ausführen
 (die Plattenkontur mit den Schwenkfreigängen ist hier bewusst als Python-Geometrie gebaut,
 nicht über Spreadsheet-Ausdrücke).
 
 Koordinaten (wie slarc_sim_V10): X = vorn, Y = links, Z = oben, Ursprung = Körpermitte,
 Z = 0 = Oberkante Hüllmaß der Coxa-Servos (ST3215 liegt mit Horn nach oben zwischen den Platten).
+
+V2.9
+- Pi 5: vier gedruckte Distanzhülsen (Ø6 × pi_so, Bohrung 2.8). Eine M2.5x16 von unten durch Platte, Hülse und Pi
+  schraubt direkt in die Abstandsbolzen des AI HAT+ (ersetzt dessen lange Schrauben). Keine Kauf-Distanzbolzen.
+- Treiberboard auf den mitgelieferten 16-mm-Hülsen (gdr_so 12 -> 16).
 
 V2.8
 - Plätze für die Lochraster-Platinen aus Documentation/Wiring (Eckbohrungen Ø2 im Abstand Seitenlänge - 4 mm):
@@ -84,8 +89,9 @@ P = dict(
     srv_holes=[(-29.0, 10.2), (-29.0, -10.2)], srv_hole_d=2.4,
     cb_d=4.4, cb_rest=1.5,          # Senkung für 2x5-Servoschrauben: 1.5 mm Material unter dem Kopf
     # Elektronik
-    pi_x=115.0, pi_so=6.0, pi_hole_d=2.7,          # Pi 5: Mitte X, Bolzenhöhe, M2.5
-    gdr_x=42.5, gdr_so=12.0, gdr_hole_d=2.7,       # Treiberboard: Lochbild-Mitte X, Bolzen (Stiftleiste unten 9.4)
+    pi_x=115.0, pi_so=6.0, pi_hole_d=2.7,          # Pi 5: Mitte X, Höhe der gedruckten Hülsen, M2.5
+    pi_sleeve=(6.0, 2.8),                          # V2.9: Hülse Außen-Ø, Bohrung (M2.5 frei)
+    gdr_x=42.5, gdr_so=16.0, gdr_hole_d=2.7,       # Treiberboard: Lochbild-Mitte X, mitgelieferte 16-mm-Hülsen (Stiftleiste unten 9.4)
     relay_on_top=False, relay_x=-110.0, relay_so=5.0, relay_hole_d=3.2,   # Option: Relais oben hinten
     # Untere Platte / zwischen den Platten
     z_lt=-35.0,             # Oberseite untere Platte = Unterkante Servo-Hüllmaß
@@ -517,6 +523,12 @@ def latch_pin(x=0.0, y=0.0, lock=90.0, world=True):
     return cut(fuse([head, shaft, lug]), neg)
 
 
+def pi_sleeve(x=0.0, y=0.0, z=0.0):
+    """V2.9: gedruckte Distanzhülse unter dem Pi (M2.5 läuft frei durch)."""
+    d, h = P["pi_sleeve"]
+    return cut(cyl(x, y, z, d / 2, P["pi_so"]), [cyl(x, y, z - 1, h / 2, P["pi_so"] + 2)])
+
+
 def pcb_frame(cx, cy, rot, L, W):
     """Platinen-Frame: lokales x entlang L (Lochende bei x = 0), y entlang W, Mitte (cx, cy), gedreht um rot."""
     return lambda lx, ly: (cx + math.cos(math.radians(rot)) * (lx - L / 2) - math.sin(math.radians(rot)) * (ly - W / 2),
@@ -765,6 +777,8 @@ def run_freecad():
     for n, shp, col in payload_boxes():
         add(n, shp, col)
     add("Connector_Holder", conn_holder(), (0.08, 0.08, 0.08))      # V2.6
+    for i, (hx, hy) in enumerate(pi_holes()):                     # V2.9: Distanzhülsen Pi
+        add("Pi_Sleeve%d" % (i + 1), pi_sleeve(hx, hy, Z_T), (0.08, 0.08, 0.08))
     for n, shp in leg_pcb_parts()[2]:                              # V2.8: Platinen-Platzhalter + Halter
         add(n, shp, (0.15, 0.55, 0.3))
     car, hub_ph = hub_carrier(); add("Hub_Carrier", car, (0.08, 0.08, 0.08)); add("PCB_B_Hub", hub_ph, (0.15, 0.55, 0.3))
