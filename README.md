@@ -674,6 +674,7 @@ SLARC/
 │   └── Motion_development/
 │       └── slarc_sim/          # PyBullet simulation, harness, CMA-ES optimizer, teleop
 ├── Documentation/              # Model training/deploy notebooks, Hailo notes, HW trigger setup
+│   ├── Hardware_Interfaces.md  # Hardware interfaces for the firmware, Pi, simulation and AI work
 │   └── Wiring/                 # Wiring plan, current budget, perfboard layouts (SVG)
 ├── Drawings/
 │   ├── Macros/                 # FreeCAD macros, STEP models used by them, bill of materials
