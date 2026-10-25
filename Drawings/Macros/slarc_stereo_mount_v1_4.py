@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – Stereo-Kamerahalterung für 2x IMX296-Modul mit M12-Objektiv (39x39 mm Board).   V1.5
+SLARC – Stereo-Kamerahalterung für 2x IMX296-Modul mit M12-Objektiv (39x39 mm Board).   V1.5.1
+(V1.5.1: IMU-Bunde bis zur Frontfläche verlängert (D-Form) – sie hingen beim Druck auf der Front 0.25 mm über dem Bett in der Luft)
 (V1.5: Ecken gerundet – obere Rahmenecken R corner_r, Laschenenden rund (ear_r), Kehle zwischen Rahmen und Lasche
  (ear_fil). Sieht weniger kastig aus und die runden Ecken der Frontfläche heben sich beim Druck kaum ab.)
 (V1.4.1: Bunde der IMU-Kernlöcher 0.5 mm nach hinten (imu_hz 2.5) – standen 0.25 mm über die Frontfläche, Druck auf der Front ging nicht)
@@ -197,6 +198,7 @@ if IMU_MOUNT:                       # Zusatz-IMU oben mittig, Board flach auf zw
     for i, sx in enumerate((-1, 1)):
         ix = f"({sx})*imu_hs/2"
         pos.append(cyly(f"IMU_so{i}", ix, "y_top - 0.5", IZ, "imu_sod", "imu_so + 0.5"))
+        pos.append(box(f"IMU_pad{i}", f"{ix} - imu_sod/2", "y_top - 0.5", IZ, "imu_sod", "imu_so + 0.5", "imu_hz"))   # V1.5.1: bis zur Front -> steht auf dem Bett
         neg.append(cyly(f"IMU_pilot{i}", ix, "y_top - imu_depth", IZ, "imu_pd", "imu_depth + imu_so + 0.2"))
 # V1.5: Ecken runden (Ansicht von vorn). Material liegt von der Ecke aus in Richtung (-sx, -sy) -> konvex
 ZH = f"({DEPTH}) + 2"
