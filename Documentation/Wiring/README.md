@@ -148,7 +148,7 @@ Eine halbe 3×7-cm-Platine (10 × 11 Löcher), aus jeder 3×7 entstehen zwei Bei
 
 - **Bestückung:** drei 3-polige Stiftleisten für Coxa, Femur und Tibia, C1 470 µF / 25 V, XH3 J4 zum Hub, XH2 J5 für den Fußschalter.
 - **Einspeisung:** 12 V (vom Bein-Relais) und GND (vom Power-Board) von unten direkt an die Schienen löten.
-- **Montage:** dicht am jeweiligen Coxa-Servo zwischen den Platten. Die genaue Lage prüfe ich im CAD, sobald die Platinen gebaut sind.
+- **Montage (Baseplates V2.8):** zwischen den Platten auf der unteren Platte, je zwei M2-Bunde am Lochende (2× M2x5) und ein Stützstift am freien Ende. Lage: FR/FL bei x 183, y ∓25 (vor dem Relaismodul), MR/ML bei x 0, y ∓60 (neben den Mittel-Servos), RR/RL bei x −100, y ∓55 (neben dem Akku, außerhalb des Ausziehwegs). Die hinteren Platinen sitzen ~100 mm von der Coxa-Achse, dort reichen die Servokabel eventuell nicht – vorher messen.
 
 ### B – Hub (1×)
 
@@ -162,7 +162,7 @@ Eine halbe 3×7-cm-Platine (10 × 11 Löcher), aus jeder 3×7 entstehen zwei Bei
 - **Adresse:** Die Lötbrücken A0–A2 müssen auf GND stehen, das ergibt 0x20. Bitte nachsehen.
 - **Pull-ups für die Füße:** sechs 10-kΩ-Widerstände, stehend, von PA0–5 nach 3,3 V. Die 3,3 V kommen vom VCC-Pin des Moduls.
 - **Datenstern:** Spalte 14 auf der Unterseite verbindet J2 (von H5) mit den DATA-Pins aller sechs Beinstecker.
-- **Montage:** auf dem Modulplatz MCP (−115 / +35). Dafür kommt ein kleiner gedruckter Träger, der die M2-Eckbohrungen der Platine aufnimmt. Dafür fehlt noch das gemessene Eckloch-Maß.
+- **Montage (Baseplates V2.8):** auf dem gedruckten Hub-Träger (2× M3 auf den Modulplatz MCP, 4× M2x5 in die Eckbohrungen 66 × 46). Die Platine liegt bei x −150…−80, y −5…45 und überdeckt den Reserveplatz MUX. Die Modulseite zeigt nach außen, wo der Panzer niedrig ist (dort nur ~10 mm Bauhöhe): I²C- und INT-Leitungen direkt in die Kopfleisten-Löcher des Moduls löten, keine Stiftleiste. Die XH-Stecker der Beine liegen innen.
 
 ### C – Power-Verteiler (1×)
 
@@ -173,13 +173,13 @@ Die halbe Länge einer 5×7-Platine reicht. Zwei Sammelschienen auf der Untersei
 - 12 V Haupt (dauernd): F1 rein, je eine Ader zu K1…K7 COM und zum Treiber.
 - GND: P− rein, je eine Ader zu den sechs Beinen, zum Treiber und zum DC-DC.
 
-Jede Ader kommt in ein eigenes Loch. Platz: unter der oberen Platte über dem BMS, neben dem Relaismodul.
+Jede Ader kommt in ein eigenes Loch. **Montage (Baseplates V2.8):** auf der gedruckten Power-Brücke über dem BMS (x 30…80). Die Brücke liegt auf zwei Hülsen, die über die Säulen bei (60, ±45) geschoben werden; Platine mit 2× M2x5 am Lochende, Auflage am anderen Ende. Unter dem Deck bleiben 4,5 mm für den BMS-Gurt.
 
 ### D – Relais-Adapter (1×)
 
 ![Platine D](board_d_relais.svg)
 
-Ein Streifen aus der 2×8-cm-Platine. Er sitzt mit einer 10-poligen Buchsenleiste auf der Eingangsleiste des Relaismoduls.
+Ein Streifen aus der 2×8-cm-Platine. Die Eingangsstifte des Relaismoduls sitzen an der Vorderkante (x 142,6) und zeigen nach oben, darüber sind nur ~16 mm bis zur oberen Platte. Deshalb steckt der Adapter mit einer **gewinkelten** 10-poligen Buchsenleiste auf den Stiften und liegt flach vor dem Modul (x 147…165, zwischen Relais und den vorderen Bein-Platinen).
 
 - **Jumper ziehen:** Am Modul wird der Jumper JD-VCC–VCC entfernt.
   - VCC (Optokoppler) bekommt 3,3 V über den Adapter.
@@ -212,6 +212,5 @@ Im Stand ziehen ESP32, Treiber und Relaisspulen Strom. Den Akku nach dem Betrieb
 
 ## Offen
 
-- Lage der Bein-Platinen, des Power-Boards und des Relais-Adapters im CAD prüfen und Halter vorsehen.
-- Träger für den Hub am Modulplatz MCP (Eckbohrungen der 5×7-Platine messen).
+- Länge der Servokabel zu den hinteren Bein-Platinen prüfen.
 - Trigger-Platine (20 × 22 mm) ist eigenständig und hier nur verdrahtet.
