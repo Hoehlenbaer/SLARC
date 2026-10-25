@@ -284,6 +284,7 @@ def cam_bracket():
         if g.imu:
             ix, iz = sx * g.imu_hs / 2, ZF - g.imu_hz
             pos.append(cyly(ix, H2 - 0.5, iz, g.imu_sod / 2, g.imu_so + 0.5))
+            pos.append(box(ix - g.imu_sod / 2, H2 - 0.5, iz, g.imu_sod, g.imu_so + 0.5, g.imu_hz))   # V1.5.1: bis zur Front
             neg.append(cyly(ix, H2 - g.imu_depth, iz, g.imu_pd / 2, g.imu_depth + g.imu_so + 0.2))
     def rc(x, y, sx, sy, r, z0, h):          # V1.5: Eckstück/Kehle (Box - Zylinder), Richtung wie im Stereo-Makro
         return cut(box(x - r if sx < 0 else x, y - r if sy < 0 else y, z0, r, r, h), [cyl(x + sx * r, y + sy * r, z0 - 1, r, h + 2)])
