@@ -82,6 +82,8 @@ Die Bein-Relais nur schalten, wenn das Drehmoment der Servos aus ist. Beim Einsc
 | L22 | Pi GPIO18 (Pin 12) / GPIO23 (Pin 16) | Trigger-Platine (Ausgang / Rückführung) | 2 + GND | Dupont | Dupont |
 | L23 | Pi CAM0 / CAM1 | IMX296 links / rechts | FPC | – | CSI-Kabel 200 mm |
 | L24 | Pi ↔ ESP32 | UART | 3 oder USB | AWG24 / USB-C | USB-C (CP2102) oder GPIO14/15 an die 40-pol. Leiste |
+| L25 | Ein/Aus-Taster (hinten rechts) | Hub J6 | 2 | AWG24 | XH2 / angelötet |
+| L26 | Hub J7 (IO35, GND) | Treiber IO35 (Encoder-Stecker A) | 2 | AWG24 | XH2 / PH2.0 |
 
 ## Pinbelegung
 
@@ -95,7 +97,7 @@ Die Bein-Relais nur schalten, wenn das Drehmoment der Servos aus ist. Beim Einsc
 | IO16 | K1 Pi-Versorgung, **low = an**, als Open-Drain betreiben | Ausgang |
 | IO27 | K2…K7 Bein-Versorgung, **low = an** (~12 mA Senke) | Ausgang |
 | IO4 | WS2812-Daten | Ausgang |
-| IO35 | frei (nur Eingang) | – |
+| IO35 | Ein/Aus-Taster (low = gedrückt, 10 kΩ Pull-up auf dem Hub), Wecken aus dem Deep Sleep | Eingang |
 | IO5 | frei (Strapping-Pin, beim Booten nicht low ziehen) | – |
 
 IO16 als Open-Drain (`OUTPUT_OPEN_DRAIN`): IN1 hängt auch am Transistor des Pi. Ein Push-Pull-High des ESP32 gegen den durchgeschalteten Transistor wäre ein Kurzschluss.
@@ -162,6 +164,7 @@ Eine halbe 3×7-cm-Platine (10 × 11 Löcher), aus jeder 3×7 entstehen zwei Bei
 - **Adresse:** Die Lötbrücken A0–A2 müssen auf GND stehen, das ergibt 0x20. Bitte nachsehen.
 - **Pull-ups für die Füße:** sechs 10-kΩ-Widerstände, stehend, von PA0–5 nach 3,3 V. Die 3,3 V kommen vom VCC-Pin des Moduls.
 - **Datenstern:** Spalte 14 auf der Unterseite verbindet J2 (von H5) mit den DATA-Pins aller sechs Beinstecker.
+- **Ein/Aus-Taster:** J6 (Taster), R7 10 kΩ nach 3,3 V, J7 führt IO35 und GND zum Treiber.
 - **Montage (Baseplates V2.8):** auf dem gedruckten Hub-Träger (2× M3 auf den Modulplatz MCP, 4× M2x5 in die Eckbohrungen 66 × 46). Die Platine liegt bei x −150…−80, y −5…45 und überdeckt den Reserveplatz MUX. Die Modulseite zeigt nach außen, wo der Panzer niedrig ist (dort nur ~10 mm Bauhöhe): I²C- und INT-Leitungen direkt in die Kopfleisten-Löcher des Moduls löten, keine Stiftleiste. Die XH-Stecker der Beine liegen innen.
 
 ### C – Power-Verteiler (1×)
@@ -193,13 +196,16 @@ Ein Streifen aus der 2×8-cm-Platine. Die Eingangsstifte des Relaismoduls sitzen
 
 ## Ablauf Ein / Aus
 
-1. Akku stecken: ESP32 und BMS laufen, DC-DC und Servos sind stromlos (K1–K7 aus).
-2. ESP32 zieht IO16 low: K1 zieht an, der DC-DC startet, der Pi bootet (`POWER_OFF_ON_HALT=0` ist gesetzt).
+Der Akku bleibt dauerhaft eingesteckt (Deans und Balancer). Ein/Aus macht ein Taster hinten rechts (Baseplates V2.10, versenkt hinter der Plattenkante) zusammen mit dem Deep Sleep des ESP32. Der Taster liegt über J6 auf dem Hub, R7 10 kΩ zieht IO35 auf 3,3 V, Druck = low.
+
+1. **Aus-Zustand:** ESP32 im Deep Sleep, Wecken über IO35 (ext0, low). Alle Relais offen, Pi und Beine stromlos. Ruhestrom des Treibers vor dem Festlegen messen (erwartet 5–15 mA).
+2. **Taster drücken:** ESP32 wacht auf und zieht IO16 low. K1 zieht an, der DC-DC startet, der Pi bootet (`POWER_OFF_ON_HALT=0` ist gesetzt).
 3. Der Pi setzt GPIO26 high: K1 hält jetzt auch ohne den ESP32.
 4. ESP32 zieht IO27 low: Die Beine bekommen Strom, die Servos sind dabei noch ohne Drehmoment. Danach schaltet der ESP32 das Drehmoment ein.
-5. Ausschalten: ESP32 schaltet das Drehmoment ab und nimmt die Beine weg (IO27 high). Der Pi fährt herunter, GPIO26 fällt ab, K1 fällt, sobald der ESP32 IO16 auch losgelassen hat.
+5. **Ausschalten, Taster kurz oder Befehl vom Webinterface des Pi:** Beine ablegen, Drehmoment aus, IO27 high. Shutdown an den Pi, auf Bestätigung warten (Zeitlimit ~30 s). IO16 loslassen, K1 fällt mit GPIO26. Dann Deep Sleep.
+6. **Taster 5 s halten:** Notaus. Der ESP32 lässt sofort alle Relais los und geht in den Deep Sleep.
 
-Im Stand ziehen ESP32, Treiber und Relaisspulen Strom. Den Akku nach dem Betrieb abziehen.
+Lagerung über Wochen: hinten Deans und Balancer abziehen, beide sind bei geschlossenem Panzer erreichbar. Der Schalter auf dem Treiber liegt unter dem Panzer und bleibt auf Ein.
 
 ## Inbetriebnahme
 

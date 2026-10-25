@@ -1,12 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – obere + untere Baseplate inkl. Coxa-Servo-Aufnahme, Elektronik und Energieversorgung.   V2.9 (gedruckte Distanzhülsen für den Pi, Treiber auf 16-mm-Hülsen)
+SLARC – obere + untere Baseplate inkl. Coxa-Servo-Aufnahme, Elektronik und Energieversorgung.   V2.10 (Ein/Aus-Taster hinten rechts)
 FreeCAD 0.21 / 1.0: Makro ausführen. Parameter in P (unten) ändern und Makro neu ausführen
 (die Plattenkontur mit den Schwenkfreigängen ist hier bewusst als Python-Geometrie gebaut,
 nicht über Spreadsheet-Ausdrücke).
 
 Koordinaten (wie slarc_sim_V10): X = vorn, Y = links, Z = oben, Ursprung = Körpermitte,
 Z = 0 = Oberkante Hüllmaß der Coxa-Servos (ST3215 liegt mit Horn nach oben zwischen den Platten).
+
+V2.10
+- Ein/Aus-Taster (12-mm-Einbautaster, Schließer) hinten rechts zwischen den Platten, versenkt hinter der
+  Plattenkante (Kopf ~3 mm innen -> beim Abrollen drückt nichts drauf). Gedruckter Winkel mit 1× M3 auf der
+  unteren Platte. Der Taster weckt den ESP32 aus dem Deep Sleep (IO35) und löst auch das Ausschalten aus.
 
 V2.9
 - Pi 5: vier gedruckte Distanzhülsen (Ø6 × pi_so, Bohrung 2.8). Eine M2.5x16 von unten durch Platte, Hülse und Pi
@@ -134,6 +139,9 @@ P = dict(
              top=2.5,                            # Stiftende: so tief steckt der Stift in der oberen Platte (Führung)
              ramp=4.0,                           # Rampe am hinteren Taschenende (2 mm hoch auf 4 mm)
              head_d=20.0, head_h=5.0),           # Griffkopf (gerändelt, Rille zeigt die Nasenrichtung)
+    # V2.10: Ein/Aus-Taster (12-mm-Einbautaster; Kopf-Ø/Länge als Annahme)
+    btn=dict(y=-37.0, zc=16.0, hole_d=12.2, panel_x=-192.0, t=3.0, w=18.0, h=30.0, foot_l=12.0,
+             m3=(-183.0, -37.0), head=(15.0, 3.0), body=(16.0, 22.0)),
     # V2.8: Lochraster-Platinen (Documentation/Wiring)
     pcb=dict(t=1.6, hole_in=2.0, m2_pilot=1.7, boss_d=5.0,
              leg=dict(L=35.0, W=30.0, so=4.0, env=18.0,          # ½ 3×7: Löcher nur an einem Ende (Abstand 26)
@@ -523,6 +531,28 @@ def latch_pin(x=0.0, y=0.0, lock=90.0, world=True):
     return cut(fuse([head, shaft, lug]), neg)
 
 
+def button_bracket():
+    """V2.10: Winkel für den Ein/Aus-Taster: Blende (senkrecht, Bohrung) + Fuß mit M3 auf der unteren Platte."""
+    b = P["btn"]
+    x0, y0, z0 = b["panel_x"], b["y"] - b["w"] / 2, Z_LT
+    panel = box(x0, y0, z0, b["t"], b["w"], b["h"])
+    foot = box(x0, y0, z0, b["foot_l"] + b["t"], b["w"], b["t"])
+    rib = [box(x0 + b["t"] - 0.1, y0 + yy, z0, 8.0, 2.5, b["h"] * 0.6) for yy in (0.0, b["w"] - 2.5)]
+    br = fuse([panel, foot] + rib)
+    hole = Part.makeCylinder(b["hole_d"] / 2, b["t"] + 2, V(x0 - 1, b["y"], Z_LT + b["zc"]), V(1, 0, 0)) if FC else None
+    neg = [hole, cyl(b["m3"][0], b["m3"][1], z0 - 1, P["m3_d"] / 2, b["t"] + 2)]
+    return cut(br, neg)
+
+
+def button_dummy():
+    """V2.10: Platzhalter Taster (Kopf vor der Blende, Körper dahinter)."""
+    b = P["btn"]; hd, hl = b["head"]; bd, bl = b["body"]
+    c = V(b["panel_x"], b["y"], Z_LT + b["zc"])
+    head = Part.makeCylinder(hd / 2, hl, c - V(hl, 0, 0), V(1, 0, 0))
+    body = Part.makeCylinder(bd / 2, bl, c + V(b["t"], 0, 0), V(1, 0, 0))
+    return head.fuse(body)
+
+
 def pi_sleeve(x=0.0, y=0.0, z=0.0):
     """V2.9: gedruckte Distanzhülse unter dem Pi (M2.5 läuft frei durch)."""
     d, h = P["pi_sleeve"]
@@ -650,6 +680,7 @@ def build_bottom():
     for xh in P["conn"]["holes"]:                      # V2.6: Steckerhalter
         neg.append(cyl(xh, conn_dims()["yc"], zb - 1, P["m3_d"] / 2, t + 2))
     neg += latch_bottom_neg()                          # V2.7: Akku-Riegel
+    neg.append(cyl(P["btn"]["m3"][0], P["btn"]["m3"][1], zb - 1, P["m3_d"] / 2, t + 2))   # V2.10: Taster-Winkel
     lp, ln_, _ = leg_pcb_parts()                       # V2.8: Bein-Platinen
     pos_extra = lp; neg += ln_
     plate = cut(fuse(pos + pos_extra), neg)
@@ -777,6 +808,8 @@ def run_freecad():
     for n, shp, col in payload_boxes():
         add(n, shp, col)
     add("Connector_Holder", conn_holder(), (0.08, 0.08, 0.08))      # V2.6
+    add("Button_Bracket", button_bracket(), (0.08, 0.08, 0.08))     # V2.10: Ein/Aus-Taster
+    add("Power_Button", button_dummy(), (0.8, 0.1, 0.1))
     for i, (hx, hy) in enumerate(pi_holes()):                     # V2.9: Distanzhülsen Pi
         add("Pi_Sleeve%d" % (i + 1), pi_sleeve(hx, hy, Z_T), (0.08, 0.08, 0.08))
     for n, shp in leg_pcb_parts()[2]:                              # V2.8: Platinen-Platzhalter + Halter

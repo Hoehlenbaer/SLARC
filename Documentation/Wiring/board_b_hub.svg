@@ -501,6 +501,11 @@ svg{font-family:'IBM Plex Sans','Segoe UI',Arial,sans-serif}
 <polyline points="284.0,554.0 332.0,554.0" class="trace nsw" fill="none"/>
 <polyline points="404.0,506.0 428.0,506.0" class="trace ndata" fill="none"/>
 <polyline points="404.0,482.0 380.0,482.0" class="trace ngnd" fill="none"/>
+<line x1="356.0" y1="554.0" x2="356.0" y2="578.0" class="bar n33"/>
+<polyline points="404.0,578.0 452.0,578.0" class="trace nint" fill="none"/>
+<polyline points="452.0,578.0 476.0,578.0" class="trace nint" fill="none"/>
+<polyline points="404.0,554.0 380.0,554.0" class="trace ngnd" fill="none"/>
+<polyline points="476.0,602.0 500.0,602.0" class="trace ngnd" fill="none"/>
 <rect x="125.6" y="102.8" width="169.19999999999996" height="511.2" rx="3" fill="#3f9a4e" stroke="#1f5e2c" stroke-width="1.2" opacity=".55"/>
 <text x="202.4" y="266.0" class="btxt" text-anchor="middle">MCP23017-Modul</text>
 <text x="202.4" y="290.0" class="btxt" text-anchor="middle">liegt auf der</text>
@@ -616,6 +621,24 @@ svg{font-family:'IBM Plex Sans','Segoe UI',Arial,sans-serif}
 <text x="418.4" y="509.0" class="bsmall" text-anchor="start">DATA</text>
 <rect x="396.40000000000003" y="457.12" width="58.4" height="13" rx="3" fill="#163626" opacity=".85"/>
 <text x="425.6" y="467.1" class="btxt" text-anchor="middle">J2 von H5</text>
+<polyline points="356.0,578.0 368.0,614.0 428.0,614.0 428.0,602.0" class="wire n33"/>
+<line x1="428.0" y1="602.0" x2="428.0" y2="578.0" stroke="#777" stroke-width="1.6"/>
+<circle cx="428.0" cy="602.0" r="6" class="res"/>
+<text x="419.0" y="605.0" class="btxt" text-anchor="end">R7</text>
+<rect x="464.48" y="566.48" width="23.04" height="47.04" rx="2" class="hdr" opacity=".85"/>
+<rect x="472.8" y="574.8" width="6.4" height="6.4" class="fint"/>
+<text x="490.4" y="581.0" class="bsmall" text-anchor="start">BTN</text>
+<rect x="472.8" y="598.8" width="6.4" height="6.4" class="fgnd"/>
+<text x="490.4" y="605.0" class="bsmall" text-anchor="start">GND</text>
+<rect x="468.40000000000003" y="553.12" width="58.4" height="13" rx="3" fill="#163626" opacity=".85"/>
+<text x="497.6" y="563.1" class="btxt" text-anchor="middle">J6 Taster</text>
+<rect x="392.48" y="542.48" width="23.04" height="47.04" rx="2" class="hdr" opacity=".85"/>
+<rect x="400.8" y="550.8" width="6.4" height="6.4" class="fgnd"/>
+<text x="389.6" y="557.0" class="bsmall" text-anchor="end">GND</text>
+<rect x="400.8" y="574.8" width="6.4" height="6.4" class="fint"/>
+<text x="389.6" y="581.0" class="bsmall" text-anchor="end">IO35</text>
+<rect x="374.8" y="529.12" width="58.4" height="13" rx="3" fill="#163626" opacity=".85"/>
+<text x="404.0" y="539.1" class="btxt" text-anchor="middle">J7 → IO35</text>
 <text x="530.0" y="74.0" class="small" text-anchor="start">MCP23017-Modul (Breakout) mit der seitlichen</text>
 <text x="530.0" y="89.0" class="small" text-anchor="start">  20-pol. Stiftleiste in Spalte 8 eingelötet</text>
 <text x="530.0" y="104.0" class="small" text-anchor="start">  (oder in eine Buchsenleiste gesteckt)</text>
@@ -632,6 +655,8 @@ svg{font-family:'IBM Plex Sans','Segoe UI',Arial,sans-serif}
 <text x="530.0" y="269.0" class="small" text-anchor="start">Unterseite: GND Spalte 12+17 + Zeile 23,</text>
 <text x="530.0" y="284.0" class="small" text-anchor="start">  3V3 Spalte 11 (vom Modul-VCC, Zeile 13)</text>
 <text x="530.0" y="299.0" class="small" text-anchor="start">Bank B (PB0–7) frei für Status-LEDs</text>
-<text x="530.0" y="314.0" class="small" text-anchor="start">Befestigung: Eckbohrungen M2 auf</text>
-<text x="530.0" y="329.0" class="small" text-anchor="start">  gedrucktem Träger am Modulplatz MCP</text>
+<text x="530.0" y="314.0" class="small" text-anchor="start">Ein/Aus-Taster an J6, R7 10k nach 3,3 V,</text>
+<text x="530.0" y="329.0" class="small" text-anchor="start">  J7 → IO35 (Deep-Sleep-Wecken + Aus)</text>
+<text x="530.0" y="344.0" class="small" text-anchor="start">Befestigung: Eckbohrungen M2 auf</text>
+<text x="530.0" y="359.0" class="small" text-anchor="start">  gedrucktem Träger am Modulplatz MCP</text>
 </svg>

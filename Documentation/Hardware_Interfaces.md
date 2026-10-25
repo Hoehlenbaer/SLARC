@@ -1,6 +1,6 @@
 # SLARC – Hardware-Schnittstellen
 
-Stand 25.10.2026. Übergabe vom Hardware/Elektronik-Chat an die Chats für ESP32-Software, Pi-Software, Simulation und KI. Hier steht, was die Hardware liefert und was sie von der Software erwartet.
+Stand 25.10.2026 (Ein/Aus-Taster mit Deep Sleep ergänzt). Übergabe vom Hardware/Elektronik-Chat an die Chats für ESP32-Software, Pi-Software, Simulation und KI. Hier steht, was die Hardware liefert und was sie von der Software erwartet.
 
 Was nicht hier steht, gilt nach Repo: Mechanik in den Makros unter `Drawings/Macros`, Verkabelung in `Documentation/Wiring`, Protokoll in `Documentation/SLARC Pi↔ESP32 Protokoll v0.1.pdf`.
 
@@ -118,7 +118,7 @@ Die Zehnerstelle folgt der Protokoll-Reihenfolge.
 | IO16 | K1 (Pi-Versorgung), low = an | **als Open-Drain betreiben**, weil der Pi am selben Eingang über einen Transistor hält |
 | IO27 | K2…K7 (alle Beine gemeinsam), low = an | ~12 mA Senke |
 | IO4 | WS2812-Daten (optional) | 5 V vom Treiber |
-| IO35 | frei, nur Eingang | |
+| IO35 | Ein/Aus-Taster, low = gedrückt | 10 kΩ Pull-up auf dem Hub; RTC-fähig, weckt aus dem Deep Sleep (ext0) |
 | IO5 | frei, Strapping-Pin | beim Booten nicht low ziehen |
 
 **I²C-Geräte** (Annahme, mit einem I²C-Scan bestätigen und hier eintragen):
@@ -145,13 +145,26 @@ Das INA219 misst nur den Strom des Treibers. Die Akkuspannung zeigt es trotzdem.
 
 Port B ist frei für Status-LEDs.
 
-**Ein- und Ausschalten** (fest):
-1. Akku stecken: der ESP32 läuft, Pi und Beine sind stromlos.
+**Ein- und Ausschalten** (fest, Deep-Sleep-Lösung):
+- Der Akku bleibt eingesteckt. Ein Taster hinten rechts weckt den ESP32 aus dem Deep Sleep und löst auch das Ausschalten aus.
+- Der Ruhestrom im Deep Sleep wird gemessen (Strom in der 12-V-Zuleitung des Treibers, erwartet 5–15 mA). Bei mehr als etwa 5 mA greift die Ausweichlösung: K8 als Selbsthaltung für den Treiber.
+
+Ablauf:
+1. Aus: Deep Sleep, alle Relais offen. Wecken über IO35 low.
 2. IO16 low: K1 zieht an, der Pi bootet.
 3. Der Pi setzt GPIO26 high und hält K1 damit selbst.
 4. IO27 low: die Beine bekommen Strom, das Drehmoment ist noch aus.
 5. Das Drehmoment einschalten.
-6. Aus: Drehmoment aus, IO27 high. Der Pi fährt herunter. IO16 loslassen, K1 fällt, sobald GPIO26 abfällt.
+6. Aus (Taster kurz oder Befehl vom Pi, z. B. aus einem Webinterface):
+   1. Beine ablegen, Drehmoment aus, IO27 high.
+   2. Shutdown an den Pi, auf Bestätigung warten (höchstens ~30 s).
+   3. IO16 loslassen. K1 fällt, sobald GPIO26 abfällt.
+   4. Deep Sleep.
+7. Taster 5 s halten: Notaus, sofort alle Relais los, Deep Sleep.
+
+Im Protokoll braucht es dafür einen Befehl „power off“ vom Pi zum ESP32 und eine Meldung „shutdown“ vom ESP32 an den Pi (mit Bestätigung).
+
+Watchdog: Hängt die Firmware mit gezogenen Relais, muss der Task-Watchdog den ESP32 zurücksetzen. Nach einem Reset sind alle Relais offen.
 
 **Sicherheit** (aus README/Protokoll):
 - 100-Hz-Regelschleife, Heartbeat vom Pi alle 100 ms. Fehlt er länger als 300 ms während einer Bewegung, geht der ESP32 in `SAFE_STOP`.
@@ -236,6 +249,8 @@ Port B ist frei für Status-LEDs.
 | I²C-Adressen auf dem Treiber | ESP32 | Scan |
 | UART Pi ↔ ESP32 über GPIO oder USB | ESP32, Pi | offen |
 | Massen wiegen (Akku, Elektronik, Kabel) | Sim | offen |
+| Ruhestrom des Treibers im Deep Sleep | ESP32, Hardware | messen, entscheidet Deep Sleep oder K8 |
+| Taster beschaffen (12-mm-Einbautaster, Schließer) | Hardware | offen |
 | Kabellänge der Servos zu den hinteren Bein-Platinen | Hardware | messen |
 
 ---
