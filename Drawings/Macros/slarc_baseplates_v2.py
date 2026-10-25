@@ -599,6 +599,32 @@ def cam_placements(dims):
             for n, sx in (("L", 1), ("R", -1))]
 
 
+def lens_zh3019(z_img):
+    """M12-Objektiv ZH3019-14 (2.8 mm, F2.2) nach Herstellerzeichnung, rotationssymmetrisch um +Z.
+    z_img = Bildebene (Sensoroberfläche) = Bezugskante der Zeichnung. Abstände davor: Objektivende 5.59,
+    Gewinde M12 bis 16.4, Hals Ø10.7, Kopf Ø14 von 17.76 bis 21.71 (Stirn), Glaskuppel bis 22.0.
+    Gemaßt sind nur M12, Ø14, 5.59, 21.71, 22 – der Rest ist aus der Zeichnung abgegriffen (±0.2).
+    Beim Scharfstellen verschiebt sich das Objektiv um ein paar Zehntel."""
+    import Part
+    zs = lambda d: z_img + d
+    pts = [(0.0, zs(5.59)), (5.5, zs(5.59)), (6.0, zs(6.4)), (6.0, zs(15.9)), (5.35, zs(16.4)), (5.35, zs(17.76)),
+           (7.0, zs(17.76)), (7.0, zs(21.71)), (5.55, zs(21.71))]
+    for i in range(1, 7):                                   # Glaskuppel 0.29 mm über der Stirn
+        r = 5.55 * (1 - i / 6.0)
+        pts.append((r, zs(21.71 + 0.29 * (1 - (r / 5.55) ** 2))))
+    pts.append((0.0, zs(5.59)))
+    w = Part.makePolygon([App.Vector(r, 0, z) for r, z in pts])
+    return Part.Solid(Part.Shell(Part.Face(Part.Wire(w)).revolve(App.Vector(0, 0, 0), App.Vector(0, 0, 1), 360).Faces))
+
+
+def lens_shapes(dims):
+    """Objektive (Welt), Bildebene = Sensor 1.7 über der Board-Oberseite (Kamera-STEP)."""
+    m, out = cam_matrix(dims), []
+    for n, sx in (("L", 1), ("R", -1)):
+        out.append(("Lens_ZH3019_" + n, xform(lens_zh3019(1.7), mul(m, ((1, 0, 0, sx * P["cam_base"] / 2), (0, 1, 0, 0), (0, 0, 1, 0))))))
+    return out
+
+
 def find_step(names):
     dirs = [STEP_DIR] if STEP_DIR else []
     try:
@@ -641,6 +667,8 @@ def run_freecad():
     for n, shp, col in payload_boxes():
         add(n, shp, col)
     add("Connector_Holder", conn_holder(), (0.08, 0.08, 0.08))      # V2.6
+    for n, shp in lens_shapes(g["dims"]):                           # M12-Objektive ZH3019-14
+        add(n, shp, (0.75, 0.75, 0.78))
     for i, y in enumerate(P["lat"]["ys"]):                          # V2.7: Akku-Riegel (eingerastet, Nase nach außen)
         add("Battery_Latch_%d" % (i + 1), latch_pin(P["lat"]["x"], y, 90.0 if y > 0 else 270.0), (0.85, 0.35, 0.1))
     cache = {}

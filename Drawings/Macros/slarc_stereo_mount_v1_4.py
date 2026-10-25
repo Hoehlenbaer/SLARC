@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – Stereo-Kamerahalterung für 2x IMX296-Modul mit M12-Objektiv (39x39 mm Board).   V1.5.1
+SLARC – Stereo-Kamerahalterung für 2x IMX296-Modul mit M12-Objektiv (39x39 mm Board).   V1.5.2
+(V1.5.2: Objektiv ZH3019-14 als Kontrollkörper (LENS); Kamera-STEP wird auch als \"IMX296 With M12.stp\" gefunden)
 (V1.5.1: IMU-Bunde bis zur Frontfläche verlängert (D-Form) – sie hingen beim Druck auf der Front 0.25 mm über dem Bett in der Luft)
 (V1.5: Ecken gerundet – obere Rahmenecken R corner_r, Laschenenden rund (ear_r), Kehle zwischen Rahmen und Lasche
  (ear_fil). Sieht weniger kastig aus und die runden Ecken der Frontfläche heben sich beim Druck kaum ab.)
@@ -32,8 +33,10 @@ import FreeCAD as App
 import Part
 
 CAM_STEP = r""        # Pfad zum Kamera-STEP; leer = neben dem Makro / im Makro-Ordner suchen
-CAM_STEP_NAMES = ("IMX296_With_M12.stp", "IMX296_With_M12 (2).stp", "IMX296_With_M12.step")
+CAM_STEP_NAMES = ("IMX296_With_M12.stp", "IMX296 With M12.stp", "IMX296_With_M12 (2).stp", "IMX296_With_M12.step")
 CAM_STEP_BOARD_TOP = 2.5
+CAM_SENSOR_Z = 1.7      # Sensoroberfläche über der Board-Oberseite (STEP: z 4.2 - 2.5)
+LENS = True             # M12-Objektiv ZH3019-14 als Kontrollkörper einsetzen (kein Druckteil)
 IMU_MOUNT = True      # True = Platz für ICM20948 (VIO/SLAM, Pi-I2C) oben auf dem Rahmen
 TRIG_SLOTS = False    # True = Kabelschlitze im oberen Rahmen für die Trigger-/Strobe-Stiftleisten (Breite trig_w)
 
@@ -249,6 +252,24 @@ def _find_cam():
     return None
 
 
+def lens_zh3019(z_img):
+    """M12-Objektiv ZH3019-14 (2.8 mm, F2.2) nach Herstellerzeichnung, rotationssymmetrisch um +Z.
+    z_img = Bildebene (Sensoroberfläche) = Bezugskante der Zeichnung. Abstände davor: Objektivende 5.59,
+    Gewinde M12 bis 16.4, Hals Ø10.7, Kopf Ø14 von 17.76 bis 21.71 (Stirn), Glaskuppel bis 22.0.
+    Gemaßt sind nur M12, Ø14, 5.59, 21.71, 22 – der Rest ist aus der Zeichnung abgegriffen (±0.2).
+    Beim Scharfstellen verschiebt sich das Objektiv um ein paar Zehntel."""
+    import Part
+    zs = lambda d: z_img + d
+    pts = [(0.0, zs(5.59)), (5.5, zs(5.59)), (6.0, zs(6.4)), (6.0, zs(15.9)), (5.35, zs(16.4)), (5.35, zs(17.76)),
+           (7.0, zs(17.76)), (7.0, zs(21.71)), (5.55, zs(21.71))]
+    for i in range(1, 7):                                   # Glaskuppel 0.29 mm über der Stirn
+        r = 5.55 * (1 - i / 6.0)
+        pts.append((r, zs(21.71 + 0.29 * (1 - (r / 5.55) ** 2))))
+    pts.append((0.0, zs(5.59)))
+    w = Part.makePolygon([App.Vector(r, 0, z) for r, z in pts])
+    return Part.Solid(Part.Shell(Part.Face(Part.Wire(w)).revolve(App.Vector(0, 0, 0), App.Vector(0, 0, 1), 360).Faces))
+
+
 _cp = _find_cam()
 if _cp:
     cam_shape = Part.makeCompound([Part.read(_cp)])
@@ -262,6 +283,14 @@ if _cp:
     print("Kamera-STEP geladen:", _cp)
 else:
     print("Kamera-STEP nicht gefunden -> nur Halterung")
+if LENS:
+    _ls = lens_zh3019(CAM_SENSOR_Z)
+    for c, sx in (("L", -1), ("R", 1)):
+        o = doc.addObject("Part::Feature", f"Lens_ZH3019_{c}"); grp.addObject(o)
+        o.Shape = _ls
+        _x(o, "Placement.Base.x", f"({sx})*baseline/2")
+        if GUI:
+            o.ViewObject.ShapeColor = (0.75, 0.75, 0.78)
 
 doc.recompute()
 if GUI:
