@@ -1,0 +1,160 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 700" width="1080" class="pcb" role="img" aria-label="Blockschaltbild SLARC"><style>
+svg{font-family:'IBM Plex Sans','Segoe UI',Arial,sans-serif}
+.bg{fill:#f7f8f4}.board{fill:#2f6b4a}.boardedge{fill:none;stroke:#1f4a33;stroke-width:2}
+.pad{fill:#c9b37a;stroke:#8a7440;stroke-width:.8}.padhole{fill:#2a2a2a}
+.txt{fill:#1d2320;font-size:11px}.small{fill:#1d2320;font-size:9.5px}.title{fill:#1d2320;font-size:14px;font-weight:600}
+.btxt{fill:#f2f5ef;font-size:9px}.bsmall{fill:#e9efe6;font-size:8px}
+.comp{fill:#e8e3d3;stroke:#3a3a3a;stroke-width:1}.hdr{fill:#f1f1ee;stroke:#3a3a3a;stroke-width:1}
+.ic{fill:#26292b;stroke:#111;stroke-width:1}.ictxt{fill:#e8e8e8;font-size:8px}
+.res{fill:#d8c39b;stroke:#6b5a37;stroke-width:1}.dio{fill:#c84b2f;stroke:#7a2b18;stroke-width:1}.band{fill:#1e1e1e}
+.cap{fill:#2b4e8c;stroke:#162a4d;stroke-width:1}
+.n12{stroke:#d1362f}.ngnd{stroke:#1f1f1f}.ndata{stroke:#d9a400}.nsw{stroke:#2f6fdb}.ni2c{stroke:#1b9a6b}
+.n33{stroke:#9b59b6}.n5{stroke:#e07b00}.nctl{stroke:#c2187a}.nint{stroke:#0aa1b8}
+.f12{fill:#d1362f}.fgnd{fill:#1f1f1f}.fdata{fill:#d9a400}.fsw{fill:#2f6fdb}.fi2c{fill:#1b9a6b}.f33{fill:#9b59b6}.f5{fill:#e07b00}.fctl{fill:#c2187a}.fint{fill:#0aa1b8}
+.bar{stroke-width:7;stroke-linecap:round;opacity:.55}.trace{stroke-width:3.2;stroke-linecap:round;opacity:.7}
+.wire{stroke-width:2.6;fill:none;stroke-linecap:round}.drill{fill:none;stroke:#fff;stroke-width:1.4;stroke-dasharray:3 2}
+.box{fill:#ffffff;stroke:#2c3a33;stroke-width:1.3}.box2{fill:#eef3ec;stroke:#2c3a33;stroke-width:1.3}.boxnew{fill:#fff6dc;stroke:#a7781a;stroke-width:1.6}
+.lab{fill:#1d2320;font-size:11px}.labb{fill:#1d2320;font-size:12px;font-weight:600}.labs{fill:#4b5a52;font-size:9.5px}
+.ln{fill:none;stroke-width:2.2}.lnth{fill:none;stroke-width:4}.dash{stroke-dasharray:5 3}
+</style><rect width="1080" height="700" class="bg"/>
+<rect x="20" y="40" width="150" height="62" rx="6" class="box"/>
+<text x="28.0" y="57.0" class="labb" text-anchor="start">LiPo 3S 9000 mAh</text>
+<text x="28.0" y="72.0" class="labs" text-anchor="start">Deans-Buchse + Balancer</text>
+<rect x="20" y="140" width="150" height="50" rx="6" class="box2"/>
+<text x="28.0" y="157.0" class="labb" text-anchor="start">Steckerhalter</text>
+<text x="28.0" y="172.0" class="labs" text-anchor="start">Deans-Stifte · Balancer-Adapter</text>
+<rect x="220" y="40" width="110" height="44" rx="6" class="box"/>
+<text x="228.0" y="57.0" class="labb" text-anchor="start">F1 30 A</text>
+<text x="228.0" y="72.0" class="labs" text-anchor="start">Flachsicherung</text>
+<rect x="220" y="140" width="110" height="62" rx="6" class="box"/>
+<text x="228.0" y="157.0" class="labb" text-anchor="start">BMS Daly 3S</text>
+<text x="228.0" y="172.0" class="labs" text-anchor="start">B− · P− · Balance</text>
+<rect x="380" y="40" width="150" height="200" rx="6" class="boxnew"/>
+<text x="388.0" y="57.0" class="labb" text-anchor="start">C Power-Verteiler</text>
+<text x="388.0" y="72.0" class="labs" text-anchor="start">12 V Haupt</text>
+<text x="388.0" y="85.0" class="labs" text-anchor="start">12 V links (K2)</text>
+<text x="388.0" y="98.0" class="labs" text-anchor="start">12 V rechts (K3)</text>
+<text x="388.0" y="111.0" class="labs" text-anchor="start">GND</text>
+<rect x="380" y="290" width="150" height="96" rx="6" class="box"/>
+<text x="388.0" y="307.0" class="labb" text-anchor="start">Relaismodul 8-fach</text>
+<text x="388.0" y="322.0" class="labs" text-anchor="start">K1 12 V → DC-DC</text>
+<text x="388.0" y="335.0" class="labs" text-anchor="start">K2 Servos links</text>
+<text x="388.0" y="348.0" class="labs" text-anchor="start">K3 Servos rechts</text>
+<rect x="380" y="420" width="150" height="58" rx="6" class="boxnew"/>
+<text x="388.0" y="437.0" class="labb" text-anchor="start">D Relais-Adapter</text>
+<text x="388.0" y="452.0" class="labs" text-anchor="start">3 Dioden + BC547</text>
+<rect x="220" y="290" width="110" height="56" rx="6" class="box"/>
+<text x="228.0" y="307.0" class="labb" text-anchor="start">DC-DC 12→5 V</text>
+<text x="228.0" y="322.0" class="labs" text-anchor="start">Fulree 5 A</text>
+<rect x="20" y="420" width="300" height="120" rx="6" class="box"/>
+<text x="28.0" y="437.0" class="labb" text-anchor="start">Raspberry Pi 5 + Hailo-8</text>
+<text x="28.0" y="452.0" class="labs" text-anchor="start">GPIO26 Halten · GPIO18 PWM Trigger</text>
+<text x="28.0" y="465.0" class="labs" text-anchor="start">GPIO23 Trigger zurück · GPIO24 IMU-INT</text>
+<text x="28.0" y="478.0" class="labs" text-anchor="start">I²C1 (GPIO2/3) · CSI 0/1 · UART</text>
+<rect x="20" y="580" width="140" height="48" rx="6" class="box"/>
+<text x="28.0" y="597.0" class="labb" text-anchor="start">ICM-20948</text>
+<text x="28.0" y="612.0" class="labs" text-anchor="start">I²C + INT</text>
+<rect x="180" y="580" width="140" height="48" rx="6" class="box"/>
+<text x="188.0" y="597.0" class="labb" text-anchor="start">Trigger-Platine</text>
+<text x="188.0" y="612.0" class="labs" text-anchor="start">→ XTR beider IMX296</text>
+<rect x="180" y="645" width="140" height="40" rx="6" class="box"/>
+<text x="188.0" y="662.0" class="labb" text-anchor="start">2× IMX296</text>
+<rect x="600" y="40" width="200" height="150" rx="6" class="box"/>
+<text x="608.0" y="57.0" class="labb" text-anchor="start">Waveshare General Driver</text>
+<text x="608.0" y="72.0" class="labs" text-anchor="start">ESP32 · XH 12 V Eingang</text>
+<text x="608.0" y="85.0" class="labs" text-anchor="start">H5 Servo-Bus (DATA)</text>
+<text x="608.0" y="98.0" class="labs" text-anchor="start">I²C IO32/33 · IO34 INT</text>
+<text x="608.0" y="111.0" class="labs" text-anchor="start">IO16 · IO27 · IO4</text>
+<text x="608.0" y="124.0" class="labs" text-anchor="start">40-pol.: 5 V / GND</text>
+<rect x="600" y="250" width="200" height="100" rx="6" class="boxnew"/>
+<text x="608.0" y="267.0" class="labb" text-anchor="start">B Hub</text>
+<text x="608.0" y="282.0" class="labs" text-anchor="start">MCP23017 (Fußkontakte)</text>
+<text x="608.0" y="295.0" class="labs" text-anchor="start">Datenstern 1 → 6</text>
+<text x="608.0" y="308.0" class="labs" text-anchor="start">10k Pull-ups</text>
+<rect x="600" y="400" width="200" height="44" rx="6" class="box"/>
+<text x="608.0" y="417.0" class="labb" text-anchor="start">WS2812-Streifen (opt.)</text>
+<text x="608.0" y="432.0" class="labs" text-anchor="start">Daten IO4</text>
+<rect x="870" y="40" width="190" height="80" rx="6" class="boxnew"/>
+<text x="878.0" y="57.0" class="labb" text-anchor="start">A Bein FR</text>
+<text x="878.0" y="72.0" class="labs" text-anchor="start">3× ST3215 (Coxa/Femur/Tibia)</text>
+<text x="878.0" y="85.0" class="labs" text-anchor="start">Fußschalter</text>
+<text x="878.0" y="98.0" class="labs" text-anchor="start">470 µF</text>
+<rect x="870" y="140" width="190" height="80" rx="6" class="boxnew"/>
+<text x="878.0" y="157.0" class="labb" text-anchor="start">A Bein MR</text>
+<text x="878.0" y="172.0" class="labs" text-anchor="start">3× ST3215 (Coxa/Femur/Tibia)</text>
+<text x="878.0" y="185.0" class="labs" text-anchor="start">Fußschalter</text>
+<text x="878.0" y="198.0" class="labs" text-anchor="start">470 µF</text>
+<rect x="870" y="240" width="190" height="80" rx="6" class="boxnew"/>
+<text x="878.0" y="257.0" class="labb" text-anchor="start">A Bein RR</text>
+<text x="878.0" y="272.0" class="labs" text-anchor="start">3× ST3215 (Coxa/Femur/Tibia)</text>
+<text x="878.0" y="285.0" class="labs" text-anchor="start">Fußschalter</text>
+<text x="878.0" y="298.0" class="labs" text-anchor="start">470 µF</text>
+<rect x="870" y="360" width="190" height="80" rx="6" class="boxnew"/>
+<text x="878.0" y="377.0" class="labb" text-anchor="start">A Bein FL</text>
+<text x="878.0" y="392.0" class="labs" text-anchor="start">3× ST3215 (Coxa/Femur/Tibia)</text>
+<text x="878.0" y="405.0" class="labs" text-anchor="start">Fußschalter</text>
+<text x="878.0" y="418.0" class="labs" text-anchor="start">470 µF</text>
+<rect x="870" y="460" width="190" height="80" rx="6" class="boxnew"/>
+<text x="878.0" y="477.0" class="labb" text-anchor="start">A Bein ML</text>
+<text x="878.0" y="492.0" class="labs" text-anchor="start">3× ST3215 (Coxa/Femur/Tibia)</text>
+<text x="878.0" y="505.0" class="labs" text-anchor="start">Fußschalter</text>
+<text x="878.0" y="518.0" class="labs" text-anchor="start">470 µF</text>
+<rect x="870" y="560" width="190" height="80" rx="6" class="boxnew"/>
+<text x="878.0" y="577.0" class="labb" text-anchor="start">A Bein RL</text>
+<text x="878.0" y="592.0" class="labs" text-anchor="start">3× ST3215 (Coxa/Femur/Tibia)</text>
+<text x="878.0" y="605.0" class="labs" text-anchor="start">Fußschalter</text>
+<text x="878.0" y="618.0" class="labs" text-anchor="start">470 µF</text>
+<polyline points="170,60 220,60" class="lnth n12"/>
+<polyline points="330,60 380,60" class="lnth n12"/>
+<polyline points="170,90 195,90 195,160 220,160" class="lnth ngnd"/>
+<text x="176.0" y="128.0" class="labs" text-anchor="start">B−</text>
+<polyline points="330,180 355,180 355,220 380,220" class="lnth ngnd"/>
+<text x="338.0" y="210.0" class="labs" text-anchor="start">P−</text>
+<polyline points="95,102 95,140" class="ln nctl"/>
+<text x="100.0" y="125.0" class="labs" text-anchor="start">Balance</text>
+<polyline points="170,175 220,190" class="ln nctl dash"/>
+<polyline points="410,240 410,290" class="ln n12"/>
+<text x="414.0" y="270.0" class="labs" text-anchor="start">COM</text>
+<polyline points="440,240 440,290" class="ln n12"/>
+<polyline points="470,240 470,290" class="ln n12"/>
+<polyline points="380,320 330,320" class="ln n12"/>
+<text x="345.0" y="314.0" class="labs" text-anchor="start">K1</text>
+<polyline points="275,346 275,420" class="lnth n5"/>
+<text x="280.0" y="390.0" class="labs" text-anchor="start">5 V / 5 A</text>
+<polyline points="530,330 560,330 560,200 530,200" class="ln n12"/>
+<text x="482.0" y="282.0" class="labs" text-anchor="start">K2/K3 NO</text>
+<polyline points="530,60 600,60" class="ln n12"/>
+<text x="545.0" y="54.0" class="labs" text-anchor="start">12 V</text>
+<polyline points="530,205 845,205 845,70 870,70" class="ln n12"/>
+<polyline points="530,205 845,205 845,170 870,170" class="ln n12"/>
+<polyline points="530,205 845,205 845,270 870,270" class="ln n12"/>
+<polyline points="530,222 852,222 852,390 870,390" class="ln n12"/>
+<polyline points="530,222 852,222 852,490 870,490" class="ln n12"/>
+<polyline points="530,222 852,222 852,590 870,590" class="ln n12"/>
+<text x="808.0" y="216.0" class="labs" text-anchor="end">je Bein 1 Paar AWG20</text>
+<polyline points="700,190 700,250" class="ln ndata"/>
+<text x="672.0" y="244.0" class="labs" text-anchor="start">DATA</text>
+<polyline points="750,190 750,250" class="ln ni2c"/>
+<text x="732.0" y="244.0" class="labs" text-anchor="start">I²C</text>
+<polyline points="780,250 780,190" class="ln nint"/>
+<polyline points="800,300 830,300 830,95 870,95" class="ln ndata"/>
+<polyline points="800,300 830,300 830,195 870,195" class="ln ndata"/>
+<polyline points="800,300 830,300 830,295 870,295" class="ln ndata"/>
+<polyline points="800,300 830,300 830,415 870,415" class="ln ndata"/>
+<polyline points="800,300 830,300 830,515 870,515" class="ln ndata"/>
+<polyline points="800,300 830,300 830,615 870,615" class="ln ndata"/>
+<text x="796.0" y="372.0" class="labs" text-anchor="end">je Bein XH3: GND · DATA · SW</text>
+<polyline points="640,190 640,230 560,230 560,450 530,450" class="ln nctl"/>
+<text x="536.0" y="470.0" class="labs" text-anchor="start">IO16/27</text>
+<polyline points="610,190 610,215 545,215 545,420" class="ln n5"/>
+<polyline points="455,420 455,386" class="ln nctl"/>
+<polyline points="320,440 380,440" class="ln nctl"/>
+<text x="330.0" y="434.0" class="labs" text-anchor="start">GPIO26</text>
+<polyline points="800,175 815,175 815,422 800,422" class="ln ndata dash"/>
+<text x="810.0" y="410.0" class="labs" text-anchor="end">IO4</text>
+<polyline points="320,500 580,500 580,120 600,120" class="ln ndata dash"/>
+<text x="586.0" y="300.0" class="labs" text-anchor="start">UART</text>
+<polyline points="90,540 90,580" class="ln ni2c"/>
+<polyline points="250,540 250,580" class="ln nctl"/>
+<polyline points="250,628 250,645" class="ln ndata"/>
+</svg>
