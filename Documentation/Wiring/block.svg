@@ -31,18 +31,17 @@ svg{font-family:'IBM Plex Sans','Segoe UI',Arial,sans-serif}
 <text x="228.0" y="172.0" class="labs" text-anchor="start">B− · P− · Balance</text>
 <rect x="380" y="40" width="150" height="200" rx="6" class="boxnew"/>
 <text x="388.0" y="57.0" class="labb" text-anchor="start">C Power-Verteiler</text>
-<text x="388.0" y="72.0" class="labs" text-anchor="start">12 V Haupt</text>
-<text x="388.0" y="85.0" class="labs" text-anchor="start">12 V links (K2)</text>
-<text x="388.0" y="98.0" class="labs" text-anchor="start">12 V rechts (K3)</text>
-<text x="388.0" y="111.0" class="labs" text-anchor="start">GND</text>
+<text x="388.0" y="72.0" class="labs" text-anchor="start">12 V Haupt (dauernd)</text>
+<text x="388.0" y="85.0" class="labs" text-anchor="start">GND</text>
+<text x="388.0" y="98.0" class="labs" text-anchor="start">2 Sammelschienen</text>
 <rect x="380" y="290" width="150" height="96" rx="6" class="box"/>
 <text x="388.0" y="307.0" class="labb" text-anchor="start">Relaismodul 8-fach</text>
-<text x="388.0" y="322.0" class="labs" text-anchor="start">K1 12 V → DC-DC</text>
-<text x="388.0" y="335.0" class="labs" text-anchor="start">K2 Servos links</text>
-<text x="388.0" y="348.0" class="labs" text-anchor="start">K3 Servos rechts</text>
+<text x="388.0" y="322.0" class="labs" text-anchor="start">K1 12 V → DC-DC (Pi)</text>
+<text x="388.0" y="335.0" class="labs" text-anchor="start">K2…K7 je ein Bein</text>
+<text x="388.0" y="348.0" class="labs" text-anchor="start">K8 frei · je 10 A</text>
 <rect x="380" y="420" width="150" height="58" rx="6" class="boxnew"/>
 <text x="388.0" y="437.0" class="labb" text-anchor="start">D Relais-Adapter</text>
-<text x="388.0" y="452.0" class="labs" text-anchor="start">3 Dioden + BC547</text>
+<text x="388.0" y="452.0" class="labs" text-anchor="start">BC547 für den Pi</text>
 <rect x="220" y="290" width="110" height="56" rx="6" class="box"/>
 <text x="228.0" y="307.0" class="labb" text-anchor="start">DC-DC 12→5 V</text>
 <text x="228.0" y="322.0" class="labs" text-anchor="start">Fulree 5 A</text>
@@ -121,17 +120,23 @@ svg{font-family:'IBM Plex Sans','Segoe UI',Arial,sans-serif}
 <text x="345.0" y="314.0" class="labs" text-anchor="start">K1</text>
 <polyline points="275,346 275,420" class="lnth n5"/>
 <text x="280.0" y="390.0" class="labs" text-anchor="start">5 V / 5 A</text>
-<polyline points="530,330 560,330 560,200 530,200" class="ln n12"/>
-<text x="482.0" y="282.0" class="labs" text-anchor="start">K2/K3 NO</text>
+<text x="482.0" y="282.0" class="labs" text-anchor="start">7× COM</text>
 <polyline points="530,60 600,60" class="ln n12"/>
 <text x="545.0" y="54.0" class="labs" text-anchor="start">12 V</text>
-<polyline points="530,205 845,205 845,70 870,70" class="ln n12"/>
-<polyline points="530,205 845,205 845,170 870,170" class="ln n12"/>
-<polyline points="530,205 845,205 845,270 870,270" class="ln n12"/>
-<polyline points="530,222 852,222 852,390 870,390" class="ln n12"/>
-<polyline points="530,222 852,222 852,490 870,490" class="ln n12"/>
-<polyline points="530,222 852,222 852,590 870,590" class="ln n12"/>
-<text x="808.0" y="216.0" class="labs" text-anchor="end">je Bein 1 Paar AWG20</text>
+<polyline points="530,362 852,362 852,70 870,70" class="ln n12"/>
+<polyline points="530,225 845,225 845,62 870,62" class="ln ngnd"/>
+<polyline points="530,362 852,362 852,170 870,170" class="ln n12"/>
+<polyline points="530,225 845,225 845,162 870,162" class="ln ngnd"/>
+<polyline points="530,362 852,362 852,270 870,270" class="ln n12"/>
+<polyline points="530,225 845,225 845,262 870,262" class="ln ngnd"/>
+<polyline points="530,362 852,362 852,390 870,390" class="ln n12"/>
+<polyline points="530,225 845,225 845,382 870,382" class="ln ngnd"/>
+<polyline points="530,362 852,362 852,490 870,490" class="ln n12"/>
+<polyline points="530,225 845,225 845,482 870,482" class="ln ngnd"/>
+<polyline points="530,362 852,362 852,590 870,590" class="ln n12"/>
+<polyline points="530,225 845,225 845,582 870,582" class="ln ngnd"/>
+<text x="842.0" y="218.0" class="labs" text-anchor="end">GND je Bein</text>
+<text x="842.0" y="357.0" class="labs" text-anchor="end">12 V je Bein von K2…K7 NO</text>
 <polyline points="700,190 700,250" class="ln ndata"/>
 <text x="672.0" y="244.0" class="labs" text-anchor="start">DATA</text>
 <polyline points="750,190 750,250" class="ln ni2c"/>
@@ -143,10 +148,11 @@ svg{font-family:'IBM Plex Sans','Segoe UI',Arial,sans-serif}
 <polyline points="800,300 830,300 830,415 870,415" class="ln ndata"/>
 <polyline points="800,300 830,300 830,515 870,515" class="ln ndata"/>
 <polyline points="800,300 830,300 830,615 870,615" class="ln ndata"/>
-<text x="796.0" y="372.0" class="labs" text-anchor="end">je Bein XH3: GND · DATA · SW</text>
-<polyline points="640,190 640,230 560,230 560,450 530,450" class="ln nctl"/>
-<text x="536.0" y="470.0" class="labs" text-anchor="start">IO16/27</text>
-<polyline points="610,190 610,215 545,215 545,420" class="ln n5"/>
+<text x="796.0" y="388.0" class="labs" text-anchor="end">je Bein XH3: GND · DATA · SW</text>
+<polyline points="640,190 640,238 560,238 560,450 530,450" class="ln nctl"/>
+<text x="536.0" y="470.0" class="labs" text-anchor="start">IO16/27, 3,3 V</text>
+<polyline points="610,190 610,232 545,232 545,290" class="ln n5"/>
+<text x="550.0" y="284.0" class="labs" text-anchor="start">5 V Spulen</text>
 <polyline points="455,420 455,386" class="ln nctl"/>
 <polyline points="320,440 380,440" class="ln nctl"/>
 <text x="330.0" y="434.0" class="labs" text-anchor="start">GPIO26</text>

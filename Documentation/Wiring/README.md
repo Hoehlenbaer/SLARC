@@ -7,21 +7,28 @@ Stand 25.10.2026. Plan für Energie, Servo-Bus, Fußkontakte, Relais und Sensori
 ## Grundentscheidungen
 
 - **Akku → BMS → Verteiler.** Akku-Plus über die 30-A-Flachsicherung F1 auf das Power-Board (Platine C). Akku-Minus auf B− des Daly-BMS, dessen P− auf die GND-Schiene. Der Balancer hängt über den Adapter im Steckerhalter am BMS. Geladen wird extern, der Akku kommt dafür raus.
+- **Ein Relais je Bein.** Das Relaismodul (8× SRD-05VDC-SL-C, 10 A je Kontakt) schaltet:
+  - K1: 12 V auf den DC-DC-Wandler, also den Pi.
+  - K2…K7: je ein Bein (FR, MR, RR, FL, ML, RL).
+  - K8: frei.
 
-- **Drei Relais, alle vom ESP32 gesteuert.**
-  - K1 schaltet 12 V auf den DC-DC-Wandler, also den Pi.
-  - K2 schaltet die Servos links, K3 die Servos rechts.
-  - Der ESP32 läuft dauernd, sobald der Akku steckt. Er entscheidet, wann Pi und Servos Strom bekommen, und kann den Servos im Notfall die Spannung nehmen, ohne auf den Bus angewiesen zu sein.
+  Ein Bein zieht im Mittel ~1,7 A und höchstens 8,1 A (3 × 2,7 A Stall). Das liegt unter den 10 A eines Kontakts. Eine ganze Seite (~15 A Spitze) wäre für ein Relais zu viel.
+- **Steuerung durch den ESP32.** Der ESP32 läuft dauernd, sobald der Akku steckt.
+  - IO16 schaltet K1, IO27 schaltet K2…K7 gemeinsam.
+  - So kann er den Servos im Notfall die Spannung nehmen, auch wenn der Bus nicht mehr antwortet.
   - Der Pi hält K1 zusätzlich selbst über einen Transistor, damit er sauber herunterfahren kann.
+- **Relaismodul mit getrennter Versorgung.** Der Jumper JD-VCC–VCC wird gezogen.
+  - Optokoppler-Seite (VCC): 3,3 V.
+  - Spulen (JD-VCC): 5 V vom Treiber.
 
-- **Servo-Strom sternförmig.** Jede Bein-Platine (A) bekommt ein eigenes Paar AWG20 vom Power-Board. Auf der Bein-Platine geht jeder Servo einzeln ab, ohne Daisy-Chain durch die Servos. So fließt durch die dünnen Servokabel nur der Strom eines Servos.
-
-- **Daten getrennt vom Strom.** Am Treiber wird von H5 nur DATA und GND abgegriffen. Auf dem Hub (B) verteilt sich DATA sternförmig auf die sechs Beine. H5 und H6 hängen auf dem Treiber ohnehin am selben Bustreiber (SN74LVC1G125), deshalb genügt H5. GND läuft in jedem Signalkabel mit. So hat DATA eine saubere Masse, auch wenn auf den Stromleitungen bei 15 A ein paar Zehntel Volt abfallen.
-
-- **Fußkontakte am MCP23017 auf dem Hub.** Jeder Fußschalter läuft mit zwei Adern das Bein hoch zur Bein-Platine. Von dort geht er im 3-adrigen Signalkabel (GND · DATA · SW) zum Hub. Dort sitzt ein 10-kΩ-Pull-up nach 3,3 V.
-
-- **Pi-Versorgung kurz und doppelt.** Vom DC-DC-Ausgang laufen je Pol 2× AWG20 zum Pi. Das geht über die USB-C-Buchse oder über die 5-V-Pins der GPIO-Leiste.
-
+  Damit sperrt ein 3,3-V-High den Eingang sicher, und es braucht keine Dioden.
+- **Servo-Strom sternförmig.** Jede Bein-Platine (A) bekommt 12 V von ihrem Relais und GND vom Power-Board, je eine Ader AWG20. Auf der Bein-Platine geht jeder Servo einzeln ab, ohne Daisy-Chain durch die Servos. So fließt durch die dünnen Servokabel nur der Strom eines Servos.
+- **Daten getrennt vom Strom.** Am Treiber wird von H5 nur DATA und GND abgegriffen.
+  - Auf dem Hub (B) verteilt sich DATA sternförmig auf die sechs Beine.
+  - H5 und H6 hängen auf dem Treiber am selben Bustreiber (SN74LVC1G125), deshalb genügt H5.
+  - GND läuft in jedem Signalkabel mit. So hat DATA eine saubere Masse, auch wenn auf den Stromleitungen ein paar Zehntel Volt abfallen.
+- **Fußkontakte am MCP23017-Modul auf dem Hub.** Jeder Fußschalter läuft mit zwei Adern das Bein hoch zur Bein-Platine. Von dort geht er im 3-adrigen Signalkabel (GND · DATA · SW) zum Hub. Dort sitzt ein 10-kΩ-Pull-up nach 3,3 V.
+- **Pi-Versorgung kurz und doppelt.** Vom DC-DC-Ausgang laufen je Pol 2× AWG20 zum Pi, über die USB-C-Buchse oder die 5-V-Pins der GPIO-Leiste.
 - **Strommessung am Treiber.** Das INA219 auf dem Treiber misst nur noch den Strom des Treibers. Die Akkuspannung sieht es weiterhin.
 
 ## Strombudget und Querschnitte
@@ -29,47 +36,47 @@ Stand 25.10.2026. Plan für Energie, Servo-Bus, Fußkontakte, Relais und Sensori
 | Verbraucher | Mittel | Spitze | Leitung |
 |---|---|---|---|
 | 18 Servos gesamt (Tripod) | ~10 A | 20–30 A | – |
-| je Seite (9 Servos, über K2/K3) | ~5 A | ~15 A | Power-Board ↔ Relais: 2× AWG20 je Weg |
-| je Bein (3 Servos) | ~1,7 A | 8,1 A (3× 2,7 A Stall) | 1 Paar AWG20, 15–30 cm |
+| je Bein (3 Servos, über ein Relais) | ~1,7 A | 8,1 A (3× 2,7 A Stall) | 12 V: Kx NO → Bein, GND: Power-Board → Bein, je 1× AWG20 |
 | Pi 5 + Hailo-8 (5 V) | 2–3 A | ~5 A | je Pol 2× AWG20, ≤ 25 cm (≈ 40 mV Abfall) |
 | DC-DC-Eingang (12 V, über K1) | ~1,3 A | ~2,5 A | AWG20 |
 | Treiber (12 V) | 0,15 A | 0,5 A | mitgeliefertes XH-Kabel oder AWG22 |
-| Relaisspulen (5 V vom Treiber) | 3× 72 mA | – | AWG24 |
+| Relaisspulen (5 V vom Treiber) | bis 7× 72 mA ≈ 0,5 A | – | AWG24 |
 | Akku → F1 → Power-Board, Akku− → BMS → GND | ~12 A | 30 A | **AWG14** (oder 3× AWG20 parallel), ≤ 30 cm |
 
 Laufzeit grob: 9 Ah bei ~12 A Mittel ergibt 40–45 min Gehen.
 
 Kurzschlussschutz: Ein Kurzschluss löst die Kurzschlussabschaltung des BMS im Mikrosekundenbereich aus, F1 sichert dahinter. Die kurzen AWG20-Abgänge brauchen deshalb keine eigene Sicherung.
 
+Die Bein-Relais nur schalten, wenn das Drehmoment der Servos aus ist. Beim Einschalten lädt der 470-µF-Kondensator kurz über den Kontakt, unter Last schalten verschleißt die Kontakte.
+
 **AWG20 und Steckverbinder.** Für Datenleitungen ist AWG20 elektrisch mehr als genug. Es passt aber nicht in XH- oder Dupont-Crimpkontakte, die nehmen höchstens AWG22. Deshalb gilt:
 
 - Gelötete Verbindungen und alle Stromleitungen: AWG20.
-
 - Gesteckte Signalleitungen (Hub ↔ Beine, I²C, INT, Relais): AWG24.
 
 ## Leitungsliste
 
 | Nr | Von | Nach | Adern | Querschnitt | Verbindung |
 |---|---|---|---|---|---|
-| L1 | Deans + (Steckerhalter) | F1 → Power-Board 12 V Haupt | 1 | AWG14 | gelötet / Flachsicherungshalter |
+| L1 | Deans + (Steckerhalter) | F1 → Power-Board 12 V | 1 | AWG14 | gelötet / Flachsicherungshalter |
 | L2 | Deans − | BMS B− | 1 | AWG14 (BMS-Litze) | gelötet |
 | L3 | BMS P− | Power-Board GND | 1 | AWG14 | gelötet, 3 Löcher |
 | L4 | Balancer-Adapter (Steckerhalter) | BMS Balance | 4 | BMS-Kabel | Stecker; erst B−, dann Balancer |
-| L5 | Power-Board 12 V Haupt | K1 / K2 / K3 COM | 1 / 2 / 2 | AWG20 | Schraubklemme Relais |
-| L6 | K2 NO / K3 NO | Power-Board 12 V links / rechts | je 2 | AWG20 | Schraubklemme |
-| L7 | Power-Board 12 V links/rechts + GND | Bein-Platine je Bein | 2 | AWG20 | beidseitig gelötet |
+| L5 | Power-Board 12 V | K1…K7 COM | je 1 | AWG20 | Schraubklemme Relais |
+| L6 | K2…K7 NO | Bein-Platine FR, MR, RR, FL, ML, RL (12 V) | je 1 | AWG20 | Schraubklemme / gelötet |
+| L7 | Power-Board GND | Bein-Platine je Bein (GND) | je 1 | AWG20 | beidseitig gelötet |
 | L8 | K1 NO / Power-Board GND | DC-DC IN+ / IN− | 2 | AWG20 | gelötet |
 | L9 | DC-DC OUT+ / OUT− | Pi 5 (USB-C-Pigtail oder Pin 2+4 / 6+9) | 2 + 2 | AWG20 | gelötet / Dupont |
-| L10 | Power-Board 12 V Haupt + GND | Treiber XH-Eingang | 2 | AWG20 / XH-Kabel | XH2 |
+| L10 | Power-Board 12 V + GND | Treiber XH-Eingang | 2 | AWG20 / XH-Kabel | XH2 |
 | L11 | Treiber H5 (DATA, GND) | Hub J2 | 2 | Servokabel 5264 | 5264 / XH2 |
-| L12 | Treiber I²C (GND, 3V3, SCL, SDA) | Hub J1 | 4 | AWG24 | XH4 |
-| L13 | Hub J3 INTA | Treiber IO34 | 2 (INT, GND) | AWG24 | Encoder-Stecker A |
+| L12 | Treiber I²C (GND, 3V3, SCL, SDA) | Kopfleiste MCP23017-Modul | 4 | AWG24 | Dupont |
+| L13 | MCP23017-Modul ITA | Treiber IO34 | 1 + GND | AWG24 | Dupont / Encoder-Stecker A |
 | L14 | Hub J-FR … J-RL | Bein-Platine J4 | 3 je Bein | AWG24 | XH3 / XH3 |
 | L15 | Fußschalter | Bein-Platine J5 | 2 | AWG24 | im Bein geführt, XH2 |
-| L16 | Femur-/Tibia-/Coxa-Servo | Bein-Platine | 3 je Servo | Servokabel | 5264 auf Stiftleiste |
-| L17 | Treiber IO16, IO27, GND | Relais-Adapter J1 | 3 | AWG24 | XH4 |
-| L18 | Pi GPIO26 (Pin 37) | Relais-Adapter J1 | 1 | AWG24 | Dupont / XH4 |
-| L19 | Treiber 40-pol. 5 V (Pin 2) / GND (Pin 6) | Relais-Adapter 5 V / GND | 2 | AWG24 | Dupont / gelötet |
+| L16 | Coxa-/Femur-/Tibia-Servo | Bein-Platine | 3 je Servo | Servokabel | 5264 auf Stiftleiste |
+| L17 | Treiber IO16, IO27, GND, 3V3 | Relais-Adapter J1 | 4 | AWG24 | XH5 / Dupont |
+| L18 | Pi GPIO26 (Pin 37) | Relais-Adapter J1 | 1 | AWG24 | Dupont |
+| L19 | Treiber 40-pol. 5 V (Pin 2) / GND (Pin 6) | Relaismodul JD-VCC / GND (3-pol. Leiste) | 2 | AWG24 | Dupont |
 | L20 | Treiber IO4 + 5 V + GND | WS2812-Streifen (optional) | 3 | AWG24 | 3-pol. Servostecker |
 | L21 | Pi I²C1 (Pin 1, 3, 5, 9) + GPIO24 (Pin 18) | ICM-20948 | 5 | AWG24 | Dupont |
 | L22 | Pi GPIO18 (Pin 12) / GPIO23 (Pin 16) | Trigger-Platine (Ausgang / Rückführung) | 2 + GND | Dupont | Dupont |
@@ -85,11 +92,13 @@ Kurzschlussschutz: Ein Kurzschluss löst die Kurzschlussabschaltung des BMS im M
 | IO18 / IO19 | Servo-Bus (UART1, intern über SN74LVC1G125/126) | – |
 | IO32 / IO33 | I²C: Board-IMU QMI8658C/AK09918C + MCP23017 (0x20) | – |
 | IO34 | MCP23017 INTA | Eingang |
-| IO16 | K1 Pi-Versorgung, **low = an** | Ausgang |
-| IO27 | K2 + K3 Servo-Versorgung, **low = an** | Ausgang |
+| IO16 | K1 Pi-Versorgung, **low = an**, als Open-Drain betreiben | Ausgang |
+| IO27 | K2…K7 Bein-Versorgung, **low = an** (~12 mA Senke) | Ausgang |
 | IO4 | WS2812-Daten | Ausgang |
 | IO35 | frei (nur Eingang) | – |
 | IO5 | frei (Strapping-Pin, beim Booten nicht low ziehen) | – |
+
+IO16 als Open-Drain (`OUTPUT_OPEN_DRAIN`): IN1 hängt auch am Transistor des Pi. Ein Push-Pull-High des ESP32 gegen den durchgeschalteten Transistor wäre ein Kurzschluss.
 
 **Raspberry Pi 5**
 
@@ -105,18 +114,27 @@ Kurzschlussschutz: Ein Kurzschluss löst die Kurzschlussabschaltung des BMS im M
 
 Bei Versorgung über die GPIO-5-V-Pins oder ein Netzteil ohne USB-PD: `PSU_MAX_CURRENT=5000` in der EEPROM-Konfiguration setzen (`sudo rpi-eeprom-config -e`). Sonst begrenzt der Pi die USB-Ports und warnt.
 
-**MCP23017 (Hub):** GPA0 = RL, GPA1 = RR, GPA2 = ML, GPA3 = MR, GPA4 = FL, GPA5 = FR. Die Reihenfolge folgt der Leiterführung auf der Platine, die Firmware bildet sie auf die Beine ab. Bank B ist frei für Status-LEDs. Jede LED braucht einen 330-Ω-Vorwiderstand, insgesamt höchstens ~125 mA.
+**MCP23017-Modul (Hub)**
+
+| Pin | Funktion |
+|---|---|
+| PA0 | Fußschalter RR |
+| PA1 | Fußschalter RL |
+| PA2 | Fußschalter MR |
+| PA3 | Fußschalter ML |
+| PA4 | Fußschalter FR |
+| PA5 | Fußschalter FL |
+| PB0…PB7 | frei für Status-LEDs, je LED 330 Ω Vorwiderstand, insgesamt höchstens ~125 mA |
+
+Die Reihenfolge folgt der Leiterführung auf der Platine, die Firmware bildet sie auf die Beine ab.
 
 ## Platinen
 
 Allgemein:
 
 - **Unterseite:** Schienen aus Draht, satt verzinnt. Sie sind breit und halbtransparent gezeichnet.
-
 - **Oberseite:** Drahtbrücken, als farbige Linien gezeichnet. Jede Drahtbrücke endet im Nachbarloch des Pins und wird dort mit einer Lötbrücke angeschlossen.
-
 - **Farben:** rot 12 V, schwarz GND, gelb DATA, blau Fußschalter, grün I²C, lila 3,3 V, orange 5 V, magenta Relaissteuerung, türkis INT.
-
 - **Vor dem Löten prüfen:**
   - die Pinfolge am Servokabel (GND / 12 V / DATA)
   - an H5, welcher Pin DATA ist: Er liegt im Ruhezustand bei 3,3–5 V, der Versorgungspin bei Akkuspannung.
@@ -129,40 +147,31 @@ Allgemein:
 Eine halbe 3×7-cm-Platine (10 × 11 Löcher), aus jeder 3×7 entstehen zwei Bein-Platinen.
 
 - **Bestückung:** drei 3-polige Stiftleisten für Coxa, Femur und Tibia, C1 470 µF / 25 V, XH3 J4 zum Hub, XH2 J5 für den Fußschalter.
-
-- **Einspeisung:** 12 V und GND von unten direkt an die Schienen löten.
-
+- **Einspeisung:** 12 V (vom Bein-Relais) und GND (vom Power-Board) von unten direkt an die Schienen löten.
 - **Montage:** dicht am jeweiligen Coxa-Servo zwischen den Platten. Die genaue Lage prüfe ich im CAD, sobald die Platinen gebaut sind.
 
 ### B – Hub (1×)
 
 ![Platine B](board_b_hub.svg)
 
-5×7 cm.
+5×7 cm mit dem MCP23017-Modul (Breakout).
 
-- **U1:** MCP23017 im DIP-28-Gehäuse in Fassung. A0–A2 auf GND, das ergibt Adresse 0x20. RESET an 3,3 V. C1 100 nF dicht an VDD/VSS.
-
-- **Pull-ups:** sechs 10-kΩ-Widerstände, stehend, von GPA0–5 nach 3,3 V.
-
+- **Modul:** Die seitliche 20-polige Stiftleiste wird in Spalte 8 eingelötet, das Modul liegt über der linken Hälfte der Platine. Alternativ steckt es in einer Buchsenleiste.
+- **Kopfleiste des Moduls:** Dort kommen I²C (VCC 3,3 V, GND, SCL, SDA) vom Treiber und ITA zum IO34 direkt per Dupont an.
+- **Was das Modul schon mitbringt:** RST-Pull-up (10 kΩ) und I²C-Pull-ups (4,7 kΩ). Mit den Pull-ups auf dem Treiber parallel ist das unkritisch.
+- **Adresse:** Die Lötbrücken A0–A2 müssen auf GND stehen, das ergibt 0x20. Bitte nachsehen.
+- **Pull-ups für die Füße:** sechs 10-kΩ-Widerstände, stehend, von PA0–5 nach 3,3 V. Die 3,3 V kommen vom VCC-Pin des Moduls.
 - **Datenstern:** Spalte 14 auf der Unterseite verbindet J2 (von H5) mit den DATA-Pins aller sechs Beinstecker.
-
 - **Montage:** auf dem Modulplatz MCP (−115 / +35). Dafür kommt ein kleiner gedruckter Träger, der die M2-Eckbohrungen der Platine aufnimmt. Dafür fehlt noch das gemessene Eckloch-Maß.
-
-- **Breakout statt DIP:** Steckt statt des DIP ein Breakout drauf, ändert sich nur die Lage von U1.
 
 ### C – Power-Verteiler (1×)
 
 ![Platine C](board_c_power.svg)
 
-5×7 cm mit vier Sammelschienen auf der Unterseite aus 1,5 mm² Kupfer massiv, zum Beispiel ein Rest NYM-Leitung, auf ganzer Länge verlötet:
+Die halbe Länge einer 5×7-Platine reicht. Zwei Sammelschienen auf der Unterseite aus 1,5 mm² Kupfer massiv, zum Beispiel ein Rest NYM-Leitung, auf ganzer Länge verlötet:
 
-- 12 V Haupt (dauernd)
-
-- 12 V links (hinter K2)
-
-- 12 V rechts (hinter K3)
-
-- GND
+- 12 V Haupt (dauernd): F1 rein, je eine Ader zu K1…K7 COM und zum Treiber.
+- GND: P− rein, je eine Ader zu den sechs Beinen, zum Treiber und zum DC-DC.
 
 Jede Ader kommt in ein eigenes Loch. Platz: unter der oberen Platte über dem BMS, neben dem Relaismodul.
 
@@ -170,44 +179,39 @@ Jede Ader kommt in ein eigenes Loch. Platz: unter der oberen Platte über dem BM
 
 ![Platine D](board_d_relais.svg)
 
-Ein Streifen aus der 2×8-cm-Platine. Er sitzt mit einer 10-poligen Buchsenleiste auf der Eingangsleiste des Relaismoduls. Die Modul-Eingänge sind aktiv-low, das Modul läuft mit VCC = JD-VCC = 5 V vom Treiber.
+Ein Streifen aus der 2×8-cm-Platine. Er sitzt mit einer 10-poligen Buchsenleiste auf der Eingangsleiste des Relaismoduls.
 
-- **ESP32-Seite:** IO16 → D1 → IN1 und IO27 → D2/D3 → IN2/IN3. Der Ring der 1N4148 zeigt zum ESP32. Die Dioden sorgen dafür, dass ein 3,3-V-High den 5-V-Optokoppler sicher sperrt.
+- **Jumper ziehen:** Am Modul wird der Jumper JD-VCC–VCC entfernt.
+  - VCC (Optokoppler) bekommt 3,3 V über den Adapter.
+  - JD-VCC (Spulen) bekommt 5 V vom Treiber an der 3-poligen Leiste.
 
-- **Pi-Seite:** GPIO26 → 4,7 kΩ → BC547 → IN1. Eine Diode geht hier nicht: Ein ausgeschalteter Pi zöge IN1 über die Schutzdiode seines Pins nach unten, und K1 würde einschalten.
+  Die Eingänge sind aktiv-low und hängen direkt an der 3,3-V-Logik.
+- **IN1 (K1):** ESP32 IO16 als Open-Drain und parallel der BC547 des Pi (GPIO26 → 4,7 kΩ → Basis).
+- **Warum der Pi einen Transistor braucht:** Direkt am Pin ginge es nicht. Ein ausgeschalteter Pi zöge IN1 über die Schutzdiode seines Pins nach unten, und K1 würde einschalten.
+- **IN2…IN7 (K2…K7):** in Spalte 1 gebrückt und gemeinsam an IO27. IN8 bleibt frei.
+- **Später möglich:** Die Bein-Relais einzeln über PB0–5 des MCP23017 schalten, etwa um die Beine nacheinander einzuschalten oder ein Bein stromlos zu machen. Dafür die Brücke in Spalte 1 auftrennen.
 
 ## Ablauf Ein / Aus
 
-1. Akku stecken: ESP32 und BMS laufen, DC-DC und Servos sind stromlos (K1–K3 aus).
-
+1. Akku stecken: ESP32 und BMS laufen, DC-DC und Servos sind stromlos (K1–K7 aus).
 2. ESP32 zieht IO16 low: K1 zieht an, der DC-DC startet, der Pi bootet (`POWER_OFF_ON_HALT=0` ist gesetzt).
-
 3. Der Pi setzt GPIO26 high: K1 hält jetzt auch ohne den ESP32.
+4. ESP32 zieht IO27 low: Die Beine bekommen Strom, die Servos sind dabei noch ohne Drehmoment. Danach schaltet der ESP32 das Drehmoment ein.
+5. Ausschalten: ESP32 schaltet das Drehmoment ab und nimmt die Beine weg (IO27 high). Der Pi fährt herunter, GPIO26 fällt ab, K1 fällt, sobald der ESP32 IO16 auch losgelassen hat.
 
-4. ESP32 zieht IO27 low: Die Servos bekommen Strom (Drehmoment vorher aus, dann einschalten).
-
-5. Ausschalten: ESP32 nimmt die Servos weg (IO27 high). Der Pi fährt herunter, GPIO26 fällt ab, K1 fällt, sobald der ESP32 IO16 auch losgelassen hat.
-
-Im Stand zieht der ESP32 samt Treiber Strom. Den Akku nach dem Betrieb abziehen.
+Im Stand ziehen ESP32, Treiber und Relaisspulen Strom. Den Akku nach dem Betrieb abziehen.
 
 ## Inbetriebnahme
 
 1. Jede Platine vor dem ersten Einschalten durchmessen: kein Durchgang zwischen 12 V und GND und zwischen 3,3 V und GND.
-
 2. **Servo-IDs vergeben, bevor ein Servo an den Bus kommt.** Neue ST3215 haben alle ID 1. Jeden Servo einzeln am Treiber anschließen und umnummerieren, zum Beispiel FR 11/12/13 … RL 61/62/63.
-
-3. Nur Treiber und Relais-Adapter: IO16 und IO27 toggeln, die Relais müssen hörbar klicken.
-
+3. Nur Treiber, Relaismodul und Relais-Adapter: IO16 und IO27 toggeln, die Relais müssen hörbar klicken. Mit IO27 high müssen alle Bein-Relais sicher abfallen.
 4. DC-DC an K1, am Ausgang 5,0–5,25 V messen, erst dann den Pi anschließen.
-
-5. Hub: Im I²C-Scan des ESP32 erscheint 0x20. Jeden Fußschalter drücken und das passende GPA-Bit prüfen.
-
+5. Hub: Im I²C-Scan des ESP32 erscheint 0x20. Jeden Fußschalter drücken und das passende PA-Bit prüfen.
 6. Ein Bein komplett, dann alle.
 
 ## Offen
 
 - Lage der Bein-Platinen, des Power-Boards und des Relais-Adapters im CAD prüfen und Halter vorsehen.
-
 - Träger für den Hub am Modulplatz MCP (Eckbohrungen der 5×7-Platine messen).
-
 - Trigger-Platine (20 × 22 mm) ist eigenständig und hier nur verdrahtet.

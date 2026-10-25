@@ -194,65 +194,58 @@ def board_leg():
 
 def board_hub():
     b = Board("Platine B · Hub (Fußkontakte + Datenstern)", 18, 24, "Lochraster 5×7 cm", p=24)
-    pinl = ["GPB0", "GPB1", "GPB2", "GPB3", "GPB4", "GPB5", "GPB6", "GPB7", "VDD", "VSS", "nc", "SCL", "SDA", "nc",
-            "A0", "A1", "A2", "RST", "INTB", "INTA", "GPA0", "GPA1", "GPA2", "GPA3", "GPA4", "GPA5", "GPA6", "GPA7"]
-    b.dip(4, 7, 2, 14, "", pinl)
-    b.bar("3V3", (11, 1), (11, 13)); b.bar("GND", (0, 18), (17, 18))
-    b.trace("GND", [(7, 13), (7, 18)])                    # A0..A2 -> GND (Adresse 0x20)
-    b.trace("3V3", [(7, 12), (11, 12)])                   # RESET -> 3V3
+    # MCP23017-Modul liegt über Spalte 1..8, seitliche Stiftleiste in Spalte 8 (Zeile 3..22)
+    x0, y0 = b.xy(1.4, 1.2); x1, y1 = b.xy(8.45, 22.5)
+    b.over.append(f'<rect x="{x0}" y="{y0}" width="{x1-x0}" height="{y1-y0}" rx="3" fill="#3f9a4e" stroke="#1f5e2c" stroke-width="1.2" opacity=".55"/>')
+    xm, ym = b.xy(4.6, 8); b.over.append(T(xm, ym, "MCP23017-Modul", "btxt", "middle"))
+    xm, ym = b.xy(4.6, 9); b.over.append(T(xm, ym, "liegt auf der", "btxt", "middle"))
+    xm, ym = b.xy(4.6, 10); b.over.append(T(xm, ym, "Stiftleiste", "btxt", "middle"))
+    xm, ym = b.xy(4.6, 1.9); b.over.append(T(xm, ym, "Kopfleiste: VCC GND SCL SDA RST ITA ITB", "bsmall", "middle"))
+    names = ["VCC", "GND"] + [f"PB{i}" for i in range(7, -1, -1)] + ["VCC", "GND"] + [f"PA{i}" for i in range(8)]
+    nets = {"VCC": "3V3", "GND": "GND"}
+    b.header([(8, 3 + i, n, nets.get(n, "SW" if n in ("PA0", "PA1", "PA2", "PA3", "PA4", "PA5") else "CTL")) for i, n in enumerate(names)], "", "left")
+    b.bar("3V3", (11, 13), (11, 20)); b.trace("3V3", [(8, 13), (11, 13)])
+    b.trace("GND", [(8, 14), (10, 14)]); b.wire("GND", (10, 14), (12, 14))
     legs = [("FR", 13, 1), ("MR", 13, 6), ("RR", 13, 11), ("FL", 16, 1), ("ML", 16, 6), ("RL", 16, 11)]
-    gpa = {"FR": 4, "FL": 5, "MR": 6, "ML": 7, "RR": 8, "RL": 9}   # Zeile: GPA5..GPA0
+    pa = {"RR": 15, "RL": 16, "MR": 17, "ML": 18, "FR": 19, "FL": 20}      # Zeile von PA0..PA5
     for n, c, r in legs:
         b.header([(c, r, "", "GND"), (c, r + 1, "", "DATA"), (c, r + 2, "", "SW")], n, "left")
-    b.trace("DATA", [(14, 2), (14, 16)])
+    b.trace("DATA", [(14, 2), (14, 18)])
     for n, c, r in legs:
         b.trace("DATA", [(c, r + 1), (14, r + 1)])
         b.trace("GND", [(c, r), (12 if c == 13 else 17, r)])
-    b.trace("GND", [(12, 1), (12, 18)]); b.trace("GND", [(17, 1), (17, 18)])
-    for n, row in gpa.items():
-        b.trace("SW", [(7, row), (10, row)])
+    b.trace("GND", [(12, 1), (12, 23)]); b.trace("GND", [(17, 1), (17, 23)]); b.trace("GND", [(12, 23), (17, 23)])
+    for n, row in pa.items():
+        b.trace("SW", [(8, row), (10, row)])
         b.res((10, row), (11, row), "", standing=True)
-    x, y = b.xy(10, 3.2); b.over.append(T(x, y, "R1–R6 10k", "btxt", "middle"))
+    x, y = b.xy(10.5, 21.3); b.over.append(T(x, y, "R1–R6 10k", "btxt", "middle"))
     for n, c, r in legs:
-        tr = r + 3
-        b.wire("SW", (9, gpa[n]), (c, tr), via=[(12.4, tr)] if c == 13 else [(12.4, tr)])
-    b.header([(1, 2, "GND", "GND"), (1, 3, "3V3", "3V3"), (1, 4, "SCL", "I2C"), (1, 5, "SDA", "I2C")], "J1 I²C", "left")
-    b.wire("I2C", (1, 4), (4, 13), via=[(2.3, 4), (2.3, 13)]); b.wire("I2C", (1, 5), (4, 14), via=[(1.7, 5), (1.7, 14)])
-    b.wire("3V3", (1, 3), (11, 1), via=[(2.9, 3), (2.9, 0.4), (11, 0.4)])
-    b.wire("GND", (1, 2), (0, 18), via=[(0.4, 2), (0.4, 18)])
-    b.cap((3, 10), (3, 11), "C1", pol=False, big=False)
-    b.trace("3V3", [(3, 10), (4, 10)]); b.trace("GND", [(3, 11), (4, 11)])
-    b.wire("3V3", (3, 10), (2.9, 3), via=[(2.9, 10)])
-    b.wire("GND", (3, 11), (3, 18), via=[(3, 11)])
-    b.header([(1, 20, "GND", "GND"), (1, 21, "DATA", "DATA")], "J2 von H5", "right")
-    b.header([(7, 20, "GND", "GND"), (7, 21, "INTA", "INT")], "J3 → IO34", "right")
-    b.wire("GND", (1, 20), (1, 18)); b.wire("GND", (7, 20), (7, 18.6), via=[(7.5, 20), (7.5, 18.6)])
-    b.wire("DATA", (1, 21), (14, 16), via=[(1, 22.6), (14, 22.6)])
-    b.wire("INT", (7, 21), (8, 10), via=[(8.6, 21), (8.6, 10)])
-    b.note(["U1 MCP23017 (DIP-28 in Fassung) an I²C",
-            "  des ESP32 (IO32/33)",
-            "  Adresse 0x20 (A0–A2 auf GND), RST an 3,3 V",
-            "C1 100 nF dicht an VDD/VSS",
-            "GPA0 RL · GPA1 RR · GPA2 ML",
-            "GPA3 MR · GPA4 FL · GPA5 FR",
-            "R1–R6 10k (stehend) von GPA nach 3,3 V",
-            "INTA → IO34 (IOCON: Push-Pull, aktiv low)",
-            "Bank B frei für Status-LEDs",
+        b.wire("SW", (9, pa[n]), (c, r + 3), via=[(12.5, r + 3)])
+    b.header([(13, 17, "GND", "GND"), (13, 18, "DATA", "DATA")], "J2 von H5", "right")
+    b.trace("DATA", [(13, 18), (14, 18)]); b.trace("GND", [(13, 17), (12, 17)])
+    b.note(["MCP23017-Modul (Breakout) mit der seitlichen",
+            "  20-pol. Stiftleiste in Spalte 8 eingelötet",
+            "  (oder in eine Buchsenleiste gesteckt)",
+            "I²C + INT direkt an die Kopfleiste des Moduls:",
+            "  VCC 3,3 V · GND · SCL · SDA → Treiber-I²C",
+            "  ITA → IO34 (Dupont)",
+            "Adresse 0x20: A0–A2 auf GND (Modul-Brücken",
+            "  prüfen), RST hat das Modul schon (10k)",
+            "PA0 RR · PA1 RL · PA2 MR · PA3 ML",
+            "PA4 FR · PA5 FL",
+            "R1–R6 10k (stehend) von PA nach 3,3 V",
             "Datenstern: J2 (von H5) → Spalte 14",
-            "  → DATA-Pin aller 6 Beinstecker",
-            "Beinstecker XH3: GND · DATA · SW",
-            "Unterseite: GND Zeile 18, Spalte 12+17",
-            "  3V3 Spalte 11",
-            "Drahtbrücken enden im Nachbarloch des",
-            "  Pins, Lötbrücke zum Pin",
+            "  → DATA-Pin aller 6 Beinstecker (XH3)",
+            "Unterseite: GND Spalte 12+17 + Zeile 23,",
+            "  3V3 Spalte 11 (vom Modul-VCC, Zeile 13)",
+            "Bank B (PB0–7) frei für Status-LEDs",
             "Befestigung: Eckbohrungen M2 auf",
             "  gedrucktem Träger am Modulplatz MCP"])
     return b
 
-# ======================================================================= Platine C: Power
 def board_power():
-    b = Board("Platine C · Power-Verteiler", 18, 24, "Lochraster 5×7 cm", p=26)
-    rows = {"12V": 2, "12VL": 8, "12VR": 14, "GND": 21}
+    b = Board("Platine C · Power-Verteiler", 18, 14, "Lochraster 5×7 cm (halbe Länge reicht)", p=26)
+    rows = {"12V": 3, "GND": 10}
     for net, r in rows.items():
         b.bar(net, (0, r), (17, r))
     def padrow(net, r, items):
@@ -262,65 +255,64 @@ def board_power():
             w = 5.4 * len(t) + 6
             b.over.append(f'<rect x="{x-w/2}" y="{y+8}" width="{w}" height="12" rx="2" fill="#163626" opacity=".9"/>')
             b.over.append(T(x, y + 17.5, t, "bsmall", "middle"))
-    padrow("12V", 2, [(1, "F1"), (3, "F1"), (5, "F1"), (8, "K1"), (10, "K2"), (12, "K3"), (15, "Trb")])
-    padrow("12VL", 8, [(1, "K2"), (3, "K2"), (8, "FL"), (11, "ML"), (14, "RL")])
-    padrow("12VR", 14, [(1, "K3"), (3, "K3"), (8, "FR"), (11, "MR"), (14, "RR")])
-    padrow("GND", 21, [(0, "P−"), (1, "P−"), (2, "P−"), (4, "FL"), (5, "ML"), (6, "RL"), (8, "FR"), (9, "MR"), (10, "RR"),
-                      (12, "Trb"), (14, "DC"), (16, "Rel")])
-    b.note(["Sammelschienen auf der Unterseite:",
+    padrow("12V", 3, [(0, "F1"), (1, "F1"), (2, "F1"), (4, "K1"), (6, "K2"), (8, "K3"), (10, "K4"), (12, "K5"), (14, "K6"), (16, "K7"), (17, "Trb")])
+    padrow("GND", 10, [(0, "P−"), (1, "P−"), (2, "P−"), (4, "FR"), (5, "MR"), (6, "RR"), (8, "FL"), (9, "ML"), (10, "RL"),
+                      (12, "Trb"), (14, "DC")])
+    b.note(["Zwei Sammelschienen auf der Unterseite:",
             "  1,5 mm² Cu massiv (NYM-Rest),",
             "  auf ganzer Länge verlötet",
-            "Zeile 2  12 V Haupt (dauernd)",
+            "Zeile 3  12 V Haupt (dauernd)",
             "  F1 = von der 30-A-Sicherung,",
             "    3 Löcher für 3× AWG20 (oder AWG14)",
-            "  K1/K2/K3 = zu COM am Relaismodul",
+            "  K1…K7 = je 1× AWG20 zu COM am Relais",
             "  Trb = Treiber XH-Eingang",
-            "Zeile 8  12 V Servos links (von K2 NO)",
-            "  2 Einspeiselöcher = 2× AWG20",
-            "Zeile 14 12 V Servos rechts (von K3 NO)",
-            "Zeile 21 GND",
+            "Zeile 10 GND",
             "  P− = BMS-Ausgang, 3 Löcher",
-            "  DC = DC-DC IN−, Rel = Relaismodul",
-            "Je Bein ein Paar AWG20 (12 V + GND)",
+            "  je Bein 1× AWG20 (GND der Bein-Platine)",
+            "  Trb = Treiber, DC = DC-DC IN−",
+            "12 V der Beine kommt von Kx NO,",
+            "  nicht vom Power-Board",
             "Jede Ader in ein eigenes Loch"])
     return b
 
 # ======================================================================= Platine D: Relais-Adapter
 def board_relay():
-    b = Board("Platine D · Relais-Adapter", 7, 17, "Streifen aus Lochraster 2×8 cm", p=28)
-    pins = [(0, 0, "GND", "GND")] + [(0, i, f"IN{i}", "CTL") for i in range(1, 9)] + [(0, 9, "VCC", "5V")]
+    b = Board("Platine D · Relais-Adapter", 7, 14, "Streifen aus Lochraster 2×8 cm", p=28)
+    pins = [(0, 0, "GND", "GND")] + [(0, i, f"IN{i}", "CTL") for i in range(1, 9)] + [(0, 9, "VCC", "33")]
+    pins[-1] = (0, 9, "VCC", "3V3")
     b.header(pins, "", "out", kind="hdr")
-    x, y = b.xy(0, -0.9); b.over.append(T(x - 10, y, "Buchse → Relaismodul", "small", "start"))
-    for i in (1, 2, 3):
-        b.trace("CTL", [(0, i), (2, i)])
-    b.dio((2, 1), (6, 1), "D1 1N4148"); b.dio((2, 2), (6, 2), "D2"); b.dio((2, 3), (6, 3), "D3")
-    b.trace("CTL", [(6, 2), (6, 3)])
-    # Q1 BC547: C B E
-    b.header([(2, 6, "C", "CTL"), (3, 6, "B", "CTL"), (4, 6, "E", "GND")], "Q1 BC547", "bottom", kind="comp")
-    b.wire("CTL", (2, 6), (1, 1), via=[(1.5, 6), (1.5, 1.5)])
-    b.trace("CTL", [(3, 6), (3, 7)])
-    b.res((3, 7), (3, 11), "R1 4k7")
-    hdr = [(6, 12, "IO16", "CTL"), (6, 13, "IO27", "CTL"), (6, 14, "GPIO26", "CTL"), (6, 15, "GND", "GND")]
-    b.header(hdr, "J1 Steuerung (XH4)", "left")
-    b.wire("CTL", (6, 1), (6, 12), via=[(6.5, 1), (6.5, 11.5)])
-    b.wire("CTL", (6, 3), (6, 13), via=[(5.5, 3.5), (5.5, 12.5), (6, 12.6)])
-    b.wire("CTL", (3, 11), (6, 14), via=[(3, 14)])
-    b.wire("GND", (4, 6), (6, 15), via=[(4.5, 6), (4.5, 15)])
-    b.trace("5V", [(0, 9), (0, 16)]); b.pad(0, 16, "5V", "5 V", "end", -0.9)
-    b.pad(1, 16, "GND"); b.wire("GND", (1, 16), (6, 15), via=[(1, 15.6), (5.4, 15.6)])
-    b.wire("GND", (0, 0), (1, 16), via=[(0.5, 0), (0.5, 16.5), (1, 16.5)])
-    b.note(["IN1 = K1  12 V → DC-DC (Pi)",
-            "   ESP IO16 low  ODER  Pi GPIO26 high",
-            "IN2 = K2  Servos links,  IN3 = K3 rechts",
-            "   beide über IO27 (low = an)",
-            "Eingänge aktiv-low (Optokoppler)",
-            "Dioden: Kathode (Ring) zum ESP32",
-            "Q1 statt Diode für den Pi: ein",
-            "   ausgeschalteter Pi zieht IN1 sonst",
-            "   über seinen Pin nach unten",
-            "5 V + GND vom Treiber (40-pol., Pin 2/6)",
-            "Reihenfolge der Modul-Stiftleiste",
-            "   vor dem Löten prüfen"])
+    x, y = b.xy(0, -0.9); b.over.append(T(x - 10, y, "Buchse → Eingangsleiste Relaismodul", "small", "start"))
+    b.trace("CTL", [(0, 2), (1, 2), (1, 7), (0, 7)])          # IN2..IN7 gebrückt (Spalte 1)
+    for i in range(3, 7): b.trace("CTL", [(0, i), (1, i)])
+    b.trace("CTL", [(0, 1), (2, 1)])                          # IN1-Knoten
+    b.header([(2, 3, "C", "CTL"), (3, 3, "B", "CTL"), (4, 3, "E", "GND")], "Q1 BC547", "bottom", kind="comp")
+    b.wire("CTL", (2, 3), (2, 1))
+    b.trace("CTL", [(3, 3), (3, 4)])
+    b.res((3, 4), (3, 8), "R1 4k7")
+    hdr = [(6, 9, "IO16", "CTL"), (6, 10, "IO27", "CTL"), (6, 11, "GPIO26", "CTL"), (6, 12, "GND", "GND"), (6, 13, "3V3", "3V3")]
+    b.header(hdr, "J1 Steuerung", "left")
+    b.wire("CTL", (2, 1), (6, 9), via=[(5.5, 1), (5.5, 8.5), (6, 8.5)])
+    b.wire("CTL", (1, 7), (6, 10), via=[(1, 10)])
+    b.wire("CTL", (3, 8), (6, 11), via=[(3, 11)])
+    b.wire("GND", (4, 3), (6, 12), via=[(4.6, 3), (4.6, 12)])
+    b.wire("GND", (0, 0), (6, 12), via=[(0.5, 0), (0.5, 12.6), (6, 12.6)])
+    b.wire("3V3", (0, 9), (6, 13), via=[(0.5, 9.4), (0.5, 13), (6, 13)]) if False else b.wire("3V3", (0, 9), (6, 13), via=[(-0.3, 9), (-0.3, 13.5), (6, 13.5)])
+    b.note(["Modul: Jumper JD-VCC–VCC ziehen!",
+            "  VCC (Optokoppler) = 3,3 V über J1",
+            "  JD-VCC (Spulen) = 5 V vom Treiber,",
+            "  GND an der 3-pol. Leiste",
+            "Eingänge aktiv-low, direkt an 3,3-V-Logik",
+            "IN1 = K1 12 V → DC-DC (Pi)",
+            "  ESP IO16 (Open-Drain) ODER Pi GPIO26",
+            "  über Q1 (high = halten)",
+            "IN2…IN7 = K2…K7 je ein Bein",
+            "  FR MR RR FL ML RL, alle an IO27",
+            "  (low = an, ~12 mA Senke)",
+            "IN8 = K8 frei",
+            "Q1 statt Direktanschluss für den Pi:",
+            "  ein ausgeschalteter Pi zöge IN1 über",
+            "  seinen Pin nach unten",
+            "Reihenfolge der Modul-Leiste prüfen"])
     return b
 
 # ======================================================================= Blockschaltbild
@@ -345,9 +337,9 @@ def block():
     box("hold", 20, 140, 150, 50, "Steckerhalter", "Deans-Stifte · Balancer-Adapter", "box2")
     box("fuse", 220, 40, 110, 44, "F1 30 A", "Flachsicherung")
     box("bms", 220, 140, 110, 62, "BMS Daly 3S", "B− · P− · Balance")
-    box("pwr", 380, 40, 150, 200, "C Power-Verteiler", "12 V Haupt\n12 V links (K2)\n12 V rechts (K3)\nGND", "boxnew")
-    box("rel", 380, 290, 150, 96, "Relaismodul 8-fach", "K1 12 V → DC-DC\nK2 Servos links\nK3 Servos rechts")
-    box("adp", 380, 420, 150, 58, "D Relais-Adapter", "3 Dioden + BC547", "boxnew")
+    box("pwr", 380, 40, 150, 200, "C Power-Verteiler", "12 V Haupt (dauernd)\nGND\n2 Sammelschienen", "boxnew")
+    box("rel", 380, 290, 150, 96, "Relaismodul 8-fach", "K1 12 V → DC-DC (Pi)\nK2…K7 je ein Bein\nK8 frei · je 10 A")
+    box("adp", 380, 420, 150, 58, "D Relais-Adapter", "BC547 für den Pi", "boxnew")
     box("dcdc", 220, 290, 110, 56, "DC-DC 12→5 V", "Fulree 5 A")
     box("pi", 20, 420, 300, 120, "Raspberry Pi 5 + Hailo-8", "GPIO26 Halten · GPIO18 PWM Trigger\nGPIO23 Trigger zurück · GPIO24 IMU-INT\nI²C1 (GPIO2/3) · CSI 0/1 · UART")
     box("imu", 20, 580, 140, 48, "ICM-20948", "I²C + INT")
@@ -370,23 +362,23 @@ def block():
     ln("12V", [(410, 240), (410, 290)], lab="COM", lpos=(414, 270)); ln("12V", [(440, 240), (440, 290)]); ln("12V", [(470, 240), (470, 290)])
     ln("12V", [(380, 320), (330, 320)], lab="K1", lpos=(345, 314))
     ln("5V", [(275, 346), (275, 420)], True, lab="5 V / 5 A", lpos=(280, 390))
-    ln("12V", [(530, 330), (560, 330), (560, 200), (530, 200)], lab="K2/K3 NO", lpos=(482, 282))
+    o.append(T(482, 282, "7× COM", "labs"))
     ln("12V", [(530, 60), (600, 60)], lab="12 V", lpos=(545, 54))
     # Servo-Speisung zu Beinen
     for n, y in (("FR", 40), ("MR", 140), ("RR", 240), ("FL", 360), ("ML", 460), ("RL", 560)):
-        yy = 205 if n[1] == "R" else 222
-        xx = 845 if n[1] == "R" else 852
-        ln("12V", [(530, yy), (xx, yy), (xx, y + 30), (870, y + 30)])
-    o.append(T(808, 216, "je Bein 1 Paar AWG20", "labs", "end"))
+        ln("12V", [(530, 362), (852, 362), (852, y + 30), (870, y + 30)])
+        ln("GND", [(530, 225), (845, 225), (845, y + 22), (870, y + 22)])
+    o.append(T(842, 218, "GND je Bein", "labs", "end")); o.append(T(842, 357, "12 V je Bein von K2…K7 NO", "labs", "end"))
     # Daten
     ln("DATA", [(700, 190), (700, 250)], lab="DATA", lpos=(672, 244))
     ln("I2C", [(750, 190), (750, 250)], lab="I²C", lpos=(732, 244))
     ln("INT", [(780, 250), (780, 190)])
     for n, y in (("FR", 40), ("MR", 140), ("RR", 240), ("FL", 360), ("ML", 460), ("RL", 560)):
         ln("DATA", [(800, 300), (830, 300), (830, y + 55), (870, y + 55)])
-    o.append(T(796, 372, "je Bein XH3: GND · DATA · SW", "labs", "end"))
-    ln("CTL", [(640, 190), (640, 230), (560, 230), (560, 450), (530, 450)], lab="IO16/27", lpos=(536, 470))
-    ln("5V", [(610, 190), (610, 215), (545, 215), (545, 420)])
+    o.append(T(796, 388, "je Bein XH3: GND · DATA · SW", "labs", "end"))
+    ln("CTL", [(640, 190), (640, 238), (560, 238), (560, 450), (530, 450)], lab="IO16/27, 3,3 V", lpos=(536, 470))
+    ln("5V", [(610, 190), (610, 232), (545, 232), (545, 290)])
+    o.append(T(550, 284, "5 V Spulen", "labs"))
     ln("CTL", [(455, 420), (455, 386)])
     ln("CTL", [(320, 440), (380, 440)], lab="GPIO26", lpos=(330, 434))
     ln("DATA", [(800, 175), (815, 175), (815, 422), (800, 422)], dash=True)
