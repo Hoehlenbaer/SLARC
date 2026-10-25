@@ -1,12 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – obere + untere Baseplate inkl. Coxa-Servo-Aufnahme, Elektronik und Energieversorgung.   V2.7 (Akku-Riegel: Bajonett-Stift mittig, werkzeuglos)
+SLARC – obere + untere Baseplate inkl. Coxa-Servo-Aufnahme, Elektronik und Energieversorgung.   V2.8 (Plätze für die Lochraster-Platinen der Verkabelung)
 FreeCAD 0.21 / 1.0: Makro ausführen. Parameter in P (unten) ändern und Makro neu ausführen
 (die Plattenkontur mit den Schwenkfreigängen ist hier bewusst als Python-Geometrie gebaut,
 nicht über Spreadsheet-Ausdrücke).
 
 Koordinaten (wie slarc_sim_V10): X = vorn, Y = links, Z = oben, Ursprung = Körpermitte,
 Z = 0 = Oberkante Hüllmaß der Coxa-Servos (ST3215 liegt mit Horn nach oben zwischen den Platten).
+
+V2.8
+- Plätze für die Lochraster-Platinen aus Documentation/Wiring (Eckbohrungen Ø2 im Abstand Seitenlänge - 4 mm):
+  Bein-Platinen A (½ 3×7 = 30×35) zwischen den Platten auf je zwei M2-Bunden + Stützstift auf der unteren Platte,
+  Hub B (5×7) auf einem gedruckten Träger am Modulplatz MCP (2× M3 auf die Platte, 4× M2 für die Platine),
+  Power-Verteiler C (½ 5×7 = 50×35) auf einer gedruckten Brücke über dem BMS, die auf den Säulen (60, ±45) sitzt,
+  Relais-Adapter D vorn am Relaismodul (gewinkelte Buchsenleiste auf die Eingangsstifte).
+  Platzhalter mit Bauhöhe; die Lage ist gegen Servos, Akku-Ausziehweg, Relais, BMS, Steckerhalter, Säulen und Panzer geprüft.
 
 V2.7
 - Akku-Riegel ohne Zukaufteile: ein gedruckter Stift (Ø8) mittig hinter dem Akku (zwischen Balancer- und Hauptkabel), von unten durch die untere Platte
@@ -120,6 +128,16 @@ P = dict(
              top=2.5,                            # Stiftende: so tief steckt der Stift in der oberen Platte (Führung)
              ramp=4.0,                           # Rampe am hinteren Taschenende (2 mm hoch auf 4 mm)
              head_d=20.0, head_h=5.0),           # Griffkopf (gerändelt, Rille zeigt die Nasenrichtung)
+    # V2.8: Lochraster-Platinen (Documentation/Wiring)
+    pcb=dict(t=1.6, hole_in=2.0, m2_pilot=1.7, boss_d=5.0,
+             leg=dict(L=35.0, W=30.0, so=4.0, env=18.0,          # ½ 3×7: Löcher nur an einem Ende (Abstand 26)
+                      pos=[("FR", 183.0, -25.0, 90.0), ("FL", 183.0, 25.0, -90.0), ("MR", 0.0, -60.0, 0.0),
+                           ("ML", 0.0, 60.0, 0.0), ("RR", -100.0, -55.0, 90.0), ("RL", -100.0, 55.0, -90.0)]),
+             hub=dict(cx=-115.0, cy=20.0, L=70.0, W=50.0, t_car=3.0, so=4.0,              # 5×7, Löcher 66×46
+                      env_mod=10.0, y_mod=24.0, env_con=24.0),    # Modulseite außen (flach, Panzer niedrig), Stecker innen
+             pwr=dict(cx=55.0, cy=0.0, L=50.0, W=35.0, deck=(27.0, 83.0, -50.0, 50.0), deck_z=-16.5, deck_t=2.5,
+                      sleeve_d=13.0, so=3.0, env=9.0),                                    # ½ 5×7: Löcher 46 an einem Ende
+             adp=dict(x0=146.8, y0=-20.0, L=18.5, W=40.0, z0=-27.0, env=17.0)),
     split_x=-40.0, lap=24.0, lap_screws=[-65.0, -32.0, 32.0, 65.0],   # Vorderteil 252 x 209 mm
 )
 STEP_DIR = r""
@@ -499,6 +517,86 @@ def latch_pin(x=0.0, y=0.0, lock=90.0, world=True):
     return cut(fuse([head, shaft, lug]), neg)
 
 
+def pcb_frame(cx, cy, rot, L, W):
+    """Platinen-Frame: lokales x entlang L (Lochende bei x = 0), y entlang W, Mitte (cx, cy), gedreht um rot."""
+    return lambda lx, ly: (cx + math.cos(math.radians(rot)) * (lx - L / 2) - math.sin(math.radians(rot)) * (ly - W / 2),
+                           cy + math.sin(math.radians(rot)) * (lx - L / 2) + math.cos(math.radians(rot)) * (ly - W / 2))
+
+
+def leg_pcb_parts():
+    """V2.8: Bunde (pos) und Kernlöcher (neg) für die 6 Bein-Platinen auf der unteren Platte, Platzhalter (Welt)."""
+    c, g = P["pcb"], P["pcb"]["leg"]
+    pos, neg, ph = [], [], []
+    for n, cx, cy, rot in g["pos"]:
+        T = pcb_frame(cx, cy, rot, g["L"], g["W"])
+        for lx, ly in ((c["hole_in"], c["hole_in"]), (c["hole_in"], g["W"] - c["hole_in"])):
+            x, y = T(lx, ly)
+            pos.append(cyl(x, y, Z_LT - 0.5, c["boss_d"] / 2, g["so"] + 0.5))
+            neg.append(cyl(x, y, Z_LT, c["m2_pilot"] / 2, g["so"] + 0.1))
+        x, y = T(g["L"] - 4.0, g["W"] / 2)                                   # Stütze am freien Ende
+        pos.append(cyl(x, y, Z_LT - 0.5, 2.0, g["so"] + 0.5))
+        ph.append(("PCB_A_" + n, rbox(cx, cy, rot, -g["L"] / 2, -g["W"] / 2, Z_LT + g["so"], g["L"], g["W"], g["env"])))
+    return pos, neg, ph
+
+
+def hub_carrier():
+    """V2.8: Träger für den Hub (5×7) auf dem Modulplatz MCP: Platte mit 2× M3 zur oberen Platte, 4 M2-Bunde."""
+    c, h = P["pcb"], P["pcb"]["hub"]
+    x0, y0, zt = h["cx"] - h["L"] / 2, h["cy"] - h["W"] / 2, Z_T
+    plate = box(x0, y0, zt, h["L"], h["W"], h["t_car"])
+    pos = [plate]; neg = []
+    for sx in (c["hole_in"], h["L"] - c["hole_in"]):
+        for sy in (c["hole_in"], h["W"] - c["hole_in"]):
+            pos.append(cyl(x0 + sx, y0 + sy, zt + h["t_car"] - 0.5, c["boss_d"] / 2 + 0.5, h["so"] + 0.5))
+            neg.append(cyl(x0 + sx, y0 + sy, zt + 1.0, c["m2_pilot"] / 2, h["t_car"] + h["so"]))
+    for _, mx, my in [m for m in P["mods"] if m[0] == "MCP"]:
+        for s_ in (-1, 1):
+            neg.append(cyl(mx + s_ * P["mod_dx"], my, zt - 1, P["m3_d"] / 2, h["t_car"] + 2))
+            neg.append(cyl(mx + s_ * P["mod_dx"], my, zt + h["t_car"] - 1.2, 3.1, 2))     # Kopfsenkung M3
+    neg.append(box(x0 + 10, y0 + 10, zt - 1, h["L"] - 20, h["W"] - 20, h["t_car"] + 2))   # Fenster (Gewicht)
+    neg = [n_ for n_ in neg]
+    car = cut(fuse(pos), neg)
+    # Kopfsenkung liegt im Fenster? -> Stege um die Schraubenlöcher
+    rings = []
+    for _, mx, my in [m for m in P["mods"] if m[0] == "MCP"]:
+        for s_ in (-1, 1):
+            rings.append(cut(cyl(mx + s_ * P["mod_dx"], my, zt, 5.0, h["t_car"]),
+                             [cyl(mx + s_ * P["mod_dx"], my, zt - 1, P["m3_d"] / 2, h["t_car"] + 2)]))
+    bars = [box(x0 + 9, my - 3, zt, h["L"] - 18, 6, h["t_car"]) for _, mx, my in [m for m in P["mods"] if m[0] == "MCP"]]
+    car = cut(fuse([car] + rings + bars), [cyl(mx + s_ * P["mod_dx"], my, zt - 1, P["m3_d"] / 2, h["t_car"] + 2)
+                                          for _, mx, my in [m for m in P["mods"] if m[0] == "MCP"] for s_ in (-1, 1)])
+    zb = zt + h["t_car"] + h["so"]
+    ym = y0 + h["W"] - h["y_mod"]                       # äußere Seite (große y): Modul, flach
+    ph = fuse([box(x0, ym, zb, h["L"], h["y_mod"], h["env_mod"]), box(x0, y0, zb, h["L"], h["W"] - h["y_mod"], h["env_con"])])
+    return car, ph
+
+
+def power_bridge():
+    """V2.8: Brücke über dem BMS für den Power-Verteiler; steckt mit zwei Hülsen auf den Säulen (60, ±45)."""
+    c, w = P["pcb"], P["pcb"]["pwr"]
+    xa, xb, ya, yb = w["deck"]
+    z0 = w["deck_z"]
+    deck = box(xa, ya, z0, xb - xa, yb - ya, w["deck_t"])
+    pos = [deck]; neg = []
+    cols = [(sx, sy) for sx, sy in P["standoffs"] if abs(sx - 60.0) < 1e-6]
+    tubes = []
+    for sx, sy in cols:                                  # Hülsen separat (Druck), Deck liegt darauf
+        pos.append(cyl(sx, sy, z0, w["sleeve_d"] / 2, w["deck_t"]))
+        neg.append(cyl(sx, sy, z0 - 1, P["col_d"] / 2 + 0.3, w["deck_t"] + 2))
+        tubes.append(cut(cyl(sx, sy, Z_LT, w["sleeve_d"] / 2, z0 - Z_LT),
+                         [cyl(sx, sy, Z_LT - 1, P["col_d"] / 2 + 0.3, z0 - Z_LT + 2)]))
+    x0, y0 = w["cx"] - w["L"] / 2, w["cy"] - w["W"] / 2
+    zt = z0 + w["deck_t"]
+    for sy in (c["hole_in"], w["W"] - c["hole_in"]):                      # Lochende bei x0
+        pos.append(cyl(x0 + c["hole_in"], y0 + sy, zt - 0.5, c["boss_d"] / 2, w["so"] + 0.5))
+        neg.append(cyl(x0 + c["hole_in"], y0 + sy, zt, c["m2_pilot"] / 2, w["so"] + 0.1))
+    pos.append(box(x0 + w["L"] - 6, y0 + 4, zt - 0.5, 4, w["W"] - 8, w["so"] + 0.5))   # Auflage am freien Ende
+    neg.append(box(x0 + 8, y0 + 6, z0 - 1, w["L"] - 18, w["W"] - 12, w["deck_t"] + 2))   # Fenster (Kabel nach unten)
+    br = cut(fuse(pos), neg)
+    ph = box(x0, y0, zt + w["so"], w["L"], w["W"], w["env"])
+    return br, ph, tubes
+
+
 def build_bottom():
     t, zb, zt = P["t"], Z_LB, Z_LT
     col_h = Z_B - zt                                   # Säule bis Unterseite obere Platte
@@ -540,7 +638,9 @@ def build_bottom():
     for xh in P["conn"]["holes"]:                      # V2.6: Steckerhalter
         neg.append(cyl(xh, conn_dims()["yc"], zb - 1, P["m3_d"] / 2, t + 2))
     neg += latch_bottom_neg()                          # V2.7: Akku-Riegel
-    plate = cut(fuse(pos), neg)
+    lp, ln_, _ = leg_pcb_parts()                       # V2.8: Bein-Platinen
+    pos_extra = lp; neg += ln_
+    plate = cut(fuse(pos + pos_extra), neg)
     front, rear = split(plate, zb, upper_front=False)   # Säulen stehen auf der oberen Stoßhälfte -> hinteres Teil
     return dict(plate=plate, front=front, rear=rear)
 
@@ -551,9 +651,7 @@ def payload_boxes():
     m0, m1, mw, mh = P["bms"]
     return [("Battery_3S_9000", box(bx0 + 1, -25, Z_LT - P["bat_pocket"], 170, 50, P["bat_h"]), (0.85, 0.75, 0.1)),
             ("BMS_Daly_3S", box(m0, -mw / 2, Z_LT, m1 - m0, mw, mh), (0.2, 0.2, 0.8)),
-            ("DCDC_5V_Fulree", dcdc_shape(), (0.75, 0.75, 0.78))] + \
-           [("Modulplatz_" + n, box(x - P["mod_dx"] - 4, y - 12, Z_T, 2 * P["mod_dx"] + 8, 24, 0.6), (0.9, 0.2, 0.2))
-            for n, x, y in P["mods"]]
+            ("DCDC_5V_Fulree", dcdc_shape(), (0.75, 0.75, 0.78))]      # V2.8: Modulplätze -> Hub_Carrier
 
 
 def dcdc_shape():
@@ -667,6 +765,13 @@ def run_freecad():
     for n, shp, col in payload_boxes():
         add(n, shp, col)
     add("Connector_Holder", conn_holder(), (0.08, 0.08, 0.08))      # V2.6
+    for n, shp in leg_pcb_parts()[2]:                              # V2.8: Platinen-Platzhalter + Halter
+        add(n, shp, (0.15, 0.55, 0.3))
+    car, hub_ph = hub_carrier(); add("Hub_Carrier", car, (0.08, 0.08, 0.08)); add("PCB_B_Hub", hub_ph, (0.15, 0.55, 0.3))
+    br, pwr_ph, tubes = power_bridge(); add("Power_Bridge", br, (0.08, 0.08, 0.08)); add("PCB_C_Power", pwr_ph, (0.15, 0.55, 0.3))
+    for i, tb in enumerate(tubes):
+        add("Power_Bridge_Sleeve%d" % (i + 1), tb, (0.08, 0.08, 0.08))
+    a = P["pcb"]["adp"]; add("PCB_D_Relay_Adapter", box(a["x0"], a["y0"], a["z0"], a["L"], a["W"], a["env"]), (0.15, 0.55, 0.3))
     for n, shp in lens_shapes(g["dims"]):                           # M12-Objektive ZH3019-14
         add(n, shp, (0.75, 0.75, 0.78))
     for i, y in enumerate(P["lat"]["ys"]):                          # V2.7: Akku-Riegel (eingerastet, Nase nach außen)
