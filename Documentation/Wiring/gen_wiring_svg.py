@@ -223,6 +223,14 @@ def board_hub():
         b.wire("SW", (9, pa[n]), (c, r + 3), via=[(12.5, r + 3)])
     b.header([(13, 17, "GND", "GND"), (13, 18, "DATA", "DATA")], "J2 von H5", "right")
     b.trace("DATA", [(13, 18), (14, 18)]); b.trace("GND", [(13, 17), (12, 17)])
+    # Ein/Aus-Taster: Pull-up R7 10k nach 3,3 V, J6 Taster, J7 -> IO35
+    b.bar("3V3", (11, 20), (11, 21))
+    b.wire("3V3", (11, 21), (14, 22), via=[(11.5, 22.5), (14, 22.5)])
+    b.res((14, 22), (14, 21), "R7", standing=True)
+    b.header([(16, 21, "BTN", "INT"), (16, 22, "GND", "GND")], "J6 Taster", "right")
+    b.header([(13, 20, "GND", "GND"), (13, 21, "IO35", "INT")], "J7 → IO35", "left")
+    b.trace("INT", [(13, 21), (15, 21)]); b.trace("INT", [(15, 21), (16, 21)])
+    b.trace("GND", [(13, 20), (12, 20)]); b.trace("GND", [(16, 22), (17, 22)])
     b.note(["MCP23017-Modul (Breakout) mit der seitlichen",
             "  20-pol. Stiftleiste in Spalte 8 eingelötet",
             "  (oder in eine Buchsenleiste gesteckt)",
@@ -239,6 +247,8 @@ def board_hub():
             "Unterseite: GND Spalte 12+17 + Zeile 23,",
             "  3V3 Spalte 11 (vom Modul-VCC, Zeile 13)",
             "Bank B (PB0–7) frei für Status-LEDs",
+            "Ein/Aus-Taster an J6, R7 10k nach 3,3 V,",
+            "  J7 → IO35 (Deep-Sleep-Wecken + Aus)",
             "Befestigung: Eckbohrungen M2 auf",
             "  gedrucktem Träger am Modulplatz MCP"])
     return b
