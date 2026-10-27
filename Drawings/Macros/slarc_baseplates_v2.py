@@ -1,12 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – obere + untere Baseplate inkl. Coxa-Servo-Aufnahme, Elektronik und Energieversorgung.   V2.10 (Ein/Aus-Taster hinten rechts)
+SLARC – obere + untere Baseplate inkl. Coxa-Servo-Aufnahme, Elektronik und Energieversorgung.   V2.11 (Relais auf Gewindeeinsätzen)
 FreeCAD 0.21 / 1.0: Makro ausführen. Parameter in P (unten) ändern und Makro neu ausführen
 (die Plattenkontur mit den Schwenkfreigängen ist hier bewusst als Python-Geometrie gebaut,
 nicht über Spreadsheet-Ausdrücke).
 
 Koordinaten (wie slarc_sim_V10): X = vorn, Y = links, Z = oben, Ursprung = Körpermitte,
 Z = 0 = Oberkante Hüllmaß der Coxa-Servos (ST3215 liegt mit Horn nach oben zwischen den Platten).
+
+V2.11
+- Relaismodul auf M3-Gewindeeinsätzen statt Durchgangsschraube + Mutter: Bunde Ø8 (statt 7), Kernloch Ø4,0 × 6,5
+  von oben. Befestigung mit M3x6 von oben (wie die Gabelwangen) -> keine M3x14 und keine Muttern mehr.
 
 V2.10
 - Ein/Aus-Taster (12-mm-Einbautaster, Schließer) hinten rechts zwischen den Platten, versenkt hinter der
@@ -98,6 +102,7 @@ P = dict(
     pi_sleeve=(6.0, 2.8),                          # V2.9: Hülse Außen-Ø, Bohrung (M2.5 frei)
     gdr_x=42.5, gdr_so=16.0, gdr_hole_d=2.7,       # Treiberboard: Lochbild-Mitte X, mitgelieferte 16-mm-Hülsen (Stiftleiste unten 9.4)
     relay_on_top=False, relay_x=-110.0, relay_so=5.0, relay_hole_d=3.2,   # Option: Relais oben hinten
+    relay_insert=(4.0, 6.5, 8.0),                  # V2.11: Gewindeeinsatz M3 unten: Kernloch Ø, Tiefe ab Bundoberkante, Bund-Ø
     # Untere Platte / zwischen den Platten
     z_lt=-35.0,             # Oberseite untere Platte = Unterkante Servo-Hüllmaß
     plug=(-29.7, -14.0, 11.0),      # Steckeröffnung im Servo-Frame: X von..bis, ±Y
@@ -653,7 +658,7 @@ def build_bottom():
         pos.append(box(bx0, y0, zt - 0.5, bx1 - bx0, 3.0, rh + 0.5))          # Schienen
     pos.append(box(bx1, -bw / 2 - 3.0, zt - 0.5, 3.0, bw + 6.0, rh + 0.5))   # Anschlag vorn
     for hx, hy in relay_holes_low():
-        pos.append(cyl(hx, hy, zt - 0.5, 3.5, P["relay_so"] + 0.5))
+        pos.append(cyl(hx, hy, zt - 0.5, P["relay_insert"][2] / 2, P["relay_so"] + 0.5))
     neg = []
     for name, x, y, yaw in P["coxa"]:
         neg.append(sweep_2d(x, y, yaw, zb - 1, t + 2))
@@ -673,8 +678,9 @@ def build_bottom():
             neg.append(box(xs - 11, s * (mw / 2 + 3.5) - 1.5, zb - 1, 22, 3, t + 2))
     for sx, sy in P["standoffs"]:
         neg.append(cyl(sx, sy, zb - 1, P["col_hole_d"] / 2, col_h + t + 2))
-    for hx, hy in relay_holes_low():
-        neg.append(cyl(hx, hy, zb - 1, P["relay_hole_d"] / 2, t + P["relay_so"] + 2))
+    for hx, hy in relay_holes_low():                   # V2.11: Kernloch für Gewindeeinsatz von oben (blind)
+        di, depth, _ = P["relay_insert"]
+        neg.append(cyl(hx, hy, zt + P["relay_so"] - depth, di / 2, depth + 1))
     for sy in P["lap_screws"]:
         neg.append(cyl(P["split_x"], sy, zb - 1, 1.6, t + 2))
     for xh in P["conn"]["holes"]:                      # V2.6: Steckerhalter
