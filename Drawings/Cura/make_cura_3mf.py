@@ -1,63 +1,110 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – Cura-Projekte (3MF) pro Druckteil erzeugen.   V1.0
+SLARC – Cura-Projekte (3MF) pro Druckteil erzeugen.   V1.1 (Quelle: Stückliste)
 Drucker: Anycubic Kobra Plus, Cura 5.13 (setting_version 27).
 
 Ablauf:
+- Teile, Material, Füllung, Wände, Ausrichtung kommen aus Drawings/Macros/SLARC_Stueckliste.xlsx, Blatt
+  Druckteile. Erzeugt werden nur Zeilen mit STL-Datei (Spalte N). Spalte O: Fläche, die aufs Bett kommt
+  (-Z = wie modelliert, +Z = Oberseite, ±X, ±Y = Seitenflächen, siehe ORIENT).
+  In Spalte M (Stützen / Besonderes) werden "Brim N mm" und "Tree Support" erkannt.
 - Vorlage pro Material (templates/AKP_template_<MAT>.3mf) = von Marco in Cura gespeichertes Projekt
   (Drucker, Startcode, Material). Daraus werden nur Modell und Profil ersetzt.
-- Ein Profil pro Material ("PLA SLARC", "PETG SLARC") mit den Basiswerten aus BASE.
-- Abweichungen pro Teil stehen als "Einstellungen pro Modell" am Objekt (in Cura 5.13 geprüft, 2026-11-01).
-- Modell wird gedreht (ORIENT), mittig aufs Bett gesetzt.
+- Ein Profil pro Material ("PLA SLARC", "PETG SLARC") mit den Basiswerten aus BASE
+  (entspricht Blatt Druckeinstellungen).
+- Füllung, Wände, Stützen stehen als "Einstellungen pro Modell" am Objekt (in Cura 5.13 geprüft, 2026-11-01).
+  Brim ist in Cura nur global einstellbar -> steht als Benutzeränderung im Projekt, nicht im Profil.
+- Vorhandene 3MF, die nicht von diesem Skript stammen (von Hand in Cura gespeichert), werden nicht
+  überschrieben, außer mit --force.
 Ausgabe: Drawings/STL files/AKP_<STL-Name>.3mf
 
-Aufruf:  python make_cura_3mf.py            (alle Teile aus PARTS)
-         python make_cura_3mf.py Cap Base   (nur Teile, deren STL-Name den Text enthält)
-Beim Öffnen in Cura für das Profil "neu erstellen" bzw. beim zweiten Mal "aktualisieren" wählen.
+Aufruf:  python make_cura_3mf.py               (alle Teile mit STL-Datei)
+         python make_cura_3mf.py Cap Base      (nur Teile, deren STL-Name den Text enthält)
+         python make_cura_3mf.py --force Cap   (auch von Hand gespeicherte Projekte überschreiben)
+Benötigt: numpy, openpyxl.
+Beim Öffnen in Cura für das Profil "neu erstellen" bzw. später "aktualisieren" wählen.
+
+V1.1
+- Quelle ist die Stückliste statt der PARTS-Tabelle im Skript. ASCII-STL. Schutz für von Hand gespeicherte
+  Projekte. Brim über Benutzeränderungen. PETG mit Brückeneinstellungen, erste Schicht 120 % (wie Blatt
+  Druckeinstellungen).
+- Ausrichtung als Bettfläche (-Z, +Z, ±X, ±Y) statt none/flip_x, damit auch seitlich liegende Teile gehen.
 """
 import os, re, struct, sys, zipfile
 import numpy as np
+import openpyxl
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 STL_DIR = os.path.join(HERE, "..", "STL files")
+BOM = os.path.join(HERE, "..", "Macros", "SLARC_Stueckliste.xlsx")
+MARK = "<!-- SLARC make_cura_3mf -->"
 TPL = {"PLA": os.path.join(HERE, "templates", "AKP_template_PLA.3mf"),      # eSUN PLA+ Black
        "PETG": os.path.join(HERE, "templates", "AKP_template_PETG.3mf")}    # eSUN PETG Black
 
 # Basiswerte je Material: (global, extruder, Einträge der Vorlage, die entfernt werden)
 # PLA: Temperaturen, Bett, Lüfter, Rückzug kommen aus dem Material (eSUN PLA+: 210 °C, 60 °C, 100 %, 3 mm).
-# PETG: Temperaturen 235/240/230 und Bett 80 aus Marcos Profil (Vorlage) bleiben.
+# PETG: Temperaturen 235/240/230, Bett 80, Lüfter 40 %, Rückzug 4,5 mm aus Marcos Profil (Vorlage) bleiben.
 COMMON_G = {"layer_height": "0.2", "layer_height_0": "0.2", "adhesion_type": "skirt",
             "print_sequence": "all_at_once", "support_enable": "False", "support_structure": "tree",
-            "support_type": "buildplate"}
+            "support_type": "buildplate", "retraction_combing": "noskin"}
 COMMON_E = {"wall_line_width": "0.42", "hole_xy_offset": "0.15", "xy_offset_layer_0": "-0.1",
-            "brim_width": "5", "infill_pattern": "gyroid"}
+            "initial_layer_line_width_factor": "120", "brim_width": "8", "infill_pattern": "gyroid"}
 BASE = {
-    "PLA": (dict(COMMON_G, retraction_combing="noskin"),
+    "PLA": (COMMON_G,
             dict(COMMON_E, top_thickness="1.0", bottom_thickness="0.8", infill_sparse_density="20",
                  wall_line_count="3"),
             ("top_bottom_thickness", "material_print_temperature", "material_print_temperature_layer_0",
              "material_final_print_temperature")),
-    "PETG": (dict(COMMON_G, retraction_combing="noskin"),
-             dict(COMMON_E, top_bottom_thickness="1.0", infill_sparse_density="40", wall_line_count="4"),
+    "PETG": (COMMON_G,
+             dict(COMMON_E, top_bottom_thickness="1.0", infill_sparse_density="40", wall_line_count="4",
+                  bridge_settings_enabled="True", bridge_wall_speed="20", bridge_skin_speed="25",
+                  bridge_fan_speed="100", bridge_skin_material_flow="100", bridge_enable_more_layers="True"),
              ()),
 }
 
-# Druckausrichtung: Drehung des STL (Makro-Koordinaten) vor dem Ablegen aufs Bett
-ORIENT = {"none": np.eye(3),
-          "flip_x": np.array([[1, 0, 0], [0, -1, 0], [0, 0, -1]], float)}   # Oberseite aufs Bett
+# Druckausrichtung: welche Fläche des STL (Makro-Koordinaten) aufs Bett kommt. Drehung um 90° bzw. 180°.
+ORIENT = {"-Z": np.eye(3),                                                    # wie modelliert
+          "+Z": np.array([[1, 0, 0], [0, -1, 0], [0, 0, -1]], float),         # Oberseite aufs Bett (180° um X)
+          "+X": np.array([[0, 0, 1], [0, 1, 0], [-1, 0, 0]], float),          # +X-Fläche aufs Bett (90° um Y)
+          "-X": np.array([[0, 0, -1], [0, 1, 0], [1, 0, 0]], float),
+          "+Y": np.array([[1, 0, 0], [0, 0, 1], [0, -1, 0]], float),          # +Y-Fläche aufs Bett (90° um X)
+          "-Y": np.array([[1, 0, 0], [0, 0, -1], [0, 1, 0]], float)}
 
-# Teile: STL-Name -> (Material, Ausrichtung, Einstellungen pro Modell). Werte wie Stückliste/Druckteile.
-PARTS = {
-    "SLARC_Leg_Test_Stand_Base": ("PLA", "none", {"infill_sparse_density": "15", "wall_line_count": "3"}),
-    "SLARC_Leg_Test_Stand_Cap": ("PLA", "flip_x", {"infill_sparse_density": "40", "wall_line_count": "4"}),
-}
+
+def parts_from_bom():
+    """Blatt Druckteile -> {STL-Name: (Material, Ausrichtung, Einstellungen pro Modell, Brim-Breite oder None)}"""
+    ws = openpyxl.load_workbook(BOM)["Druckteile"]
+    hdr = {str(c.value).split(" ")[0]: c.column for c in ws[1] if c.value}
+    get = lambda r, name: ws.cell(r, hdr[name]).value
+    out = {}
+    for r in range(2, ws.max_row + 1):
+        stl = get(r, "STL-Datei")
+        if not stl:
+            continue
+        mat = str(get(r, "Material")).split(" ")[0]
+        orient = str(get(r, "Cura-Ausrichtung") or "-Z").strip().upper()
+        if orient not in ORIENT:
+            raise ValueError("Zeile %d: unbekannte Ausrichtung %r" % (r, orient))
+        obj = {}
+        m = re.search(r"(\d+)", str(get(r, "Füllung") or ""))
+        if m:
+            obj["infill_sparse_density"] = m.group(1)
+        if get(r, "Wände"):
+            obj["wall_line_count"] = str(int(get(r, "Wände")))
+        note = str(get(r, "Stützen") or "")
+        if "tree support" in note.lower():
+            obj["support_enable"] = "True"
+        m = re.search(r"Brim\s+(\d+)", note)
+        out[str(stl).replace(".stl", "")] = (mat, orient, obj, m.group(1) if m else None)
+    return out
 
 
 def read_stl(p):
     b = open(p, "rb").read()
-    n = struct.unpack("<I", b[80:84])[0]
-    if len(b) != 84 + 50 * n:
-        raise ValueError("nur binäre STL: " + p)
+    n = struct.unpack("<I", b[80:84])[0] if len(b) >= 84 else 0
+    if len(b) != 84 + 50 * n:                                # ASCII-STL
+        v = re.findall(rb"vertex\s+(\S+)\s+(\S+)\s+(\S+)", b)
+        return np.array(v, float).reshape(-1, 3, 3)
     a = np.frombuffer(b[84:84 + n * 50], dtype=np.dtype([("n", "<3f4"), ("v", "<9f4"), ("a", "<u2")]))
     return a["v"].reshape(-1, 3, 3).astype(float)
 
@@ -67,7 +114,7 @@ def model_xml(tris, name, obj):
     uv, idx = np.unique(np.round(v, 5), axis=0, return_inverse=True)
     idx = idx.reshape(-1, 3)
     meta = "".join('<metadata name="cura:%s" preserve="true">%s</metadata>' % kv for kv in obj.items())
-    out = ['<?xml version="1.0"?>\n<model unit="millimeter" '
+    out = ['<?xml version="1.0"?>\n' + MARK + '\n<model unit="millimeter" '
            'xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" '
            'xmlns:cura="http://software.ultimaker.com/xml/cura/3mf/2015/10" xml:lang="en-US">\n<resources>\n'
            '<object id="1" name="%s" type="model"><metadatagroup>'
@@ -82,8 +129,9 @@ def model_xml(tris, name, obj):
     return "".join(out)
 
 
-def set_vals(txt, name, vals, dels):
-    txt = re.sub(r"(?m)^name = .*$", "name = " + name, txt, count=1)
+def set_vals(txt, name, vals, dels=()):
+    if name:
+        txt = re.sub(r"(?m)^name = .*$", "name = " + name, txt, count=1)
     head, body = txt.split("[values]\n", 1)
     keys = set(vals) | set(dels)
     lines = [l for l in body.splitlines() if l.strip() and l.split(" = ")[0] not in keys]
@@ -91,33 +139,48 @@ def set_vals(txt, name, vals, dels):
     return head + "[values]\n" + "\n".join(sorted(lines)) + "\n\n"
 
 
-def make(stl_name):
-    mat, orient, obj = PARTS[stl_name]
+def make(stl_name, part, force=False):
+    mat, orient, obj, brim = part
+    if mat not in TPL:
+        print("%-40s übersprungen: keine Cura-Vorlage für %s" % (stl_name, mat)); return
+    out = os.path.join(STL_DIR, "AKP_%s.3mf" % stl_name)
+    if os.path.exists(out) and not force:
+        with zipfile.ZipFile(out) as z:
+            if MARK.encode() not in z.read("3D/3dmodel.model")[:200]:
+                print("%-40s übersprungen: von Hand gespeichertes Projekt (--force zum Überschreiben)" % stl_name)
+                return
     g_vals, e_vals, e_del = BASE[mat]
+    g_user, e_user = ({"adhesion_type": "brim"}, {"brim_width": brim}) if brim else ({}, {})
     t = read_stl(os.path.join(STL_DIR, stl_name + ".stl")) @ ORIENT[orient].T
     flat = t.reshape(-1, 3)
     c = (flat.max(0) + flat.min(0)) / 2
     t = t - np.array([c[0], c[1], flat[:, 2].min()])
-    out = os.path.join(STL_DIR, "AKP_%s.3mf" % stl_name)
     with zipfile.ZipFile(TPL[mat]) as zin, zipfile.ZipFile(out, "w", zipfile.ZIP_DEFLATED) as zout:
         for it in zin.infolist():
             n = it.filename
             if n.startswith("Metadata/thumbnail"):
-                continue                                   # altes Vorschaubild weg, Cura erzeugt neu
+                continue                                     # altes Vorschaubild weg, Cura erzeugt neu
             d = zin.read(n)
             if n == "3D/3dmodel.model":
                 d = model_xml(t, stl_name + ".stl", obj).encode()
             elif n == "_rels/.rels":
                 d = re.sub(rb'<Relationship Target="/Metadata/thumbnail.png"[^>]*/>', b"", d)
-            elif n.startswith("Cura/") and n.endswith(".inst.cfg") and b"type = quality_changes" in d:
-                ext = "extruder" in n
-                d = set_vals(d.decode(), "%s SLARC" % mat, e_vals if ext else g_vals, e_del if ext else ()).encode()
+            elif n.startswith("Cura/") and n.endswith(".inst.cfg"):
+                ext = b"\nposition = " in d or b"\nextruder = " in d
+                if b"type = quality_changes" in d:
+                    d = set_vals(d.decode(), "%s SLARC" % mat, e_vals if ext else g_vals,
+                                 e_del if ext else ()).encode()
+                elif b"type = user" in d:                    # Benutzeränderungen: nur Brim
+                    d = set_vals(d.decode(), None, e_user if ext else g_user, ("adhesion_type", "brim_width")).encode()
             zout.writestr(it, d)
-    print("%-40s %-4s %-6s Höhe %5.1f mm  %s" % (os.path.basename(out), mat, orient, t[:, :, 2].max(), obj))
+    print("%-40s %-4s %-3s Höhe %5.1f mm  Brim %-3s %s" % (os.path.basename(out), mat, orient,
+                                                           t[:, :, 2].max(), brim or "-", obj))
 
 
 if __name__ == "__main__":
-    sel = sys.argv[1:]
-    for name in PARTS:
+    args = sys.argv[1:]
+    force = "--force" in args
+    sel = [a for a in args if a != "--force"]
+    for name, part in parts_from_bom().items():
         if not sel or any(s in name for s in sel):
-            make(name)
+            make(name, part, force)
