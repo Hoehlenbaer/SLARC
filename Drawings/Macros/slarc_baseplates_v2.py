@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – obere + untere Baseplate inkl. Coxa-Servo-Aufnahme, Elektronik und Energieversorgung.   V2.11 (Relais auf Gewindeeinsätzen)
+SLARC – obere + untere Baseplate inkl. Coxa-Servo-Aufnahme, Elektronik und Energieversorgung.   V2.12 (Bein-Prüfstand)
 FreeCAD 0.21 / 1.0: Makro ausführen. Parameter in P (unten) ändern und Makro neu ausführen
 (die Plattenkontur mit den Schwenkfreigängen ist hier bewusst als Python-Geometrie gebaut,
 nicht über Spreadsheet-Ausdrücke).
 
 Koordinaten (wie slarc_sim_V10): X = vorn, Y = links, Z = oben, Ursprung = Körpermitte,
 Z = 0 = Oberkante Hüllmaß der Coxa-Servos (ST3215 liegt mit Horn nach oben zwischen den Platten).
+
+V2.12
+- Bein-Prüfstand test_stand(): ein Coxa-Servo wie im Roboter zwischen zwei Plattenstücken (gleiche Tasche,
+  Bohrungen, Senkungen, Freischnitt). Unterteil mit Wänden liegt auf dem Tisch, Achse 60 mm vor der Tischkante
+  (Kerben an den Seiten markieren die Kante), Klemmfläche hinten für eine Schraubzwinge. Deckel mit 4× M3x8 in
+  Gewindeeinsätze. Im Modell ausgeblendet bei y = -300 abgelegt.
 
 V2.11
 - Relaismodul auf M3-Gewindeeinsätzen statt Durchgangsschraube + Mutter: Bunde Ø8 (statt 7), Kernloch Ø4,0 × 6,5
@@ -158,6 +164,20 @@ P = dict(
                       sleeve_d=13.0, so=3.0, env=9.0),                                    # ½ 5×7: Löcher 46 an einem Ende
              adp=dict(x0=146.8, y0=-20.0, L=18.5, W=40.0, z0=-27.0, env=17.0)),
     split_x=-40.0, lap=24.0, lap_screws=[-65.0, -32.0, 32.0, 65.0],   # Vorderteil 252 x 209 mm
+    # V2.12: Bein-Prüfstand (ein Coxa-Servo wie im Roboter zwischen zwei Plattenstücken, Achse vor der Tischkante)
+    stand=dict(edge_x=-60.0,        # Tischkante im Servo-Frame: Achse 60 mm vor der Kante -> alles mit r > 0 frei
+               x_tail=-200.0,       # Ende Klemmfläche (Schraubzwinge bei x -200 … -95)
+               x_wall=-90.0,        # Seitenwände von hier ...
+               x_wall_f=-38.0,      # ... bis hier (Abstand zum Femur-Servo bei Coxa ±95°)
+               x_cap=-90.0,         # Deckel von x_cap bis vorn
+               w=45.0,              # halbe Breite hinten
+               w_f=22.0,            # halbe Breite vorn (x > -35): bleibt innerhalb r < 35 neben dem Freischnitt
+               x_f=-35.0,           # Übergang breit/schmal
+               x_front=5.0,
+               wall_y=(32.0, 40.0), # Seitenwand innen/außen |y|
+               back_x=(-90.0, -82.0),
+               cap_screws=[(-76.0, 36.0), (-76.0, -36.0), (-46.0, 36.0), (-46.0, -36.0)],
+               cap_hole_d=3.4, insert=(4.0, 6.5)),
 )
 STEP_DIR = r""
 
@@ -716,6 +736,57 @@ def dcdc_shape():
     return cut(fuse([body] + tabs), slots)
 
 
+# ============================================================ V2.12 Bein-Prüfstand
+def test_stand():
+    """Prüfstand für ein Bein: Unterteil (Platte + Wände, liegt auf dem Tisch) und Deckel (M3 in Gewindeeinsätze).
+    Servo-Frame wie im Roboter (Achse bei 0/0, Gehäuse nach -X), Coxa-Gier 0. Liefert (unterteil, deckel)."""
+    S = P["stand"]
+    t = P["t"]
+
+    def outline(x0, z0, h):
+        return fuse([box(x0, -S["w"], z0, S["x_f"] - x0, 2 * S["w"], h),
+                     box(S["x_f"] - 0.01, -S["w_f"], z0, S["x_front"] - S["x_f"], 2 * S["w_f"], h)])
+
+    # Unterteil: wie untere Platte (Bolzen, Steckeröffnung, Senkungen von unten)
+    zb, zt = Z_LB, Z_LT
+    pos = [outline(S["x_tail"], zb, t)]
+    for hx, hy in P["srv_holes_bot"]:
+        pos.append(cyl(hx, hy, zt - 0.5, 2.5, P["boss_bot"] + 0.5))
+    wh = Z_B - zt                                       # Wandhöhe bis Unterseite Deckel
+    yi, yo = S["wall_y"]
+    for s in (-1, 1):
+        y0 = yi if s > 0 else -yo
+        pos.append(box(S["x_wall"], y0, zt - 0.5, S["x_wall_f"] - S["x_wall"], yo - yi, wh + 0.5))
+    bx0, bx1 = S["back_x"]
+    pos.append(box(bx0, -yo, zt - 0.5, bx1 - bx0, 2 * yo, wh + 0.5))
+    neg = [sweep_2d(0, 0, 0, zb - 1, t + 2)]
+    px0, px1, py = P["plug"]
+    neg.append(box(px0, -py, zb - 1, px1 - px0, 2 * py, t + 2))
+    for hx, hy in P["srv_holes_bot"]:
+        neg.append(cyl(hx, hy, zb - 1, P["srv_hole_d"] / 2, t + P["boss_bot"] + 2))
+        neg.append(cyl(hx, hy, zb - 1, P["cb_d"] / 2, (zt + P["boss_bot"] - P["cb_rest"]) - (zb - 1)))
+    di, dd = S["insert"]
+    for hx, hy in S["cap_screws"]:
+        neg.append(cyl(hx, hy, Z_B - dd, di / 2, dd + 1))
+    # Markierung Tischkante: Kerben an beiden Seitenkanten (außerhalb der Wände)
+    for s in (-1, 1):
+        neg.append(box(S["edge_x"] - 1.0, s * (S["w"] - 1.5) - 2.5, zb - 1, 2.0, 5.0, t + 2))
+    base = cut(fuse(pos), neg)
+    # Deckel: wie obere Platte (Zentriertasche, Servoschrauben mit Senkung)
+    zb, zt = Z_B, Z_T
+    neg = [sweep_2d(0, 0, 0, zb - 1, t + 2)]
+    rx0, rx1, ry = P["raised"]
+    neg.append(box(rx0, -ry, zb - 0.1, rx1 - rx0, 2 * ry, P["pk"] + 0.2))
+    for hx, hy in P["srv_holes"]:
+        neg.append(cyl(hx, hy, zb - 1, P["srv_hole_d"] / 2, t + 2))
+        neg.append(cyl(hx, hy, zb + P["cb_rest"], P["cb_d"] / 2, t))
+    for hx, hy in S["cap_screws"]:
+        neg.append(cyl(hx, hy, zb - 1, S["cap_hole_d"] / 2, t + 2))
+    neg.append(box(-74.0, -20.0, zb - 1, 26.0, 40.0, t + 2))     # Fenster (Material sparen, Sicht aufs Kabel)
+    cap = cut(outline(S["x_cap"], zb, t), neg)
+    return base, cap
+
+
 # ============================================================ Platzierung der STEP-Modelle
 def servo_matrix(x, y, yaw):
     # ST3215.step -> Servo-Frame (Achse Z, Hülle oben z=0, Gehäuse nach -X), dann Gier + Position
@@ -827,6 +898,10 @@ def run_freecad():
     a = P["pcb"]["adp"]; add("PCB_D_Relay_Adapter", box(a["x0"], a["y0"], a["z0"], a["L"], a["W"], a["env"]), (0.15, 0.55, 0.3))
     for n, shp in lens_shapes(g["dims"]):                           # M12-Objektive ZH3019-14
         add(n, shp, (0.75, 0.75, 0.78))
+    sb, sc = test_stand()                                           # V2.12: Bein-Prüfstand, abseits abgelegt
+    m_st = m_rz(0, 0, -300.0, 0)
+    add("Leg_Test_Stand_Base", xform(sb, m_st), (0.2, 0.3, 0.6), False)
+    add("Leg_Test_Stand_Cap", xform(sc, m_st), (0.2, 0.3, 0.6), False)
     for i, y in enumerate(P["lat"]["ys"]):                          # V2.7: Akku-Riegel (eingerastet, Nase nach außen)
         add("Battery_Latch_%d" % (i + 1), latch_pin(P["lat"]["x"], y, 90.0 if y > 0 else 270.0), (0.85, 0.35, 0.1))
     cache = {}
