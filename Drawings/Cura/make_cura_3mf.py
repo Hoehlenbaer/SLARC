@@ -5,7 +5,8 @@ Drucker: Anycubic Kobra Plus, Cura 5.13 (setting_version 27).
 
 Ablauf:
 - Teile, Material, Füllung, Wände, Ausrichtung kommen aus Drawings/Macros/SLARC_Stueckliste.xlsx, Blatt
-  Druckteile. Erzeugt werden nur Zeilen mit STL-Datei (Spalte N). Ausrichtung in Spalte O (Codes: ORIENT).
+  Druckteile. Erzeugt werden nur Zeilen mit STL-Datei (Spalte N). Spalte O: Fläche, die aufs Bett kommt
+  (-Z = wie modelliert, +Z = Oberseite, ±X, ±Y = Seitenflächen, siehe ORIENT).
   In Spalte M (Stützen / Besonderes) werden "Brim N mm" und "Tree Support" erkannt.
 - Vorlage pro Material (templates/AKP_template_<MAT>.3mf) = von Marco in Cura gespeichertes Projekt
   (Drucker, Startcode, Material). Daraus werden nur Modell und Profil ersetzt.
@@ -27,6 +28,7 @@ V1.1
 - Quelle ist die Stückliste statt der PARTS-Tabelle im Skript. ASCII-STL. Schutz für von Hand gespeicherte
   Projekte. Brim über Benutzeränderungen. PETG mit Brückeneinstellungen, erste Schicht 120 % (wie Blatt
   Druckeinstellungen).
+- Ausrichtung als Bettfläche (-Z, +Z, ±X, ±Y) statt none/flip_x, damit auch seitlich liegende Teile gehen.
 """
 import os, re, struct, sys, zipfile
 import numpy as np
@@ -60,9 +62,13 @@ BASE = {
              ()),
 }
 
-# Druckausrichtung: Drehung des STL (Makro-Koordinaten) vor dem Ablegen aufs Bett
-ORIENT = {"none": np.eye(3),
-          "flip_x": np.array([[1, 0, 0], [0, -1, 0], [0, 0, -1]], float)}   # Oberseite aufs Bett
+# Druckausrichtung: welche Fläche des STL (Makro-Koordinaten) aufs Bett kommt. Drehung um 90° bzw. 180°.
+ORIENT = {"-Z": np.eye(3),                                                    # wie modelliert
+          "+Z": np.array([[1, 0, 0], [0, -1, 0], [0, 0, -1]], float),         # Oberseite aufs Bett (180° um X)
+          "+X": np.array([[0, 0, 1], [0, 1, 0], [-1, 0, 0]], float),          # +X-Fläche aufs Bett (90° um Y)
+          "-X": np.array([[0, 0, -1], [0, 1, 0], [1, 0, 0]], float),
+          "+Y": np.array([[1, 0, 0], [0, 0, 1], [0, -1, 0]], float),          # +Y-Fläche aufs Bett (90° um X)
+          "-Y": np.array([[1, 0, 0], [0, 0, -1], [0, 1, 0]], float)}
 
 
 def parts_from_bom():
@@ -76,7 +82,7 @@ def parts_from_bom():
         if not stl:
             continue
         mat = str(get(r, "Material")).split(" ")[0]
-        orient = get(r, "Cura-Ausrichtung") or "none"
+        orient = str(get(r, "Cura-Ausrichtung") or "-Z").strip().upper()
         if orient not in ORIENT:
             raise ValueError("Zeile %d: unbekannte Ausrichtung %r" % (r, orient))
         obj = {}
@@ -167,7 +173,7 @@ def make(stl_name, part, force=False):
                 elif b"type = user" in d:                    # Benutzeränderungen: nur Brim
                     d = set_vals(d.decode(), None, e_user if ext else g_user, ("adhesion_type", "brim_width")).encode()
             zout.writestr(it, d)
-    print("%-40s %-4s %-6s Höhe %5.1f mm  Brim %-3s %s" % (os.path.basename(out), mat, orient,
+    print("%-40s %-4s %-3s Höhe %5.1f mm  Brim %-3s %s" % (os.path.basename(out), mat, orient,
                                                            t[:, :, 2].max(), brim or "-", obj))
 
 
