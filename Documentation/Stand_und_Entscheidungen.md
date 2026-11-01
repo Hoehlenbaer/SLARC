@@ -18,7 +18,8 @@ Stand: 25.10.2026. Zusammenfassung aus dem CAD-, Hardware- und Sim-Chat (Oktober
 | Verkabelung, Lochraster-Layouts | `Documentation/Wiring/` (README + SVG, Generator `gen_wiring_svg.py`) |
 | Simulation (aktuell V10.17) | `utilities/Motion_development/slarc_sim/slarc_sim_V10.py` |
 | CAD-URDF + Meshes + Doku | `utilities/Motion_development/slarc_sim/urdf/` |
-| STL-Exporte (Kamerahalter, Steckerhalter, Akku-Riegel, ST3215-Dummy) | `Drawings/STL files/` |
+| STL-Exporte und Cura-Projekte `AKP_*.3mf` | `Drawings/STL files/` |
+| Cura-Generator + Vorlagen (Quelle: Stückliste, Blatt Druckteile) | `Drawings/Cura/` |
 
 Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. Nach dem Merge Branch löschen. Zu Beginn einer Sitzung frischen `master` holen. Mehrere offene PRs, die dieselbe Binärdatei (Stückliste) ändern, werden in einem PR zusammengeführt (Konflikte in .xlsx lassen sich auf GitHub nicht lösen). Auf einen Branch nur weiter pushen, solange sein PR nachweislich noch offen ist – sonst neuer Branch/PR vom aktuellen master.
 
@@ -148,3 +149,4 @@ Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. N
 7. Testdrucke: Kamerahalter V1.5.x, dann Bein und Panzer.
 8. Steckermaße und echte Akkulänge messen → `conn`/`lat`.
 9. PR #20 (Verkabelung) mergen.
+10. Sprache der Doku (notiert 01.11.2026): Im Moment sind Doku, Kommentare und Stückliste gemischt Deutsch/Englisch. In der finalen Version soll die ganze Doku auf Englisch sein (inkl. Stückliste und Code-Kommentare). Bis dahin gilt die Regel aus `CLAUDE.md` (Deutsch, `README.md` Englisch).
