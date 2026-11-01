@@ -11,3 +11,7 @@ old_structure/
 __pycache__/
 *.pyc
 *.FCBak
+
+# Claude Code: persönliche Einstellungen nicht einchecken
+CLAUDE.local.md
+.claude/settings.local.json
