@@ -18,7 +18,6 @@ Hexapod-Roboter (6 × 3 DOF, ST3215-Servos), Pi 5 + Hailo-8 für Perzeption und 
 | ESP32 | Firmware (noch nicht im Repo) | – |
 
 - Makros finden Kaufteil-STEPs relativ zur eigenen Datei. Pfade in Makros nie hart auf Linux oder Windows setzen, sondern relativ zu `__file__` bilden.
-- `make_urdf.py` enthält in Zeile 8 noch einen harten Pfad aus einer früheren Sitzung. Vor dem Lauf unter Windows anpassen.
 - Zeilenenden: LF. Bestehende Dateien nicht umkonvertieren.
 
 ## Simulation (`utilities/Motion_development/slarc_sim/`)

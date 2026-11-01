@@ -1,8 +1,10 @@
-import json, math
-D = json.load(open("/tmp/claude-0/run/urdf_data.json"))
+import json, math, os
+# Pfade relativ zu dieser Datei, passend zu make_urdf.py.
+HERE = os.path.dirname(os.path.abspath(__file__))
+D = json.load(open(os.path.join(HERE, "urdf_data.json")))
 L, G = D["links"], D["geo"]
 P = G["P"]
-OUT = "/tmp/claude-0/urdf/slarc_urdf/slarc_cad.urdf"
+OUT = os.path.join(os.path.dirname(HERE), "slarc_cad.urdf")
 mm = 0.001
 COXA = [("front_right", 200.0, -75.0, -30.0, "R"), ("front_left", 200.0, 75.0, 30.0, "L"),
         ("mid_right", 0.0, -115.0, -90.0, "R"), ("mid_left", 0.0, 115.0, 90.0, "L"),
