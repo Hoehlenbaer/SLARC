@@ -1,11 +1,16 @@
-import FreeCAD as App, Part, Mesh, MeshPart, math, json, os, traceback
-OUT = "/tmp/claude-0/urdf/slarc_urdf"
+import FreeCAD as App, Part, Mesh, MeshPart, math, json, os, tempfile, traceback
+# Alle Pfade relativ zu dieser Datei, damit das Skript unter Windows und Linux läuft.
+HERE = os.path.dirname(os.path.abspath(__file__))                         # urdf/tools
+OUT = os.path.dirname(HERE)                                               # urdf/
+MACROS = os.path.join(HERE, "..", "..", "..", "..", "..", "Drawings", "Macros")
 os.makedirs(OUT + "/meshes", exist_ok=True)
-log = open("/tmp/claude-0/run/make_urdf.txt", "w")
+LOG_PATH = os.path.join(tempfile.gettempdir(), "make_urdf.txt")
+print("Log: " + LOG_PATH)
+log = open(LOG_PATH, "w")
 def w(s): log.write(s + "\n"); log.flush()
 V = App.Vector
 try:
-    d = App.openDocument("/home/claude/slarc/Drawings/Macros/SLARC.FCStd")
+    d = App.openDocument(os.path.normpath(os.path.join(MACROS, "SLARC.FCStd")))
     sheets = [o for o in d.Objects if o.TypeId == "Spreadsheet::Sheet"]
     for s in sheets:
         for k in ("q_coxa", "q_femur", "q_tibia"):
@@ -164,7 +169,7 @@ try:
     w("base: %.1f g CoM %s" % (M, [round(v, 1) for v in (C.x, C.y, C.z)]))
     nf = export(vis, "base.stl", V()); w("base facets %d" % nf)
     # Kollisions-Hülle Panzer: Außenform (konvex)
-    cf = "/home/claude/slarc/Drawings/Macros/slarc_cover_v1.py"
+    cf = os.path.normpath(os.path.join(MACROS, "slarc_cover_v1.py"))
     cn = {"__name__": "__slarc_lib__", "__file__": cf}; exec(open(cf, encoding="utf-8").read(), cn)
     hull = cn["loft"](cn["C"]["x_rear"] + 0.5, cn["C"]["x_front"], 24)
     m = MeshPart.meshFromShape(Shape=hull, LinearDeflection=1.0, AngularDeflection=0.6); m.write(OUT + "/meshes/cover_hull.stl")
@@ -174,7 +179,7 @@ try:
     w("TOTAL %.0f g" % tot)
     geo = dict(P=P, FEM=[FEM.x, FEM.y, FEM.z], TIB=[TIB.x, TIB.y, TIB.z], BALL_T=[BALL_T.x, BALL_T.y, BALL_T.z],
                TIP_T=[TIP_T.x, TIP_T.y, TIP_T.z], cam_bb=list(d.getObject("Stereo_Mount").Shape.BoundBox.__getattribute__(a) for a in ("XMin", "XMax", "YMin", "YMax", "ZMin", "ZMax")))
-    json.dump(dict(links={"%s_%s" % k: v for k, v in LINKS.items()}, geo=geo, total=tot), open("/tmp/claude-0/run/urdf_data.json", "w"), indent=1)
+    json.dump(dict(links={"%s_%s" % k: v for k, v in LINKS.items()}, geo=geo, total=tot), open(os.path.join(HERE, "urdf_data.json"), "w"), indent=1)
     w("done")
 except Exception:
     w(traceback.format_exc())

@@ -63,4 +63,4 @@ FOOT_R    = 0.016
 
 ## Neu erzeugen
 
-`tools/make_urdf.py` (mit `freecadcmd` ausführen) liest `SLARC.FCStd`, schreibt die Meshes und `urdf_data.json`. Danach schreibt `tools/gen_urdf.py` (normales Python) die URDF. Die Pfade oben in beiden Skripten musst du an dein System anpassen.
+`tools/make_urdf.py` (mit `freecadcmd` ausführen) liest `SLARC.FCStd`, schreibt die Meshes und `urdf_data.json`. Danach schreibt `tools/gen_urdf.py` (normales Python) die URDF. Beide Skripte bilden ihre Pfade relativ zur eigenen Datei und überschreiben die eingecheckten Dateien in `urdf/` (`meshes/`, `slarc_cad.urdf`, `tools/urdf_data.json`). Änderungen also vor dem Commit mit `git diff` prüfen. `make_urdf.py` schreibt sein Log ins Temp-Verzeichnis und gibt den Pfad beim Start aus.
