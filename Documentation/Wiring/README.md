@@ -216,6 +216,17 @@ Lagerung über Wochen: hinten Deans und Balancer abziehen, beide sind bei geschl
 5. Hub: Im I²C-Scan des ESP32 erscheint 0x20. Jeden Fußschalter drücken und das passende PA-Bit prüfen.
 6. Ein Bein komplett, dann alle.
 
+### Prüfstand für das erste Bein (vor dem Rumpf)
+
+Mechanik: `Leg_Test_Stand_Base` + `_Cap` aus dem Baseplate-Makro (V2.12). Der Coxa-Servo sitzt wie im Roboter (gleiche Tasche, Bohrungen und Senkungen). Die Kerben an den Seiten auf die Tischkante legen, dann liegt die Coxa-Achse 60 mm vor der Kante und das Bein schwingt frei. Hinten mit einer Schraubzwinge klemmen.
+
+Elektrik (provisorisch, ohne Relais und Platinen):
+
+- Akku → Sicherung → Treiber-Eingang. Bis die 30-A-Sicherung da ist, eine Kfz-Flachsicherung mit 7,5–10 A inline. Drei Servos ziehen im Betrieb unter 3 A, blockiert etwa 8 A. **Nie ohne Sicherung:** Der Akku liefert in einen Kurzschluss mehrere hundert Ampere, und das BMS ist auf dem Tisch noch nicht verdrahtet.
+- Akku nicht unbeaufsichtigt angeschlossen lassen und vor dem Umstecken abziehen. Spannung im Blick behalten: ab 3,5 V/Zelle aufhören, weil ohne BMS kein Tiefentladeschutz greift.
+- Servos direkt an den Bus-Buchsen des Treibers. IDs einzeln vergeben (nur ein Servo am Bus), danach alle drei Servos zusammen.
+- ESP32 über USB am PC. Zuerst kleine Bewegungen bei niedrigem Drehmoment-Limit, dann die Grenzen aus `Hardware_Interfaces.md` prüfen.
+
 ## Offen
 
 - Länge der Servokabel zu den hinteren Bein-Platinen prüfen.
