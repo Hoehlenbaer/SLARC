@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – Rückenpanzer (Cover) über der oberen Baseplate.   V1.1
+SLARC – Rückenpanzer (Cover) über der oberen Baseplate.   V1.2
+(V1.2: druckbar ohne Stützen geprüft (Schichtanalyse): keine Seitenrauten mehr über den Kabeldurchlässen,
+ keine Dachwaben im hinteren Kuppelbereich, wo das Dach auch in X stark fällt (Wabenspitze zeigt dort nicht
+ mehr bergauf -> Waben-Decke ins Leere).)
 (V1.1: leichter – Wand 2.4 mm, Waben 9 mm / Steg 2.4 mm, Rautenfenster in den Seitenwänden, schmalere
  Zwischenspanten, hohle Säulen, Kamm 3 mm)
 FreeCAD 0.21 / 1.0: Makro ausführen. Parameter in C (unten) ändern und neu ausführen.
@@ -58,6 +61,8 @@ C = dict(
     crest_w=3.0, crest_h=5.0,           # Firstkamm (Naht der Deckflügel): Auflagelinie in Rückenlage
     port_win=(92.0, 140.0),             # großes Seitenfenster für die Pi-Anschlüsse (beidseitig)
     notch=[(-150.0, 16.0), (-95.0, 16.0), (-15.0, 0.0), (30.0, 18.0)],   # Kabeldurchlässe unten (x, Breite; 0 = aus)
+    notch_gap=4.0,           # V1.2: Mindestabstand Seitenraute <-> Kabeldurchlass (sonst dünne Stege, Druck ins Leere)
+    hex_slope=0.25,          # V1.2: Dachwabe nur, wenn Firstgefälle |dH/dx| < hex_slope * tan(roof_a)
     bolt_d=3.4,
 )
 
@@ -171,6 +176,18 @@ def bolt_points(x):
     return [(0.0, zr - 3.0), (w - d, ze * 0.55), (-(w - d), ze * 0.55)]
 
 
+def ridge_slope(x, d=1.0):
+    return (ridge(x + d) - ridge(x - d)) / (2 * d)
+
+
+def near_notch(x0, x1):
+    """V1.2: True, wenn [x0, x1] einem Kabeldurchlass (inkl. Bogen) näher als notch_gap kommt."""
+    for xn, wd in C["notch"]:
+        if wd > 0 and x1 > xn - wd / 2 - C["notch_gap"] and x0 < xn + wd / 2 + C["notch_gap"]:
+            return True
+    return False
+
+
 def keep_out_x(x, r):
     c = C
     xs = [c["split_x"]] + c["span_dx"]
@@ -212,6 +229,8 @@ def roof_windows():
             x = c["x_rear"] + (dx / 2 if j % 2 else 0.0)
             while x < c["x_front"]:
                 ok = not keep_out_x(x, math.sqrt(3) / 2 * r)
+                if abs(ridge_slope(x)) > c["hex_slope"] * TAN:      # V1.2: Kuppel hinten -> keine Waben
+                    ok = False
                 cy = sgn * yy
                 if ok:                                  # alle 6 Ecken innerhalb der Dachfläche (Traufband frei)
                     for k in range(6):
@@ -242,7 +261,7 @@ def wall_windows():
         h = z1 - z0
         b = min(0.5 * h, c["wall_r"] * 2)
         inport = c["port_win"][0] - b < x < c["port_win"][1] + b
-        if h >= 10 and not keep_out_x(x, b / 2) and not inport:
+        if h >= 10 and not keep_out_x(x, b / 2) and not inport and not near_notch(x - b / 2, x + b / 2):
             for sgn in (1, -1):
                 yb = ywin(sgn, w)
                 P = [V(x - b / 2, yb, (z0 + z1) / 2), V(x, yb, z0), V(x + b / 2, yb, (z0 + z1) / 2), V(x, yb, z1)]
