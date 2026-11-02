@@ -82,7 +82,7 @@ Die Bein-Relais nur schalten, wenn das Drehmoment der Servos aus ist. Beim Einsc
 | L22 | Pi GPIO18 (Pin 12) / GPIO23 (Pin 16) | Trigger-Platine (Ausgang / Rückführung) | 2 + GND | Dupont | Dupont |
 | L23 | Pi CAM0 / CAM1 | IMX296 links / rechts | FPC | – | CSI-Kabel 200 mm |
 | L24 | Pi ↔ ESP32 | UART | 3 oder USB | AWG24 / USB-C | USB-C (CP2102) oder GPIO14/15 an die 40-pol. Leiste |
-| L25 | Ein/Aus-Taster (hinten rechts) | Hub J6 | 2 | AWG24 | XH2 / angelötet |
+| L25 | Ein/Aus-Taster (rechte Seite, x −140) | Hub J6 | 2 | AWG24 | XH2 / angelötet |
 | L26 | Hub J7 (IO35, GND) | Treiber IO35 (Encoder-Stecker A) | 2 | AWG24 | XH2 / PH2.0 |
 
 ## Pinbelegung
@@ -196,7 +196,7 @@ Ein Streifen aus der 2×8-cm-Platine. Die Eingangsstifte des Relaismoduls sitzen
 
 ## Ablauf Ein / Aus
 
-Der Akku bleibt dauerhaft eingesteckt (Deans und Balancer). Ein/Aus macht ein Taster hinten rechts (Baseplates V2.10, versenkt hinter der Plattenkante) zusammen mit dem Deep Sleep des ESP32. Der Taster liegt über J6 auf dem Hub, R7 10 kΩ zieht IO35 auf 3,3 V, Druck = low.
+Der Akku bleibt dauerhaft eingesteckt (Deans und Balancer). Ein/Aus macht ein Taster an der rechten Seite (Baseplates V2.13: x −140, versenkt 5 mm hinter der Plattenkante; vorher hinten rechts) zusammen mit dem Deep Sleep des ESP32. Der Taster liegt über J6 auf dem Hub, R7 10 kΩ zieht IO35 auf 3,3 V, Druck = low.
 
 1. **Aus-Zustand:** ESP32 im Deep Sleep, Wecken über IO35 (ext0, low). Alle Relais offen, Pi und Beine stromlos. Ruhestrom des Treibers vor dem Festlegen messen (erwartet 5–15 mA).
 2. **Taster drücken:** ESP32 wacht auf und zieht IO16 low. K1 zieht an, der DC-DC startet, der Pi bootet (`POWER_OFF_ON_HALT=0` ist gesetzt).

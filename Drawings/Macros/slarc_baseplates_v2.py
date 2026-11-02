@@ -13,7 +13,10 @@ V2.13
   0,2 mm Spiel, bis z = -4. Bisher hielten nur die flache Tasche oben und die vier 2x5-Blechschrauben das
   Stall-Moment um die Coxa-Achse. Jetzt liegt es formschlüssig an (Hebel ca. 25 mm, ca. 120 N bei 2,94 Nm).
   Die Wangen enden vorn am Freischnitt der Gabel. Bein-Platinen FR/FL dafür 3,5 mm nach innen (y ∓21,5).
-  Hinten (RR/RL) noch ohne Wiege: Kollision mit Taster-Winkel/Taster bzw. Steckerhalter, Lösung offen.
+  Taster (rechts) und Akkustecker-Halter (links) dafür von hinten an die Seiten verlegt (x -140, 8 mm hinter
+  der Plattenkante), damit auch RR/RL eine Wiege bekommen.
+- Fenster in der oberen Platte unter Pi und Treiber (innerhalb der Lochbilder, 6 mm Rand) gegen das
+  Zusatzgewicht der Wiegen.
 
 V2.12
 - Bein-Prüfstand test_stand(): ein Coxa-Servo wie im Roboter zwischen zwei Plattenstücken (gleiche Tasche,
@@ -147,7 +150,8 @@ P = dict(
               deans=(19.0, 13.0, 7.5),          # Deans-Stecker Robot-Seite: Länge (X), Breite (Y), Höhe (Z) – NACHMESSEN
               bal=(10.0, 12.4, 5.8),            # Balancer-Adapter (JST-XH 4-pol. als Startwert): L, B, H – NACHMESSEN
               clr=0.25, wall=1.6, floor=2.0, back=3.0, slot=(6.0, 3.0),   # Spiel, Wände, Rückwand, Kabelschlitz B x H
-              flange=8.0, holes=(-194.0, -164.0)),                         # Laschen vorn/hinten mit M3
+              flange=8.0, holes=(-194.0, -164.0),                          # Laschen vorn/hinten mit M3
+              place=(-90.0, -140.0, 67.0)),     # V2.13: verlegt an die linke Seite: Drehung, Lage der Stirnseiten-Mitte (x, y)
     # V2.7: Akku-Riegel (Bajonett-Stifte hinter dem Akku, Kopf unter der unteren Platte)
     lat=dict(x=-171.0, ys=(0.0,),               # Stiftachse(n), ein Stift mittig zwischen den Kabelabgängen; Vorderkante x + d/2 = -167 = Akku-Ende
              d=8.0, clr=0.25,                    # Stift Ø, radiales Spiel in Bohrung/Schale
@@ -159,7 +163,8 @@ P = dict(
              head_d=20.0, head_h=5.0),           # Griffkopf (gerändelt, Rille zeigt die Nasenrichtung)
     # V2.10: Ein/Aus-Taster (12-mm-Einbautaster; Kopf-Ø/Länge als Annahme)
     btn=dict(y=-37.0, zc=16.0, hole_d=12.2, panel_x=-192.0, t=3.0, w=18.0, h=30.0, foot_l=12.0,
-             m3=(-183.0, -37.0), head=(15.0, 3.0), body=(16.0, 22.0)),
+             m3=(-183.0, -37.0), head=(15.0, 3.0), body=(16.0, 22.0),
+             place=(90.0, -140.0, -67.0)),      # V2.13: verlegt an die rechte Seite: Drehung, Lage der Blenden-Mitte (x, y)
     # V2.8: Lochraster-Platinen (Documentation/Wiring)
     pcb=dict(t=1.6, hole_in=2.0, m2_pilot=1.7, boss_d=5.0,
              leg=dict(L=35.0, W=30.0, so=4.0, env=18.0,          # ½ 3×7: Löcher nur an einem Ende (Abstand 26)
@@ -173,7 +178,9 @@ P = dict(
     # V2.13: Servo-Wiege auf der unteren Platte: seitliche Führung + hinterer Anschlag -> Stall-Moment formschlüssig
     # (Servo-Frame; Gehäuse volle Breite ±12.3 nur zwischen z -27 und -2, darunter schmaler)
     cradle=dict(clr=0.2, t=5.0, z_top=-4.0, rear_t=4.0, x_rear=-35.11, half_w=12.39,
-                legs=("FR", "FL", "MR", "ML")),   # RR/RL offen: Wiege kollidiert mit Taster-Winkel bzw. Steckerhalter
+                legs=("FR", "FL", "MR", "ML", "RR", "RL")),
+    # V2.13: Gewichtsersparnis: Fenster in der oberen Platte unter Pi und Treiber (Abstand zu den Bohrungen)
+    lighten=dict(margin=6.0, r=5.0),
     split_x=-40.0, lap=24.0, lap_screws=[-65.0, -32.0, 32.0, 65.0],   # Vorderteil 252 x 209 mm
     # V2.12: Bein-Prüfstand (ein Coxa-Servo wie im Roboter zwischen zwei Plattenstücken, Achse vor der Tischkante)
     stand=dict(edge_x=-60.0,        # Tischkante im Servo-Frame: Achse 60 mm vor der Kante -> alles mit r > 0 frei
@@ -421,6 +428,21 @@ def PEDESTALS(dims):
     return [(e - 3.0, 9.0), (-e - 6.0, 9.0), (-8.0, 16.0)]
 
 
+def rrect(x0, y0, x1, y1, r, z0, h):
+    return fuse([box(x0 + r, y0, z0, x1 - x0 - 2 * r, y1 - y0, h), box(x0, y0 + r, z0, x1 - x0, y1 - y0 - 2 * r, h)]
+                + [cyl(x, y, z0, r, h) for x in (x0 + r, x1 - r) for y in (y0 + r, y1 - r)])
+
+
+def lighten_top(z0, h):
+    """V2.13: Fenster innerhalb der Lochbilder von Pi und Treiber (Rand margin zu den Bohrungsmitten)."""
+    m, r = P["lighten"]["margin"], P["lighten"]["r"]
+    out = []
+    for holes in (pi_holes(), gdr_holes()):
+        xs, ys = [h[0] for h in holes], [h[1] for h in holes]
+        out.append(rrect(min(xs) + m, min(ys) + m, max(xs) - m, max(ys) - m, r, z0, h))
+    return out
+
+
 def build():
     t, zb = P["t"], Z_B
     br, dims = cam_bracket()
@@ -437,6 +459,7 @@ def build():
         for hx, hy in P["srv_holes"]:
             neg.append(rcyl(x, y, yaw, hx, hy, zb - 1, P["srv_hole_d"] / 2, t + 2))
             neg.append(rcyl(x, y, yaw, hx, hy, zb + P["cb_rest"], P["cb_d"] / 2, t + P["ped_h"]))
+    neg += lighten_top(zb - 1, t + 2)                  # V2.13: Fenster unter Pi und Treiber
     # Bohrungen Elektronik
     for hx, hy in pi_holes():
         neg.append(cyl(hx, hy, zb - 1, P["pi_hole_d"] / 2, t + 2))
@@ -479,6 +502,24 @@ def relay_holes_low():
     return [(P["relay_low_x"] + dx, dy) for dx in (-25.4, 25.4) for dy in (-66.1, 66.1)]
 
 
+def place_m(key, anchor):
+    """V2.13: Matrix, die ein Bauteil aus seiner Definitionslage (hinten, Öffnung nach -X) an P[key]["place"] bringt."""
+    deg, x, y = P[key]["place"]
+    return mul(m_rz(deg, x, y, 0), ((1, 0, 0, -anchor[0]), (0, 1, 0, -anchor[1]), (0, 0, 1, 0)))
+
+
+def place_pt(m, px, py):
+    return (m[0][0] * px + m[0][1] * py + m[0][3], m[1][0] * px + m[1][1] * py + m[1][3])
+
+
+def conn_m():
+    return place_m("conn", (P["conn"]["x_front"], conn_dims()["yc"]))
+
+
+def btn_m():
+    return place_m("btn", (P["btn"]["panel_x"], P["btn"]["y"]))
+
+
 def conn_dims():
     c = P["conn"]
     dl, dw, dh = c["deans"]; bl, bw_, bh = c["bal"]; k, wl = c["clr"], c["wall"]
@@ -508,7 +549,7 @@ def conn_holder():
         neg.append(cyl(xh, yc, zt - 1, P["m3_d"] / 2, 10))
     for xs in (x0 + 5.0, x0 + 12.0):                                 # Kabelbinder quer über beide Tunnel (2.5er)
         neg.append(box(xs - 1.5, c["y0"] - 1, zt + d["H"] - 1.4, 3.0, d["W"] + 2, 1.4))
-    return cut(fuse(pos), neg)
+    return xform(cut(fuse(pos), neg), conn_m())          # V2.13: an die Seite verlegt
 
 
 def latch_bottom_neg():
@@ -577,7 +618,7 @@ def button_bracket():
     br = fuse([panel, foot] + rib)
     hole = Part.makeCylinder(b["hole_d"] / 2, b["t"] + 2, V(x0 - 1, b["y"], Z_LT + b["zc"]), V(1, 0, 0)) if FC else None
     neg = [hole, cyl(b["m3"][0], b["m3"][1], z0 - 1, P["m3_d"] / 2, b["t"] + 2)]
-    return cut(br, neg)
+    return xform(cut(br, neg), btn_m())                  # V2.13: an die Seite verlegt
 
 
 def button_dummy():
@@ -586,7 +627,7 @@ def button_dummy():
     c = V(b["panel_x"], b["y"], Z_LT + b["zc"])
     head = Part.makeCylinder(hd / 2, hl, c - V(hl, 0, 0), V(1, 0, 0))
     body = Part.makeCylinder(bd / 2, bl, c + V(b["t"], 0, 0), V(1, 0, 0))
-    return head.fuse(body)
+    return xform(head.fuse(body), btn_m())
 
 
 def pi_sleeve(x=0.0, y=0.0, z=0.0):
@@ -729,10 +770,12 @@ def build_bottom():
         neg.append(cyl(hx, hy, zt + P["relay_so"] - depth, di / 2, depth + 1))
     for sy in P["lap_screws"]:
         neg.append(cyl(P["split_x"], sy, zb - 1, 1.6, t + 2))
-    for xh in P["conn"]["holes"]:                      # V2.6: Steckerhalter
-        neg.append(cyl(xh, conn_dims()["yc"], zb - 1, P["m3_d"] / 2, t + 2))
+    for xh in P["conn"]["holes"]:                      # V2.6: Steckerhalter (V2.13: an der Seite)
+        hx, hy = place_pt(conn_m(), xh, conn_dims()["yc"])
+        neg.append(cyl(hx, hy, zb - 1, P["m3_d"] / 2, t + 2))
     neg += latch_bottom_neg()                          # V2.7: Akku-Riegel
-    neg.append(cyl(P["btn"]["m3"][0], P["btn"]["m3"][1], zb - 1, P["m3_d"] / 2, t + 2))   # V2.10: Taster-Winkel
+    hx, hy = place_pt(btn_m(), *P["btn"]["m3"])          # V2.10: Taster-Winkel (V2.13: an der Seite)
+    neg.append(cyl(hx, hy, zb - 1, P["m3_d"] / 2, t + 2))
     lp, ln_, _ = leg_pcb_parts()                       # V2.8: Bein-Platinen
     pos_extra = lp + [cradle(x, y, yaw) for name, x, y, yaw in P["coxa"] if name in P["cradle"]["legs"]]   # V2.13
     neg += ln_
