@@ -15,7 +15,7 @@ Hexapod-Roboter (6 × 3 DOF, ST3215-Servos), Pi 5 + Hailo-8 für Perzeption und 
 | Windows | FreeCAD: Makros in `Drawings/Macros/`, `SLARC.FCStd`, `utilities/Motion_development/slarc_sim/urdf/tools/make_urdf.py` | Nicht ausführbar, wenn FreeCAD fehlt. Prüfen mit `python -m py_compile`. Marco führt die Makros in FreeCAD aus. |
 | WSL2 | PyBullet-Simulation, CMA-ES, Training (RTX 3080 Ti, PyTorch/ONNX), Hailo-DFC | Ausführbar. Sim headless mit `--no-gui`. |
 | Raspberry Pi 5 | `src_stable/`, `src_dev/`, venvs unter `~/projects/slarc/venvs/` (`utilities/setup_venvs.sh`) | Nicht lokal starten, nur statisch prüfen. |
-| ESP32 | Firmware (noch nicht im Repo) | – |
+| ESP32 | Firmware in `firmware/esp32/` (PlatformIO, Arduino) | Bauen nur, wenn PlatformIO die Toolchain laden kann; sonst Syntaxprüfung mit g++ gegen Arduino-Stubs. Flashen macht Marco. |
 
 - Makros finden Kaufteil-STEPs relativ zur eigenen Datei. Pfade in Makros nie hart auf Linux oder Windows setzen, sondern relativ zu `__file__` bilden.
 - Zeilenenden: LF. Bestehende Dateien nicht umkonvertieren.
