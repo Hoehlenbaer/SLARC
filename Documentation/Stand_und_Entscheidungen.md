@@ -74,10 +74,14 @@ Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. N
 
 ---
 
-## 5. Rückenpanzer (V1.1)
+## 5. Rückenpanzer (V1.2)
 
 - Käferform, Satteldach 40° mit Firstkamm, Wabengitter; ~170 g, Wand 2,4 mm, **PETG**.
 - Selbstaufrichten muss über eine Beinbewegung kommen (noch zu entwickeln).
+- **V1.2 (02.11.2026):** Marco hat Stellen gefunden, an denen der Drucker ins Leere drucken müsste. Per Schichtanalyse der STL bestätigt: 0,2-mm-Schichten, Überhang bis 50°, Stege unter 0,84 mm zählen nicht. Ursachen und Lösung:
+  - Seitenrauten, die die Kabeldurchlässe bei x −95 und 30 anschnitten, ließen dünne Stege stehen. Jetzt mindestens 4 mm Abstand (`notch_gap`).
+  - Dachwaben in der hinteren Kuppel (x < ca. −135): Dort fällt das Dach auch in X, die Wabenspitze zeigt nicht mehr bergauf, und die Decke der Wabe hängt frei. Dort jetzt keine Waben mehr (`hex_slope`).
+  - Ergebnis: Ohne Stützen druckbar, übrig sind nur die Decken der M3-Querbohrungen im Teilungsspant (Ø3,4, kurze Brücke). Masse +6,6 cm³, etwa +7 g.
 
 ---
 
