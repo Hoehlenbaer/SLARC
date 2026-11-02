@@ -150,7 +150,7 @@ Eine halbe 3×7-cm-Platine (10 × 11 Löcher), aus jeder 3×7 entstehen zwei Bei
 
 - **Bestückung:** drei 3-polige Stiftleisten für Coxa, Femur und Tibia, C1 470 µF / 25 V, XH3 J4 zum Hub, XH2 J5 für den Fußschalter.
 - **Einspeisung:** 12 V (vom Bein-Relais) und GND (vom Power-Board) von unten direkt an die Schienen löten.
-- **Montage (Baseplates V2.8):** zwischen den Platten auf der unteren Platte, je zwei M2-Bunde am Lochende (2× M2x5) und ein Stützstift am freien Ende. Lage: FR/FL bei x 183, y ∓25 (vor dem Relaismodul), MR/ML bei x 0, y ∓60 (neben den Mittel-Servos), RR/RL bei x −100, y ∓55 (neben dem Akku, außerhalb des Ausziehwegs). Die hinteren Platinen sitzen ~100 mm von der Coxa-Achse, dort reichen die Servokabel eventuell nicht – vorher messen.
+- **Montage (Baseplates V2.8):** zwischen den Platten auf der unteren Platte, je zwei M2-Bunde am Lochende (2× M2x5) und ein Stützstift am freien Ende. Lage: FR/FL bei x 183, y ∓21,5 (vor dem Relaismodul; V2.13 von ∓25 nach innen wegen der Servo-Wiegen), MR/ML bei x 0, y ∓60 (neben den Mittel-Servos), RR/RL bei x −100, y ∓55 (neben dem Akku, außerhalb des Ausziehwegs). Die hinteren Platinen sitzen ~100 mm von der Coxa-Achse, dort reichen die Servokabel eventuell nicht – vorher messen.
 
 ### B – Hub (1×)
 

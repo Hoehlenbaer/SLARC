@@ -60,6 +60,7 @@ Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. N
 - **Akku (ZEEE 3S 9000 mAh, 100C, 99,9 Wh):** Kabelabgänge seitlich an der Stirnseite (~38 mm auseinander), Stirnseite nach hinten. Tasche 2 mm, Schienen, Anschlag vorn, obere Platte 4,1 mm darüber, 2 Klettgurte, Ausbau nach hinten über 4-mm-Rampe.
 - **Akkustecker-Halter (V2.6):** hinten links, Deans (Stifte Robot-Seite) + Balancer-Adapter zum BMS. Daly: erst B−, dann Balancer.
 - **Akku-Riegel (V2.7):** ein gedruckter Bajonett-Stift Ø8 mittig (x −171, y 0), von unten bis in die obere Platte, keine Aufbauten auf der unteren Platte. Hochdrücken, 90° drehen (Rille quer = zu). Moosgummi unter dem Kopf. Kein Zukaufteil.
+- **Servo-Wiege (V2.13, 02.11.2026):** Marco beim Prüfstand-Deckel: Bisher hielten nur die 0,9-mm-Tasche oben und die vier 2x5-Blechschrauben im Servogehäuse das Stall-Moment um die Coxa-Achse (2,94 Nm). Jetzt auf der unteren Platte je eine Wiege: Seitenwangen 5 mm und hinterer Anschlag 4 mm, 0,2 mm Spiel, bis z −4. Die volle Gehäusebreite ±12,4 liegt nur zwischen z −27 und −2 an (aus ST3215.step). Bei Stall drückt das Gehäuse auf eine Wange, etwa 110 N mit Hebel ~27 mm. Biegespannung am Wangenfuß ~22 MPa bei voller Stall-Last. Für PETG quer zu den Schichten ist das knapp, aber im Normalbetrieb deutlich weniger. Die Wangen enden vorn am Freischnitt der Gabel. Bein-Platinen FR/FL dafür nach y ∓21,5. Untere Platte vorn +42 cm³. **Offen:** RR/RL noch ohne Wiege, Kollision mit Taster-Winkel/Taster (RR) und Steckerhalter (RL).
 
 ---
 
@@ -150,3 +151,4 @@ Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. N
 8. Steckermaße und echte Akkulänge messen → `conn`/`lat`.
 9. PR #20 (Verkabelung) mergen.
 10. Sprache der Doku (notiert 01.11.2026): Im Moment sind Doku, Kommentare und Stückliste gemischt Deutsch/Englisch. In der finalen Version soll die ganze Doku auf Englisch sein (inkl. Stückliste und Code-Kommentare). Bis dahin gilt die Regel aus `CLAUDE.md` (Deutsch, `README.md` Englisch).
+11. Servo-Wiege RR/RL: Platz für Taster (hinten rechts) und Akkustecker-Halter (hinten links) neu klären (V2.13).

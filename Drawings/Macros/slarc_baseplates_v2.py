@@ -1,12 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – obere + untere Baseplate inkl. Coxa-Servo-Aufnahme, Elektronik und Energieversorgung.   V2.12 (Bein-Prüfstand)
+SLARC – obere + untere Baseplate inkl. Coxa-Servo-Aufnahme, Elektronik und Energieversorgung.   V2.13 (Servo-Wiege)
 FreeCAD 0.21 / 1.0: Makro ausführen. Parameter in P (unten) ändern und Makro neu ausführen
 (die Plattenkontur mit den Schwenkfreigängen ist hier bewusst als Python-Geometrie gebaut,
 nicht über Spreadsheet-Ausdrücke).
 
 Koordinaten (wie slarc_sim_V10): X = vorn, Y = links, Z = oben, Ursprung = Körpermitte,
 Z = 0 = Oberkante Hüllmaß der Coxa-Servos (ST3215 liegt mit Horn nach oben zwischen den Platten).
+
+V2.13
+- Servo-Wiege auf der unteren Platte (und im Prüfstand): zwei Seitenwangen 5 mm + hinterer Anschlag 4 mm,
+  0,2 mm Spiel, bis z = -4. Bisher hielten nur die flache Tasche oben und die vier 2x5-Blechschrauben das
+  Stall-Moment um die Coxa-Achse. Jetzt liegt es formschlüssig an (Hebel ca. 25 mm, ca. 120 N bei 2,94 Nm).
+  Die Wangen enden vorn am Freischnitt der Gabel. Bein-Platinen FR/FL dafür 3,5 mm nach innen (y ∓21,5).
+  Hinten (RR/RL) noch ohne Wiege: Kollision mit Taster-Winkel/Taster bzw. Steckerhalter, Lösung offen.
 
 V2.12
 - Bein-Prüfstand test_stand(): ein Coxa-Servo wie im Roboter zwischen zwei Plattenstücken (gleiche Tasche,
@@ -156,13 +163,17 @@ P = dict(
     # V2.8: Lochraster-Platinen (Documentation/Wiring)
     pcb=dict(t=1.6, hole_in=2.0, m2_pilot=1.7, boss_d=5.0,
              leg=dict(L=35.0, W=30.0, so=4.0, env=18.0,          # ½ 3×7: Löcher nur an einem Ende (Abstand 26)
-                      pos=[("FR", 183.0, -25.0, 90.0), ("FL", 183.0, 25.0, -90.0), ("MR", 0.0, -60.0, 0.0),
+                      pos=[("FR", 183.0, -21.5, 90.0), ("FL", 183.0, 21.5, -90.0), ("MR", 0.0, -60.0, 0.0),
                            ("ML", 0.0, 60.0, 0.0), ("RR", -100.0, -55.0, 90.0), ("RL", -100.0, 55.0, -90.0)]),
              hub=dict(cx=-115.0, cy=20.0, L=70.0, W=50.0, t_car=3.0, so=4.0,              # 5×7, Löcher 66×46
                       env_mod=10.0, y_mod=24.0, env_con=24.0),    # Modulseite außen (flach, Panzer niedrig), Stecker innen
              pwr=dict(cx=55.0, cy=0.0, L=50.0, W=35.0, deck=(27.0, 83.0, -50.0, 50.0), deck_z=-16.5, deck_t=2.5,
                       sleeve_d=13.0, so=3.0, env=9.0),                                    # ½ 5×7: Löcher 46 an einem Ende
              adp=dict(x0=146.8, y0=-20.0, L=18.5, W=40.0, z0=-27.0, env=17.0)),
+    # V2.13: Servo-Wiege auf der unteren Platte: seitliche Führung + hinterer Anschlag -> Stall-Moment formschlüssig
+    # (Servo-Frame; Gehäuse volle Breite ±12.3 nur zwischen z -27 und -2, darunter schmaler)
+    cradle=dict(clr=0.2, t=5.0, z_top=-4.0, rear_t=4.0, x_rear=-35.11, half_w=12.39,
+                legs=("FR", "FL", "MR", "ML")),   # RR/RL offen: Wiege kollidiert mit Taster-Winkel bzw. Steckerhalter
     split_x=-40.0, lap=24.0, lap_screws=[-65.0, -32.0, 32.0, 65.0],   # Vorderteil 252 x 209 mm
     # V2.12: Bein-Prüfstand (ein Coxa-Servo wie im Roboter zwischen zwei Plattenstücken, Achse vor der Tischkante)
     stand=dict(edge_x=-60.0,        # Tischkante im Servo-Frame: Achse 60 mm vor der Kante -> alles mit r > 0 frei
@@ -664,6 +675,21 @@ def power_bridge():
     return br, ph, tubes
 
 
+def cradle(cx, cy, yaw):
+    """V2.13: Wiege für den Coxa-Servo auf der unteren Platte (U aus zwei Seitenwangen + hinterem Anschlag).
+    Nimmt das Stall-Moment um die Coxa-Achse formschlüssig auf; Freischnitt der Gabel wird ausgespart."""
+    c = P["cradle"]
+    z0, h = Z_LT - 0.5, c["z_top"] - Z_LT + 0.5
+    yi = c["half_w"] + c["clr"]
+    xr = c["x_rear"] - c["clr"]
+    L = 30.0                                            # nach vorn lang genug, der Freischnitt kürzt
+    parts = [rbox(cx, cy, yaw, xr - c["rear_t"], -yi - c["t"], z0, c["rear_t"], 2 * (yi + c["t"]), h)]
+    for s in (-1, 1):
+        y0 = yi if s > 0 else -yi - c["t"]
+        parts.append(rbox(cx, cy, yaw, xr - c["rear_t"], y0, z0, c["rear_t"] + L, c["t"], h))
+    return cut(fuse(parts), [sweep_2d(cx, cy, yaw, z0 - 1, h + 2)])
+
+
 def build_bottom():
     t, zb, zt = P["t"], Z_LB, Z_LT
     col_h = Z_B - zt                                   # Säule bis Unterseite obere Platte
@@ -708,7 +734,8 @@ def build_bottom():
     neg += latch_bottom_neg()                          # V2.7: Akku-Riegel
     neg.append(cyl(P["btn"]["m3"][0], P["btn"]["m3"][1], zb - 1, P["m3_d"] / 2, t + 2))   # V2.10: Taster-Winkel
     lp, ln_, _ = leg_pcb_parts()                       # V2.8: Bein-Platinen
-    pos_extra = lp; neg += ln_
+    pos_extra = lp + [cradle(x, y, yaw) for name, x, y, yaw in P["coxa"] if name in P["cradle"]["legs"]]   # V2.13
+    neg += ln_
     plate = cut(fuse(pos + pos_extra), neg)
     front, rear = split(plate, zb, upper_front=False)   # Säulen stehen auf der oberen Stoßhälfte -> hinteres Teil
     return dict(plate=plate, front=front, rear=rear)
@@ -759,6 +786,7 @@ def test_stand():
         pos.append(box(S["x_wall"], y0, zt - 0.5, S["x_wall_f"] - S["x_wall"], yo - yi, wh + 0.5))
     bx0, bx1 = S["back_x"]
     pos.append(box(bx0, -yo, zt - 0.5, bx1 - bx0, 2 * yo, wh + 0.5))
+    pos.append(cradle(0, 0, 0))                         # V2.13: Servo-Wiege wie im Roboter
     neg = [sweep_2d(0, 0, 0, zb - 1, t + 2)]
     px0, px1, py = P["plug"]
     neg.append(box(px0, -py, zb - 1, px1 - px0, 2 * py, t + 2))
