@@ -15,3 +15,6 @@ __pycache__/
 # Claude Code: persönliche Einstellungen nicht einchecken
 CLAUDE.local.md
 .claude/settings.local.json
+
+# PlatformIO
+firmware/esp32/.pio/
