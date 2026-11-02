@@ -4,6 +4,10 @@
 
 SLARC is a personal hobby project with an ambitious goal: build a **state-of-the-art hexapod robot that is fully AI-controlled** — from low-level motion to high-level mission planning — using entirely off-the-shelf hardware, a fully 3D-printable chassis, and custom-trained neural networks.
 
+![SLARC – full CAD model, isometric view](Documentation/Images/slarc_iso.png)
+
+*Full CAD model, rendered straight from the parametric FreeCAD macros (Nov 2026).*
+
 ---
 
 ## What makes SLARC interesting
