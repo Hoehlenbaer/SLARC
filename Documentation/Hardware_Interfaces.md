@@ -146,7 +146,7 @@ Das INA219 misst nur den Strom des Treibers. Die Akkuspannung zeigt es trotzdem.
 Port B ist frei für Status-LEDs.
 
 **Ein- und Ausschalten** (fest, Deep-Sleep-Lösung):
-- Der Akku bleibt eingesteckt. Ein Taster hinten rechts weckt den ESP32 aus dem Deep Sleep und löst auch das Ausschalten aus.
+- Der Akku bleibt eingesteckt. Ein Taster an der rechten Seite (zwischen den Platten bei x −140, seit V2.13; vorher hinten rechts) weckt den ESP32 aus dem Deep Sleep und löst auch das Ausschalten aus.
 - Der Ruhestrom im Deep Sleep wird gemessen (Strom in der 12-V-Zuleitung des Treibers, erwartet 5–15 mA). Bei mehr als etwa 5 mA greift die Ausweichlösung: K8 als Selbsthaltung für den Treiber.
 
 Ablauf:
