@@ -1,0 +1,56 @@
+<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;background:#fff}canvas{display:block}</style>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+</head><body><script type="module">
+import * as THREE from 'three';
+import {STLLoader} from 'three/addons/loaders/STLLoader.js';
+import {RoomEnvironment} from 'three/addons/environments/RoomEnvironment.js';
+const P=new URLSearchParams(location.search);
+const W=+(P.get('w')||1600), H=+(P.get('h')||1000);
+const dir=(P.get('dir')||'1,-1.15,0.8').split(',').map(Number);
+const r=new THREE.WebGLRenderer({antialias:true,preserveDrawingBuffer:true,alpha:true});
+r.setPixelRatio(2); r.setSize(W,H); r.toneMapping=THREE.ACESFilmicToneMapping; r.toneMappingExposure=1.0;
+r.shadowMap.enabled=true; r.shadowMap.type=THREE.PCFSoftShadowMap; r.outputColorSpace=THREE.SRGBColorSpace;
+document.body.appendChild(r.domElement);
+const scene=new THREE.Scene();
+const pm=new THREE.PMREMGenerator(r); scene.environment=pm.fromScene(new RoomEnvironment(),0.04).texture;
+const M={
+ print:{color:0x2a2c30,roughness:0.62,metalness:0.0},
+ cover:{color:0x222428,roughness:0.55,metalness:0.0},
+ servo:{color:0x15161a,roughness:0.45,metalness:0.15},
+ deco:{color:0xe8742a,roughness:0.5,metalness:0.0},
+ foot:{color:0x3d4148,roughness:0.9,metalness:0.0},
+ switch:{color:0x1f1f1f,roughness:0.5,metalness:0.0},
+ pcb:{color:0x1f6b3a,roughness:0.5,metalness:0.1},
+ pi:{color:0x2f7d46,roughness:0.5,metalness:0.1},
+ lens:{color:0xb8bcc4,roughness:0.25,metalness:0.8},
+ accent:{color:0xe8742a,roughness:0.5,metalness:0.0},
+ battery:{color:0x3b5bdb,roughness:0.5,metalness:0.1},
+};
+const man=await (await fetch('parts/manifest.json')).json();
+const loader=new STLLoader(); const grp=new THREE.Group(); scene.add(grp);
+await Promise.all(man.map(async e=>{
+  const g=await loader.loadAsync('parts/'+e.file); g.computeVertexNormals();
+  const mat=new THREE.MeshStandardMaterial({...(M[e.cat]||M.print),side:THREE.DoubleSide});
+  const mesh=new THREE.Mesh(g,mat); mesh.castShadow=true; mesh.receiveShadow=true; grp.add(mesh);
+}));
+const box=new THREE.Box3().setFromObject(grp); const c=box.getCenter(new THREE.Vector3()); const sz=box.getSize(new THREE.Vector3());
+// Boden
+const gnd=new THREE.Mesh(new THREE.PlaneGeometry(4000,4000),new THREE.ShadowMaterial({opacity:0.22}));
+gnd.position.set(c.x,c.y,box.min.z-0.5); gnd.receiveShadow=true; scene.add(gnd);
+scene.add(new THREE.HemisphereLight(0xffffff,0x8a8f99,0.6));
+const sun=new THREE.DirectionalLight(0xffffff,2.2); sun.position.set(c.x+300,c.y-150,c.z+900); sun.target.position.copy(c);
+sun.castShadow=true; sun.shadow.mapSize.set(4096,4096); const s=sun.shadow.camera; s.left=-500;s.right=500;s.top=500;s.bottom=-500;s.near=10;s.far=3000; sun.shadow.bias=-0.0008; sun.shadow.radius=4;
+scene.add(sun,sun.target);
+const fill=new THREE.DirectionalLight(0xdfe7ff,0.6); fill.position.set(c.x-600,c.y+500,c.z+300); scene.add(fill);
+// Kamera iso, orthografisch
+const d=new THREE.Vector3(...dir).normalize();
+const cam=new THREE.OrthographicCamera(-1,1,1,-1,1,10000); cam.up.set(0,0,1);
+cam.position.copy(c).addScaledVector(d,2000); cam.lookAt(c); cam.updateMatrixWorld();
+// Rahmen an Projektion anpassen
+const pts=[];for(const x of [box.min.x,box.max.x])for(const y of [box.min.y,box.max.y])for(const z of [box.min.z,box.max.z])pts.push(new THREE.Vector3(x,y,z).applyMatrix4(cam.matrixWorldInverse));
+let minx=1e9,maxx=-1e9,miny=1e9,maxy=-1e9; for(const p of pts){minx=Math.min(minx,p.x);maxx=Math.max(maxx,p.x);miny=Math.min(miny,p.y);maxy=Math.max(maxy,p.y);}
+const pad=1.06, cx=(minx+maxx)/2, cy=(miny+maxy)/2; let hw=(maxx-minx)/2*pad, hh=(maxy-miny)/2*pad;
+if(hw/hh>W/H) hh=hw*H/W; else hw=hh*W/H;
+cam.left=cx-hw;cam.right=cx+hw;cam.top=cy+hh;cam.bottom=cy-hh;cam.updateProjectionMatrix();
+r.render(scene,cam); window.DONE=true;
+</script></body></html>
