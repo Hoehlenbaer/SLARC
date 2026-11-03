@@ -28,6 +28,8 @@ V1.3
 - V1.2 zurückgenommen: Stützen wieder nur vom Druckbett. Tree Support führt die Äste um die untere Gabelwange
   herum bis zur oberen (in Cura geprüft, Marco 03.11.2026). So entstehen keine Stützen auf der Innenseite der
   unteren Wange, und die liegt am Servo an.
+- Neue Stücklisten-Spalte P "Cura-Extras": beliebige Einstellungen pro Modell als "key=value; key=value"
+  (Cura-Schlüssel, z. B. support_top_distance=0.2).
 
 V1.2
 - "Tree Support" setzt zusätzlich Stützen "überall" (support_type = everywhere, global als Benutzeränderung):
@@ -103,6 +105,11 @@ def parts_from_bom():
         note = str(get(r, "Stützen") or "")
         if "tree support" in note.lower():
             obj["support_enable"] = "True"
+        if "Cura-Extras" in hdr:                         # V1.3: freie Einstellungen pro Modell "key=value; key=value"
+            for kv in str(get(r, "Cura-Extras") or "").split(";"):
+                if "=" in kv:
+                    k, v = (x.strip() for x in kv.split("=", 1))
+                    obj[k] = v
         m = re.search(r"Brim\s+(\d+)", note)
         out[str(stl).replace(".stl", "")] = (mat, orient, obj, m.group(1) if m else None, "support_enable" in obj)
     return out
