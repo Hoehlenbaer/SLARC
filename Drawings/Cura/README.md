@@ -11,9 +11,10 @@ Alles Teilspezifische steht in `Drawings/Macros/SLARC_Stueckliste.xlsx`, Blatt D
 | C Material | PLA, PETG, TPU 95A | Vorlage und Profil. Für TPU gibt es noch keine Vorlage, die Zeile wird übersprungen. |
 | J Füllung | z. B. „40 % Gyroid“ | erste Zahl = Fülldichte (pro Modell) |
 | K Wände | Linien | Wandlinienanzahl (pro Modell) |
-| M Stützen / Besonderes | Freitext | „Tree Support“ schaltet Stützen ein (pro Modell) und setzt die Platzierung auf „überall“ (global als Benutzeränderung), damit z. B. die obere Gabelwange von der unteren aus gestützt wird. „Brim N mm“ setzt Brim mit N mm. |
+| M Stützen / Besonderes | Freitext | „Tree Support“ schaltet Stützen ein (pro Modell), Platzierung nur vom Druckbett aus. Die Äste führen um die untere Gabelwange herum (in Cura geprüft). „Brim N mm“ setzt Brim mit N mm. |
 | N STL-Datei | Name ohne `.stl` | nur Zeilen mit Eintrag bekommen ein Projekt |
 | O Cura-Ausrichtung | `-Z`, `+Z`, `+X`, `-X`, `+Y`, `-Y` | Fläche des Modells (Makro-Koordinaten), die aufs Bett kommt. `-Z` = wie modelliert, `+Z` = Oberseite (180°), `±X`/`±Y` = Seitenfläche (90°) |
+| P Cura-Extras | `key=value; …` | weitere Einstellungen pro Modell mit Cura-Schlüssel, z. B. `support_top_distance=0.2; support_roof_enable=True` |
 
 Basiswerte pro Material (Profil „PLA SLARC“ / „PETG SLARC“) stehen in `BASE` im Skript und entsprechen dem Blatt Druckeinstellungen. Wer dort etwas ändert, ändert es auch im Skript.
 

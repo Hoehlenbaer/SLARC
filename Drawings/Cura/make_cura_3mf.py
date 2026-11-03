@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – Cura-Projekte (3MF) pro Druckteil erzeugen.   V1.2 (Quelle: Stückliste)
+SLARC – Cura-Projekte (3MF) pro Druckteil erzeugen.   V1.3 (Quelle: Stückliste)
 Drucker: Anycubic Kobra Plus, Cura 5.13 (setting_version 27).
 
 Ablauf:
@@ -23,6 +23,13 @@ Aufruf:  python make_cura_3mf.py               (alle Teile mit STL-Datei)
          python make_cura_3mf.py --force Cap   (auch von Hand gespeicherte Projekte überschreiben)
 Benötigt: numpy, openpyxl.
 Beim Öffnen in Cura für das Profil "neu erstellen" bzw. später "aktualisieren" wählen.
+
+V1.3
+- V1.2 zurückgenommen: Stützen wieder nur vom Druckbett. Tree Support führt die Äste um die untere Gabelwange
+  herum bis zur oberen (in Cura geprüft, Marco 03.11.2026). So entstehen keine Stützen auf der Innenseite der
+  unteren Wange, und die liegt am Servo an.
+- Neue Stücklisten-Spalte P "Cura-Extras": beliebige Einstellungen pro Modell als "key=value; key=value"
+  (Cura-Schlüssel, z. B. support_top_distance=0.2).
 
 V1.2
 - "Tree Support" setzt zusätzlich Stützen "überall" (support_type = everywhere, global als Benutzeränderung):
@@ -98,6 +105,11 @@ def parts_from_bom():
         note = str(get(r, "Stützen") or "")
         if "tree support" in note.lower():
             obj["support_enable"] = "True"
+        if "Cura-Extras" in hdr:                         # V1.3: freie Einstellungen pro Modell "key=value; key=value"
+            for kv in str(get(r, "Cura-Extras") or "").split(";"):
+                if "=" in kv:
+                    k, v = (x.strip() for x in kv.split("=", 1))
+                    obj[k] = v
         m = re.search(r"Brim\s+(\d+)", note)
         out[str(stl).replace(".stl", "")] = (mat, orient, obj, m.group(1) if m else None, "support_enable" in obj)
     return out
@@ -155,8 +167,6 @@ def make(stl_name, part, force=False):
                 return
     g_vals, e_vals, e_del = BASE[mat]
     g_user, e_user = ({"adhesion_type": "brim"}, {"brim_width": brim}) if brim else ({}, {})
-    if tree:                                             # V1.2: Stützen auch auf dem Modell (Gabel)
-        g_user = dict(g_user, support_type="everywhere")
     t = read_stl(os.path.join(STL_DIR, stl_name + ".stl")) @ ORIENT[orient].T
     flat = t.reshape(-1, 3)
     c = (flat.max(0) + flat.min(0)) / 2
