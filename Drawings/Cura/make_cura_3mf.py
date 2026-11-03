@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – Cura-Projekte (3MF) pro Druckteil erzeugen.   V1.1 (Quelle: Stückliste)
+SLARC – Cura-Projekte (3MF) pro Druckteil erzeugen.   V1.2 (Quelle: Stückliste)
 Drucker: Anycubic Kobra Plus, Cura 5.13 (setting_version 27).
 
 Ablauf:
@@ -23,6 +23,10 @@ Aufruf:  python make_cura_3mf.py               (alle Teile mit STL-Datei)
          python make_cura_3mf.py --force Cap   (auch von Hand gespeicherte Projekte überschreiben)
 Benötigt: numpy, openpyxl.
 Beim Öffnen in Cura für das Profil "neu erstellen" bzw. später "aktualisieren" wählen.
+
+V1.2
+- "Tree Support" setzt zusätzlich Stützen "überall" (support_type = everywhere, global als Benutzeränderung):
+  bei den Beinteilen muss die obere Gabelwange von der unteren aus gestützt werden, nicht nur vom Bett.
 
 V1.1
 - Quelle ist die Stückliste statt der PARTS-Tabelle im Skript. ASCII-STL. Schutz für von Hand gespeicherte
@@ -95,7 +99,7 @@ def parts_from_bom():
         if "tree support" in note.lower():
             obj["support_enable"] = "True"
         m = re.search(r"Brim\s+(\d+)", note)
-        out[str(stl).replace(".stl", "")] = (mat, orient, obj, m.group(1) if m else None)
+        out[str(stl).replace(".stl", "")] = (mat, orient, obj, m.group(1) if m else None, "support_enable" in obj)
     return out
 
 
@@ -140,7 +144,7 @@ def set_vals(txt, name, vals, dels=()):
 
 
 def make(stl_name, part, force=False):
-    mat, orient, obj, brim = part
+    mat, orient, obj, brim, tree = part
     if mat not in TPL:
         print("%-40s übersprungen: keine Cura-Vorlage für %s" % (stl_name, mat)); return
     out = os.path.join(STL_DIR, "AKP_%s.3mf" % stl_name)
@@ -151,6 +155,8 @@ def make(stl_name, part, force=False):
                 return
     g_vals, e_vals, e_del = BASE[mat]
     g_user, e_user = ({"adhesion_type": "brim"}, {"brim_width": brim}) if brim else ({}, {})
+    if tree:                                             # V1.2: Stützen auch auf dem Modell (Gabel)
+        g_user = dict(g_user, support_type="everywhere")
     t = read_stl(os.path.join(STL_DIR, stl_name + ".stl")) @ ORIENT[orient].T
     flat = t.reshape(-1, 3)
     c = (flat.max(0) + flat.min(0)) / 2
@@ -171,7 +177,7 @@ def make(stl_name, part, force=False):
                     d = set_vals(d.decode(), "%s SLARC" % mat, e_vals if ext else g_vals,
                                  e_del if ext else ()).encode()
                 elif b"type = user" in d:                    # Benutzeränderungen: nur Brim
-                    d = set_vals(d.decode(), None, e_user if ext else g_user, ("adhesion_type", "brim_width")).encode()
+                    d = set_vals(d.decode(), None, e_user if ext else g_user, ("adhesion_type", "brim_width", "support_type")).encode()
             zout.writestr(it, d)
     print("%-40s %-4s %-3s Höhe %5.1f mm  Brim %-3s %s" % (os.path.basename(out), mat, orient,
                                                            t[:, :, 2].max(), brim or "-", obj))
