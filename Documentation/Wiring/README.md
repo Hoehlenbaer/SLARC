@@ -47,6 +47,8 @@ Laufzeit grob: 9 Ah bei ~12 A Mittel ergibt 40–45 min Gehen.
 
 Kurzschlussschutz: Ein Kurzschluss löst die Kurzschlussabschaltung des BMS im Mikrosekundenbereich aus, F1 sichert dahinter. Die kurzen AWG20-Abgänge brauchen deshalb keine eigene Sicherung.
 
+Absicherung (04.11.2026): Das Daly-BMS ist für 60 A ausgelegt, F1 hat 30 A. Damit begrenzt F1, das BMS übernimmt nur Kurzschlüsse. F1 ist nach der AWG14-Leitung bemessen, nicht nach dem theoretischen Maximum aller 18 Servos im Stall (18 × 2,7 A ≈ 49 A). Flachsicherungen sind träge: Nach ISO 8820-3 löst eine 30-A-Sicherung bei 60 A erst nach etwa 0,15–5 s aus. Kurze Stall-Spitzen hält sie aus, ein Dauerstall des ganzen Roboters löst sie aus. Die Stall-Überwachung selbst gehört in die Firmware (Servostrom überwachen, Drehmoment abschalten).
+
 Die Bein-Relais nur schalten, wenn das Drehmoment der Servos aus ist. Beim Einschalten lädt der 470-µF-Kondensator kurz über den Kontakt, unter Last schalten verschleißt die Kontakte.
 
 **AWG20 und Steckverbinder.** Für Datenleitungen ist AWG20 elektrisch mehr als genug. Es passt aber nicht in XH- oder Dupont-Crimpkontakte, die nehmen höchstens AWG22. Deshalb gilt:
