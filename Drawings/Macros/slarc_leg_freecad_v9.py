@@ -8,6 +8,9 @@ V9.3 (Tropfenbohrungen)
 - Schraubenlöcher und Senkungen der Servo-Laschen, die beim Druck waagerecht liegen (Femur-Servo in der Coxa,
   Frame mit rx), als Tropfen mit 45°-Spitze nach oben (Druckrichtung = +Z des Glieds). Druckt ohne Stützen;
   Schraubenkopf liegt weiter plan auf. Senkrechte Bohrungen (Tibia-Servo im Femur) bleiben rund.
+- Laschen: Die Senkung (Ø4.4) berührte die Laschenkante bei -tab_x tangential (Wand 0, Cura zeigte eine
+  Fehlerfläche). tab_x 30.5 -> 29.9 und Verlängerung tab_ext = 3 mm nach vorn, nur unterhalb des Servo-Hüllmaßes
+  (bis 0.3 unter dessen Unterseite), damit Steckerbuchsen und Gehäuse frei bleiben.
 V9.2 (Servo-Tasche weiter)
 - Hüllmaße aus dem STEP genau übernommen: servo_W 24.7 -> 24.78, servo_L 45.2 -> 45.25. Mit fit 0.2 blieben
   seitlich nur 0.16 mm Spiel; der Servo ging im Druck (PETG) nur mit Druck hinein und schwer heraus (Marco, 05.11.2026).
@@ -134,7 +137,8 @@ PARAMS = [
     ("lip_t",       3.0,  "Laschen unten: Dicke unter dem Hüllmaß"),
     ("wall_f",      2.0,  "Rahmen: vorderer Steg vor der Achse"),
     ("ring_c",      1.0,  "Rahmen: Abstand zum Gabelsteg (Beschnitt auf r_clr - ring_c)"),
-    ("tab_x",      30.5,  "Laschen unten: Beginn hinter der Achse (Steckerbuchsen bis -29.2)"),
+    ("tab_x",      29.9,  "Laschen unten: Beginn hinter der Achse (Steckerbuchsen bis -29.2; V9.3: 30.5 -> 29.9)"),
+    ("tab_ext",     3.0,  "V9.3: Laschen unten nach vorn verlängert, nur unterhalb des Servos (Wand um die Senkung)"),
     ("tab_y",       6.0,  "Laschen unten: Abstand von Mitte (Lücke für die Servokabel nach hinten)"),
     ("bot_z",      33.2,  "Laschen unten: Oberkante unter Hülle oben (Unterseite an den Bohrungen -33.1)"),
     ("hole_bx",    32.7,  "Gehäusebohrung unten: X hinter Achse (STEP)"),
@@ -507,6 +511,8 @@ def cradle(g, n, fr):
     for s, y0 in (("L", "tab_y"), ("R", f"-({YW})")):
         lp.append(box(g, f"{n}_tab_bot{s}", fr, "-back", y0, "-servo_H - lip_t", "back - tab_x",
                       f"({YW}) - tab_y", "lip_t + servo_H - bot_z"))
+        lp.append(box(g, f"{n}_tab_ext{s}", fr, "-tab_x - 0.01", y0, "-servo_H - lip_t", "tab_ext",
+                      f"({YW}) - tab_y", "lip_t - 0.3"))                            # V9.3: unter dem Servo
     ln = []
     for i, sy in enumerate((1, -1)):
         hy = f"({sy})*hole_y"
