@@ -25,7 +25,7 @@ Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. N
 
 ---
 
-## 2. Bein (Makro V9.1)
+## 2. Bein (Makro V9.2)
 
 **Standardparameter (von Marco festgelegt):** Coxa 60 mm, Femur 150 mm, Tibia-Sehne 175 mm (Knieachse → Fußspitze), Knick 38,6° nach unten, Fußsegment 140 mm → Segment 1 (`tib_a`) = 42,2 mm. Standardpose im Makro: q_femur −15°, q_tibia 100°.
 
@@ -49,6 +49,8 @@ Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. N
 | Tibia | ±117° (V9.1) | ±112° |
 
 ---
+- **Servo-Tasche (V9.2, 05.11.2026):** Erster Druck (Coxa, PETG): Der Femur-Servo ging nur mit Druck in die Tasche und schwer heraus. Ursache: Die Hüllmaße im Makro waren gerundet (24,7 statt 24,78 mm). Mit fit 0,2 blieben so je Seite nur 0,16 mm Spiel. Jetzt Maße aus dem STEP (24,78 × 45,25) und eigenes Spiel `fit_srv` = 0,3 mm je Seite. Die Schaltertasche behält `fit` = 0,2. Die Gabelpassung zum Horn ist gut (leichtes Spiel).
+- **Gabelmontage:** Die obere Wange (ohne Bund) kommt auf das Servohorn. Die untere Wange mit dem 1-mm-Distanzbund kommt auf die Rückseitenscheibe (passive Lagerung), Bund zum Servo.
 
 ## 3. Baseplates (V2.7)
 
