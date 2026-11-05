@@ -1,9 +1,16 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – parametrisches Bein (Coxa/Femur/Tibia) mit 3x ST3215, doppelt gelagert.   V9.2
+SLARC – parametrisches Bein (Coxa/Femur/Tibia) mit 3x ST3215, doppelt gelagert.   V9.3
 FreeCAD 0.21 / 1.0 – Makro ausführen oder in der Python-Konsole:
     exec(open(r"PFAD/slarc_leg_freecad_v8.py", encoding="utf-8").read())
 
+V9.3 (Tropfenbohrungen)
+- Schraubenlöcher und Senkungen der Servo-Laschen, die beim Druck waagerecht liegen (Femur-Servo in der Coxa,
+  Frame mit rx), als Tropfen mit 45°-Spitze nach oben (Druckrichtung = +Z des Glieds). Druckt ohne Stützen;
+  Schraubenkopf liegt weiter plan auf. Senkrechte Bohrungen (Tibia-Servo im Femur) bleiben rund.
+- Laschen: Die Senkung (Ø4.4) berührte die Laschenkante bei -tab_x tangential (Wand 0, Cura zeigte eine
+  Fehlerfläche). tab_x 30.5 -> 29.9 und Verlängerung tab_ext = 3 mm nach vorn, nur unterhalb des Servo-Hüllmaßes
+  (bis 0.3 unter dessen Unterseite), damit Steckerbuchsen und Gehäuse frei bleiben.
 V9.2 (Servo-Tasche weiter)
 - Hüllmaße aus dem STEP genau übernommen: servo_W 24.7 -> 24.78, servo_L 45.2 -> 45.25. Mit fit 0.2 blieben
   seitlich nur 0.16 mm Spiel; der Servo ging im Druck (PETG) nur mit Druck hinein und schwer heraus (Marco, 05.11.2026).
@@ -130,7 +137,8 @@ PARAMS = [
     ("lip_t",       3.0,  "Laschen unten: Dicke unter dem Hüllmaß"),
     ("wall_f",      2.0,  "Rahmen: vorderer Steg vor der Achse"),
     ("ring_c",      1.0,  "Rahmen: Abstand zum Gabelsteg (Beschnitt auf r_clr - ring_c)"),
-    ("tab_x",      30.5,  "Laschen unten: Beginn hinter der Achse (Steckerbuchsen bis -29.2)"),
+    ("tab_x",      29.9,  "Laschen unten: Beginn hinter der Achse (Steckerbuchsen bis -29.2; V9.3: 30.5 -> 29.9)"),
+    ("tab_ext",     3.0,  "V9.3: Laschen unten nach vorn verlängert, nur unterhalb des Servos (Wand um die Senkung)"),
     ("tab_y",       6.0,  "Laschen unten: Abstand von Mitte (Lücke für die Servokabel nach hinten)"),
     ("bot_z",      33.2,  "Laschen unten: Oberkante unter Hülle oben (Unterseite an den Bohrungen -33.1)"),
     ("hole_bx",    32.7,  "Gehäusebohrung unten: X hinter Achse (STEP)"),
@@ -503,14 +511,36 @@ def cradle(g, n, fr):
     for s, y0 in (("L", "tab_y"), ("R", f"-({YW})")):
         lp.append(box(g, f"{n}_tab_bot{s}", fr, "-back", y0, "-servo_H - lip_t", "back - tab_x",
                       f"({YW}) - tab_y", "lip_t + servo_H - bot_z"))
+        lp.append(box(g, f"{n}_tab_ext{s}", fr, "-tab_x - 0.01", y0, "-servo_H - lip_t", "tab_ext",
+                      f"({YW}) - tab_y", "lip_t - 0.3"))                            # V9.3: unter dem Servo
     ln = []
     for i, sy in enumerate((1, -1)):
         hy = f"({sy})*hole_y"
-        ln.append(cyl(g, f"{n}_scr_b{i}", fr, "-hole_bx", hy, "-servo_H - lip_t - 1", "scr_d/2",
-                      "lip_t + servo_H - bot_z + 2"))
-        ln.append(cyl(g, f"{n}_cb_b{i}", fr, "-hole_bx", hy, "-servo_H - lip_t - 1", "cb_d/2",
-                      "lip_t + servo_H - bot_z - cb_rest + 1"))
+        ln += drop(g, f"{n}_scr_b{i}", fr, "-hole_bx", hy, "-servo_H - lip_t - 1", "scr_d/2",
+                   "lip_t + servo_H - bot_z + 2")                                   # V9.3: Tropfen
+        ln += drop(g, f"{n}_cb_b{i}", fr, "-hole_bx", hy, "-servo_H - lip_t - 1", "cb_d/2",
+                   "lip_t + servo_H - bot_z - cb_rest + 1")
     return pos, neg, lp, ln
+
+
+def drop(g, n, fr, x, y, z0, r, h):
+    """V9.3: Bohrung entlang der lokalen Z-Achse; liegt sie beim Druck waagerecht (fr.rx), Tropfen mit Spitze
+    nach +Z des Containers (Druckrichtung). Quadrat mit Seite r, Ecke im Bohrungsmittelpunkt, um die Bohrungsachse
+    gedreht -> Diagonale zeigt nach oben, Kanten tangential zum Kreis."""
+    out = [cyl(g, n, fr, x, y, z0, r, h)]
+    if not fr.rx:
+        return out
+    o = doc.addObject("Part::Box", n + "_tip"); g.addObject(o)
+    _x(o, "Length", r); _x(o, "Width", r); _x(o, "Height", h)
+    bx, by, bz = fr.base(x, y, z0)
+    if MIR > 0:     # Rx(-90): lokal -Y -> +Z; Diagonale (45°) auf -90° drehen
+        o.Placement = App.Placement(V(), fr.rot.multiply(ROT(V(0, 0, 1), -135)))
+    else:           # gespiegelt Rx(+90): lokal +Y -> +Z; Basis wie in _place gespiegelt
+        o.Placement = App.Placement(V(), fr.rot_m.multiply(ROT(V(0, 0, 1), 45)))
+        by = f"-({by})"
+    _x(o, "Placement.Base.x", bx); _x(o, "Placement.Base.y", by); _x(o, "Placement.Base.z", bz)
+    out.append(o)
+    return out
 
 
 def with_lips(g, n, core, lp, ln):
