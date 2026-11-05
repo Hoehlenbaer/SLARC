@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – parametrisches Bein (Coxa/Femur/Tibia) mit 3x ST3215, doppelt gelagert.   V9.2
+SLARC – parametrisches Bein (Coxa/Femur/Tibia) mit 3x ST3215, doppelt gelagert.   V9.3
 FreeCAD 0.21 / 1.0 – Makro ausführen oder in der Python-Konsole:
     exec(open(r"PFAD/slarc_leg_freecad_v8.py", encoding="utf-8").read())
 
+V9.3 (Tropfenbohrungen)
+- Schraubenlöcher und Senkungen der Servo-Laschen, die beim Druck waagerecht liegen (Femur-Servo in der Coxa,
+  Frame mit rx), als Tropfen mit 45°-Spitze nach oben (Druckrichtung = +Z des Glieds). Druckt ohne Stützen;
+  Schraubenkopf liegt weiter plan auf. Senkrechte Bohrungen (Tibia-Servo im Femur) bleiben rund.
 V9.2 (Servo-Tasche weiter)
 - Hüllmaße aus dem STEP genau übernommen: servo_W 24.7 -> 24.78, servo_L 45.2 -> 45.25. Mit fit 0.2 blieben
   seitlich nur 0.16 mm Spiel; der Servo ging im Druck (PETG) nur mit Druck hinein und schwer heraus (Marco, 05.11.2026).
@@ -506,11 +510,31 @@ def cradle(g, n, fr):
     ln = []
     for i, sy in enumerate((1, -1)):
         hy = f"({sy})*hole_y"
-        ln.append(cyl(g, f"{n}_scr_b{i}", fr, "-hole_bx", hy, "-servo_H - lip_t - 1", "scr_d/2",
-                      "lip_t + servo_H - bot_z + 2"))
-        ln.append(cyl(g, f"{n}_cb_b{i}", fr, "-hole_bx", hy, "-servo_H - lip_t - 1", "cb_d/2",
-                      "lip_t + servo_H - bot_z - cb_rest + 1"))
+        ln += drop(g, f"{n}_scr_b{i}", fr, "-hole_bx", hy, "-servo_H - lip_t - 1", "scr_d/2",
+                   "lip_t + servo_H - bot_z + 2")                                   # V9.3: Tropfen
+        ln += drop(g, f"{n}_cb_b{i}", fr, "-hole_bx", hy, "-servo_H - lip_t - 1", "cb_d/2",
+                   "lip_t + servo_H - bot_z - cb_rest + 1")
     return pos, neg, lp, ln
+
+
+def drop(g, n, fr, x, y, z0, r, h):
+    """V9.3: Bohrung entlang der lokalen Z-Achse; liegt sie beim Druck waagerecht (fr.rx), Tropfen mit Spitze
+    nach +Z des Containers (Druckrichtung). Quadrat mit Seite r, Ecke im Bohrungsmittelpunkt, um die Bohrungsachse
+    gedreht -> Diagonale zeigt nach oben, Kanten tangential zum Kreis."""
+    out = [cyl(g, n, fr, x, y, z0, r, h)]
+    if not fr.rx:
+        return out
+    o = doc.addObject("Part::Box", n + "_tip"); g.addObject(o)
+    _x(o, "Length", r); _x(o, "Width", r); _x(o, "Height", h)
+    bx, by, bz = fr.base(x, y, z0)
+    if MIR > 0:     # Rx(-90): lokal -Y -> +Z; Diagonale (45°) auf -90° drehen
+        o.Placement = App.Placement(V(), fr.rot.multiply(ROT(V(0, 0, 1), -135)))
+    else:           # gespiegelt Rx(+90): lokal +Y -> +Z; Basis wie in _place gespiegelt
+        o.Placement = App.Placement(V(), fr.rot_m.multiply(ROT(V(0, 0, 1), 45)))
+        by = f"-({by})"
+    _x(o, "Placement.Base.x", bx); _x(o, "Placement.Base.y", by); _x(o, "Placement.Base.z", bz)
+    out.append(o)
+    return out
 
 
 def with_lips(g, n, core, lp, ln):
