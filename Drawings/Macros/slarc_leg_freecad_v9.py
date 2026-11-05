@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – parametrisches Bein (Coxa/Femur/Tibia) mit 3x ST3215, doppelt gelagert.   V9.1
+SLARC – parametrisches Bein (Coxa/Femur/Tibia) mit 3x ST3215, doppelt gelagert.   V9.2
 FreeCAD 0.21 / 1.0 – Makro ausführen oder in der Python-Konsole:
     exec(open(r"PFAD/slarc_leg_freecad_v8.py", encoding="utf-8").read())
 
+V9.2 (Servo-Tasche weiter)
+- Hüllmaße aus dem STEP genau übernommen: servo_W 24.7 -> 24.78, servo_L 45.2 -> 45.25. Mit fit 0.2 blieben
+  seitlich nur 0.16 mm Spiel; der Servo ging im Druck (PETG) nur mit Druck hinein und schwer heraus (Marco, 05.11.2026).
+- Eigenes Passungsspiel fit_srv = 0.3 für die Servo-Tasche (je Seite). fit (0.2) bleibt für die Schaltertasche.
 V9.1 (mehr Gelenkwinkel an Knie und Femur)
 - Fase fork_ch an den beiden Innenkanten des Gabelstegs (Femur- und Tibia-Gelenk), nur zwischen den Wangen.
   Bisher lief die Stegecke bei ±109° gegen die Seitenwand der Servo-Einhausung im Vorgängerglied;
@@ -100,8 +104,8 @@ ROT = App.Rotation
 # ---------------------------------------------------------------- Parameter
 PARAMS = [
     # name,        wert,   kommentar
-    ("servo_L",    45.2,  "ST3215 Hüllmaß Länge (STEP)"),
-    ("servo_W",    24.7,  "ST3215 Hüllmaß Breite (STEP)"),
+    ("servo_L",    45.25, "ST3215 Hüllmaß Länge (STEP: -35.11 … 10.14)"),
+    ("servo_W",    24.78, "ST3215 Hüllmaß Breite (STEP: ±12.39)"),
     ("servo_H",    35.0,  "ST3215 Hüllmaß Höhe ohne Horn/Scheibe (STEP)"),
     ("servo_ax",   10.1,  "Achse -> nahe Stirnseite (STEP)"),
     ("horn_d",     18.8,  "Horn- und Rückscheiben-Ø (STEP)"),
@@ -120,7 +124,8 @@ PARAMS = [
     ("bridge_t",    4.0,  "Dicke Gabelsteg"),
     ("fork_w",     26.0,  "Breite Gabelwangen"),
     ("clr",         4.0,  "Freigang Gabelsteg zur Servo-Ecke (Platz für vorderen Rahmensteg)"),
-    ("fit",         0.2,  "Passungsspiel Servo-Aufnahme"),
+    ("fit",         0.2,  "Passungsspiel Schaltertasche"),
+    ("fit_srv",     0.3,  "Passungsspiel Servo-Tasche je Seite (V9.2)"),
     ("wall",        2.5,  "Wandstärke Servo-Aufnahme"),
     ("lip_t",       3.0,  "Laschen unten: Dicke unter dem Hüllmaß"),
     ("wall_f",      2.0,  "Rahmen: vorderer Steg vor der Achse"),
@@ -489,11 +494,11 @@ def cradle(g, n, fr):
     YW = "servo_W/2 + wall"
     rear = box(g, n + "_cradle", fr, "-back", f"-({YW})", "-servo_H", "back", f"2*({YW})", "servo_H")
     front = common(g, n + "_ring",
-                   box(g, n + "_ring_box", fr, 0, f"-({YW})", "-servo_H", "servo_ax + fit + wall_f", f"2*({YW})", "servo_H"),
+                   box(g, n + "_ring_box", fr, 0, f"-({YW})", "-servo_H", "servo_ax + fit_srv + wall_f", f"2*({YW})", "servo_H"),
                    cyl(g, n + "_ring_cyl", fr, 0, 0, "-servo_H - 1", "r_clr - ring_c", "servo_H + 2"))
     pos = [rear, front]
-    neg = [box(g, n + "_pocket", fr, "-(servo_L - servo_ax) - fit", "-servo_W/2 - fit",
-               "-servo_H - 1", "servo_L + 2*fit", "servo_W + 2*fit", "servo_H + 2")]
+    neg = [box(g, n + "_pocket", fr, "-(servo_L - servo_ax) - fit_srv", "-servo_W/2 - fit_srv",
+               "-servo_H - 1", "servo_L + 2*fit_srv", "servo_W + 2*fit_srv", "servo_H + 2")]
     lp = []
     for s, y0 in (("L", "tab_y"), ("R", f"-({YW})")):
         lp.append(box(g, f"{n}_tab_bot{s}", fr, "-back", y0, "-servo_H - lip_t", "back - tab_x",
