@@ -49,7 +49,7 @@ Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. N
 | Tibia | ±117° (V9.1) | ±112° |
 
 ---
-- **Servo-Tasche (V9.2, 05.11.2026):** Erster Druck (Coxa, PETG): Der Femur-Servo ging nur mit Druck in die Tasche und schwer heraus. Ursache: Die Hüllmaße im Makro waren gerundet (24,7 statt 24,78 mm). Mit fit 0,2 blieben so je Seite nur 0,16 mm Spiel. Jetzt Maße aus dem STEP (24,78 × 45,25) und eigenes Spiel `fit_srv` = 0,3 mm je Seite. Die Schaltertasche behält `fit` = 0,2. Die Gabelpassung zum Horn ist gut (leichtes Spiel).
+- **Servo-Tasche (V9.2, 05.11.2026):** Erster Druck (Coxa, PETG): Der Femur-Servo ging nur mit Druck in die Tasche und schwer heraus. Ursache: Die Hüllmaße im Makro waren gerundet (24,7 statt 24,78 mm). Mit fit 0,2 blieben so je Seite nur 0,16 mm Spiel. Jetzt Maße aus dem STEP (24,78 × 45,25) und eigenes Spiel `fit_srv` = 0,3 mm je Seite. Die Schaltertasche behält `fit` = 0,2. Die Gabelpassung zum Horn ist gut (leichtes Spiel). Messung alte Tasche: 24,86 mm statt 25,10 mm im Modell (oben und unten gleich). Der Drucker macht große Taschen in PETG also je Seite etwa 0,12 mm enger; die Lochkorrektur von Cura greift bei großen Öffnungen nicht. Die neue Tasche wird damit etwa 25,14 mm breit, also etwa 0,18 mm Spiel je Seite zum Servo (24,78 laut STEP).
 - **Gabelmontage:** Die obere Wange (ohne Bund) kommt auf das Servohorn. Die untere Wange mit dem 1-mm-Distanzbund kommt auf die Rückseitenscheibe (passive Lagerung), Bund zum Servo.
 
 ## 3. Baseplates (V2.7)
