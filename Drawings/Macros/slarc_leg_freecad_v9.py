@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – parametrisches Bein (Coxa/Femur/Tibia) mit 3x ST3215, doppelt gelagert.   V9.3
+SLARC – parametrisches Bein (Coxa/Femur/Tibia) mit 3x ST3215, doppelt gelagert.   V9.4
 FreeCAD 0.21 / 1.0 – Makro ausführen oder in der Python-Konsole:
     exec(open(r"PFAD/slarc_leg_freecad_v8.py", encoding="utf-8").read())
 
+V9.4 (Spitzdach im Hohlprofil)
+- Hohlräume von Femur und Tibia oben als Spitzdach mit 45° (Schnitt mit einer auf die Kante gestellten
+  Quadratsäule, roof_d). Vorher war die Decke eine 16-mm-Brücke; Cura legte die Brückenlinien längs, und eine
+  schlecht tragende Deckschicht schwächt das Biegemoment des ganzen Glieds (Marco, 06.11.2026).
 V9.3 (Tropfenbohrungen)
 - Schraubenlöcher und Senkungen der Servo-Laschen, die beim Druck waagerecht liegen (Femur-Servo in der Coxa,
   Frame mit rx), als Tropfen mit 45°-Spitze nach oben (Druckrichtung = +Z des Glieds). Druckt ohne Stützen;
@@ -149,6 +153,7 @@ PARAMS = [
     ("link_w",     20.0,  "Glied-Querschnitt in Beinebene"),
     ("link_h",     28.0,  "Glied-Querschnitt entlang Gelenkachse"),
     ("link_wall",   2.0,  "Wandstärke Hohlprofil"),
+    ("roof_d",     40.0,  "V9.4: halbe Diagonale der Dach-Quadratsäule (Spitzdach 45° im Hohlraum)"),
     ("coxa_len",   60.0,  "Coxa: Achse-Achse"),
     ("femur_len", 150.0,  "Femur: Achse-Achse"),
     ("tibia_len", 175.0,  "Tibia: Knieachse -> Fußspitze (Sehne, = Sim-Wert)"),
@@ -478,14 +483,32 @@ def fork_neg(g, n, fr):
     return t
 
 
+def roof(g, n, x0, L, px="0", py="0", ang="0"):
+    """V9.4: Quadratsäule (Seite roof_d*sqrt(2)), um 45° auf die Kante gestellt, entlang des Glieds (lokal x).
+    Ihre obere Spitze liegt an der Hohlraumdecke; Schnitt mit dem Hohlraum ergibt ein 45°-Spitzdach.
+    Symmetrisch zu y = 0, daher im Spiegelbild nur Drehung und Basis gespiegelt."""
+    o = doc.addObject("Part::Box", n); g.addObject(o)
+    _x(o, "Length", L); _x(o, "Width", "roof_d*sqrt(2)"); _x(o, "Height", "roof_d*sqrt(2)")
+    o.Placement = App.Placement(V(), ROT(0, 0, 45))
+    _x(o, "Placement.Rotation.Yaw", ang if MIR > 0 else f"-({ang})")
+    bx, by = rpt(px, py, ang, x0, 0)
+    if MIR < 0:
+        by = f"-({by})"
+    _x(o, "Placement.Base.x", bx); _x(o, "Placement.Base.y", by)
+    _x(o, "Placement.Base.z", "zc + link_h/2 - link_wall - 2*roof_d")
+    return o
+
+
 def beam(g, n, fr, x0, x1, hollow):
     pos = [box(g, n + "_beam", fr, x0, "-link_w/2", "zc - link_h/2",
                f"({x1}) - ({x0})", "link_w", "link_h")]
     neg = []
     if hollow:
-        neg.append(box(g, n + "_beam_in", fr, f"({x0}) + link_wall", "-link_w/2 + link_wall",
-                       "zc - link_h/2 + link_wall", f"({x1}) - ({x0}) - 2*link_wall",
-                       "link_w - 2*link_wall", "link_h - 2*link_wall"))
+        inner = box(g, n + "_beam_in", fr, f"({x0}) + link_wall", "-link_w/2 + link_wall",
+                    "zc - link_h/2 + link_wall", f"({x1}) - ({x0}) - 2*link_wall",
+                    "link_w - 2*link_wall", "link_h - 2*link_wall")
+        neg.append(common(g, n + "_beam_cav", inner,                         # V9.4: Spitzdach
+                          roof(g, n + "_roof", f"({x0})", f"({x1}) - ({x0})")))
     return pos, neg
 
 
@@ -621,9 +644,12 @@ seg1_in = box(j3, "Tibia_seg1_in", I, f"({X1}) + link_wall", "-link_w/2 + link_w
               "link_w - 2*link_wall", "link_h - 2*link_wall")
 knuckle = cyl(j3, "Tibia_knuckle", I, "tib_a", 0, "zc - link_h/2", "link_w/2", "link_h")
 seg2 = s2box("Tibia_seg2", 0, "-link_w/2", "zc - link_h/2", XE, "link_w", "link_h")
-neg += [seg1_in,
-        s2box("Tibia_seg2_in", 0, "-link_w/2 + link_wall", "zc - link_h/2 + link_wall", XV,
-              "link_w - 2*link_wall", "link_h - 2*link_wall"),
+neg += [common(j3, "Tibia_seg1_cav", seg1_in,                                  # V9.4: Spitzdach
+               roof(j3, "Tibia_seg1_roof", X1, f"tib_a - ({X1}) + 1")),
+        common(j3, "Tibia_seg2_cav",
+               s2box("Tibia_seg2_in", 0, "-link_w/2 + link_wall", "zc - link_h/2 + link_wall", XV,
+                     "link_w - 2*link_wall", "link_h - 2*link_wall"),
+               roof(j3, "Tibia_seg2_roof", -1, f"({XV}) + 2", "tib_a", 0, BEND)),
         s2box("Tibia_wire", f"({XV}) - 1", "-wire_w/2", "zc - wire_h/2", f"({XSW}) - ({XV}) + 2",
               "wire_w", "wire_h"),
         s2box("Tibia_swpocket", XSW, "-sw_T/2 - fit", "zc - sw_L/2 - fit", f"({XE}) - ({XSW}) + 1",
