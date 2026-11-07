@@ -1,6 +1,7 @@
 # brain/run_open_suite.py
 # Version 0.2 (07.11.2026) – Testsuite für die semantischen Aufgaben (semantic.py).
 # V0.2: run(..., rows_out=False) für compare_models.py.
+# V0.4: Holdout-Sätze von Marco als eigene Gruppe "eigen"; Lücken getrennt ausgewiesen.
 # V0.3: Chat mit Tagebuch-Kontext (ERLEBT); Objekte mit Regeln, Zählung Regel/LLM;
 #       --no-rules prüft das LLM allein an allen Objekt-Fällen.
 #
@@ -20,7 +21,7 @@ import time
 
 from . import semantic as S
 from .llm import LlamaBrain, MockBrain
-from .open_scenarios import CHAT_CASES, DIARY_SAMPLE, OBJECT_CASES, SEARCH_CASES
+from .open_scenarios import CHAT_CASES, DIARY_SAMPLE, HOLDOUT_CHAT, OBJECT_CASES, SEARCH_CASES
 
 
 def mock_responder(msgs, gbnf):
@@ -56,6 +57,16 @@ def run(b, repeat: int, rows_out: bool = True, use_rules: bool = True) -> dict:
             ok = r.service in c.services and _item_ok(r.item, c.item_any)
             row("chat", c.text, ok, r.service is not None, r.latency_s,
                 f"{r.service}({r.item}) „{r.reply}“")
+        for c in HOLDOUT_CHAT:
+            r = S.interpret_chat(b, c.text, diary=DIARY_SAMPLE)
+            out = f"{r.service}({r.item}) „{r.reply}“"
+            if c.gap:
+                rows.append({"aufgabe": "luecke", "fall": c.text, "ok": None, "gueltig": r.service is not None,
+                             "latenz_s": round(r.latency_s, 2), "ausgabe": out, "grund": c.gap, "quelle": "llm"})
+                say(f"{'LÜCKE':8} {'eigen':7} {c.text[:44]:44} -> {out}", flush=True)
+                continue
+            ok = r.service in c.services and _item_ok(r.item, c.item_any)
+            row("eigen", c.text, ok, r.service is not None, r.latency_s, out)
         for c in OBJECT_CASES:
             r = S.assess_object(b, c.cls, c.place, c.context, use_rules=use_rules)
             ok = r.report == c.report and r.interest in c.interest
@@ -71,7 +82,7 @@ def run(b, repeat: int, rows_out: bool = True, use_rules: bool = True) -> dict:
     say("\nTagebuch-Beispiel:\n" + (text or f"(Fehler: {err})") + f"\n({lat:.1f} s)")
 
     summary = {"modell": b.name}
-    for task in ("chat", "objekt", "suchen"):
+    for task in ("chat", "eigen", "objekt", "suchen"):
         rs = [r for r in rows if r["aufgabe"] == task]
         lats = [r["latenz_s"] for r in rs if r["gueltig"] and r["quelle"] == "llm"]
         summary[task] = {
@@ -114,7 +125,7 @@ def main() -> None:
         r = run(b, a.repeat, use_rules=not a.no_rules)
         results.append(r)
         s = r["summary"]
-        for task in ("chat", "objekt", "suchen"):
+        for task in ("chat", "eigen", "objekt", "suchen"):
             t = s[task]
             print(f"--> {task:7}: {t['treffer']}/{t['laeufe']} richtig, {t['ungueltig']} ungültig, "
                   f"Latenz Median {t['latenz_median_s']} s"

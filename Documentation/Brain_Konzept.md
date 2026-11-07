@@ -355,3 +355,9 @@ Qwen3.5 und Gemma meldeten den eingeschalteten Herd 3/3 nicht. Qwen3.5 antwortet
 
 Auf dem Pi entscheidet der Cache: Ohne ihn wird bei jedem Wechsel der Aufgabe der feste Teil neu gerechnet (bis ~1100 Tokens), mit ihm nur 34–164 Tokens. Alle festen Teile zusammen sind ~2400 Tokens; bei Qwen3-4B (36 Schichten, 8 KV-Köpfe à 128, f16) sind das grob 150 kB je Token, also ~360 MB im RAM-Cache (Rechnung, nicht gemessen).
 
+**Holdout (07.11.2026):** Marco hat zehn eigene Chat-Sätze geschrieben (`HOLDOUT_CHAT` in `open_scenarios.py`). Sie dienen nur zur Prüfung; Prompts und Beispiele werden nicht danach abgestimmt. Zwei Sätze zeigen fehlende Fähigkeiten, die getrennt ausgewiesen statt gewertet werden:
+- „Überwache das Wohnzimmer!“: kein Dienst „überwachen“.
+- „Gehe ins Badezimmer!“: kein Dienst „zu einem Ort gehen“.
+
+Außerdem setzen mehrere Sätze voraus, dass SLARC Personen unterscheidet (Sophia, Laura) und weiß, welches Zimmer wem gehört. Die Perzeption kennt bisher nur „Person“; das Gedächtnis kennt keine Zimmer-Zuordnung (offen).
+
