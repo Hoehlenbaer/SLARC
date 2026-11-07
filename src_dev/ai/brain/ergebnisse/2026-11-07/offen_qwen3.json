@@ -1,0 +1,919 @@
+[
+ {
+  "summary": {
+   "modell": "Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+   "chat": {
+    "laeufe": 45,
+    "treffer": 36,
+    "ungueltig": 0,
+    "latenz_median_s": 0.58
+   },
+   "objekt": {
+    "laeufe": 30,
+    "treffer": 26,
+    "ungueltig": 0,
+    "latenz_median_s": 0.81
+   },
+   "suchen": {
+    "laeufe": 24,
+    "treffer": 24,
+    "ungueltig": 0,
+    "latenz_median_s": 0.91
+   },
+   "tagebuch": "Heute habe ich eine ungenannte Tasche im Wohnzimmer untersucht – alles in Ordnung! Dann habe ich Marco begrüßt, und das Antippen hat ihm gut gefallen. Leider konnte ich seinen Schlüssel nicht finden. Der Akku ist jetzt knapp, also gehe ich zurück zum Ausgangspunkt. Vielleicht morgen finden wir ihn – oder er kommt mit einem neuen Tipp!"
+  },
+  "rows": [
+   {
+    "aufgabe": "chat",
+    "fall": "Ich hab Durst.",
+    "ok": false,
+    "gueltig": true,
+    "latenz_s": 1.03,
+    "ausgabe": "check(tasse) „Ich schaue nach, ob eine Tasse bereit ist.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Bring mir bitte eine Cola.",
+    "ok": false,
+    "gueltig": true,
+    "latenz_s": 0.54,
+    "ausgabe": "fetch(flasche) „Ich hol dir eine Cola.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Wo ist mein Handy?",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.49,
+    "ausgabe": "search(handy) „Ich suche es gerade für dich.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Hast du meine Lesebrille gesehen?",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.63,
+    "ausgabe": "search(brille) „Ich schaue nach und melde mich, wenn ich sie finde.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Such mal die Katze.",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.49,
+    "ausgabe": "search(katze) „Ich suche die Katze für dich.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Der Ball ist unters Sofa gerollt.",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.6,
+    "ausgabe": "push_out(ball) „Ich schiebe den Ball unter das Sofa hervor.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Komm mal her!",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.48,
+    "ausgabe": "come() „Ich komme sofort her!“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Komm mit, ich zeig dir was.",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.42,
+    "ausgabe": "follow() „Ich folge dir gerne!“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Schau mal nach, ob das Fenster im Bad offen ist.",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.63,
+    "ausgabe": "check(fenster) „Ich schaue nach, ob das Badfenster offen ist.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Lass mich bitte in Ruhe.",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.4,
+    "ausgabe": "stop() „Okay, ich bin still.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Gut gemacht!",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.57,
+    "ausgabe": "praise() „Danke! Freut mich, dir helfen zu können.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Nein, nicht in die Küche!",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.59,
+    "ausgabe": "stop(kitchen) „Okay, ich bleibe hier und mache nichts in der Küche.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Wie geht's dir?",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.52,
+    "ausgabe": "smalltalk() „Gut, danke! Und dir?“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Ich geh jetzt schlafen, gute Nacht.",
+    "ok": false,
+    "gueltig": true,
+    "latenz_s": 0.57,
+    "ausgabe": "come() „Gute Nacht, ich komme, wenn du mich brauchst!“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Hast du heute was Spannendes erlebt?",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.68,
+    "ausgabe": "smalltalk() „Ja, ich habe eine Katze im Wohnzimmer gesehen – sie hat mich angeschaut!“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "schlüssel / flur, auf dem Boden",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.68,
+    "ausgabe": "melden=ja, interesse=hoch",
+    "grund": "Ein Schlüssel auf dem Boden könnte verloren sein oder jemandem fehlen."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "fenster_offen / bad",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.7,
+    "ausgabe": "melden=ja, interesse=hoch",
+    "grund": "Ein Fenster im Bad ist offen bei Regen – könnte Feuchtigkeit oder Schimmel verursachen."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "herd_an / küche",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.82,
+    "ausgabe": "melden=ja, interesse=hoch",
+    "grund": "Die Herdplatte ist eingeschaltet, obwohl niemand in der Küche ist – das könnte gefährlich sein."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "wasserpfütze / bad, auf dem Boden vor der Waschmaschine",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.88,
+    "ausgabe": "melden=ja, interesse=hoch",
+    "grund": "Eine Wassertropfenpfütze im Bad könnte auf einen Leck oder eine fehlerhafte Waschmaschine hindeuten."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "glasscherben / küche, auf dem Boden",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.64,
+    "ausgabe": "melden=ja, interesse=hoch",
+    "grund": "Glasscherben auf dem Boden sind gefährlich und könnten jemandem schaden."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "stuhl / küche, am Tisch",
+    "ok": false,
+    "gueltig": true,
+    "latenz_s": 0.63,
+    "ausgabe": "melden=ja, interesse=mittel",
+    "grund": "Ein Stuhl in der Küche am Tisch ist nicht sein gewöhnlicher Ort."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "socke / schlafzimmer, unter dem Bett",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 1.01,
+    "ausgabe": "melden=nein, interesse=niedrig",
+    "grund": "Eine Socke unter dem Bett ist ein kleiner, alltäglicher Fund, der nichts Ungewöhnliches oder Gefährliches signalisiert."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "katze / wohnzimmer, auf dem Sofa",
+    "ok": false,
+    "gueltig": true,
+    "latenz_s": 0.79,
+    "ausgabe": "melden=nein, interesse=niedrig",
+    "grund": "Eine Katze auf dem Sofa ist normal und vertraut, da Katzen oft dort hingehen."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "karton / flur, vor der Haustür",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 1.01,
+    "ausgabe": "melden=ja, interesse=mittel",
+    "grund": "Ein Karton vor der Haustür könnte ein verlorenes Paket oder eine Einladung sein, aber ohne Kontext ist es unklar."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "fernseher_an / wohnzimmer",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 1.03,
+    "ausgabe": "melden=ja, interesse=hoch",
+    "grund": "Der Fernseher ist eingeschaltet, aber niemand ist da, um ihn zu benutzen – das könnte ein Sicherheitsrisiko oder ein Fehler sein."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "dose",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.94,
+    "ausgabe": "küche, abstellraum",
+    "grund": "Dosen werden häufig in der Küche oder im Abstellraum aufbewahrt, da dort Lebensmittel und Verpackungen gelagert werden."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "zahnbürste",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.89,
+    "ausgabe": "bad, küche, schlafzimmer",
+    "grund": "Zahnbürsten werden meist im Bad aufbewahrt, manchmal in der Küche oder im Schlafzimmer."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "fernbedienung",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 1.02,
+    "ausgabe": "wohnzimmer, schlafzimmer",
+    "grund": "Fernbedienungen werden meist im Wohnzimmer oder im Schlafzimmer liegen gelassen, da diese Räume häufig Fernseher haben."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "schuh",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.91,
+    "ausgabe": "flur, schlafzimmer",
+    "grund": "Schuhe liegen häufig im Flur oder im Schlafzimmer, da diese Räume häufig als Eingangsbereich oder Schlafbereich dienen."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "kopfkissen",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.72,
+    "ausgabe": "schlafzimmer",
+    "grund": "Kopfkissen gehören typischerweise zum Schlafzimmer, wo sie als Schlafzimmereinrichtung verwendet werden."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "lesebrille",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.95,
+    "ausgabe": "wohnzimmer, schlafzimmer",
+    "grund": "Lesebriten werden meist im Wohnzimmer oder Schlafzimmer aufbewahrt, da diese Räume häufig für Lesen genutzt werden."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "staubsauger",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 1.0,
+    "ausgabe": "flur, wohnzimmer",
+    "grund": "Staubsauger werden meist im Flur oder Wohnzimmer gestellt, da diese Bereiche häufiger durchlaufen werden und als Startpunkt für Reinigung dienen."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "pfanne",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.79,
+    "ausgabe": "küche, abstellraum",
+    "grund": "Pfanne ist ein Kochutensil, das in der Küche aufbewahrt oder verwendet wird."
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Ich hab Durst.",
+    "ok": false,
+    "gueltig": true,
+    "latenz_s": 0.74,
+    "ausgabe": "fetch(tasse) „Ich hol dir eine Tasse, damit du trinken kannst.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Bring mir bitte eine Cola.",
+    "ok": false,
+    "gueltig": true,
+    "latenz_s": 0.65,
+    "ausgabe": "fetch(flasche) „Ich hol dir eine Cola – nur ein Moment!“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Wo ist mein Handy?",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.53,
+    "ausgabe": "search(handy) „Ich suche es gerade für dich.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Hast du meine Lesebrille gesehen?",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.76,
+    "ausgabe": "search(brille) „Ich schaue nach und melde mich, wenn ich sie finde.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Such mal die Katze.",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.55,
+    "ausgabe": "search(katze) „Ich suche die Katze für dich.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Der Ball ist unters Sofa gerollt.",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.68,
+    "ausgabe": "push_out(ball) „Ich schiebe den Ball unter das Sofa hervor.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Komm mal her!",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.47,
+    "ausgabe": "come() „Ich komme sofort her!“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Komm mit, ich zeig dir was.",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.41,
+    "ausgabe": "follow() „Ich folge dir gerne!“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Schau mal nach, ob das Fenster im Bad offen ist.",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.65,
+    "ausgabe": "check(fenster) „Ich schaue nach, ob das Badfenster offen ist.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Lass mich bitte in Ruhe.",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.53,
+    "ausgabe": "stop() „Okay, ich bin still und mache nichts mehr.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Gut gemacht!",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.55,
+    "ausgabe": "praise() „Danke! Freut mich, dir helfen zu können.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Nein, nicht in die Küche!",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.58,
+    "ausgabe": "stop(kitchen) „Okay, ich bleibe hier und mache nichts mehr.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Wie geht's dir?",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.47,
+    "ausgabe": "smalltalk() „Gut, danke! Und dir?“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Ich geh jetzt schlafen, gute Nacht.",
+    "ok": false,
+    "gueltig": true,
+    "latenz_s": 0.62,
+    "ausgabe": "come() „Gute Nacht, ich komme, wenn du mich brauchst!“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Hast du heute was Spannendes erlebt?",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.69,
+    "ausgabe": "smalltalk() „Ja, ich habe eine Katze im Wohnzimmer gesehen – sie hat mich angeschaut!“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "schlüssel / flur, auf dem Boden",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.69,
+    "ausgabe": "melden=ja, interesse=hoch",
+    "grund": "Ein Schlüssel auf dem Boden könnte verloren sein oder jemandem fehlen."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "fenster_offen / bad",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.8,
+    "ausgabe": "melden=ja, interesse=hoch",
+    "grund": "Ein Fenster im Bad ist offen bei Regen – könnte Wasser eindringen und Schaden verursachen."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "herd_an / küche",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.72,
+    "ausgabe": "melden=ja, interesse=hoch",
+    "grund": "Die Herdplatte ist eingeschaltet, ohne dass jemand da ist – das könnte gefährlich sein."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "wasserpfütze / bad, auf dem Boden vor der Waschmaschine",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.99,
+    "ausgabe": "melden=ja, interesse=hoch",
+    "grund": "Eine Wassertropfenpfütze im Bad könnte auf ein Leck oder ein ungewöhnliches Verhalten der Waschmaschine hindeuten."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "glasscherben / küche, auf dem Boden",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.66,
+    "ausgabe": "melden=ja, interesse=hoch",
+    "grund": "Glasscherben auf dem Boden sind gefährlich und könnten jemandem schaden."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "stuhl / küche, am Tisch",
+    "ok": false,
+    "gueltig": true,
+    "latenz_s": 0.63,
+    "ausgabe": "melden=ja, interesse=mittel",
+    "grund": "Ein Stuhl in der Küche am Tisch ist nicht sein gewöhnlicher Ort."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "socke / schlafzimmer, unter dem Bett",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.98,
+    "ausgabe": "melden=nein, interesse=niedrig",
+    "grund": "Eine Socke unter dem Bett ist ein typisches, alltägliches Phänomen und zeigt keine Abweichung von der Norm."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "katze / wohnzimmer, auf dem Sofa",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.67,
+    "ausgabe": "melden=nein, interesse=mittel",
+    "grund": "Eine Katze auf dem Sofa ist normal und vertraut, da Katzen oft dort liegen."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "karton / flur, vor der Haustür",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.91,
+    "ausgabe": "melden=ja, interesse=mittel",
+    "grund": "Ein Karton vor der Haustür könnte ein verlorenes Paket oder eine Einladung sein, aber ohne Kontext ist es unklar."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "fernseher_an / wohnzimmer",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.96,
+    "ausgabe": "melden=ja, interesse=hoch",
+    "grund": "Der Fernseher ist eingeschaltet, aber niemand ist da, um ihn zu benutzen – das könnte ein Sicherheitsrisiko oder ein Fehler sein."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "dose",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.83,
+    "ausgabe": "küche, abstellraum",
+    "grund": "Dosen werden häufig in der Küche aufbewahrt, da dort Lebensmittel und Verpackungen gelagert werden."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "zahnbürste",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.99,
+    "ausgabe": "bad, küche, schlafzimmer",
+    "grund": "Zahnbürsten werden meist im Bad aufbewahrt, manchmal in der Küche oder im Schlafzimmer."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "fernbedienung",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.91,
+    "ausgabe": "wohnzimmer, schlafzimmer",
+    "grund": "Fernbedienungen werden meist im Wohnzimmer oder im Schlafzimmer gelagert, da diese Räume häufig Fernseher haben."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "schuh",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.96,
+    "ausgabe": "flur, schlafzimmer",
+    "grund": "Schuhe liegen meist im Flur oder im Schlafzimmer, da diese Räume häufig als Eingangsbereich oder Schlafbereich dienen."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "kopfkissen",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.75,
+    "ausgabe": "schlafzimmer",
+    "grund": "Kopfkissen gehören typischerweise zum Schlafzimmer, wo sie direkt im Bett verwendet werden."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "lesebrille",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.97,
+    "ausgabe": "wohnzimmer, schlafzimmer",
+    "grund": "Lesebriten werden meist im Wohnzimmer oder Schlafzimmer aufbewahrt, da diese Räume häufig für Lesen genutzt werden."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "staubsauger",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 1.01,
+    "ausgabe": "flur, wohnzimmer",
+    "grund": "Staubsauger werden meist im Flur oder Wohnzimmer gestellt, da diese Bereiche häufiger durchlaufen werden und dort oft Geräte abgestellt sind."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "pfanne",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.65,
+    "ausgabe": "küche, abstellraum",
+    "grund": "Pfannen werden hauptsächlich in der Küche verwendet und aufbewahrt."
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Ich hab Durst.",
+    "ok": false,
+    "gueltig": true,
+    "latenz_s": 0.69,
+    "ausgabe": "fetch(tasse) „Ich hol dir eine Tasse, damit du trinken kannst.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Bring mir bitte eine Cola.",
+    "ok": false,
+    "gueltig": true,
+    "latenz_s": 0.61,
+    "ausgabe": "fetch(flasche) „Ich hol dir eine Cola, keine Zeit verlieren!“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Wo ist mein Handy?",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.48,
+    "ausgabe": "search(handy) „Ich suche es gerade für dich.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Hast du meine Lesebrille gesehen?",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.75,
+    "ausgabe": "search(brille) „Ich schaue nach und melde mich, sobald ich sie gefunden habe.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Such mal die Katze.",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.53,
+    "ausgabe": "search(katze) „Ich suche die Katze für dich.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Der Ball ist unters Sofa gerollt.",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.61,
+    "ausgabe": "push_out(ball) „Ich schiebe den Ball unter das Sofa hervor.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Komm mal her!",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.43,
+    "ausgabe": "come() „Ich komme sofort her!“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Komm mit, ich zeig dir was.",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.51,
+    "ausgabe": "follow() „Ich folge dir gerne!“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Schau mal nach, ob das Fenster im Bad offen ist.",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.83,
+    "ausgabe": "check(fenster) „Ich schaue nach, ob das Badfenster offen ist.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Lass mich bitte in Ruhe.",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.44,
+    "ausgabe": "stop() „Okay, ich bin still.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Gut gemacht!",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.54,
+    "ausgabe": "praise() „Danke! Das macht mich glücklich.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Nein, nicht in die Küche!",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.68,
+    "ausgabe": "stop(küche) „Okay, ich bleibe hier und mache nichts mehr.“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Wie geht's dir?",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.58,
+    "ausgabe": "smalltalk() „Gut, danke! Und dir?“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Ich geh jetzt schlafen, gute Nacht.",
+    "ok": false,
+    "gueltig": true,
+    "latenz_s": 0.67,
+    "ausgabe": "come() „Gute Nacht, ich komme, wenn du mich brauchst!“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "chat",
+    "fall": "Hast du heute was Spannendes erlebt?",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.76,
+    "ausgabe": "smalltalk() „Ja, ich habe eine Katze im Wohnzimmer gesehen – sie hat mich angeschaut!“",
+    "grund": ""
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "schlüssel / flur, auf dem Boden",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.76,
+    "ausgabe": "melden=ja, interesse=hoch",
+    "grund": "Ein Schlüssel auf dem Boden könnte verloren sein oder jemandem fehlen."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "fenster_offen / bad",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.79,
+    "ausgabe": "melden=ja, interesse=hoch",
+    "grund": "Ein Fenster im Bad ist offen bei Regen – könnte Feuchtigkeit oder Schimmel verursachen."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "herd_an / küche",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.81,
+    "ausgabe": "melden=ja, interesse=hoch",
+    "grund": "Der Herd ist eingeschaltet, aber niemand ist da – das könnte gefährlich sein."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "wasserpfütze / bad, auf dem Boden vor der Waschmaschine",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 1.1,
+    "ausgabe": "melden=ja, interesse=hoch",
+    "grund": "Eine Wassertropfenpfütze im Bad könnte auf einen Leck oder eine fehlerhafte Waschmaschine hindeuten."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "glasscherben / küche, auf dem Boden",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.76,
+    "ausgabe": "melden=ja, interesse=hoch",
+    "grund": "Glasscherben auf dem Boden sind gefährlich und könnten jemandem schaden."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "stuhl / küche, am Tisch",
+    "ok": false,
+    "gueltig": true,
+    "latenz_s": 0.6,
+    "ausgabe": "melden=ja, interesse=hoch",
+    "grund": "Ein Stuhl in der Küche am Tisch ist nicht sein üblicher Platz."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "socke / schlafzimmer, unter dem Bett",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.93,
+    "ausgabe": "melden=nein, interesse=niedrig",
+    "grund": "Eine Socke unter dem Bett ist ein typisches, alltägliches Phänomen und zeigt keine Abweichung von der Norm."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "katze / wohnzimmer, auf dem Sofa",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.84,
+    "ausgabe": "melden=nein, interesse=mittel",
+    "grund": "Eine Katze auf dem Sofa ist normal und vertraut, da Katzen oft dort hinein klettern."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "karton / flur, vor der Haustür",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.92,
+    "ausgabe": "melden=ja, interesse=mittel",
+    "grund": "Ein Karton vor der Haustür könnte ein verlorenes Paket oder eine Abfallstoffe sein, aber ohne weitere Hinweise ist es unklar."
+   },
+   {
+    "aufgabe": "objekt",
+    "fall": "fernseher_an / wohnzimmer",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.99,
+    "ausgabe": "melden=ja, interesse=hoch",
+    "grund": "Der Fernseher ist eingeschaltet, aber niemand ist da, um ihn zu benutzen – das könnte ein Sicherheitsrisiko oder ein Fehler sein."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "dose",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.76,
+    "ausgabe": "küche, abstellraum",
+    "grund": "Dosen werden häufig in der Küche aufbewahrt, da dort Lebensmittel und Verpackungen gelagert werden."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "zahnbürste",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.82,
+    "ausgabe": "bad, küche, schlafzimmer",
+    "grund": "Zahnbürsten werden meist im Bad aufbewahrt, manchmal in der Küche oder im Schlafzimmer."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "fernbedienung",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.91,
+    "ausgabe": "wohnzimmer, schlafzimmer",
+    "grund": "Fernbedienungen werden meist im Wohnzimmer oder im Schlafzimmer gelagert, da diese Räume häufig Fernseher haben."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "schuh",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.92,
+    "ausgabe": "flur, schlafzimmer",
+    "grund": "Schuhe liegen häufig im Flur oder im Schlafzimmer, da diese Räume häufig als Eingangsbereich oder Wohnbereich dienen."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "kopfkissen",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.75,
+    "ausgabe": "schlafzimmer",
+    "grund": "Kopfkissen gehören typischerweise zum Schlafzimmer, wo sie zur Bettenzubehör gehören."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "lesebrille",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 1.1,
+    "ausgabe": "wohnzimmer, schlafzimmer",
+    "grund": "Lesebriten werden meist im Wohnzimmer oder Schlafzimmer aufbewahrt, da diese Räume oft für Lesen genutzt werden."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "staubsauger",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.93,
+    "ausgabe": "flur, wohnzimmer",
+    "grund": "Staubsauger werden meist im Flur oder Wohnzimmer gestellt, da diese Bereiche häufiger durchlaufen und gereinigt werden."
+   },
+   {
+    "aufgabe": "suchen",
+    "fall": "pfanne",
+    "ok": true,
+    "gueltig": true,
+    "latenz_s": 0.75,
+    "ausgabe": "küche, abstellraum",
+    "grund": "Pfannen werden hauptsächlich in der Küche aufbewahrt oder verwendet."
+   }
+  ]
+ }
+]

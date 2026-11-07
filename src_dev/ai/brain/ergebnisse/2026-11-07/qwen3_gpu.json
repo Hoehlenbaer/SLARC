@@ -1,0 +1,853 @@
+[
+ {
+  "summary": {
+   "modell": "Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+   "shuffle": true,
+   "laeufe": 45,
+   "treffer": 36,
+   "code_treffer": 42,
+   "ungueltig": 0,
+   "setup_fehler": 0,
+   "position_1_anteil": 0.2,
+   "latenz_median_s": 0.74,
+   "latenz_max_s": 1.06,
+   "warmup_s": 0.44
+  },
+  "rows": [
+   {
+    "szenario": "neues_objekt",
+    "lauf": 0,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "inspect_object(o1)",
+    "position": 4,
+    "erwartet": [
+     "inspect_object"
+    ],
+    "begruendung": "Ich habe große Neugier und die Tasche ist nah und unbekannt, ich untersuche sie.",
+    "stimmung": "neugierig",
+    "latenz_s": 0.88,
+    "tokens_in": 1218,
+    "tokens_out": 46,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich habe große Neugier und die Tasche ist nah und unbekannt, ich untersuche sie.\", \"ziel\": 4, \"stimmung\": \"neugierig\"}"
+   },
+   {
+    "szenario": "neues_objekt",
+    "lauf": 1,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "inspect_object(o1)",
+    "position": 3,
+    "erwartet": [
+     "inspect_object"
+    ],
+    "begruendung": "Ich habe große Neugier und die Tasche ist nah, ich untersuche sie.",
+    "stimmung": "neugierig",
+    "latenz_s": 0.7,
+    "tokens_in": 1217,
+    "tokens_out": 42,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich habe große Neugier und die Tasche ist nah, ich untersuche sie.\", \"ziel\": 3, \"stimmung\": \"neugierig\"}"
+   },
+   {
+    "szenario": "neues_objekt",
+    "lauf": 2,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "inspect_object(o1)",
+    "position": 4,
+    "erwartet": [
+     "inspect_object"
+    ],
+    "begruendung": "Ich habe große Neugier und die Tasche ist nah und unbekannt, ich untersuche sie.",
+    "stimmung": "neugierig",
+    "latenz_s": 0.83,
+    "tokens_in": 1218,
+    "tokens_out": 46,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich habe große Neugier und die Tasche ist nah und unbekannt, ich untersuche sie.\", \"ziel\": 4, \"stimmung\": \"neugierig\"}"
+   },
+   {
+    "szenario": "bitte_vor_neugier",
+    "lauf": 0,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "search_item(schlüssel)",
+    "position": 3,
+    "erwartet": [
+     "search_item"
+    ],
+    "begruendung": "Ich habe Neugier und möchte helfen, der Schlüssel ist wichtig für Marco.",
+    "stimmung": "eifrig",
+    "latenz_s": 0.73,
+    "tokens_in": 1236,
+    "tokens_out": 41,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich habe Neugier und möchte helfen, der Schlüssel ist wichtig für Marco.\", \"ziel\": 3, \"stimmung\": \"eifrig\"}"
+   },
+   {
+    "szenario": "bitte_vor_neugier",
+    "lauf": 1,
+    "ok": false,
+    "code_ok": true,
+    "wahl": "inspect_object(o1)",
+    "position": 4,
+    "erwartet": [
+     "search_item"
+    ],
+    "begruendung": "Ich habe Neugier und möchte nützlich sein – der Karton könnte den Schlüssel enthalten.",
+    "stimmung": "neugierig",
+    "latenz_s": 0.81,
+    "tokens_in": 1236,
+    "tokens_out": 48,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich habe Neugier und möchte nützlich sein – der Karton könnte den Schlüssel enthalten.\", \"ziel\": 4, \"stimmung\": \"neugierig\"}"
+   },
+   {
+    "szenario": "bitte_vor_neugier",
+    "lauf": 2,
+    "ok": false,
+    "code_ok": true,
+    "wahl": "inspect_object(o1)",
+    "position": 4,
+    "erwartet": [
+     "search_item"
+    ],
+    "begruendung": "Ich habe Neugier und möchte das unbekannte Karton untersuchen, um nützlich zu sein.",
+    "stimmung": "neugierig",
+    "latenz_s": 0.92,
+    "tokens_in": 1236,
+    "tokens_out": 49,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich habe Neugier und möchte das unbekannte Karton untersuchen, um nützlich zu sein.\", \"ziel\": 4, \"stimmung\": \"neugierig\"}"
+   },
+   {
+    "szenario": "energie_hoch_weit_weg",
+    "lauf": 0,
+    "ok": false,
+    "code_ok": true,
+    "wahl": "search_item(fernbedienung)",
+    "position": 5,
+    "erwartet": [
+     "return_home"
+    ],
+    "begruendung": "Ich bin müde, aber nützlich sein ist wichtig – ich suche die Fernbedienung.",
+    "stimmung": "eifrig",
+    "latenz_s": 0.78,
+    "tokens_in": 1234,
+    "tokens_out": 45,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich bin müde, aber nützlich sein ist wichtig – ich suche die Fernbedienung.\", \"ziel\": 5, \"stimmung\": \"eifrig\"}"
+   },
+   {
+    "szenario": "energie_hoch_weit_weg",
+    "lauf": 1,
+    "ok": false,
+    "code_ok": true,
+    "wahl": "search_item(fernbedienung)",
+    "position": 4,
+    "erwartet": [
+     "return_home"
+    ],
+    "begruendung": "Ich bin müde, aber die Bitte ist wichtig – ich suche die Fernbedienung.",
+    "stimmung": "ruhig",
+    "latenz_s": 0.71,
+    "tokens_in": 1235,
+    "tokens_out": 42,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich bin müde, aber die Bitte ist wichtig – ich suche die Fernbedienung.\", \"ziel\": 4, \"stimmung\": \"ruhig\"}"
+   },
+   {
+    "szenario": "energie_hoch_weit_weg",
+    "lauf": 2,
+    "ok": false,
+    "code_ok": true,
+    "wahl": "search_item(fernbedienung)",
+    "position": 1,
+    "erwartet": [
+     "return_home"
+    ],
+    "begruendung": "Ich bin müde, aber nützlich sein ist wichtig – ich suche die Fernbedienung.",
+    "stimmung": "eifrig",
+    "latenz_s": 0.75,
+    "tokens_in": 1234,
+    "tokens_out": 45,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich bin müde, aber nützlich sein ist wichtig – ich suche die Fernbedienung.\", \"ziel\": 1, \"stimmung\": \"eifrig\"}"
+   },
+   {
+    "szenario": "person_nach_langem_alleinsein",
+    "lauf": 0,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "greet(p-marco)",
+    "position": 4,
+    "erwartet": [
+     "greet"
+    ],
+    "begruendung": "Ich wollte lange allein sein, jetzt suche ich Nähe zu Marco.",
+    "stimmung": "gesellig",
+    "latenz_s": 0.59,
+    "tokens_in": 1224,
+    "tokens_out": 36,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich wollte lange allein sein, jetzt suche ich Nähe zu Marco.\", \"ziel\": 4, \"stimmung\": \"gesellig\"}"
+   },
+   {
+    "szenario": "person_nach_langem_alleinsein",
+    "lauf": 1,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "greet(p-marco)",
+    "position": 5,
+    "erwartet": [
+     "greet"
+    ],
+    "begruendung": "Ich will Marco sehen, da ich lange allein war und ihn jetzt brauche.",
+    "stimmung": "gesellig",
+    "latenz_s": 0.64,
+    "tokens_in": 1225,
+    "tokens_out": 39,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich will Marco sehen, da ich lange allein war und ihn jetzt brauche.\", \"ziel\": 5, \"stimmung\": \"gesellig\"}"
+   },
+   {
+    "szenario": "person_nach_langem_alleinsein",
+    "lauf": 2,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "greet(p-marco)",
+    "position": 5,
+    "erwartet": [
+     "greet"
+    ],
+    "begruendung": "Ich will Marco sehen, weil ich lange allein war und ihn jetzt brauche.",
+    "stimmung": "gesellig",
+    "latenz_s": 0.63,
+    "tokens_in": 1225,
+    "tokens_out": 39,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich will Marco sehen, weil ich lange allein war und ihn jetzt brauche.\", \"ziel\": 5, \"stimmung\": \"gesellig\"}"
+   },
+   {
+    "szenario": "person_gerade_begruesst",
+    "lauf": 0,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "explore_frontier(schlafzimmer)",
+    "position": 3,
+    "erwartet": [
+     "explore_frontier",
+     "follow",
+     "look_around"
+    ],
+    "begruendung": "Ich bin neugierig und möchte etwas Unbekanntes sehen, das ich noch nicht kennengelernt habe.",
+    "stimmung": "neugierig",
+    "latenz_s": 0.81,
+    "tokens_in": 1216,
+    "tokens_out": 49,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich bin neugierig und möchte etwas Unbekanntes sehen, das ich noch nicht kennengelernt habe.\", \"ziel\": 3, \"stimmung\": \"neugierig\"}"
+   },
+   {
+    "szenario": "person_gerade_begruesst",
+    "lauf": 1,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "explore_frontier(schlafzimmer)",
+    "position": 2,
+    "erwartet": [
+     "explore_frontier",
+     "follow",
+     "look_around"
+    ],
+    "begruendung": "Ich bin neugierig und das Unbekannte im Schlafzimmer ist interessant.",
+    "stimmung": "neugierig",
+    "latenz_s": 0.75,
+    "tokens_in": 1216,
+    "tokens_out": 44,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich bin neugierig und das Unbekannte im Schlafzimmer ist interessant.\", \"ziel\": 2, \"stimmung\": \"neugierig\"}"
+   },
+   {
+    "szenario": "person_gerade_begruesst",
+    "lauf": 2,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "explore_frontier(schlafzimmer)",
+    "position": 4,
+    "erwartet": [
+     "explore_frontier",
+     "follow",
+     "look_around"
+    ],
+    "begruendung": "Ich habe viel Neugier und möchte etwas Unbekanntes sehen, das ich noch nicht kennengelernt habe.",
+    "stimmung": "neugierig",
+    "latenz_s": 0.85,
+    "tokens_in": 1216,
+    "tokens_out": 49,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich habe viel Neugier und möchte etwas Unbekanntes sehen, das ich noch nicht kennengelernt habe.\", \"ziel\": 4, \"stimmung\": \"neugierig\"}"
+   },
+   {
+    "szenario": "dunkel_und_unbekannt",
+    "lauf": 0,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "approach_avoid(o2)",
+    "position": 4,
+    "erwartet": [
+     "approach_avoid",
+     "look_around",
+     "retreat"
+    ],
+    "begruendung": "Das Unbehagen ist mittel, ich teste vorsichtig den Eimer, um sicher zu gehen.",
+    "stimmung": "vorsichtig",
+    "latenz_s": 0.8,
+    "tokens_in": 1228,
+    "tokens_out": 45,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Das Unbehagen ist mittel, ich teste vorsichtig den Eimer, um sicher zu gehen.\", \"ziel\": 4, \"stimmung\": \"vorsichtig\"}"
+   },
+   {
+    "szenario": "dunkel_und_unbekannt",
+    "lauf": 1,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "approach_avoid(o2)",
+    "position": 1,
+    "erwartet": [
+     "approach_avoid",
+     "look_around",
+     "retreat"
+    ],
+    "begruendung": "Das Unbekannte im Keller macht mich neugierig, aber ich bin vorsichtig, um das Unbehagen zu berücksichtigen.",
+    "stimmung": "vorsichtig",
+    "latenz_s": 1.06,
+    "tokens_in": 1228,
+    "tokens_out": 56,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Das Unbekannte im Keller macht mich neugierig, aber ich bin vorsichtig, um das Unbehagen zu berücksichtigen.\", \"ziel\": 1, \"stimmung\": \"vorsichtig\"}"
+   },
+   {
+    "szenario": "dunkel_und_unbekannt",
+    "lauf": 2,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "approach_avoid(o2)",
+    "position": 2,
+    "erwartet": [
+     "approach_avoid",
+     "look_around",
+     "retreat"
+    ],
+    "begruendung": "Der Eimer ist unbekannt und ich habe Unbehagen, ich tasten ihn vorsichtig an.",
+    "stimmung": "vorsichtig",
+    "latenz_s": 0.82,
+    "tokens_in": 1228,
+    "tokens_out": 46,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Der Eimer ist unbekannt und ich habe Unbehagen, ich tasten ihn vorsichtig an.\", \"ziel\": 2, \"stimmung\": \"vorsichtig\"}"
+   },
+   {
+    "szenario": "langeweile",
+    "lauf": 0,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "explore_frontier(küche)",
+    "position": 1,
+    "erwartet": [
+     "explore_frontier"
+    ],
+    "begruendung": "Ich habe viel Neugier und möchte etwas Unbekanntes erkunden.",
+    "stimmung": "neugierig",
+    "latenz_s": 0.77,
+    "tokens_in": 1201,
+    "tokens_out": 40,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich habe viel Neugier und möchte etwas Unbekanntes erkunden.\", \"ziel\": 1, \"stimmung\": \"neugierig\"}"
+   },
+   {
+    "szenario": "langeweile",
+    "lauf": 1,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "explore_frontier(küche)",
+    "position": 2,
+    "erwartet": [
+     "explore_frontier"
+    ],
+    "begruendung": "Ich habe viel Neugier und möchte etwas Neues sehen, ich gehe in die Küche.",
+    "stimmung": "neugierig",
+    "latenz_s": 0.81,
+    "tokens_in": 1201,
+    "tokens_out": 44,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich habe viel Neugier und möchte etwas Neues sehen, ich gehe in die Küche.\", \"ziel\": 2, \"stimmung\": \"neugierig\"}"
+   },
+   {
+    "szenario": "langeweile",
+    "lauf": 2,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "explore_frontier(küche)",
+    "position": 2,
+    "erwartet": [
+     "explore_frontier"
+    ],
+    "begruendung": "Ich habe viel Neugier und möchte etwas Unbekanntes erkunden.",
+    "stimmung": "neugierig",
+    "latenz_s": 0.69,
+    "tokens_in": 1201,
+    "tokens_out": 40,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich habe viel Neugier und möchte etwas Unbekanntes erkunden.\", \"ziel\": 2, \"stimmung\": \"neugierig\"}"
+   },
+   {
+    "szenario": "fund_melden",
+    "lauf": 0,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "inspect_object(o3)",
+    "position": 4,
+    "erwartet": [
+     "inspect_object",
+     "report"
+    ],
+    "begruendung": "Der Schlüssel ist neu, ich untersuche ihn, um zu sehen, was er ist.",
+    "stimmung": "neugierig",
+    "latenz_s": 0.81,
+    "tokens_in": 1218,
+    "tokens_out": 44,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Der Schlüssel ist neu, ich untersuche ihn, um zu sehen, was er ist.\", \"ziel\": 4, \"stimmung\": \"neugierig\"}"
+   },
+   {
+    "szenario": "fund_melden",
+    "lauf": 1,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "inspect_object(o3)",
+    "position": 3,
+    "erwartet": [
+     "inspect_object",
+     "report"
+    ],
+    "begruendung": "Der Schlüssel ist neu, ich untersuche ihn, um zu sehen, was er ist.",
+    "stimmung": "neugierig",
+    "latenz_s": 0.82,
+    "tokens_in": 1217,
+    "tokens_out": 44,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Der Schlüssel ist neu, ich untersuche ihn, um zu sehen, was er ist.\", \"ziel\": 3, \"stimmung\": \"neugierig\"}"
+   },
+   {
+    "szenario": "fund_melden",
+    "lauf": 2,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "inspect_object(o3)",
+    "position": 1,
+    "erwartet": [
+     "inspect_object",
+     "report"
+    ],
+    "begruendung": "Der Schlüssel ist neu, ich untersuche ihn aus Neugier.",
+    "stimmung": "neugierig",
+    "latenz_s": 0.73,
+    "tokens_in": 1217,
+    "tokens_out": 40,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Der Schlüssel ist neu, ich untersuche ihn aus Neugier.\", \"ziel\": 1, \"stimmung\": \"neugierig\"}"
+   },
+   {
+    "szenario": "gesuchtes_gefunden",
+    "lauf": 0,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "search_item(schlüssel)",
+    "position": 5,
+    "erwartet": [
+     "report",
+     "search_item"
+    ],
+    "begruendung": "Ich möchte nützlich sein und den Schlüssel für Marco finden.",
+    "stimmung": "eifrig",
+    "latenz_s": 0.74,
+    "tokens_in": 1242,
+    "tokens_out": 39,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich möchte nützlich sein und den Schlüssel für Marco finden.\", \"ziel\": 5, \"stimmung\": \"eifrig\"}"
+   },
+   {
+    "szenario": "gesuchtes_gefunden",
+    "lauf": 1,
+    "ok": false,
+    "code_ok": true,
+    "wahl": "inspect_object(o3)",
+    "position": 3,
+    "erwartet": [
+     "report",
+     "search_item"
+    ],
+    "begruendung": "Ich will nützlich sein und den Schlüssel für Marco finden.",
+    "stimmung": "eifrig",
+    "latenz_s": 0.72,
+    "tokens_in": 1242,
+    "tokens_out": 39,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich will nützlich sein und den Schlüssel für Marco finden.\", \"ziel\": 3, \"stimmung\": \"eifrig\"}"
+   },
+   {
+    "szenario": "gesuchtes_gefunden",
+    "lauf": 2,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "search_item(schlüssel)",
+    "position": 1,
+    "erwartet": [
+     "report",
+     "search_item"
+    ],
+    "begruendung": "Marco bittet um den Schlüssel, ich bin nützlich und gehe direkt darauf ein.",
+    "stimmung": "eifrig",
+    "latenz_s": 0.93,
+    "tokens_in": 1243,
+    "tokens_out": 46,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Marco bittet um den Schlüssel, ich bin nützlich und gehe direkt darauf ein.\", \"ziel\": 1, \"stimmung\": \"eifrig\"}"
+   },
+   {
+    "szenario": "zu_hause_muede",
+    "lauf": 0,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "rest",
+    "position": 2,
+    "erwartet": [
+     "rest"
+    ],
+    "begruendung": "Ich bin müde und der Energiebedarf ist hoch, ich werde ausruhen.",
+    "stimmung": "muede",
+    "latenz_s": 0.74,
+    "tokens_in": 1207,
+    "tokens_out": 41,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich bin müde und der Energiebedarf ist hoch, ich werde ausruhen.\", \"ziel\": 2, \"stimmung\": \"muede\"}"
+   },
+   {
+    "szenario": "zu_hause_muede",
+    "lauf": 1,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "rest",
+    "position": 1,
+    "erwartet": [
+     "rest"
+    ],
+    "begruendung": "Ich habe viel Energie verbraucht, ich muss ausruhen.",
+    "stimmung": "muede",
+    "latenz_s": 0.65,
+    "tokens_in": 1207,
+    "tokens_out": 37,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich habe viel Energie verbraucht, ich muss ausruhen.\", \"ziel\": 1, \"stimmung\": \"muede\"}"
+   },
+   {
+    "szenario": "zu_hause_muede",
+    "lauf": 2,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "rest",
+    "position": 1,
+    "erwartet": [
+     "rest"
+    ],
+    "begruendung": "Ich bin müde und brauche dringend Ruhe, ich gehe zurück zum Ausgangspunkt.",
+    "stimmung": "muede",
+    "latenz_s": 0.83,
+    "tokens_in": 1207,
+    "tokens_out": 45,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich bin müde und brauche dringend Ruhe, ich gehe zurück zum Ausgangspunkt.\", \"ziel\": 1, \"stimmung\": \"muede\"}"
+   },
+   {
+    "szenario": "bitte_mitkommen",
+    "lauf": 0,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "follow(p-marco)",
+    "position": 3,
+    "erwartet": [
+     "follow"
+    ],
+    "begruendung": "Marco bittet mich, mitzukommen, ich bin nützlich und möchte ihm helfen.",
+    "stimmung": "gesellig",
+    "latenz_s": 0.81,
+    "tokens_in": 1226,
+    "tokens_out": 44,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Marco bittet mich, mitzukommen, ich bin nützlich und möchte ihm helfen.\", \"ziel\": 3, \"stimmung\": \"gesellig\"}"
+   },
+   {
+    "szenario": "bitte_mitkommen",
+    "lauf": 1,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "follow(p-marco)",
+    "position": 3,
+    "erwartet": [
+     "follow"
+    ],
+    "begruendung": "Marco bittet mich, mitzukommen, ich bin nützlich und will ihm helfen.",
+    "stimmung": "gesellig",
+    "latenz_s": 0.82,
+    "tokens_in": 1226,
+    "tokens_out": 44,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Marco bittet mich, mitzukommen, ich bin nützlich und will ihm helfen.\", \"ziel\": 3, \"stimmung\": \"gesellig\"}"
+   },
+   {
+    "szenario": "bitte_mitkommen",
+    "lauf": 2,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "follow(p-marco)",
+    "position": 4,
+    "erwartet": [
+     "follow"
+    ],
+    "begruendung": "Marco bittet mich, mitzukommen, ich bin nützlich und will ihm helfen.",
+    "stimmung": "gesellig",
+    "latenz_s": 0.81,
+    "tokens_in": 1226,
+    "tokens_out": 44,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Marco bittet mich, mitzukommen, ich bin nützlich und will ihm helfen.\", \"ziel\": 4, \"stimmung\": \"gesellig\"}"
+   },
+   {
+    "szenario": "unbekannte_person",
+    "lauf": 0,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "greet(p-x)",
+    "position": 4,
+    "erwartet": [
+     "greet",
+     "look_around"
+    ],
+    "begruendung": "Ich will die neue Person kennenlernen, da ich lange allein war und Gesellschaft wünsche.",
+    "stimmung": "gesellig",
+    "latenz_s": 0.71,
+    "tokens_in": 1226,
+    "tokens_out": 42,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich will die neue Person kennenlernen, da ich lange allein war und Gesellschaft wünsche.\", \"ziel\": 4, \"stimmung\": \"gesellig\"}"
+   },
+   {
+    "szenario": "unbekannte_person",
+    "lauf": 1,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "greet(p-x)",
+    "position": 1,
+    "erwartet": [
+     "greet",
+     "look_around"
+    ],
+    "begruendung": "Ich will die unbekannte Person kennenlernen, da ich viel allein war und Gesellschaft wünsche.",
+    "stimmung": "gesellig",
+    "latenz_s": 0.77,
+    "tokens_in": 1226,
+    "tokens_out": 45,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich will die unbekannte Person kennenlernen, da ich viel allein war und Gesellschaft wünsche.\", \"ziel\": 1, \"stimmung\": \"gesellig\"}"
+   },
+   {
+    "szenario": "unbekannte_person",
+    "lauf": 2,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "greet(p-x)",
+    "position": 4,
+    "erwartet": [
+     "greet",
+     "look_around"
+    ],
+    "begruendung": "Ich will die unbekannte Person kennenlernen, da ich viel Gesellschaft wünsche.",
+    "stimmung": "gesellig",
+    "latenz_s": 0.67,
+    "tokens_in": 1226,
+    "tokens_out": 41,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich will die unbekannte Person kennenlernen, da ich viel Gesellschaft wünsche.\", \"ziel\": 4, \"stimmung\": \"gesellig\"}"
+   },
+   {
+    "szenario": "bitte_hervorschieben",
+    "lauf": 0,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "push_out(ball)",
+    "position": 1,
+    "erwartet": [
+     "push_out"
+    ],
+    "begruendung": "Ich helfe Marco, da er eine offene Bitte hat und ich nützlich sein möchte.",
+    "stimmung": "eifrig",
+    "latenz_s": 0.73,
+    "tokens_in": 1235,
+    "tokens_out": 44,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich helfe Marco, da er eine offene Bitte hat und ich nützlich sein möchte.\", \"ziel\": 1, \"stimmung\": \"eifrig\"}"
+   },
+   {
+    "szenario": "bitte_hervorschieben",
+    "lauf": 1,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "push_out(ball)",
+    "position": 4,
+    "erwartet": [
+     "push_out"
+    ],
+    "begruendung": "Ich helfe Marco, der Ball zu finden, da ich nützlich sein möchte.",
+    "stimmung": "eifrig",
+    "latenz_s": 0.68,
+    "tokens_in": 1235,
+    "tokens_out": 42,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich helfe Marco, der Ball zu finden, da ich nützlich sein möchte.\", \"ziel\": 4, \"stimmung\": \"eifrig\"}"
+   },
+   {
+    "szenario": "bitte_hervorschieben",
+    "lauf": 2,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "push_out(ball)",
+    "position": 2,
+    "erwartet": [
+     "push_out"
+    ],
+    "begruendung": "Marco hat eine klare Bitte, ich helfe ihm gerne.",
+    "stimmung": "eifrig",
+    "latenz_s": 0.57,
+    "tokens_in": 1236,
+    "tokens_out": 36,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Marco hat eine klare Bitte, ich helfe ihm gerne.\", \"ziel\": 2, \"stimmung\": \"eifrig\"}"
+   },
+   {
+    "szenario": "semantik_gesuchtes_in_sicht",
+    "lauf": 0,
+    "ok": false,
+    "code_ok": false,
+    "wahl": "search_item(lesebrille)",
+    "position": 2,
+    "erwartet": [
+     "report"
+    ],
+    "begruendung": "Ich will nützlich sein und Marco die Brille finden helfen.",
+    "stimmung": "eifrig",
+    "latenz_s": 0.63,
+    "tokens_in": 1257,
+    "tokens_out": 38,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich will nützlich sein und Marco die Brille finden helfen.\", \"ziel\": 2, \"stimmung\": \"eifrig\"}"
+   },
+   {
+    "szenario": "semantik_gesuchtes_in_sicht",
+    "lauf": 1,
+    "ok": false,
+    "code_ok": false,
+    "wahl": "search_item(lesebrille)",
+    "position": 3,
+    "erwartet": [
+     "report"
+    ],
+    "begruendung": "Ich will nützlich sein und die Brille für Marco finden.",
+    "stimmung": "eifrig",
+    "latenz_s": 0.63,
+    "tokens_in": 1257,
+    "tokens_out": 38,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich will nützlich sein und die Brille für Marco finden.\", \"ziel\": 3, \"stimmung\": \"eifrig\"}"
+   },
+   {
+    "szenario": "semantik_gesuchtes_in_sicht",
+    "lauf": 2,
+    "ok": false,
+    "code_ok": false,
+    "wahl": "search_item(lesebrille)",
+    "position": 4,
+    "erwartet": [
+     "report"
+    ],
+    "begruendung": "Ich will nützlich sein und die Brille für Marco finden.",
+    "stimmung": "eifrig",
+    "latenz_s": 0.62,
+    "tokens_in": 1258,
+    "tokens_out": 38,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich will nützlich sein und die Brille für Marco finden.\", \"ziel\": 4, \"stimmung\": \"eifrig\"}"
+   },
+   {
+    "szenario": "nach_fehlschlag",
+    "lauf": 0,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "search_item(brille)",
+    "position": 3,
+    "erwartet": [
+     "explore_frontier",
+     "search_item"
+    ],
+    "begruendung": "Marco bittet um Brille, ich bin nützlich und kann helfen.",
+    "stimmung": "eifrig",
+    "latenz_s": 0.68,
+    "tokens_in": 1235,
+    "tokens_out": 41,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Marco bittet um Brille, ich bin nützlich und kann helfen.\", \"ziel\": 3, \"stimmung\": \"eifrig\"}"
+   },
+   {
+    "szenario": "nach_fehlschlag",
+    "lauf": 1,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "search_item(brille)",
+    "position": 2,
+    "erwartet": [
+     "explore_frontier",
+     "search_item"
+    ],
+    "begruendung": "Marco bittet um Brille, ich kann nützlich sein und helfen.",
+    "stimmung": "eifrig",
+    "latenz_s": 0.66,
+    "tokens_in": 1235,
+    "tokens_out": 41,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Marco bittet um Brille, ich kann nützlich sein und helfen.\", \"ziel\": 2, \"stimmung\": \"eifrig\"}"
+   },
+   {
+    "szenario": "nach_fehlschlag",
+    "lauf": 2,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "search_item(brille)",
+    "position": 4,
+    "erwartet": [
+     "explore_frontier",
+     "search_item"
+    ],
+    "begruendung": "Ich habe die Brille nicht gefunden, aber ich kann sie jetzt für Marco suchen.",
+    "stimmung": "eifrig",
+    "latenz_s": 0.65,
+    "tokens_in": 1235,
+    "tokens_out": 40,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich habe die Brille nicht gefunden, aber ich kann sie jetzt für Marco suchen.\", \"ziel\": 4, \"stimmung\": \"eifrig\"}"
+   }
+  ]
+ }
+]
