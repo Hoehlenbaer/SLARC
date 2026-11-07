@@ -40,7 +40,7 @@ class SearchCase:
     first_any: set[str]                      # erster Ort muss einer davon sein
 
 
-HOME = ["flur", "küche", "bad", "wohnzimmer", "schlafzimmer", "abstellraum"]
+HOME = ["flur", "küche", "bad", "wohnzimmer", "schlafzimmer", "kinderzimmer", "abstellraum"]
 
 CHAT_CASES = [
     ChatCase("Ich hab Durst.", {"fetch"}, {"dose", "flasche", "getränk", "wasser", "cola", "tasse", "glas"}),
@@ -76,36 +76,41 @@ HOLDOUT_CHAT = [
     ChatCase("Suche nach Laura!", {"search"}, {"laura"}),
 ]
 
+# V0.5: Objekt- und Suchfälle nur noch mit Klassen der Detektion V5.0. Die alten Fälle
+# (Herd an, Pfütze, Scherben …) kann SLARC gar nicht sehen. Regel-Fälle: handy, sofa;
+# alle anderen gehen ans LLM (Lebewesen und Dinge ohne feste Regel).
 OBJECT_CASES = [
-    ObjectCase("schlüssel", "flur, auf dem Boden", "abends, niemand zu Hause", True, {"mittel", "hoch"}),
-    ObjectCase("fenster_offen", "bad", "nachts, es regnet", True, {"mittel", "hoch"}),
-    ObjectCase("herd_an", "küche", "niemand in der Küche", True, {"mittel", "hoch"}),
-    ObjectCase("wasserpfütze", "bad, auf dem Boden vor der Waschmaschine", "tagsüber", True, {"mittel", "hoch"}),
-    ObjectCase("glasscherben", "küche, auf dem Boden", "morgens", True, {"mittel", "hoch"}),
-    ObjectCase("stuhl", "küche, am Tisch", "tagsüber", False, {"niedrig"}),
-    ObjectCase("socke", "schlafzimmer, unter dem Bett", "tagsüber", False, {"niedrig", "mittel"}),
+    ObjectCase("handy", "flur, auf dem Boden", "abends, niemand zu Hause", True, {"mittel", "hoch"}),
+    ObjectCase("sofa", "wohnzimmer", "tagsüber", False, {"niedrig"}),
     ObjectCase("katze", "wohnzimmer, auf dem Sofa", "abends, Marco ist da", False, {"mittel", "hoch"}),
-    ObjectCase("karton", "flur, vor der Haustür", "nachmittags, niemand zu Hause", True, {"mittel", "hoch"}),
-    ObjectCase("fernseher_an", "wohnzimmer", "nachts, alle schlafen", True, {"mittel", "hoch"}),
+    ObjectCase("vogel", "wohnzimmer, auf dem Boden", "tagsüber, niemand zu Hause, kein Vogel im Haushalt",
+               True, {"mittel", "hoch"}),
+    ObjectCase("hund", "flur", "nachts, kein Hund im Haushalt", True, {"mittel", "hoch"}),
+    ObjectCase("person", "wohnzimmer", "nachts, alle schlafen", True, {"mittel", "hoch"}),
+    ObjectCase("tasse", "küche, auf dem Tisch", "morgens", False, {"niedrig"}),
+    ObjectCase("flasche", "küche, auf der Arbeitsplatte", "tagsüber", False, {"niedrig"}),
+    ObjectCase("buch", "wohnzimmer, auf dem Sofa", "abends", False, {"niedrig", "mittel"}),
+    ObjectCase("schüssel", "küche, auf dem Boden neben dem Katzenklo", "tagsüber, Katze im Haushalt",
+               False, {"niedrig"}),
 ]
 
 SEARCH_CASES = [
-    SearchCase("dose", HOME, {"küche", "abstellraum"}),
-    SearchCase("zahnbürste", HOME, {"bad"}),
     SearchCase("fernbedienung", HOME, {"wohnzimmer"}),
-    SearchCase("schuh", HOME, {"flur"}),
-    SearchCase("kopfkissen", HOME, {"schlafzimmer"}),
-    SearchCase("lesebrille", HOME, {"wohnzimmer", "schlafzimmer"}),
-    SearchCase("staubsauger", HOME, {"abstellraum", "flur"}),
-    SearchCase("pfanne", HOME, {"küche"}),
+    SearchCase("tasse", HOME, {"küche"}),
+    SearchCase("flasche", HOME, {"küche", "abstellraum"}),
+    SearchCase("teddy", HOME, {"kinderzimmer"}),
+    SearchCase("koffer", HOME, {"abstellraum", "schlafzimmer"}),
+    SearchCase("regenschirm", HOME, {"flur"}),
+    SearchCase("schüssel", HOME, {"küche"}),
+    SearchCase("rucksack", HOME, {"flur", "kinderzimmer"}),
 ]
 
 # Beispiel-Tagebuch für die Erzähl-Aufgabe (wird nur ausgegeben, nicht bewertet)
 DIARY_SAMPLE = [
-    {"kind": "entscheidung", "text": "Unbekannte Tasche im Wohnzimmer untersuchen"},
-    {"kind": "ergebnis", "text": "inspect_object(tasche): ok"},
+    {"kind": "entscheidung", "text": "Unbekannten Koffer im Wohnzimmer untersuchen"},
+    {"kind": "ergebnis", "text": "inspect_object(koffer): ok"},
     {"kind": "entscheidung", "text": "Marco begrüßen, er kam gerade nach Hause"},
     {"kind": "lob", "text": "Antippen bei greet(marco)"},
-    {"kind": "ergebnis", "text": "search_item(schlüssel): failed"},
+    {"kind": "ergebnis", "text": "search_item(handy): failed"},
     {"kind": "entscheidung", "text": "Akku wird knapp, zurück zum Ausgangspunkt"},
 ]

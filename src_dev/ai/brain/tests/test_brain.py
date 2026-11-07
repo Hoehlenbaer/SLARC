@@ -201,8 +201,8 @@ def test_energy_high_is_rule():
 
 
 def test_request_matches_object_in_view():
-    o = obs(objects=[ObjectSeen("o6", "brille", "wohnzimmer", 1.0)],
-            requests=[Request("r", "hast du meine Lesebrille gesehen?", "search", "lesebrille", "Marco", T - 300)])
+    o = obs(objects=[ObjectSeen("o6", "handy", "wohnzimmer", 1.0)],
+            requests=[Request("r", "hast du mein Smartphone gesehen?", "search", "smartphone", "Marco", T - 300)])
     mem = Memory()
     s, _ = NeedsModel(mem).update(o)
     menu = build_options(o, s, mem, check(o))
@@ -210,8 +210,9 @@ def test_request_matches_object_in_view():
 
 
 def test_matches():
-    assert matches("brille", "Lesebrille") and matches("fernbedienung", "fernbedienung")
-    assert not matches("tür_offen", "schlüssel") and not matches("ei", "eimer")
+    assert matches("handy", "Smartphone") and matches("fernbedienung", "die Fernbedienung")
+    assert matches("teddy", "Kuscheltier") and not matches("tasse", "handy")
+    assert not matches("ei", "eimer")
 
 
 def test_close_options():
@@ -324,7 +325,10 @@ def test_grammar_parses_and_accepts_examples():
     assert json.loads(FEW_SHOT[0][1])
 
 
-def test_hazard_reported_by_rule_even_when_tired():
+def test_hazard_reported_by_rule_even_when_tired(monkeypatch):
+    # Die Detektion V5.0 kennt keine Gefahren; Mechanismus mit einer Testklasse prüfen
+    import brain.behaviors as B
+    monkeypatch.setattr(B, "HAZARDS", {"herd_an"})
     arb = Arbiter(Memory(), random.Random(0))
     d = arb.step(obs(battery_v=11.0, home_dist_m=60.0,
                      objects=[ObjectSeen("h1", "herd_an", "küche", 3.0)]))

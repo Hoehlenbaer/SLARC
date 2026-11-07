@@ -254,6 +254,8 @@ Das LLM bekommt in jeder Stufe Text; das Konzept ändert sich durch den Kanal ni
 8. Audio-Hardware (Stufe 2/3) im Hardware-Chat.
 9. Bitten aus dem Chat in Dienste übersetzen (eigener kleiner LLM-Aufruf oder Regeln). Bisher kommen Bitten schon strukturiert als `Request` an.
 10. Brain-Prozess mit Denk-Zustand in `launch_all.py` einhängen; Simulation eines ganzen "Tages" mit dem MockBlackboard, um Abwechslung und Rhythmus zu beurteilen.
+11. **Vision-Sprachmodell für seltene Bildfragen** (notiert 07.11.2026): Qwen3.5-4B nimmt laut Modellkarte auch Bilder, braucht dafür zusätzlich `mmproj-Qwen3.5-4B-f16.gguf` (~0,7 GB). Idee: Zustände, die die Detektion nicht kennt („Fenster offen?“, „Licht an?“, „Welcher Raum ist das?“), mit einem einzelnen Kamerabild fragen statt je eine Klasse zu trainieren. Offen: Unterstützung in llama-cpp-python (sonst `llama-server` über HTTP), Dauer je Bild auf dem Pi, Qualität. Erster Test auf dem PC mit Fotos aus der Wohnung.
+12. **Perzeption kennt keine Türen, Fenster, Dosen** (07.11.2026): Die Detektion V5.0 hat 40 COCO-Klassen + „unbekannt“ (`ROBOT_CAT_IDS` in `FusedHexapodModel_V5_0-Phase-1.py`), davon 10 Außenklassen (Auto, Ampel …). Für Navigation an benennbaren Ankern und für den Meilenstein Dose fehlen Tür, Fenster, Dose. Anforderung an den KI-Chat; Quellen z. B. ADE20K, Open Images.
 
 ---
 
@@ -374,4 +376,30 @@ Außerdem setzen mehrere Sätze voraus, dass SLARC Personen unterscheidet (Sophi
 - Mit Gefahren per Regel spricht der unabgestimmte Test eher für Qwen3.5; dagegen stehen 10 Sätze als kleine Stichprobe und ~1,7× Latenz auf dem PC. Entscheidung nach dem nächsten Lauf und der Messung auf dem Pi.
 
 **V0.4 (eine Änderung): Chat zweistufig.** Stufe 1 deutet die Nachricht ohne Tagebuch; die Antwort ist nur eine Bestätigung und darf kein Ergebnis behaupten. Stufe 2 (`talk_reply`) nur bei Smalltalk, mit Tagebuch. Das Few-Shot mit dem erfundenen Ausflug ist entfernt.
+
+---
+
+## 16. Echte Klassen, simulierte Wohnung und Behavior-Tree-Schicht (07.11.2026, V0.5)
+
+**Klassen:** `perception_classes.py` ist die einzige Quelle für alles, was das Brain über Gegenstände weiß: die 41 Klassen der Detektion V5.0 mit deutschem Namen, Art (Anker, Möbel, Ding, Lebewesen, draußen, unbekannt), „meldenswert“ und typischen Räumen, dazu Synonyme („Smartphone“ → handy) und Raum-Anker (Toilette → Bad). Bitten um Dinge, die SLARC nicht sehen kann, beantwortet er ehrlich („Schlüssel kann ich leider noch nicht erkennen“). Die Gefahrenliste ist leer, weil die Detektion keine Gefahrenzustände kennt; der Mechanismus bleibt. Szenarien und Testfälle sind auf echte Klassen umgestellt; die Holdout-Sätze bleiben unverändert.
+
+**Behavior-Tree-Schicht** (`sim/bt.py`): Der Arbiter wählt das Verhalten, `build_tree()` baut dafür einen festen py_trees-Teilbaum, der Runner tickt ihn bis SUCCESS/FAILURE, das Ergebnis geht als `last_result` zurück. Beispiel Suche: Räume nacheinander (zuerst wo zuletzt gesehen, dann typische Räume bzw. `search_places`, dann nach Entfernung), je Raum hingehen, umsehen, „sehe ich es?“, am Ende melden. Das LLM baut nie Bäume. Auf dem Roboter werden nur die Blätter ausgetauscht (Protokoll zum ESP32, SLAM, Perzeption).
+
+**Simulierte Wohnung** (`sim/world.py`): sieben Räume als Graph, Gehen mit 0,12 m/s, Akku mit 15 W Grundlast + 0,2 Wh/m, Gegenstände nur aus echten Klassen, eine Katze, die umherzieht, zwei Personen mit Tagesplan (für SLARC namenlos), Chat-Drehbuch. Keine Physik.
+
+**Aufruf** (aus `src_dev/ai`):
+```
+python -m brain.sim.day                      # ohne LLM, Chat per Stichwort
+python -m brain.sim.day --trees --needs      # mit Bäumen und Bedürfnis-Stufen
+python -m brain.sim.day --model Qwen3.5-4B-Q4_K_M.gguf --gpu-layers -1
+```
+
+**Was der erste simulierte Tag gezeigt hat** (3 h, ohne LLM) und was geändert wurde:
+- Nach dem Erkunden wusste SLARC nichts mehr mit sich anzufangen: 725× Umsehen, 413× Abwarten. Ursache: Umsehen zählte als neue Information und setzte die Langeweile zurück. Neu: Umsehen wird im selben Raum langweilig, Rundgang (`wander`) zu lange nicht besuchten Räumen, Dösen (`doze`) als ruhige Beschäftigung. Räume gewöhnen mit 1 h Halbwertszeit ab, Objekte mit 6 h.
+- Laufende Verhalten wurden von jedem neuen Objekt unterbrochen, teils wurde dieselbe Suche neu gestartet. Neu: Unterbrechung nur bei Chat oder einem um 0,2 besseren Ziel, dasselbe Ziel nie neu.
+- Die Fernbedienung wurde stündlich erneut gemeldet. Neu: je Objekt und Ort nur einmal.
+- Gesucht wurde ohne Gedächtnis (Fernbedienung um 00:04 gesehen, um 00:45 erst im Wohnzimmer gesucht). Neu: `last_seen`, Suche beginnt dort (88 s statt 247 s).
+- Ergebnis danach: 125 von 180 min dösend, 6 Rundgänge, Suche direkt am letzten Fundort, keine doppelten Meldungen außer auf Nachfrage. Ob so viel Dösen gewollt ist, ist eine Einstellung (`DOZE_UTILITY`).
+- Raum-Anker sind mehrdeutig: das Kinderzimmer mit Bett wird als Schlafzimmer erkannt. Zimmernamen müssen von Menschen kommen.
+- Noch nicht gelaufen: Tag mit echtem LLM (`--model`).
 

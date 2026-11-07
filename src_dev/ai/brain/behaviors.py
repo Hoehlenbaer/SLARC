@@ -1,5 +1,10 @@
 # brain/behaviors.py
-# Version 0.3 (07.11.2026) – Verhaltenskatalog, Menübau und Code-Auswahl.
+# Version 0.4 (07.11.2026) – Verhaltenskatalog, Menübau und Code-Auswahl.
+# V0.5: Rundgang (wander) und Dösen (doze) als Beschäftigung, wenn alles erkundet ist;
+#       Umsehen wird im selben Raum langweilig; Meldung je Objekt und Ort nur einmal.
+# V0.4: Anker und Möbel (ROUTINE) lösen keine Neugier aus und werden nicht untersucht.
+# V0.4: Klassenlisten aus perception_classes.py (echte 41 Klassen der Detektion V5.0);
+#       HAZARDS leer, weil die Detektion keine Gefahrenzustände kennt; matches() mit Synonymen.
 # V0.3: Gefahren (HAZARDS) immer melden, unabhängig von Energie und LLM;
 #       ROUTINE-Klassen (Möbel) gelten als nicht meldenswert.
 # V0.2: Bitte <-> Fund im Code verknüpft, Energie "hoch" filtert das Menü,
@@ -32,19 +37,19 @@ SERVICES = {
 }
 SERVICES_ENABLED = {"search", "report", "greet", "follow", "push_out"}   # fetch erst mit Meilenstein Dose
 
-# Klassen, deren Fund gemeldet wird (Annahme, an die 41 Detektionsklassen anpassen)
-REPORTABLE = {"schlüssel", "handy", "geldbörse", "brille", "fernbedienung",
-              "fenster_offen", "tür_offen", "licht_an", "dose"}
+# Klassenlisten aus der Detektion (perception_classes.py ist die einzige Quelle)
+from .perception_classes import REPORTABLE, ROUTINE, normalize_item  # noqa: E402
 # Gefahren: immer und sofort melden, per Regel (Modellvergleich 07.11.: Qwen3.5 und
-# Gemma meldeten den eingeschalteten Herd 3/3 nicht). Annahme, an die Detektion anpassen.
-HAZARDS = {"herd_an", "bügeleisen_an", "wasserpfütze", "glasscherben", "rauch", "feuer"}
-# Alltägliches am festen Platz: nicht melden, kaum interessant (Annahme)
-ROUTINE = {"stuhl", "tisch", "sofa", "bett", "schrank", "regal", "lampe", "tür", "fenster",
-           "teppich", "pflanze", "fernseher", "kühlschrank", "waschmaschine"}
-REPORT_REPEAT_S = 3600.0        # dasselbe Objekt frühestens nach 1 h wieder melden
+# Gemma meldeten den eingeschalteten Herd 3/3 nicht). Die Detektion V5.0 erkennt aber
+# keine Gefahrenzustände (Herd an, Wasser, Rauch …), daher bleibt die Liste leer, bis
+# neue Klassen oder die Bildfrage ans Sprachmodell (Konzept 13, Punkt 11) sie liefern.
+HAZARDS: set[str] = set()
+REPORT_REPEAT_S = 7 * 24 * 3600.0  # dasselbe Objekt am selben Ort nicht erneut melden (Sim 07.11.: 4× dieselbe Meldung)
 HAZARD_REPEAT_S = 600.0         # Gefahr alle 10 min erneut, solange sie besteht
 GREET_REPEAT_S = 600.0          # dieselbe Person frühestens nach 10 min wieder begrüßen
-ENERGY_EXEMPT = {"return_home", "rest", "retreat", "idle"}
+ENERGY_EXEMPT = {"return_home", "rest", "retreat", "idle", "doze"}
+WANDER_MAX = 2
+DOZE_UTILITY = 0.3              # Dösen, wenn sonst nichts reizt (Annahme)
 ENERGY_FILTER_LEVEL = 3         # ab "hoch" nur noch ENERGY_EXEMPT im Menü (Test 07.11.: LLM ignorierte Regel 3)
 CLOSE_MARGIN = 0.15             # knapp = Nutzen höchstens so weit unter dem besten
 CLOSE_MAX = 3
@@ -76,11 +81,13 @@ def _norm(s: str) -> str:
 
 
 def matches(cls: str, wanted: Optional[str]) -> bool:
-    """Passt eine erkannte Klasse zum gesuchten Gegenstand? Einfacher Teilwort-
-    Vergleich ("brille" passt zu "lesebrille"). Synonyme ("Cola" -> "dose") liefert
-    später semantic.normalize_item() über das LLM."""
+    """Passt eine erkannte Klasse zum gesuchten Gegenstand? Erst über die Klassen-
+    namen und Synonyme ("smartphone" -> "handy"), sonst Teilwort-Vergleich."""
     if not wanted:
         return False
+    canon = normalize_item(wanted)
+    if canon is not None:
+        return _norm(cls) == canon
     a, b = _norm(cls), _norm(wanted)
     if len(a) < 3 or len(b) < 3:
         return a == b
@@ -103,7 +110,10 @@ def build_options(obs: Observation, needs: NeedsState, mem: Memory,
 
     # --- Grundverhalten ---
     add(Option("idle", None, "Stehen bleiben und abwarten", 0.1))
-    add(Option("look_around", None, "Sich umsehen", 0.15 + 0.3 * v["neugier"] + 0.2 * unease))
+    h_here = mem.habituation(f"area:{obs.place}", now)
+    add(Option("look_around", None, "Sich umsehen", 0.15 + 0.3 * v["neugier"] * (1 - h_here) + 0.2 * unease))
+    if unease < 0.5:
+        add(Option("doze", None, "Hinlegen und dösen", DOZE_UTILITY))
 
     # --- Neugier ---
     for area in obs.frontier[:FRONTIER_MAX]:
@@ -112,9 +122,15 @@ def build_options(obs: Observation, needs: NeedsState, mem: Memory,
         u = 0.8 * v["neugier"] * (1 - unease) * (1 - 0.5 * h)
         add(Option("explore_frontier", area, f"Unbekanntes erkunden: {area}", u))
 
+    # Rundgang: bekannte Räume, die lange niemand angesehen hat
+    rooms = [(mem.habituation(f"area:{p}", now), p) for p in obs.known_places if p != obs.place]
+    for h, p in sorted(rooms)[:WANDER_MAX]:
+        u = 0.6 * v["neugier"] * (1 - unease) * (1 - h)
+        add(Option("wander", p, f"Nachsehen, was es im Raum {p} Neues gibt", u))
+
     novel = []
     for o in obs.objects:
-        if not o.reachable:
+        if not o.reachable or o.cls in ROUTINE:
             continue
         h = mem.habituation(f"obj:{o.oid}", now)
         if h < 0.7:
@@ -160,7 +176,7 @@ def build_options(obs: Observation, needs: NeedsState, mem: Memory,
     for o in obs.objects:
         if any(x.behavior == "report" and x.arg == o.oid for x in opts):
             continue    # schon als Treffer zu einer Bitte im Menü
-        if o.cls in REPORTABLE and now - mem.reported.get(o.oid, -1e9) > REPORT_REPEAT_S:
+        if o.cls in REPORTABLE and now - mem.reported.get(f"{o.oid}@{o.place}", -1e9) > REPORT_REPEAT_S:
             u = (0.3 + 0.6 * v["nuetzlichkeit"]) * _w(mem, "report")
             add(Option("report", o.oid, f"Melden: {o.cls} gefunden ({o.place})", u, "report"))
 
