@@ -1,5 +1,7 @@
 # brain/compare_models.py
 # Version 0.2 (07.11.2026) – Alle Modelle mit beiden Testsuiten gegeneinander.
+# V0.3: Ergebnisse standardmäßig nach brain/ergebnisse/<Datum>/ (nicht ins Arbeitsverzeichnis).
+# V0.3: Spalte "Chat eigen" (Holdout von Marco) und Liste aller Antworten darauf.
 # V0.2: Smalltalk mit und ohne Tagebuch; Objekt-Spalte "LLM allein" (ohne Regel-Fälle).
 #
 # Aufruf aus src_dev/ai:
@@ -67,7 +69,8 @@ def evaluate(make, repeat: int) -> dict:
     t = time.perf_counter()
     open_ = OS.run(b, repeat, rows_out=False)
     s = open_["summary"]
-    print(f"    Chat {s['chat']['treffer']}/{s['chat']['laeufe']}, Objekt {s['objekt']['treffer']}/"
+    print(f"    Chat {s['chat']['treffer']}/{s['chat']['laeufe']}, eigen {s['eigen']['treffer']}/"
+          f"{s['eigen']['laeufe']}, Objekt {s['objekt']['treffer']}/"
           f"{s['objekt']['laeufe']}, Suchen {s['suchen']['treffer']}/{s['suchen']['laeufe']} "
           f"({time.perf_counter() - t:.0f} s)", flush=True)
     talk = [(q + (" [mit Tagebuch]" if d else " [ohne Tagebuch]"),
@@ -90,18 +93,18 @@ def _lat(*vals) -> str:
 
 
 def table(results: list[dict]) -> list[str]:
-    head = ("| Modell | GB | Laden s | Zielwahl voll (Code) | knapp | ungültig | Chat | Objekt (LLM allein) | Suchen | Latenz s |\n"
-            "|---|---|---|---|---|---|---|---|---|---|")
+    head = ("| Modell | GB | Laden s | Zielwahl voll (Code) | knapp | ungültig | Chat | Chat eigen | Objekt (LLM allein) | Suchen | Latenz s |\n"
+            "|---|---|---|---|---|---|---|---|---|---|---|")
     lines = [head]
     for r in results:
         if "fehler" in r:
-            lines.append(f"| {r['modell']} | | | {r['fehler']} | | | | | | |")
+            lines.append(f"| {r['modell']} | | | {r['fehler']} | | | | | | | |")
             continue
         f, k, o = r["voll"]["summary"], r["knapp"]["summary"], r["offen"]["summary"]
-        inval = f["ungueltig"] + k["ungueltig"] + sum(o[t]["ungueltig"] for t in ("chat", "objekt", "suchen"))
+        inval = f["ungueltig"] + k["ungueltig"] + sum(o[t]["ungueltig"] for t in ("chat", "eigen", "objekt", "suchen"))
         lines.append(
             f"| {r['modell']} | {r['groesse_gb'] or '-'} | {r['laden_s']} | {_rate(f)} ({f['code_treffer']}) | "
-            f"{_rate(k)} | {inval} | {_rate(o['chat'])} | {_rate(o['objekt'])} "
+            f"{_rate(k)} | {inval} | {_rate(o['chat'])} | {_rate(o['eigen'])} | {_rate(o['objekt'])} "
             f"({o['objekt'].get('llm_treffer', '-')}/{o['objekt'].get('llm_laeufe', '-')}) | {_rate(o['suchen'])} | "
             f"{_lat(f['latenz_median_s'], o['chat']['latenz_median_s'], o['objekt']['latenz_median_s'])} |")
     return lines
@@ -122,9 +125,16 @@ def report(results: list[dict], repeat: int) -> str:
                 if not row.get("ok") and not row.get("setup_fehler"):
                     errs[f"Zielwahl {part}: {row['szenario']} -> {row.get('wahl')}"] += 1
         for row in r["offen"]["rows"]:
-            if not row["ok"]:
+            if row["ok"] is False:
                 errs[f"{row['aufgabe']}: {row['fall']} -> {row['ausgabe']}"] += 1
         out += [f"- {n}× {e}" for e, n in errs.most_common(12)] or ["- keine"]
+        out += ["", "**Eigene Sätze (Holdout, erster Durchlauf)**", ""]
+        seen = set()
+        for row in r["offen"]["rows"]:
+            if row["aufgabe"] in ("eigen", "luecke") and row["fall"] not in seen:
+                seen.add(row["fall"])
+                mark = "LÜCKE" if row["aufgabe"] == "luecke" else ("ok" if row["ok"] else "FALSCH")
+                out.append(f"- {mark}: „{row['fall']}“ → {row['ausgabe']}")
         out += ["", "**Antworten zum Lesen**", ""]
         out += [f"- „{q}“ → „{a}“" for q, a in r["smalltalk"]]
         out += ["", f"Tagebuch: {r['offen']['summary'].get('tagebuch') or '-'}"]
@@ -138,9 +148,15 @@ def main() -> None:
     ap.add_argument("--repeat", type=int, default=3)
     ap.add_argument("--threads", type=int, default=4)
     ap.add_argument("--gpu-layers", type=int, default=0)
-    ap.add_argument("--report", default="modellvergleich.md")
-    ap.add_argument("--out", default="modellvergleich.json")
+    ap.add_argument("--report", default=None, help="Standard: brain/ergebnisse/<Datum>/modellvergleich_<Uhrzeit>.md")
+    ap.add_argument("--out", default=None)
     a = ap.parse_args()
+    if a.report is None or a.out is None:
+        d = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ergebnisse", time.strftime("%Y-%m-%d"))
+        os.makedirs(d, exist_ok=True)
+        stem = os.path.join(d, "modellvergleich_" + time.strftime("%H%M"))
+        a.report = a.report or stem + ".md"
+        a.out = a.out or stem + ".json"
 
     makers = []
     if a.mock:

@@ -1,5 +1,6 @@
 # brain/open_scenarios.py
 # Version 0.2 (07.11.2026) – Offene Testfälle für die semantischen Aufgaben.
+# V0.4: HOLDOUT_CHAT – Sätze von Marco (07.11.2026), nie zum Abstimmen benutzen.
 # V0.3: Objekt-Fälle zählen jetzt getrennt nach Regel und LLM (run_open_suite).
 # V0.2: Erwartungen bei Durst/Cola erweitert (Tasse, Glas, Flasche). Begründung: nach
 #       dem ersten Lauf als zu eng erkannt, nicht um das Ergebnis zu schönen –
@@ -20,6 +21,7 @@ class ChatCase:
     text: str
     services: set[str]                       # vertretbare Dienste
     item_any: set[str] = field(default_factory=set)   # Gegenstand muss eines davon enthalten (leer = egal)
+    gap: str = ""                            # Fähigkeit fehlt noch: Ausgabe wird gezeigt, nicht gewertet
 
 
 @dataclass
@@ -56,6 +58,22 @@ CHAT_CASES = [
     ChatCase("Wie geht's dir?", {"smalltalk"}),
     ChatCase("Ich geh jetzt schlafen, gute Nacht.", {"smalltalk", "stop"}),
     ChatCase("Hast du heute was Spannendes erlebt?", {"smalltalk"}),
+]
+
+# Holdout: Sätze, wie Marco sie zu SLARC sagen würde (07.11.2026). Diese Fälle
+# dienen nur zur Prüfung. Prompts und Beispiele dürfen NICHT danach abgestimmt werden,
+# sonst verlieren sie ihren Wert. Erwartungen von Claude festgelegt, vor dem ersten Lauf.
+HOLDOUT_CHAT = [
+    ChatCase("Suche unser Katze in der Wohnung!", {"search"}, {"katze"}),
+    ChatCase("Schau nach, ob Sophia in ihrem Zimmer ist!", {"check", "search"}, {"sophia", "zimmer"}),
+    ChatCase("Steht der Staubsauger im Wohnzimmer?", {"check", "search"}, {"staubsauger"}),
+    ChatCase("Ist im Schlafzimmer das Licht an?", {"check"}, {"licht", "schlafzimmer"}),
+    ChatCase("Schau nach, ob unter Lauras Bett etwas liegt und schiebe es heraus.", {"push_out"}),
+    ChatCase("Suche in der Wohnung nach einer Tasse!", {"search"}, {"tasse"}),
+    ChatCase("Überwache das Wohnzimmer!", set(), gap="kein Dienst 'überwachen/bewachen'"),
+    ChatCase("Wo ist die Fernbedienung?", {"search"}, {"fernbedienung"}),
+    ChatCase("Gehe ins Badezimmer!", set(), gap="kein Dienst 'zu einem Ort gehen'"),
+    ChatCase("Suche nach Laura!", {"search"}, {"laura"}),
 ]
 
 OBJECT_CASES = [
