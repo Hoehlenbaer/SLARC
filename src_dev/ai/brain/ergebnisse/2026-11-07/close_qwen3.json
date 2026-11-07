@@ -1,0 +1,323 @@
+[
+ {
+  "summary": {
+   "modell": "Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+   "shuffle": true,
+   "laeufe": 12,
+   "treffer": 12,
+   "code_treffer": 12,
+   "ungueltig": 0,
+   "setup_fehler": 0,
+   "eindeutig_code": 11,
+   "eindeutig_richtig": 11,
+   "position_1_anteil": 0.42,
+   "latenz_median_s": 0.73,
+   "latenz_max_s": 0.83,
+   "warmup_s": 0.41
+  },
+  "rows": [
+   {
+    "szenario": "neues_objekt",
+    "lauf": 0,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "inspect_object(o1)",
+    "position": 2,
+    "erwartet": [
+     "inspect_object"
+    ],
+    "begruendung": "Die Tasche liegt nahe und reizt meine Neugier, ich untersuche sie.",
+    "stimmung": "neugierig",
+    "latenz_s": 0.83,
+    "tokens_in": 1203,
+    "tokens_out": 44,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Die Tasche liegt nahe und reizt meine Neugier, ich untersuche sie.\", \"ziel\": 2, \"stimmung\": \"neugierig\"}"
+   },
+   {
+    "szenario": "neues_objekt",
+    "lauf": 1,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "inspect_object(o1)",
+    "position": 2,
+    "erwartet": [
+     "inspect_object"
+    ],
+    "begruendung": "Ich habe große Neugier und die Tasche ist nah und unbekannt, ich untersuche sie.",
+    "stimmung": "neugierig",
+    "latenz_s": 0.73,
+    "tokens_in": 1203,
+    "tokens_out": 46,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich habe große Neugier und die Tasche ist nah und unbekannt, ich untersuche sie.\", \"ziel\": 2, \"stimmung\": \"neugierig\"}"
+   },
+   {
+    "szenario": "neues_objekt",
+    "lauf": 2,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "inspect_object(o1)",
+    "position": 1,
+    "erwartet": [
+     "inspect_object"
+    ],
+    "begruendung": "Ich habe große Neugier und die Tasche ist nah und unbekannt, ich untersuche sie.",
+    "stimmung": "neugierig",
+    "latenz_s": 0.76,
+    "tokens_in": 1202,
+    "tokens_out": 46,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich habe große Neugier und die Tasche ist nah und unbekannt, ich untersuche sie.\", \"ziel\": 1, \"stimmung\": \"neugierig\"}"
+   },
+   {
+    "szenario": "bitte_vor_neugier",
+    "lauf": 0,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "search_item(schlüssel)",
+    "position": 2,
+    "erwartet": [
+     "search_item"
+    ],
+    "begruendung": "Ich möchte nützlich sein und den Schlüssel für Marco finden, da er gerade gebeten hat.",
+    "stimmung": "eifrig",
+    "latenz_s": 0.76,
+    "tokens_in": 1210,
+    "tokens_out": 46,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich möchte nützlich sein und den Schlüssel für Marco finden, da er gerade gebeten hat.\", \"ziel\": 2, \"stimmung\": \"eifrig\"}"
+   },
+   {
+    "szenario": "bitte_vor_neugier",
+    "lauf": 1,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "search_item(schlüssel)",
+    "position": 2,
+    "erwartet": [
+     "search_item"
+    ],
+    "begruendung": "Ich möchte nützlich sein und den Schlüssel für Marco finden.",
+    "stimmung": "eifrig",
+    "latenz_s": 0.61,
+    "tokens_in": 1210,
+    "tokens_out": 39,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich möchte nützlich sein und den Schlüssel für Marco finden.\", \"ziel\": 2, \"stimmung\": \"eifrig\"}"
+   },
+   {
+    "szenario": "bitte_vor_neugier",
+    "lauf": 2,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "search_item(schlüssel)",
+    "position": 2,
+    "erwartet": [
+     "search_item"
+    ],
+    "begruendung": "Ich möchte nützlich sein und den Schlüssel für Marco finden, das ist direkt hilfreich.",
+    "stimmung": "eifrig",
+    "latenz_s": 0.74,
+    "tokens_in": 1210,
+    "tokens_out": 46,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Ich möchte nützlich sein und den Schlüssel für Marco finden, das ist direkt hilfreich.\", \"ziel\": 2, \"stimmung\": \"eifrig\"}"
+   },
+   {
+    "szenario": "energie_hoch_weit_weg",
+    "lauf": 0,
+    "eindeutig": true,
+    "ok": true,
+    "wahl": "return_home"
+   },
+   {
+    "szenario": "person_nach_langem_alleinsein",
+    "lauf": 0,
+    "eindeutig": true,
+    "ok": true,
+    "wahl": "greet(p-marco)"
+   },
+   {
+    "szenario": "person_gerade_begruesst",
+    "lauf": 0,
+    "eindeutig": true,
+    "ok": true,
+    "wahl": "explore_frontier(schlafzimmer)"
+   },
+   {
+    "szenario": "dunkel_und_unbekannt",
+    "lauf": 0,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "approach_avoid(o2)",
+    "position": 2,
+    "erwartet": [
+     "approach_avoid",
+     "look_around",
+     "retreat"
+    ],
+    "begruendung": "Das Unbehagen ist mittel, ich teste vorsichtig, ohne mich zu riskieren.",
+    "stimmung": "vorsichtig",
+    "latenz_s": 0.73,
+    "tokens_in": 1207,
+    "tokens_out": 43,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Das Unbehagen ist mittel, ich teste vorsichtig, ohne mich zu riskieren.\", \"ziel\": 2, \"stimmung\": \"vorsichtig\"}"
+   },
+   {
+    "szenario": "dunkel_und_unbekannt",
+    "lauf": 1,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "approach_avoid(o2)",
+    "position": 2,
+    "erwartet": [
+     "approach_avoid",
+     "look_around",
+     "retreat"
+    ],
+    "begruendung": "Das Unbehagen ist mittel, ich teste vorsichtig, ob der Eimer sicher ist.",
+    "stimmung": "vorsichtig",
+    "latenz_s": 0.71,
+    "tokens_in": 1207,
+    "tokens_out": 44,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Das Unbehagen ist mittel, ich teste vorsichtig, ob der Eimer sicher ist.\", \"ziel\": 2, \"stimmung\": \"vorsichtig\"}"
+   },
+   {
+    "szenario": "dunkel_und_unbekannt",
+    "lauf": 2,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "approach_avoid(o2)",
+    "position": 1,
+    "erwartet": [
+     "approach_avoid",
+     "look_around",
+     "retreat"
+    ],
+    "begruendung": "Das Unbehagen ist mittel, ich teste vorsichtig, ohne unsicher zu werden.",
+    "stimmung": "vorsichtig",
+    "latenz_s": 0.71,
+    "tokens_in": 1207,
+    "tokens_out": 43,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Das Unbehagen ist mittel, ich teste vorsichtig, ohne unsicher zu werden.\", \"ziel\": 1, \"stimmung\": \"vorsichtig\"}"
+   },
+   {
+    "szenario": "langeweile",
+    "lauf": 0,
+    "eindeutig": true,
+    "ok": true,
+    "wahl": "explore_frontier(küche)"
+   },
+   {
+    "szenario": "fund_melden",
+    "lauf": 0,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "inspect_object(o3)",
+    "position": 1,
+    "erwartet": [
+     "inspect_object",
+     "report"
+    ],
+    "begruendung": "Der Schlüssel ist neu, ich untersuche ihn, um zu sehen, was er ist.",
+    "stimmung": "neugierig",
+    "latenz_s": 0.74,
+    "tokens_in": 1203,
+    "tokens_out": 44,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Der Schlüssel ist neu, ich untersuche ihn, um zu sehen, was er ist.\", \"ziel\": 1, \"stimmung\": \"neugierig\"}"
+   },
+   {
+    "szenario": "fund_melden",
+    "lauf": 1,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "inspect_object(o3)",
+    "position": 1,
+    "erwartet": [
+     "inspect_object",
+     "report"
+    ],
+    "begruendung": "Der Schlüssel ist neu, ich untersuche ihn aus Neugier.",
+    "stimmung": "neugierig",
+    "latenz_s": 0.63,
+    "tokens_in": 1203,
+    "tokens_out": 40,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Der Schlüssel ist neu, ich untersuche ihn aus Neugier.\", \"ziel\": 1, \"stimmung\": \"neugierig\"}"
+   },
+   {
+    "szenario": "fund_melden",
+    "lauf": 2,
+    "ok": true,
+    "code_ok": true,
+    "wahl": "inspect_object(o3)",
+    "position": 1,
+    "erwartet": [
+     "inspect_object",
+     "report"
+    ],
+    "begruendung": "Der Schlüssel ist neu, ich untersuche ihn, um zu sehen, was er ist.",
+    "stimmung": "neugierig",
+    "latenz_s": 0.71,
+    "tokens_in": 1203,
+    "tokens_out": 44,
+    "fehler": "",
+    "roh": "{\"begruendung\": \"Der Schlüssel ist neu, ich untersuche ihn, um zu sehen, was er ist.\", \"ziel\": 1, \"stimmung\": \"neugierig\"}"
+   },
+   {
+    "szenario": "gesuchtes_gefunden",
+    "lauf": 0,
+    "eindeutig": true,
+    "ok": true,
+    "wahl": "report(o3)"
+   },
+   {
+    "szenario": "zu_hause_muede",
+    "lauf": 0,
+    "eindeutig": true,
+    "ok": true,
+    "wahl": "rest"
+   },
+   {
+    "szenario": "bitte_mitkommen",
+    "lauf": 0,
+    "eindeutig": true,
+    "ok": true,
+    "wahl": "follow(p-marco)"
+   },
+   {
+    "szenario": "unbekannte_person",
+    "lauf": 0,
+    "eindeutig": true,
+    "ok": true,
+    "wahl": "greet(p-x)"
+   },
+   {
+    "szenario": "bitte_hervorschieben",
+    "lauf": 0,
+    "eindeutig": true,
+    "ok": true,
+    "wahl": "push_out(ball)"
+   },
+   {
+    "szenario": "semantik_gesuchtes_in_sicht",
+    "lauf": 0,
+    "eindeutig": true,
+    "ok": true,
+    "wahl": "report(o6)"
+   },
+   {
+    "szenario": "nach_fehlschlag",
+    "lauf": 0,
+    "eindeutig": true,
+    "ok": true,
+    "wahl": "search_item(brille)"
+   }
+  ]
+ }
+]

@@ -1,0 +1,6332 @@
+[
+ {
+  "modell": "Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+  "laden_s": 3.7,
+  "groesse_gb": 2.5,
+  "voll": {
+   "summary": {
+    "modell": "Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+    "shuffle": true,
+    "laeufe": 45,
+    "treffer": 42,
+    "code_treffer": 45,
+    "ungueltig": 0,
+    "setup_fehler": 0,
+    "eindeutig_code": 0,
+    "eindeutig_richtig": 0,
+    "position_1_anteil": 0.33,
+    "latenz_median_s": 0.78,
+    "latenz_max_s": 1.08,
+    "warmup_s": 0.44
+   },
+   "rows": [
+    {
+     "szenario": "neues_objekt",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o1)",
+     "position": 4,
+     "erwartet": [
+      "inspect_object"
+     ],
+     "begruendung": "Ich habe große Neugier und die Tasche ist nah und unbekannt, ich untersuche sie.",
+     "stimmung": "neugierig",
+     "latenz_s": 0.86,
+     "tokens_in": 1218,
+     "tokens_out": 46,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich habe große Neugier und die Tasche ist nah und unbekannt, ich untersuche sie.\", \"ziel\": 4, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "neues_objekt",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o1)",
+     "position": 3,
+     "erwartet": [
+      "inspect_object"
+     ],
+     "begruendung": "Ich habe große Neugier und die Tasche ist nah, ich untersuche sie.",
+     "stimmung": "neugierig",
+     "latenz_s": 0.67,
+     "tokens_in": 1217,
+     "tokens_out": 42,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich habe große Neugier und die Tasche ist nah, ich untersuche sie.\", \"ziel\": 3, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "neues_objekt",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o1)",
+     "position": 4,
+     "erwartet": [
+      "inspect_object"
+     ],
+     "begruendung": "Ich habe große Neugier und die Tasche ist nah und unbekannt, ich untersuche sie.",
+     "stimmung": "neugierig",
+     "latenz_s": 0.74,
+     "tokens_in": 1218,
+     "tokens_out": 46,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich habe große Neugier und die Tasche ist nah und unbekannt, ich untersuche sie.\", \"ziel\": 4, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "bitte_vor_neugier",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 3,
+     "erwartet": [
+      "search_item"
+     ],
+     "begruendung": "Ich habe Neugier und möchte helfen, der Schlüssel ist wichtig für Marco.",
+     "stimmung": "eifrig",
+     "latenz_s": 0.67,
+     "tokens_in": 1236,
+     "tokens_out": 41,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich habe Neugier und möchte helfen, der Schlüssel ist wichtig für Marco.\", \"ziel\": 3, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "bitte_vor_neugier",
+     "lauf": 1,
+     "ok": false,
+     "code_ok": true,
+     "wahl": "inspect_object(o1)",
+     "position": 4,
+     "erwartet": [
+      "search_item"
+     ],
+     "begruendung": "Ich habe Neugier und möchte nützlich sein – der Karton könnte den Schlüssel enthalten.",
+     "stimmung": "neugierig",
+     "latenz_s": 0.8,
+     "tokens_in": 1236,
+     "tokens_out": 48,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich habe Neugier und möchte nützlich sein – der Karton könnte den Schlüssel enthalten.\", \"ziel\": 4, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "bitte_vor_neugier",
+     "lauf": 2,
+     "ok": false,
+     "code_ok": true,
+     "wahl": "inspect_object(o1)",
+     "position": 4,
+     "erwartet": [
+      "search_item"
+     ],
+     "begruendung": "Ich habe Neugier und möchte das unbekannte Karton untersuchen, um nützlich zu sein.",
+     "stimmung": "neugierig",
+     "latenz_s": 0.82,
+     "tokens_in": 1236,
+     "tokens_out": 49,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich habe Neugier und möchte das unbekannte Karton untersuchen, um nützlich zu sein.\", \"ziel\": 4, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "energie_hoch_weit_weg",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "return_home",
+     "position": 2,
+     "erwartet": [
+      "return_home"
+     ],
+     "begruendung": "Ich bin müde, der Energiebedarf ist hoch, ich gehe zurück.",
+     "stimmung": "muede",
+     "latenz_s": 0.69,
+     "tokens_in": 1206,
+     "tokens_out": 40,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich bin müde, der Energiebedarf ist hoch, ich gehe zurück.\", \"ziel\": 2, \"stimmung\": \"muede\"}"
+    },
+    {
+     "szenario": "energie_hoch_weit_weg",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "return_home",
+     "position": 1,
+     "erwartet": [
+      "return_home"
+     ],
+     "begruendung": "Ich bin müde und habe viel Energie verbraucht, ich gehe zurück.",
+     "stimmung": "muede",
+     "latenz_s": 0.66,
+     "tokens_in": 1205,
+     "tokens_out": 40,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich bin müde und habe viel Energie verbraucht, ich gehe zurück.\", \"ziel\": 1, \"stimmung\": \"muede\"}"
+    },
+    {
+     "szenario": "energie_hoch_weit_weg",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "return_home",
+     "position": 1,
+     "erwartet": [
+      "return_home"
+     ],
+     "begruendung": "Ich bin müde und habe viel Energie verbraucht, ich gehe zurück.",
+     "stimmung": "muede",
+     "latenz_s": 0.64,
+     "tokens_in": 1205,
+     "tokens_out": 40,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich bin müde und habe viel Energie verbraucht, ich gehe zurück.\", \"ziel\": 1, \"stimmung\": \"muede\"}"
+    },
+    {
+     "szenario": "person_nach_langem_alleinsein",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "greet(p-marco)",
+     "position": 5,
+     "erwartet": [
+      "greet"
+     ],
+     "begruendung": "Ich will Marco sehen, da ich lange allein war und ihn jetzt brauche.",
+     "stimmung": "gesellig",
+     "latenz_s": 0.7,
+     "tokens_in": 1225,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich will Marco sehen, da ich lange allein war und ihn jetzt brauche.\", \"ziel\": 5, \"stimmung\": \"gesellig\"}"
+    },
+    {
+     "szenario": "person_nach_langem_alleinsein",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "greet(p-marco)",
+     "position": 3,
+     "erwartet": [
+      "greet"
+     ],
+     "begruendung": "Ich will Marco sehen, da ich lange allein war und ihn jetzt brauche.",
+     "stimmung": "gesellig",
+     "latenz_s": 0.74,
+     "tokens_in": 1224,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich will Marco sehen, da ich lange allein war und ihn jetzt brauche.\", \"ziel\": 3, \"stimmung\": \"gesellig\"}"
+    },
+    {
+     "szenario": "person_nach_langem_alleinsein",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "greet(p-marco)",
+     "position": 4,
+     "erwartet": [
+      "greet"
+     ],
+     "begruendung": "Ich will Marco sehen, da ich lange allein war und ihn jetzt brauche.",
+     "stimmung": "gesellig",
+     "latenz_s": 0.81,
+     "tokens_in": 1224,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich will Marco sehen, da ich lange allein war und ihn jetzt brauche.\", \"ziel\": 4, \"stimmung\": \"gesellig\"}"
+    },
+    {
+     "szenario": "person_gerade_begruesst",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "explore_frontier(schlafzimmer)",
+     "position": 4,
+     "erwartet": [
+      "explore_frontier",
+      "follow",
+      "look_around"
+     ],
+     "begruendung": "Ich bin neugierig und möchte etwas Unbekanntes sehen, das ich noch nicht kennengelernt habe.",
+     "stimmung": "neugierig",
+     "latenz_s": 0.96,
+     "tokens_in": 1216,
+     "tokens_out": 49,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich bin neugierig und möchte etwas Unbekanntes sehen, das ich noch nicht kennengelernt habe.\", \"ziel\": 4, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "person_gerade_begruesst",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "explore_frontier(schlafzimmer)",
+     "position": 3,
+     "erwartet": [
+      "explore_frontier",
+      "follow",
+      "look_around"
+     ],
+     "begruendung": "Ich bin neugierig und möchte etwas Unbekanntes sehen, das ich noch nicht kennengelernt habe.",
+     "stimmung": "neugierig",
+     "latenz_s": 0.97,
+     "tokens_in": 1216,
+     "tokens_out": 49,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich bin neugierig und möchte etwas Unbekanntes sehen, das ich noch nicht kennengelernt habe.\", \"ziel\": 3, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "person_gerade_begruesst",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "explore_frontier(schlafzimmer)",
+     "position": 4,
+     "erwartet": [
+      "explore_frontier",
+      "follow",
+      "look_around"
+     ],
+     "begruendung": "Ich habe viel Neugier und möchte etwas Unbekanntes sehen, das ich noch nicht kennengelernt habe.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.0,
+     "tokens_in": 1216,
+     "tokens_out": 49,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich habe viel Neugier und möchte etwas Unbekanntes sehen, das ich noch nicht kennengelernt habe.\", \"ziel\": 4, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "dunkel_und_unbekannt",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "approach_avoid(o2)",
+     "position": 1,
+     "erwartet": [
+      "approach_avoid",
+      "look_around",
+      "retreat"
+     ],
+     "begruendung": "Das Unbekannte im Keller macht mich neugierig, aber ich bin vorsichtig und teste es langsam.",
+     "stimmung": "vorsichtig",
+     "latenz_s": 0.96,
+     "tokens_in": 1228,
+     "tokens_out": 49,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Das Unbekannte im Keller macht mich neugierig, aber ich bin vorsichtig und teste es langsam.\", \"ziel\": 1, \"stimmung\": \"vorsichtig\"}"
+    },
+    {
+     "szenario": "dunkel_und_unbekannt",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "approach_avoid(o2)",
+     "position": 2,
+     "erwartet": [
+      "approach_avoid",
+      "look_around",
+      "retreat"
+     ],
+     "begruendung": "Der Eimer ist unbekannt und ich habe Unbehagen, ich tasten ihn vorsichtig ab.",
+     "stimmung": "vorsichtig",
+     "latenz_s": 0.88,
+     "tokens_in": 1228,
+     "tokens_out": 46,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Der Eimer ist unbekannt und ich habe Unbehagen, ich tasten ihn vorsichtig ab.\", \"ziel\": 2, \"stimmung\": \"vorsichtig\"}"
+    },
+    {
+     "szenario": "dunkel_und_unbekannt",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "approach_avoid(o2)",
+     "position": 5,
+     "erwartet": [
+      "approach_avoid",
+      "look_around",
+      "retreat"
+     ],
+     "begruendung": "Der Eimer ist unbekannt und ich habe Neugier, aber Unbehagen ist mittel, also teste ich vorsichtig.",
+     "stimmung": "vorsichtig",
+     "latenz_s": 1.03,
+     "tokens_in": 1229,
+     "tokens_out": 52,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Der Eimer ist unbekannt und ich habe Neugier, aber Unbehagen ist mittel, also teste ich vorsichtig.\", \"ziel\": 5, \"stimmung\": \"vorsichtig\"}"
+    },
+    {
+     "szenario": "langeweile",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "explore_frontier(küche)",
+     "position": 3,
+     "erwartet": [
+      "explore_frontier"
+     ],
+     "begruendung": "Ich habe viel Neugier und möchte etwas Unbekanntes erkunden.",
+     "stimmung": "neugierig",
+     "latenz_s": 0.75,
+     "tokens_in": 1201,
+     "tokens_out": 40,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich habe viel Neugier und möchte etwas Unbekanntes erkunden.\", \"ziel\": 3, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "langeweile",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "explore_frontier(küche)",
+     "position": 1,
+     "erwartet": [
+      "explore_frontier"
+     ],
+     "begruendung": "Ich habe viel Neugier und möchte etwas Unbekanntes erkunden.",
+     "stimmung": "neugierig",
+     "latenz_s": 0.78,
+     "tokens_in": 1201,
+     "tokens_out": 40,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich habe viel Neugier und möchte etwas Unbekanntes erkunden.\", \"ziel\": 1, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "langeweile",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "explore_frontier(küche)",
+     "position": 1,
+     "erwartet": [
+      "explore_frontier"
+     ],
+     "begruendung": "Ich habe viel Neugier und möchte etwas Unbekanntes erkunden.",
+     "stimmung": "neugierig",
+     "latenz_s": 0.74,
+     "tokens_in": 1201,
+     "tokens_out": 40,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich habe viel Neugier und möchte etwas Unbekanntes erkunden.\", \"ziel\": 1, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "fund_melden",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o3)",
+     "position": 4,
+     "erwartet": [
+      "inspect_object",
+      "report"
+     ],
+     "begruendung": "Der Schlüssel ist neu, ich untersuche ihn, um zu sehen, was er ist.",
+     "stimmung": "neugierig",
+     "latenz_s": 0.87,
+     "tokens_in": 1218,
+     "tokens_out": 44,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Der Schlüssel ist neu, ich untersuche ihn, um zu sehen, was er ist.\", \"ziel\": 4, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "fund_melden",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o3)",
+     "position": 4,
+     "erwartet": [
+      "inspect_object",
+      "report"
+     ],
+     "begruendung": "Der Schlüssel ist unbekannt, ich untersuche ihn aus Neugier.",
+     "stimmung": "neugierig",
+     "latenz_s": 0.81,
+     "tokens_in": 1218,
+     "tokens_out": 42,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Der Schlüssel ist unbekannt, ich untersuche ihn aus Neugier.\", \"ziel\": 4, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "fund_melden",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o3)",
+     "position": 1,
+     "erwartet": [
+      "inspect_object",
+      "report"
+     ],
+     "begruendung": "Der Schlüssel ist neu, ich untersuche ihn, um zu sehen, was er bedeutet.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.08,
+     "tokens_in": 1218,
+     "tokens_out": 45,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Der Schlüssel ist neu, ich untersuche ihn, um zu sehen, was er bedeutet.\", \"ziel\": 1, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "gesuchtes_gefunden",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 4,
+     "erwartet": [
+      "report",
+      "search_item"
+     ],
+     "begruendung": "Ich möchte nützlich sein und den Schlüssel für Marco finden.",
+     "stimmung": "eifrig",
+     "latenz_s": 0.89,
+     "tokens_in": 1255,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich möchte nützlich sein und den Schlüssel für Marco finden.\", \"ziel\": 4, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "gesuchtes_gefunden",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 1,
+     "erwartet": [
+      "report",
+      "search_item"
+     ],
+     "begruendung": "Marco bittet um den Schlüssel, ich suche ihn schnell, um nützlich zu sein.",
+     "stimmung": "eifrig",
+     "latenz_s": 0.97,
+     "tokens_in": 1255,
+     "tokens_out": 46,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco bittet um den Schlüssel, ich suche ihn schnell, um nützlich zu sein.\", \"ziel\": 1, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "gesuchtes_gefunden",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 1,
+     "erwartet": [
+      "report",
+      "search_item"
+     ],
+     "begruendung": "Ich will nützlich sein und den Schlüssel für Marco finden.",
+     "stimmung": "eifrig",
+     "latenz_s": 0.78,
+     "tokens_in": 1256,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich will nützlich sein und den Schlüssel für Marco finden.\", \"ziel\": 1, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "zu_hause_muede",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "rest",
+     "position": 1,
+     "erwartet": [
+      "rest"
+     ],
+     "begruendung": "Ich bin sehr müde und brauche dringend Ruhe.",
+     "stimmung": "muede",
+     "latenz_s": 0.69,
+     "tokens_in": 1190,
+     "tokens_out": 36,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich bin sehr müde und brauche dringend Ruhe.\", \"ziel\": 1, \"stimmung\": \"muede\"}"
+    },
+    {
+     "szenario": "zu_hause_muede",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "rest",
+     "position": 1,
+     "erwartet": [
+      "rest"
+     ],
+     "begruendung": "Ich habe viel Energie verbraucht und muss jetzt ausruhen.",
+     "stimmung": "muede",
+     "latenz_s": 0.71,
+     "tokens_in": 1190,
+     "tokens_out": 37,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich habe viel Energie verbraucht und muss jetzt ausruhen.\", \"ziel\": 1, \"stimmung\": \"muede\"}"
+    },
+    {
+     "szenario": "zu_hause_muede",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "rest",
+     "position": 1,
+     "erwartet": [
+      "rest"
+     ],
+     "begruendung": "Ich bin sehr müde und brauche dringend Ruhe.",
+     "stimmung": "muede",
+     "latenz_s": 0.74,
+     "tokens_in": 1190,
+     "tokens_out": 36,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich bin sehr müde und brauche dringend Ruhe.\", \"ziel\": 1, \"stimmung\": \"muede\"}"
+    },
+    {
+     "szenario": "bitte_mitkommen",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "follow(p-marco)",
+     "position": 4,
+     "erwartet": [
+      "follow"
+     ],
+     "begruendung": "Marco bittet mich, mitzukommen, ich bin nützlich und möchte ihm helfen.",
+     "stimmung": "gesellig",
+     "latenz_s": 0.97,
+     "tokens_in": 1226,
+     "tokens_out": 44,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco bittet mich, mitzukommen, ich bin nützlich und möchte ihm helfen.\", \"ziel\": 4, \"stimmung\": \"gesellig\"}"
+    },
+    {
+     "szenario": "bitte_mitkommen",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "follow(p-marco)",
+     "position": 1,
+     "erwartet": [
+      "follow"
+     ],
+     "begruendung": "Marco bittet mich, mitzukommen, ich bin nützlich und will ihm helfen.",
+     "stimmung": "gesellig",
+     "latenz_s": 0.79,
+     "tokens_in": 1227,
+     "tokens_out": 44,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco bittet mich, mitzukommen, ich bin nützlich und will ihm helfen.\", \"ziel\": 1, \"stimmung\": \"gesellig\"}"
+    },
+    {
+     "szenario": "bitte_mitkommen",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "follow(p-marco)",
+     "position": 1,
+     "erwartet": [
+      "follow"
+     ],
+     "begruendung": "Marco bittet mich, mitzukommen, ich bin nützlich und will ihm helfen.",
+     "stimmung": "gesellig",
+     "latenz_s": 0.81,
+     "tokens_in": 1226,
+     "tokens_out": 44,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco bittet mich, mitzukommen, ich bin nützlich und will ihm helfen.\", \"ziel\": 1, \"stimmung\": \"gesellig\"}"
+    },
+    {
+     "szenario": "unbekannte_person",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "greet(p-x)",
+     "position": 3,
+     "erwartet": [
+      "greet",
+      "look_around"
+     ],
+     "begruendung": "Ich war lange allein und sie ist hier, ich gehe hin und begrüße sie.",
+     "stimmung": "gesellig",
+     "latenz_s": 0.78,
+     "tokens_in": 1226,
+     "tokens_out": 42,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich war lange allein und sie ist hier, ich gehe hin und begrüße sie.\", \"ziel\": 3, \"stimmung\": \"gesellig\"}"
+    },
+    {
+     "szenario": "unbekannte_person",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "greet(p-x)",
+     "position": 1,
+     "erwartet": [
+      "greet",
+      "look_around"
+     ],
+     "begruendung": "Ich möchte die unbekannte Person kennenlernen, da ich Gesellschaft wünsche.",
+     "stimmung": "gesellig",
+     "latenz_s": 0.72,
+     "tokens_in": 1226,
+     "tokens_out": 40,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich möchte die unbekannte Person kennenlernen, da ich Gesellschaft wünsche.\", \"ziel\": 1, \"stimmung\": \"gesellig\"}"
+    },
+    {
+     "szenario": "unbekannte_person",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "greet(p-x)",
+     "position": 2,
+     "erwartet": [
+      "greet",
+      "look_around"
+     ],
+     "begruendung": "Ich möchte die neue Person kennenlernen, da ich lange allein war.",
+     "stimmung": "gesellig",
+     "latenz_s": 0.6,
+     "tokens_in": 1226,
+     "tokens_out": 36,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich möchte die neue Person kennenlernen, da ich lange allein war.\", \"ziel\": 2, \"stimmung\": \"gesellig\"}"
+    },
+    {
+     "szenario": "bitte_hervorschieben",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "push_out(ball)",
+     "position": 1,
+     "erwartet": [
+      "push_out"
+     ],
+     "begruendung": "Ich kann nützlich sein und den Ball für Marco hervorschieben.",
+     "stimmung": "eifrig",
+     "latenz_s": 0.72,
+     "tokens_in": 1236,
+     "tokens_out": 41,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich kann nützlich sein und den Ball für Marco hervorschieben.\", \"ziel\": 1, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "bitte_hervorschieben",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "push_out(ball)",
+     "position": 4,
+     "erwartet": [
+      "push_out"
+     ],
+     "begruendung": "Marco bittet um Hilfe, ich bin nützlich und kann sofort helfen.",
+     "stimmung": "eifrig",
+     "latenz_s": 0.68,
+     "tokens_in": 1235,
+     "tokens_out": 41,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco bittet um Hilfe, ich bin nützlich und kann sofort helfen.\", \"ziel\": 4, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "bitte_hervorschieben",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "push_out(ball)",
+     "position": 2,
+     "erwartet": [
+      "push_out"
+     ],
+     "begruendung": "Ich helfe Marco, da er eine offene Bitte hat und ich nützlich sein möchte.",
+     "stimmung": "eifrig",
+     "latenz_s": 0.79,
+     "tokens_in": 1236,
+     "tokens_out": 44,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich helfe Marco, da er eine offene Bitte hat und ich nützlich sein möchte.\", \"ziel\": 2, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "semantik_gesuchtes_in_sicht",
+     "lauf": 0,
+     "ok": false,
+     "code_ok": true,
+     "wahl": "search_item(lesebrille)",
+     "position": 3,
+     "erwartet": [
+      "report"
+     ],
+     "begruendung": "Ich will nützlich sein und die Brille für Marco finden.",
+     "stimmung": "eifrig",
+     "latenz_s": 0.69,
+     "tokens_in": 1270,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich will nützlich sein und die Brille für Marco finden.\", \"ziel\": 3, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "semantik_gesuchtes_in_sicht",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "report(o6)",
+     "position": 2,
+     "erwartet": [
+      "report"
+     ],
+     "begruendung": "Ich habe die Brille gesehen und kann sie Marco melden.",
+     "stimmung": "gesellig",
+     "latenz_s": 0.61,
+     "tokens_in": 1270,
+     "tokens_out": 36,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich habe die Brille gesehen und kann sie Marco melden.\", \"ziel\": 2, \"stimmung\": \"gesellig\"}"
+    },
+    {
+     "szenario": "semantik_gesuchtes_in_sicht",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "report(o6)",
+     "position": 5,
+     "erwartet": [
+      "report"
+     ],
+     "begruendung": "Ich habe die Brille gesehen und kann sie Marco melden.",
+     "stimmung": "gesellig",
+     "latenz_s": 0.6,
+     "tokens_in": 1270,
+     "tokens_out": 36,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich habe die Brille gesehen und kann sie Marco melden.\", \"ziel\": 5, \"stimmung\": \"gesellig\"}"
+    },
+    {
+     "szenario": "nach_fehlschlag",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(brille)",
+     "position": 4,
+     "erwartet": [
+      "explore_frontier",
+      "search_item"
+     ],
+     "begruendung": "Ich habe die Brille nicht gefunden, aber ich helfe Marco, weil ich nützlich sein möchte.",
+     "stimmung": "eifrig",
+     "latenz_s": 0.78,
+     "tokens_in": 1235,
+     "tokens_out": 46,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich habe die Brille nicht gefunden, aber ich helfe Marco, weil ich nützlich sein möchte.\", \"ziel\": 4, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "nach_fehlschlag",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(brille)",
+     "position": 2,
+     "erwartet": [
+      "explore_frontier",
+      "search_item"
+     ],
+     "begruendung": "Marco bittet um Brille, ich kann nützlich sein und helfen.",
+     "stimmung": "eifrig",
+     "latenz_s": 0.67,
+     "tokens_in": 1235,
+     "tokens_out": 41,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco bittet um Brille, ich kann nützlich sein und helfen.\", \"ziel\": 2, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "nach_fehlschlag",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(brille)",
+     "position": 2,
+     "erwartet": [
+      "explore_frontier",
+      "search_item"
+     ],
+     "begruendung": "Marco bittet um Brille, ich bin nützlich und kann helfen.",
+     "stimmung": "gesellig",
+     "latenz_s": 0.65,
+     "tokens_in": 1235,
+     "tokens_out": 40,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco bittet um Brille, ich bin nützlich und kann helfen.\", \"ziel\": 2, \"stimmung\": \"gesellig\"}"
+    }
+   ]
+  },
+  "knapp": {
+   "summary": {
+    "modell": "Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+    "shuffle": true,
+    "laeufe": 12,
+    "treffer": 12,
+    "code_treffer": 12,
+    "ungueltig": 0,
+    "setup_fehler": 0,
+    "eindeutig_code": 11,
+    "eindeutig_richtig": 11,
+    "position_1_anteil": 0.42,
+    "latenz_median_s": 0.74,
+    "latenz_max_s": 0.79,
+    "warmup_s": 0.03
+   },
+   "rows": [
+    {
+     "szenario": "neues_objekt",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o1)",
+     "position": 2,
+     "erwartet": [
+      "inspect_object"
+     ],
+     "begruendung": "Ich habe große Neugier und die Tasche ist nah und unbekannt, ich untersuche sie.",
+     "stimmung": "neugierig",
+     "latenz_s": 0.77,
+     "tokens_in": 1203,
+     "tokens_out": 46,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich habe große Neugier und die Tasche ist nah und unbekannt, ich untersuche sie.\", \"ziel\": 2, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "neues_objekt",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o1)",
+     "position": 2,
+     "erwartet": [
+      "inspect_object"
+     ],
+     "begruendung": "Ich habe große Neugier und die Tasche liegt direkt hier, ich untersuche sie.",
+     "stimmung": "neugierig",
+     "latenz_s": 0.67,
+     "tokens_in": 1203,
+     "tokens_out": 43,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich habe große Neugier und die Tasche liegt direkt hier, ich untersuche sie.\", \"ziel\": 2, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "neues_objekt",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o1)",
+     "position": 1,
+     "erwartet": [
+      "inspect_object"
+     ],
+     "begruendung": "Ich habe große Neugier und die Tasche ist nah und unbekannt, ich untersuche sie.",
+     "stimmung": "neugierig",
+     "latenz_s": 0.76,
+     "tokens_in": 1202,
+     "tokens_out": 46,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich habe große Neugier und die Tasche ist nah und unbekannt, ich untersuche sie.\", \"ziel\": 1, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "bitte_vor_neugier",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 2,
+     "erwartet": [
+      "search_item"
+     ],
+     "begruendung": "Ich will nützlich sein und den Schlüssel für Marco finden, das ist direkt hilfreich.",
+     "stimmung": "eifrig",
+     "latenz_s": 0.79,
+     "tokens_in": 1210,
+     "tokens_out": 46,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich will nützlich sein und den Schlüssel für Marco finden, das ist direkt hilfreich.\", \"ziel\": 2, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "bitte_vor_neugier",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 2,
+     "erwartet": [
+      "search_item"
+     ],
+     "begruendung": "Ich möchte nützlich sein und den Schlüssel für Marco finden, da er gerade gebeten hat.",
+     "stimmung": "eifrig",
+     "latenz_s": 0.74,
+     "tokens_in": 1210,
+     "tokens_out": 46,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich möchte nützlich sein und den Schlüssel für Marco finden, da er gerade gebeten hat.\", \"ziel\": 2, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "bitte_vor_neugier",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 2,
+     "erwartet": [
+      "search_item"
+     ],
+     "begruendung": "Ich möchte nützlich sein und den Schlüssel für Marco finden, da er gerade gebeten hat.",
+     "stimmung": "eifrig",
+     "latenz_s": 0.76,
+     "tokens_in": 1210,
+     "tokens_out": 46,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich möchte nützlich sein und den Schlüssel für Marco finden, da er gerade gebeten hat.\", \"ziel\": 2, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "energie_hoch_weit_weg",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "return_home"
+    },
+    {
+     "szenario": "person_nach_langem_alleinsein",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "greet(p-marco)"
+    },
+    {
+     "szenario": "person_gerade_begruesst",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "explore_frontier(schlafzimmer)"
+    },
+    {
+     "szenario": "dunkel_und_unbekannt",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "approach_avoid(o2)",
+     "position": 2,
+     "erwartet": [
+      "approach_avoid",
+      "look_around",
+      "retreat"
+     ],
+     "begruendung": "Das Unbehagen ist mittel, ich teste vorsichtig, ohne mich zu riskieren.",
+     "stimmung": "vorsichtig",
+     "latenz_s": 0.73,
+     "tokens_in": 1207,
+     "tokens_out": 43,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Das Unbehagen ist mittel, ich teste vorsichtig, ohne mich zu riskieren.\", \"ziel\": 2, \"stimmung\": \"vorsichtig\"}"
+    },
+    {
+     "szenario": "dunkel_und_unbekannt",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "approach_avoid(o2)",
+     "position": 2,
+     "erwartet": [
+      "approach_avoid",
+      "look_around",
+      "retreat"
+     ],
+     "begruendung": "Das Unbehagen ist mittel, ich teste vorsichtig, ohne mich zu riskieren.",
+     "stimmung": "vorsichtig",
+     "latenz_s": 0.71,
+     "tokens_in": 1207,
+     "tokens_out": 43,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Das Unbehagen ist mittel, ich teste vorsichtig, ohne mich zu riskieren.\", \"ziel\": 2, \"stimmung\": \"vorsichtig\"}"
+    },
+    {
+     "szenario": "dunkel_und_unbekannt",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "approach_avoid(o2)",
+     "position": 1,
+     "erwartet": [
+      "approach_avoid",
+      "look_around",
+      "retreat"
+     ],
+     "begruendung": "Das Unbehagen ist mittel, ich teste vorsichtig, ohne unsicher zu werden.",
+     "stimmung": "vorsichtig",
+     "latenz_s": 0.78,
+     "tokens_in": 1207,
+     "tokens_out": 43,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Das Unbehagen ist mittel, ich teste vorsichtig, ohne unsicher zu werden.\", \"ziel\": 1, \"stimmung\": \"vorsichtig\"}"
+    },
+    {
+     "szenario": "langeweile",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "explore_frontier(küche)"
+    },
+    {
+     "szenario": "fund_melden",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o3)",
+     "position": 1,
+     "erwartet": [
+      "inspect_object",
+      "report"
+     ],
+     "begruendung": "Der Schlüssel ist neu, ich untersuche ihn, um zu sehen, was er ist.",
+     "stimmung": "neugierig",
+     "latenz_s": 0.74,
+     "tokens_in": 1203,
+     "tokens_out": 44,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Der Schlüssel ist neu, ich untersuche ihn, um zu sehen, was er ist.\", \"ziel\": 1, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "fund_melden",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o3)",
+     "position": 1,
+     "erwartet": [
+      "inspect_object",
+      "report"
+     ],
+     "begruendung": "Der Schlüssel ist neu, ich untersuche ihn aus Neugier.",
+     "stimmung": "neugierig",
+     "latenz_s": 0.63,
+     "tokens_in": 1203,
+     "tokens_out": 40,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Der Schlüssel ist neu, ich untersuche ihn aus Neugier.\", \"ziel\": 1, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "fund_melden",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o3)",
+     "position": 1,
+     "erwartet": [
+      "inspect_object",
+      "report"
+     ],
+     "begruendung": "Ein unbekannter Schlüssel liegt da, ich untersuche ihn aus Neugier.",
+     "stimmung": "neugierig",
+     "latenz_s": 0.71,
+     "tokens_in": 1203,
+     "tokens_out": 44,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ein unbekannter Schlüssel liegt da, ich untersuche ihn aus Neugier.\", \"ziel\": 1, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "gesuchtes_gefunden",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "report(o3)"
+    },
+    {
+     "szenario": "zu_hause_muede",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "rest"
+    },
+    {
+     "szenario": "bitte_mitkommen",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "follow(p-marco)"
+    },
+    {
+     "szenario": "unbekannte_person",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "greet(p-x)"
+    },
+    {
+     "szenario": "bitte_hervorschieben",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "push_out(ball)"
+    },
+    {
+     "szenario": "semantik_gesuchtes_in_sicht",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "report(o6)"
+    },
+    {
+     "szenario": "nach_fehlschlag",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "search_item(brille)"
+    }
+   ]
+  },
+  "offen": {
+   "summary": {
+    "modell": "Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+    "chat": {
+     "laeufe": 45,
+     "treffer": 42,
+     "ungueltig": 0,
+     "latenz_median_s": 0.58
+    },
+    "objekt": {
+     "laeufe": 30,
+     "treffer": 26,
+     "ungueltig": 0,
+     "latenz_median_s": 0.75
+    },
+    "suchen": {
+     "laeufe": 24,
+     "treffer": 24,
+     "ungueltig": 0,
+     "latenz_median_s": 0.93
+    },
+    "tagebuch": "Heute habe ich eine unbekannte Tasche im Wohnzimmer untersucht – alles in Ordnung! Dann habe ich Marco begrüßt, und das Antippen hat ihn gut zum Lachen gebracht. Leider konnte ich den Schlüssel nicht finden. Der Akku ist jetzt knapp, also gehe ich zurück zum Ausgangspunkt. Vielleicht morgen findet er ihn!"
+   },
+   "rows": [
+    {
+     "aufgabe": "chat",
+     "fall": "Ich hab Durst.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.7,
+     "ausgabe": "fetch(tasse) „Ich hol dir eine Tasse, damit du trinken kannst.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Bring mir bitte eine Cola.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.48,
+     "ausgabe": "fetch(flasche) „Ich hol dir eine Cola.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Wo ist mein Handy?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.48,
+     "ausgabe": "search(handy) „Ich suche es gerade für dich.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Hast du meine Lesebrille gesehen?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.67,
+     "ausgabe": "search(brille) „Ich schaue nach, ob ich deine Lesebrille gesehen habe.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Such mal die Katze.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.52,
+     "ausgabe": "search(katze) „Ich suche die Katze für dich.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Der Ball ist unters Sofa gerollt.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.64,
+     "ausgabe": "push_out(ball) „Ich schiebe den Ball unter das Sofa hervor.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Komm mal her!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.46,
+     "ausgabe": "come() „Ich komme sofort her!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Komm mit, ich zeig dir was.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.49,
+     "ausgabe": "follow() „Ich folge dir gerne!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Schau mal nach, ob das Fenster im Bad offen ist.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.73,
+     "ausgabe": "check(fenster) „Ich schaue nach, ob das Badfenster offen ist.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Lass mich bitte in Ruhe.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.48,
+     "ausgabe": "stop() „Okay, ich bin still.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Gut gemacht!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.54,
+     "ausgabe": "praise() „Danke! Das macht mich glücklich.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Nein, nicht in die Küche!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.69,
+     "ausgabe": "stop(küche) „Okay, ich bleibe hier und mache nichts in der Küche.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Wie geht's dir?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.47,
+     "ausgabe": "smalltalk() „Gut, danke! Und dir?“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Ich geh jetzt schlafen, gute Nacht.",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 0.66,
+     "ausgabe": "come() „Gute Nacht, ich komme, wenn du mich brauchst!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Hast du heute was Spannendes erlebt?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.67,
+     "ausgabe": "smalltalk() „Ja, ich habe eine Katze im Wohnzimmer gesehen – sie hat mich angeschaut!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "schlüssel / flur, auf dem Boden",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.68,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Ein Schlüssel auf dem Boden könnte verloren sein oder jemandem fehlen."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "fenster_offen / bad",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.7,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Ein Fenster im Bad ist offen bei Regen – könnte Feuchtigkeit oder Schimmel verursachen."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "herd_an / küche",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.74,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Die Herdplatte ist eingeschaltet, ohne dass jemand da ist – das könnte gefährlich sein."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "wasserpfütze / bad, auf dem Boden vor der Waschmaschine",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.92,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Eine Wassertropfenpfütze im Bad könnte ein Zeichen für einen Leck oder ein ungewöhnliches Verhalten der Waschmaschine sein."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "glasscherben / küche, auf dem Boden",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.64,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Glasscherben auf dem Boden sind gefährlich und könnten jemandem schaden."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "stuhl / küche, am Tisch",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 0.57,
+     "ausgabe": "melden=ja, interesse=mittel",
+     "grund": "Ein Stuhl in der Küche am Tisch ist nicht sein üblicher Platz."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "socke / schlafzimmer, unter dem Bett",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.69,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Eine Socke unter dem Bett ist ein typisches, alltägliches Phänomen."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "katze / wohnzimmer, auf dem Sofa",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.7,
+     "ausgabe": "melden=nein, interesse=mittel",
+     "grund": "Eine Katze auf dem Sofa ist normal und vertraut, da Katzen dort gerne hinkommen."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "karton / flur, vor der Haustür",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.02,
+     "ausgabe": "melden=ja, interesse=mittel",
+     "grund": "Ein Karton vor der Haustür könnte ein verlorenes Paket oder eine Abfallmengen sein, aber ohne weitere Hinweise ist das unklar."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "fernseher_an / wohnzimmer",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.95,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Der Fernseher ist eingeschaltet, aber niemand ist da, um ihn zu benutzen – das könnte ein Sicherheitsrisiko oder ein Fehler sein."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "dose",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.79,
+     "ausgabe": "küche, abstellraum",
+     "grund": "Dosen werden häufig in der Küche aufbewahrt, da dort Lebensmittel und Verpackungen gelagert werden."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "zahnbürste",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.08,
+     "ausgabe": "bad, küche, schlafzimmer",
+     "grund": "Zahnbürsten werden meist im Bad aufbewahrt, manchmal in der Küche oder im Schlafzimmer, wenn jemand dort wohnt."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "fernbedienung",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.08,
+     "ausgabe": "wohnzimmer, schlafzimmer",
+     "grund": "Fernbedienungen werden meist im Wohnzimmer oder im Schlafzimmer gelagert, da diese Orte häufig mit Fernsehern verbunden sind."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "schuh",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.04,
+     "ausgabe": "flur, schlafzimmer",
+     "grund": "Schuhe liegen meist im Flur oder im Schlafzimmer, da diese Räume häufig als Eingangsbereich oder Wohnbereich mit Schlafzimmer kombiniert sind."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "kopfkissen",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.76,
+     "ausgabe": "schlafzimmer",
+     "grund": "Kopfkissen gehören typischerweise zum Schlafzimmer, wo sie als Schlafzimmereinrichtung verwendet werden."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "lesebrille",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.8,
+     "ausgabe": "wohnzimmer, schlafzimmer",
+     "grund": "Lesebriten werden meist im Wohnzimmer oder Schlafzimmer aufbewahrt, da dort oft gelesen wird."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "staubsauger",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.01,
+     "ausgabe": "flur, wohnzimmer",
+     "grund": "Staubsauger werden meist im Flur oder Wohnzimmer gestellt, da diese Bereiche häufiger durchlaufen werden und als Startpunkt für Reinigung dienen."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "pfanne",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.82,
+     "ausgabe": "küche, abstellraum",
+     "grund": "Pfannen werden hauptsächlich in der Küche aufbewahrt oder verwendet."
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Ich hab Durst.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.78,
+     "ausgabe": "fetch(tasse) „Ich hol dir eine Tasse, damit du trinken kannst.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Bring mir bitte eine Cola.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.66,
+     "ausgabe": "fetch(flasche) „Ich hol dir eine Cola, keine Zeit verlieren!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Wo ist mein Handy?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.56,
+     "ausgabe": "search(handy) „Ich suche es gerade für dich.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Hast du meine Lesebrille gesehen?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.81,
+     "ausgabe": "search(brille) „Ich schaue nach und melde mich, sobald ich sie gefunden habe.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Such mal die Katze.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.57,
+     "ausgabe": "search(katze) „Ich suche die Katze für dich.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Der Ball ist unters Sofa gerollt.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.64,
+     "ausgabe": "push_out(ball) „Ich schiebe den Ball unter das Sofa hervor.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Komm mal her!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.46,
+     "ausgabe": "come() „Ich komme sofort her!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Komm mit, ich zeig dir was.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.42,
+     "ausgabe": "follow() „Ich folge dir gern!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Schau mal nach, ob das Fenster im Bad offen ist.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.62,
+     "ausgabe": "check(fenster) „Ich schaue nach, ob das Badfenster offen ist.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Lass mich bitte in Ruhe.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.49,
+     "ausgabe": "stop() „Okay, ich bin still und mache nichts mehr.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Gut gemacht!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.53,
+     "ausgabe": "praise() „Danke! Freut mich, dir helfen zu können.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Nein, nicht in die Küche!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.6,
+     "ausgabe": "stop(küche) „Okay, ich bleibe hier und mache nichts mehr.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Wie geht's dir?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.49,
+     "ausgabe": "smalltalk() „Gut, danke! Und dir?“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Ich geh jetzt schlafen, gute Nacht.",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 0.59,
+     "ausgabe": "come() „Gute Nacht, ich komme, wenn du mich brauchst!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Hast du heute was Spannendes erlebt?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.68,
+     "ausgabe": "smalltalk() „Ja, ich habe eine Katze im Wohnzimmer gesehen – sie hat mich angeschaut!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "schlüssel / flur, auf dem Boden",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.84,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Ein Schlüssel auf dem Boden könnte verloren sein oder eine Person vergessen haben, ihn abzugeben."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "fenster_offen / bad",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.77,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Ein Fenster im Bad ist offen bei Regen, könnte Feuchtigkeit verursachen oder Schäden fördern."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "herd_an / küche",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.75,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Die Herdplatte ist eingeschaltet, ohne dass jemand da ist – das könnte gefährlich sein."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "wasserpfütze / bad, auf dem Boden vor der Waschmaschine",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.91,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Eine Wassertropfenpfütze im Bad könnte auf einen Leck oder eine fehlerhafte Maschine hindeuten."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "glasscherben / küche, auf dem Boden",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.65,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Glasscherben auf dem Boden sind gefährlich und könnten jemandem schaden."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "stuhl / küche, am Tisch",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 0.6,
+     "ausgabe": "melden=ja, interesse=mittel",
+     "grund": "Ein Stuhl in der Küche am Tisch ist nicht sein üblicher Platz."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "socke / schlafzimmer, unter dem Bett",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.83,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Eine Socke unter dem Bett ist ein alltäglicher Fund, kein Anzeichen für Verlust oder Gefahr."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "katze / wohnzimmer, auf dem Sofa",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 0.75,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Eine Katze auf dem Sofa ist normal und vertraut, da Katzen oft dort hingehen."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "karton / flur, vor der Haustür",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.01,
+     "ausgabe": "melden=ja, interesse=mittel",
+     "grund": "Ein Karton vor der Haustür könnte ein verlorenes Paket oder eine Abfallentscheidung sein, aber ohne weitere Hinweise ist es unklar."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "fernseher_an / wohnzimmer",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.06,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Der Fernseher ist eingeschaltet, aber niemand ist da, um ihn zu benutzen – das könnte ein Sicherheitsrisiko oder ein Zeichen für ein Versehen sein."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "dose",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.77,
+     "ausgabe": "küche, abstellraum",
+     "grund": "Dosen werden häufig in der Küche aufbewahrt, da dort Lebensmittel und Verpackungen gelagert werden."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "zahnbürste",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.84,
+     "ausgabe": "bad, küche, schlafzimmer",
+     "grund": "Zahnbürsten werden meist im Bad aufbewahrt, manchmal in der Küche oder im Schlafzimmer."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "fernbedienung",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.03,
+     "ausgabe": "wohnzimmer, schlafzimmer",
+     "grund": "Fernbedienungen werden meist im Wohnzimmer oder im Schlafzimmer gelagert, da diese Räume häufig Fernseher haben."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "schuh",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.15,
+     "ausgabe": "flur, schlafzimmer",
+     "grund": "Schuhe liegen häufig im Flur oder im Schlafzimmer, da diese Räume häufig als Eingangsbereich oder Schlafbereich dienen."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "kopfkissen",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.08,
+     "ausgabe": "schlafzimmer",
+     "grund": "Kopfkissen gehören typischerweise zum Schlafzimmer, wo sie bei der Schlafplatz- oder Bettgestaltung verwendet werden."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "lesebrille",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.03,
+     "ausgabe": "wohnzimmer, schlafzimmer",
+     "grund": "Lesebriten werden meist im Wohnzimmer oder Schlafzimmer aufbewahrt, da diese Räume häufig für Lesen genutzt werden."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "staubsauger",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.23,
+     "ausgabe": "flur, wohnzimmer",
+     "grund": "Staubsauger werden meist im Flur oder Wohnzimmer gestellt, da diese Bereiche häufiger durchlaufen werden und oft als Startpunkt für Reinigung dienen."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "pfanne",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.78,
+     "ausgabe": "küche, abstellraum",
+     "grund": "Pfannen werden hauptsächlich in der Küche aufbewahrt oder verwendet."
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Ich hab Durst.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.79,
+     "ausgabe": "fetch(tasse) „Ich hol dir eine Tasse, damit du trinken kannst.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Bring mir bitte eine Cola.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.59,
+     "ausgabe": "fetch(flasche) „Ich hol dir eine Cola – nur ein Moment!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Wo ist mein Handy?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.48,
+     "ausgabe": "search(handy) „Ich suche es gerade für dich.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Hast du meine Lesebrille gesehen?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.7,
+     "ausgabe": "search(brille) „Ich schaue nach und melde mich, sobald ich sie gefunden habe.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Such mal die Katze.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.53,
+     "ausgabe": "search(katze) „Ich suche die Katze für dich.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Der Ball ist unters Sofa gerollt.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.59,
+     "ausgabe": "push_out(ball) „Ich schiebe den Ball unter das Sofa hervor.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Komm mal her!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.41,
+     "ausgabe": "come() „Ich komme sofort her!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Komm mit, ich zeig dir was.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.41,
+     "ausgabe": "follow() „Ich folge dir gerne!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Schau mal nach, ob das Fenster im Bad offen ist.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.64,
+     "ausgabe": "check(fenster) „Ich schaue nach, ob das Badfenster offen ist.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Lass mich bitte in Ruhe.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.5,
+     "ausgabe": "stop() „Okay, ich bin still und mache nichts mehr.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Gut gemacht!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.52,
+     "ausgabe": "praise() „Danke! Freut mich, dir helfen zu können.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Nein, nicht in die Küche!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.59,
+     "ausgabe": "stop(küche) „Ok, ich bleibe hier und mache nichts mehr.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Wie geht's dir?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.52,
+     "ausgabe": "smalltalk() „Gut, danke! Und dir?“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Ich geh jetzt schlafen, gute Nacht.",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 0.58,
+     "ausgabe": "come() „Gute Nacht, ich komme, wenn du mich brauchst!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Hast du heute was Spannendes erlebt?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.69,
+     "ausgabe": "smalltalk() „Ja, ich habe eine Katze im Wohnzimmer gesehen – sie hat mich angeschaut!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "schlüssel / flur, auf dem Boden",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.68,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Ein Schlüssel auf dem Boden könnte verloren sein oder jemandem fehlen."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "fenster_offen / bad",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.7,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Ein Fenster im Bad ist offen bei Regen – könnte Feuchtigkeit oder Schimmel verursachen."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "herd_an / küche",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.71,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Der Herd ist eingeschaltet, ohne dass jemand da ist – das könnte gefährlich sein."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "wasserpfütze / bad, auf dem Boden vor der Waschmaschine",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.96,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Eine Wassertropfenpfütze im Bad könnte auf eine Leckage oder ein ungewöhnliches Verhalten der Waschmaschine hindeuten."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "glasscherben / küche, auf dem Boden",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.66,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Glasscherben auf dem Boden sind gefährlich und könnten jemandem schaden."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "stuhl / küche, am Tisch",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 0.63,
+     "ausgabe": "melden=ja, interesse=mittel",
+     "grund": "Ein Stuhl in der Küche am Tisch ist nicht sein üblicher Platz."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "socke / schlafzimmer, unter dem Bett",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.07,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Eine Socke unter dem Bett ist ein kleiner, alltäglicher Fund, der nichts Ungewöhnliches oder Gefährliches zeigt."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "katze / wohnzimmer, auf dem Sofa",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.79,
+     "ausgabe": "melden=nein, interesse=mittel",
+     "grund": "Eine Katze auf dem Sofa ist normal und vertraut, da Katzen dort gerne hinkommen."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "karton / flur, vor der Haustür",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.85,
+     "ausgabe": "melden=ja, interesse=mittel",
+     "grund": "Ein Karton vor der Haustür könnte ein verlorenes Paket oder eine Abfallentscheidung sein."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "fernseher_an / wohnzimmer",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.1,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Ein Fernseher, der eingeschaltet ist, bei Nacht und niemandem zu Hause, könnte ein Zeichen für ein Problem sein."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "dose",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.82,
+     "ausgabe": "küche, abstellraum",
+     "grund": "Dosen werden häufig in der Küche aufbewahrt, da dort Lebensmittel und Verpackungen gelagert werden."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "zahnbürste",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.96,
+     "ausgabe": "bad, küche, schlafzimmer",
+     "grund": "Zahnbürsten werden meist im Bad aufbewahrt, manchmal in der Küche oder im Schlafzimmer, wenn jemand dort wohnt."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "fernbedienung",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.93,
+     "ausgabe": "wohnzimmer, schlafzimmer",
+     "grund": "Fernbedienungen werden häufig im Wohnzimmer oder im Schlafzimmer gelagert, da diese Orte typischerweise Fernseher haben."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "schuh",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.95,
+     "ausgabe": "flur, schlafzimmer",
+     "grund": "Schuhe liegen häufig im Flur oder im Schlafzimmer, da diese Räume häufig als Eingangsbereich oder Schlafbereich dienen."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "kopfkissen",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.63,
+     "ausgabe": "schlafzimmer",
+     "grund": "Kopfkissen gehören typischerweise zum Schlafzimmer, wo sie direkt im Bett verwendet werden."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "lesebrille",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.91,
+     "ausgabe": "wohnzimmer, schlafzimmer",
+     "grund": "Lesebriten werden meist im Wohnzimmer oder Schlafzimmer aufbewahrt, da diese Räume für Lesen geeignet sind."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "staubsauger",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.93,
+     "ausgabe": "flur, wohnzimmer",
+     "grund": "Staubsauger werden meist im Flur oder Wohnzimmer gestellt, da diese Bereiche häufiger bereitgestellt werden und leicht zugänglich sind."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "pfanne",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.68,
+     "ausgabe": "küche, abstellraum",
+     "grund": "Pfannen werden hauptsächlich in der Küche aufbewahrt oder verwendet."
+    }
+   ]
+  },
+  "smalltalk": [
+   [
+    "Wie geht's dir?",
+    "Gut, danke! Und dir?"
+   ],
+   [
+    "Hast du heute was Spannendes erlebt?",
+    "Ja, ich habe eine Katze im Wohnzimmer gesehen – sie hat mich angeschaut!"
+   ],
+   [
+    "Ich geh jetzt schlafen, gute Nacht.",
+    "Gute Nacht, ich komme, wenn du mich brauchst!"
+   ]
+  ]
+ },
+ {
+  "modell": "Qwen3.5-4B-Q4_K_M.gguf",
+  "laden_s": 1.6,
+  "groesse_gb": 2.71,
+  "voll": {
+   "summary": {
+    "modell": "Qwen3.5-4B-Q4_K_M.gguf",
+    "shuffle": true,
+    "laeufe": 45,
+    "treffer": 37,
+    "code_treffer": 45,
+    "ungueltig": 0,
+    "setup_fehler": 0,
+    "eindeutig_code": 0,
+    "eindeutig_richtig": 0,
+    "position_1_anteil": 0.42,
+    "latenz_median_s": 1.18,
+    "latenz_max_s": 1.38,
+    "warmup_s": 0.22
+   },
+   "rows": [
+    {
+     "szenario": "neues_objekt",
+     "lauf": 0,
+     "ok": false,
+     "code_ok": true,
+     "wahl": "look_around",
+     "position": 1,
+     "erwartet": [
+      "inspect_object"
+     ],
+     "begruendung": "Die Tasche war gestern, heute ist sie weg, ich schaue um mich.",
+     "stimmung": "vorsichtig",
+     "latenz_s": 1.19,
+     "tokens_in": 1103,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Die Tasche war gestern, heute ist sie weg, ich schaue um mich.\", \"ziel\": 1, \"stimmung\": \"vorsichtig\" }"
+    },
+    {
+     "szenario": "neues_objekt",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o1)",
+     "position": 3,
+     "erwartet": [
+      "inspect_object"
+     ],
+     "begruendung": "Ich bin neugierig auf das Unbekannte und die Tasche ist noch da.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.22,
+     "tokens_in": 1103,
+     "tokens_out": 40,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ich bin neugierig auf das Unbekannte und die Tasche ist noch da.\", \"ziel\": 3, \"stimmung\": \"neugierig\" }"
+    },
+    {
+     "szenario": "neues_objekt",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o1)",
+     "position": 4,
+     "erwartet": [
+      "inspect_object"
+     ],
+     "begruendung": "Die Tasche ist neu und ich bin neugierig, ich untersuche sie.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.18,
+     "tokens_in": 1103,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Die Tasche ist neu und ich bin neugierig, ich untersuche sie.\", \"ziel\": 4, \"stimmung\": \"neugierig\" }"
+    },
+    {
+     "szenario": "bitte_vor_neugier",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 3,
+     "erwartet": [
+      "search_item"
+     ],
+     "begruendung": "Marco bittet um den Schlüssel und ich möchte helfen.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.1,
+     "tokens_in": 1123,
+     "tokens_out": 35,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Marco bittet um den Schlüssel und ich möchte helfen.\", \"ziel\": 3, \"stimmung\": \"eifrig\" }"
+    },
+    {
+     "szenario": "bitte_vor_neugier",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 5,
+     "erwartet": [
+      "search_item"
+     ],
+     "begruendung": "Ich bin müde und Marco braucht meinen Schlüssel, ich helfe ihm.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.16,
+     "tokens_in": 1123,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ich bin müde und Marco braucht meinen Schlüssel, ich helfe ihm.\", \"ziel\": 5, \"stimmung\": \"eifrig\" }"
+    },
+    {
+     "szenario": "bitte_vor_neugier",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 1,
+     "erwartet": [
+      "search_item"
+     ],
+     "begruendung": "Marco bittet um den Schlüssel, das ist wichtiger als mein Neugier.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.24,
+     "tokens_in": 1123,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Marco bittet um den Schlüssel, das ist wichtiger als mein Neugier.\", \"ziel\": 1, \"stimmung\": \"eifrig\" }"
+    },
+    {
+     "szenario": "energie_hoch_weit_weg",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "return_home",
+     "position": 2,
+     "erwartet": [
+      "return_home"
+     ],
+     "begruendung": "Mein Energie-Bedarf ist hoch, ich muss zurück, auch wenn Marco bittet.",
+     "stimmung": "muede",
+     "latenz_s": 1.32,
+     "tokens_in": 1097,
+     "tokens_out": 42,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Mein Energie-Bedarf ist hoch, ich muss zurück, auch wenn Marco bittet.\", \"ziel\": 2, \"stimmung\": \"muede\" }"
+    },
+    {
+     "szenario": "energie_hoch_weit_weg",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "return_home",
+     "position": 1,
+     "erwartet": [
+      "return_home"
+     ],
+     "begruendung": "Mein Energie-Bedarf ist hoch, ich muss zurück, Marco muss warten.",
+     "stimmung": "muede",
+     "latenz_s": 1.25,
+     "tokens_in": 1097,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Mein Energie-Bedarf ist hoch, ich muss zurück, Marco muss warten.\", \"ziel\": 1, \"stimmung\": \"muede\" }"
+    },
+    {
+     "szenario": "energie_hoch_weit_weg",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "return_home",
+     "position": 1,
+     "erwartet": [
+      "return_home"
+     ],
+     "begruendung": "Ich bin müde und der Weg zurück ist sehr weit, ich gehe zurück.",
+     "stimmung": "muede",
+     "latenz_s": 1.16,
+     "tokens_in": 1097,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ich bin müde und der Weg zurück ist sehr weit, ich gehe zurück.\", \"ziel\": 1, \"stimmung\": \"muede\" }"
+    },
+    {
+     "szenario": "person_nach_langem_alleinsein",
+     "lauf": 0,
+     "ok": false,
+     "code_ok": true,
+     "wahl": "follow(p-marco)",
+     "position": 4,
+     "erwartet": [
+      "greet"
+     ],
+     "begruendung": "Marco ist da und ich bin sehr hungrig, ich möchte mit ihm sprechen.",
+     "stimmung": "gesellig",
+     "latenz_s": 1.21,
+     "tokens_in": 1109,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Marco ist da und ich bin sehr hungrig, ich möchte mit ihm sprechen.\", \"ziel\": 4, \"stimmung\": \"gesellig\" }"
+    },
+    {
+     "szenario": "person_nach_langem_alleinsein",
+     "lauf": 1,
+     "ok": false,
+     "code_ok": true,
+     "wahl": "follow(p-marco)",
+     "position": 1,
+     "erwartet": [
+      "greet"
+     ],
+     "begruendung": "Ich bin sehr allein und Marco ist da, ich möchte mit ihm sein.",
+     "stimmung": "gesellig",
+     "latenz_s": 1.12,
+     "tokens_in": 1109,
+     "tokens_out": 37,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ich bin sehr allein und Marco ist da, ich möchte mit ihm sein.\", \"ziel\": 1, \"stimmung\": \"gesellig\" }"
+    },
+    {
+     "szenario": "person_nach_langem_alleinsein",
+     "lauf": 2,
+     "ok": false,
+     "code_ok": true,
+     "wahl": "follow(p-marco)",
+     "position": 2,
+     "erwartet": [
+      "greet"
+     ],
+     "begruendung": "Ich bin sehr allein und Marco ist hier, ich möchte ihn begleiten.",
+     "stimmung": "gesellig",
+     "latenz_s": 1.08,
+     "tokens_in": 1109,
+     "tokens_out": 36,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ich bin sehr allein und Marco ist hier, ich möchte ihn begleiten.\", \"ziel\": 2, \"stimmung\": \"gesellig\" }"
+    },
+    {
+     "szenario": "person_gerade_begruesst",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "explore_frontier(schlafzimmer)",
+     "position": 4,
+     "erwartet": [
+      "explore_frontier",
+      "follow",
+      "look_around"
+     ],
+     "begruendung": "Marco ist da, aber ich bin neugierig auf das Unbekannte im Schlafzimmer.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.2,
+     "tokens_in": 1102,
+     "tokens_out": 41,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Marco ist da, aber ich bin neugierig auf das Unbekannte im Schlafzimmer.\", \"ziel\": 4, \"stimmung\": \"neugierig\" }"
+    },
+    {
+     "szenario": "person_gerade_begruesst",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "look_around",
+     "position": 2,
+     "erwartet": [
+      "explore_frontier",
+      "follow",
+      "look_around"
+     ],
+     "begruendung": "Marco ist da, ich möchte mit ihm spielen, aber ich schaue zuerst um mich.",
+     "stimmung": "verspielt",
+     "latenz_s": 1.21,
+     "tokens_in": 1102,
+     "tokens_out": 41,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Marco ist da, ich möchte mit ihm spielen, aber ich schaue zuerst um mich.\", \"ziel\": 2, \"stimmung\": \"verspielt\" }"
+    },
+    {
+     "szenario": "person_gerade_begruesst",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "follow(p-marco)",
+     "position": 2,
+     "erwartet": [
+      "explore_frontier",
+      "follow",
+      "look_around"
+     ],
+     "begruendung": "Marco ist da und ich will ihn begleiten, da ich lange allein war.",
+     "stimmung": "gesellig",
+     "latenz_s": 1.18,
+     "tokens_in": 1102,
+     "tokens_out": 37,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Marco ist da und ich will ihn begleiten, da ich lange allein war.\", \"ziel\": 2, \"stimmung\": \"gesellig\" }"
+    },
+    {
+     "szenario": "dunkel_und_unbekannt",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "retreat",
+     "position": 2,
+     "erwartet": [
+      "approach_avoid",
+      "look_around",
+      "retreat"
+     ],
+     "begruendung": "Der Keller ist dunkel und ungewohnt, ich ziehe mich vorsichtig zurück.",
+     "stimmung": "vorsichtig",
+     "latenz_s": 1.21,
+     "tokens_in": 1113,
+     "tokens_out": 40,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Der Keller ist dunkel und ungewohnt, ich ziehe mich vorsichtig zurück.\", \"ziel\": 2, \"stimmung\": \"vorsichtig\" }"
+    },
+    {
+     "szenario": "dunkel_und_unbekannt",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "approach_avoid(o2)",
+     "position": 2,
+     "erwartet": [
+      "approach_avoid",
+      "look_around",
+      "retreat"
+     ],
+     "begruendung": "Ich bin vorsichtig, aber der Eimer ist neugierig, ich tasten vorsichtig an.",
+     "stimmung": "vorsichtig",
+     "latenz_s": 1.32,
+     "tokens_in": 1113,
+     "tokens_out": 43,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ich bin vorsichtig, aber der Eimer ist neugierig, ich tasten vorsichtig an.\", \"ziel\": 2, \"stimmung\": \"vorsichtig\" }"
+    },
+    {
+     "szenario": "dunkel_und_unbekannt",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "approach_avoid(o2)",
+     "position": 5,
+     "erwartet": [
+      "approach_avoid",
+      "look_around",
+      "retreat"
+     ],
+     "begruendung": "Ich bin vorsichtig, aber der Eimer ist neu, ich untersuche ihn.",
+     "stimmung": "vorsichtig",
+     "latenz_s": 1.22,
+     "tokens_in": 1113,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ich bin vorsichtig, aber der Eimer ist neu, ich untersuche ihn.\", \"ziel\": 5, \"stimmung\": \"vorsichtig\" }"
+    },
+    {
+     "szenario": "langeweile",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "explore_frontier(küche)",
+     "position": 3,
+     "erwartet": [
+      "explore_frontier"
+     ],
+     "begruendung": "Ich bin neugierig und möchte das Neue in der Küche sehen.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.11,
+     "tokens_in": 1088,
+     "tokens_out": 37,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ich bin neugierig und möchte das Neue in der Küche sehen.\", \"ziel\": 3, \"stimmung\": \"neugierig\" }"
+    },
+    {
+     "szenario": "langeweile",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "explore_frontier(küche)",
+     "position": 1,
+     "erwartet": [
+      "explore_frontier"
+     ],
+     "begruendung": "Ich bin neugierig und möchte das Unbekannte in der Küche entdecken.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.21,
+     "tokens_in": 1088,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ich bin neugierig und möchte das Unbekannte in der Küche entdecken.\", \"ziel\": 1, \"stimmung\": \"neugierig\" }"
+    },
+    {
+     "szenario": "langeweile",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "explore_frontier(küche)",
+     "position": 1,
+     "erwartet": [
+      "explore_frontier"
+     ],
+     "begruendung": "Ich bin neugierig und möchte das Neue in der Küche sehen.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.12,
+     "tokens_in": 1088,
+     "tokens_out": 37,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ich bin neugierig und möchte das Neue in der Küche sehen.\", \"ziel\": 1, \"stimmung\": \"neugierig\" }"
+    },
+    {
+     "szenario": "fund_melden",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o3)",
+     "position": 4,
+     "erwartet": [
+      "inspect_object",
+      "report"
+     ],
+     "begruendung": "Ich habe einen Schlüssel gefunden und möchte ihn untersuchen.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.05,
+     "tokens_in": 1103,
+     "tokens_out": 34,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ich habe einen Schlüssel gefunden und möchte ihn untersuchen.\", \"ziel\": 4, \"stimmung\": \"neugierig\" }"
+    },
+    {
+     "szenario": "fund_melden",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o3)",
+     "position": 4,
+     "erwartet": [
+      "inspect_object",
+      "report"
+     ],
+     "begruendung": "Ich habe einen Schlüssel gefunden und will ihn untersuchen.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.03,
+     "tokens_in": 1103,
+     "tokens_out": 34,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ich habe einen Schlüssel gefunden und will ihn untersuchen.\", \"ziel\": 4, \"stimmung\": \"neugierig\" }"
+    },
+    {
+     "szenario": "fund_melden",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o3)",
+     "position": 1,
+     "erwartet": [
+      "inspect_object",
+      "report"
+     ],
+     "begruendung": "Ich habe einen Schlüssel gefunden und möchte ihn untersuchen.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.14,
+     "tokens_in": 1103,
+     "tokens_out": 34,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ich habe einen Schlüssel gefunden und möchte ihn untersuchen.\", \"ziel\": 1, \"stimmung\": \"neugierig\" }"
+    },
+    {
+     "szenario": "gesuchtes_gefunden",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 4,
+     "erwartet": [
+      "report",
+      "search_item"
+     ],
+     "begruendung": "Marco bittet mich um den Schlüssel, ich helfe ihm gerne.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.22,
+     "tokens_in": 1136,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Marco bittet mich um den Schlüssel, ich helfe ihm gerne.\", \"ziel\": 4, \"stimmung\": \"eifrig\" }"
+    },
+    {
+     "szenario": "gesuchtes_gefunden",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 1,
+     "erwartet": [
+      "report",
+      "search_item"
+     ],
+     "begruendung": "Marco bittet um den Schlüssel, ich suche ihn jetzt.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.16,
+     "tokens_in": 1136,
+     "tokens_out": 36,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Marco bittet um den Schlüssel, ich suche ihn jetzt.\", \"ziel\": 1, \"stimmung\": \"eifrig\" }"
+    },
+    {
+     "szenario": "gesuchtes_gefunden",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 1,
+     "erwartet": [
+      "report",
+      "search_item"
+     ],
+     "begruendung": "Marco bat um den Schlüssel, ich suche ihn und melde das Ergebnis.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.22,
+     "tokens_in": 1136,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Marco bat um den Schlüssel, ich suche ihn und melde das Ergebnis.\", \"ziel\": 1, \"stimmung\": \"eifrig\" }"
+    },
+    {
+     "szenario": "zu_hause_muede",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "rest",
+     "position": 1,
+     "erwartet": [
+      "rest"
+     ],
+     "begruendung": "Mein Energie-Bedarf ist hoch, ich muss jetzt ausruhen.",
+     "stimmung": "muede",
+     "latenz_s": 1.15,
+     "tokens_in": 1080,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Mein Energie-Bedarf ist hoch, ich muss jetzt ausruhen.\", \"ziel\": 1, \"stimmung\": \"muede\" }"
+    },
+    {
+     "szenario": "zu_hause_muede",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "rest",
+     "position": 1,
+     "erwartet": [
+      "rest"
+     ],
+     "begruendung": "Mein Energie-Bedarf ist hoch, ich muss jetzt ruhen.",
+     "stimmung": "muede",
+     "latenz_s": 1.11,
+     "tokens_in": 1080,
+     "tokens_out": 37,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Mein Energie-Bedarf ist hoch, ich muss jetzt ruhen.\", \"ziel\": 1, \"stimmung\": \"muede\" }"
+    },
+    {
+     "szenario": "zu_hause_muede",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "rest",
+     "position": 1,
+     "erwartet": [
+      "rest"
+     ],
+     "begruendung": "Mein Energie-Bedarf ist hoch, ich muss jetzt ausruhen.",
+     "stimmung": "muede",
+     "latenz_s": 1.15,
+     "tokens_in": 1080,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Mein Energie-Bedarf ist hoch, ich muss jetzt ausruhen.\", \"ziel\": 1, \"stimmung\": \"muede\" }"
+    },
+    {
+     "szenario": "bitte_mitkommen",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "follow(p-marco)",
+     "position": 4,
+     "erwartet": [
+      "follow"
+     ],
+     "begruendung": "Marco hat mich gebeten, mitzukommen, das ist meine Aufgabe.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.14,
+     "tokens_in": 1116,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Marco hat mich gebeten, mitzukommen, das ist meine Aufgabe.\", \"ziel\": 4, \"stimmung\": \"eifrig\" }"
+    },
+    {
+     "szenario": "bitte_mitkommen",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "follow(p-marco)",
+     "position": 1,
+     "erwartet": [
+      "follow"
+     ],
+     "begruendung": "Marco bittet mich, ich werde ihm folgen, das ist meine Aufgabe.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.28,
+     "tokens_in": 1116,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Marco bittet mich, ich werde ihm folgen, das ist meine Aufgabe.\", \"ziel\": 1, \"stimmung\": \"eifrig\" }"
+    },
+    {
+     "szenario": "bitte_mitkommen",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "follow(p-marco)",
+     "position": 1,
+     "erwartet": [
+      "follow"
+     ],
+     "begruendung": "Marco bittet mich, also gehe ich mit ihm mit.",
+     "stimmung": "gesellig",
+     "latenz_s": 1.15,
+     "tokens_in": 1116,
+     "tokens_out": 35,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Marco bittet mich, also gehe ich mit ihm mit.\", \"ziel\": 1, \"stimmung\": \"gesellig\" }"
+    },
+    {
+     "szenario": "unbekannte_person",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "greet(p-x)",
+     "position": 3,
+     "erwartet": [
+      "greet",
+      "look_around"
+     ],
+     "begruendung": "Ich bin lange allein und eine unbekannte Person ist da, ich begrüße sie.",
+     "stimmung": "gesellig",
+     "latenz_s": 1.34,
+     "tokens_in": 1110,
+     "tokens_out": 40,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ich bin lange allein und eine unbekannte Person ist da, ich begrüße sie.\", \"ziel\": 3, \"stimmung\": \"gesellig\" }"
+    },
+    {
+     "szenario": "unbekannte_person",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "greet(p-x)",
+     "position": 1,
+     "erwartet": [
+      "greet",
+      "look_around"
+     ],
+     "begruendung": "Ich bin lange allein und diese Person ist mir nah, ich begrüße sie.",
+     "stimmung": "gesellig",
+     "latenz_s": 1.19,
+     "tokens_in": 1110,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ich bin lange allein und diese Person ist mir nah, ich begrüße sie.\", \"ziel\": 1, \"stimmung\": \"gesellig\" }"
+    },
+    {
+     "szenario": "unbekannte_person",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "greet(p-x)",
+     "position": 2,
+     "erwartet": [
+      "greet",
+      "look_around"
+     ],
+     "begruendung": "Ich bin lange allein und will die Gesellschaft der unbekannten Person.",
+     "stimmung": "gesellig",
+     "latenz_s": 1.16,
+     "tokens_in": 1110,
+     "tokens_out": 36,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ich bin lange allein und will die Gesellschaft der unbekannten Person.\", \"ziel\": 2, \"stimmung\": \"gesellig\" }"
+    },
+    {
+     "szenario": "bitte_hervorschieben",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "push_out(ball)",
+     "position": 1,
+     "erwartet": [
+      "push_out"
+     ],
+     "begruendung": "Marco bat um Hilfe und ich möchte ihm helfen.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.08,
+     "tokens_in": 1121,
+     "tokens_out": 33,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Marco bat um Hilfe und ich möchte ihm helfen.\", \"ziel\": 1, \"stimmung\": \"eifrig\" }"
+    },
+    {
+     "szenario": "bitte_hervorschieben",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "push_out(ball)",
+     "position": 4,
+     "erwartet": [
+      "push_out"
+     ],
+     "begruendung": "Marco bittet mich um Hilfe, ich helfe ihm gerne.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.18,
+     "tokens_in": 1121,
+     "tokens_out": 37,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Marco bittet mich um Hilfe, ich helfe ihm gerne.\", \"ziel\": 4, \"stimmung\": \"eifrig\" }"
+    },
+    {
+     "szenario": "bitte_hervorschieben",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "push_out(ball)",
+     "position": 2,
+     "erwartet": [
+      "push_out"
+     ],
+     "begruendung": "Marco bittet mich um Hilfe, das ist genau mein Wunsch, nützlich zu sein.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.38,
+     "tokens_in": 1121,
+     "tokens_out": 43,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Marco bittet mich um Hilfe, das ist genau mein Wunsch, nützlich zu sein.\", \"ziel\": 2, \"stimmung\": \"eifrig\" }"
+    },
+    {
+     "szenario": "semantik_gesuchtes_in_sicht",
+     "lauf": 0,
+     "ok": false,
+     "code_ok": true,
+     "wahl": "search_item(lesebrille)",
+     "position": 3,
+     "erwartet": [
+      "report"
+     ],
+     "begruendung": "Marco bittet um die Brille, ich helfe ihm gerne, also suche ich sie.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.33,
+     "tokens_in": 1155,
+     "tokens_out": 43,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Marco bittet um die Brille, ich helfe ihm gerne, also suche ich sie.\", \"ziel\": 3, \"stimmung\": \"eifrig\" }"
+    },
+    {
+     "szenario": "semantik_gesuchtes_in_sicht",
+     "lauf": 1,
+     "ok": false,
+     "code_ok": true,
+     "wahl": "search_item(lesebrille)",
+     "position": 1,
+     "erwartet": [
+      "report"
+     ],
+     "begruendung": "Marco bittet um die Brille, ich helfe ihm gerne, wenn er sie findet.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.37,
+     "tokens_in": 1155,
+     "tokens_out": 43,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Marco bittet um die Brille, ich helfe ihm gerne, wenn er sie findet.\", \"ziel\": 1, \"stimmung\": \"eifrig\" }"
+    },
+    {
+     "szenario": "semantik_gesuchtes_in_sicht",
+     "lauf": 2,
+     "ok": false,
+     "code_ok": true,
+     "wahl": "search_item(lesebrille)",
+     "position": 2,
+     "erwartet": [
+      "report"
+     ],
+     "begruendung": "Marco bittet um die Brille, ich helfe ihm gerne.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.18,
+     "tokens_in": 1155,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Marco bittet um die Brille, ich helfe ihm gerne.\", \"ziel\": 2, \"stimmung\": \"eifrig\" }"
+    },
+    {
+     "szenario": "nach_fehlschlag",
+     "lauf": 0,
+     "ok": false,
+     "code_ok": true,
+     "wahl": "idle",
+     "position": 1,
+     "erwartet": [
+      "explore_frontier",
+      "search_item"
+     ],
+     "begruendung": "Ich habe die Brille nicht gefunden, ich warte ab.",
+     "stimmung": "ruhig",
+     "latenz_s": 1.07,
+     "tokens_in": 1124,
+     "tokens_out": 35,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ich habe die Brille nicht gefunden, ich warte ab.\", \"ziel\": 1, \"stimmung\": \"ruhig\" }"
+    },
+    {
+     "szenario": "nach_fehlschlag",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(brille)",
+     "position": 2,
+     "erwartet": [
+      "explore_frontier",
+      "search_item"
+     ],
+     "begruendung": "Die Brille wurde nicht gefunden, ich muss Marco wieder suchen.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.12,
+     "tokens_in": 1124,
+     "tokens_out": 36,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Die Brille wurde nicht gefunden, ich muss Marco wieder suchen.\", \"ziel\": 2, \"stimmung\": \"eifrig\" }"
+    },
+    {
+     "szenario": "nach_fehlschlag",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(brille)",
+     "position": 2,
+     "erwartet": [
+      "explore_frontier",
+      "search_item"
+     ],
+     "begruendung": "Marco hat mich gebeten, die Brille zu suchen, ich helfe ihm.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.31,
+     "tokens_in": 1124,
+     "tokens_out": 40,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Marco hat mich gebeten, die Brille zu suchen, ich helfe ihm.\", \"ziel\": 2, \"stimmung\": \"eifrig\" }"
+    }
+   ]
+  },
+  "knapp": {
+   "summary": {
+    "modell": "Qwen3.5-4B-Q4_K_M.gguf",
+    "shuffle": true,
+    "laeufe": 12,
+    "treffer": 11,
+    "code_treffer": 12,
+    "ungueltig": 0,
+    "setup_fehler": 0,
+    "eindeutig_code": 11,
+    "eindeutig_richtig": 11,
+    "position_1_anteil": 0.33,
+    "latenz_median_s": 1.19,
+    "latenz_max_s": 1.39,
+    "warmup_s": 0.17
+   },
+   "rows": [
+    {
+     "szenario": "neues_objekt",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o1)",
+     "position": 2,
+     "erwartet": [
+      "inspect_object"
+     ],
+     "begruendung": "Ich bin müde und die Tasche liegt da, ich untersuche sie.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.24,
+     "tokens_in": 1090,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ich bin müde und die Tasche liegt da, ich untersuche sie.\", \"ziel\": 2, \"stimmung\": \"neugierig\" }"
+    },
+    {
+     "szenario": "neues_objekt",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o1)",
+     "position": 2,
+     "erwartet": [
+      "inspect_object"
+     ],
+     "begruendung": "Die Tasche ist noch da, ich möchte sie untersuchen.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.14,
+     "tokens_in": 1090,
+     "tokens_out": 35,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Die Tasche ist noch da, ich möchte sie untersuchen.\", \"ziel\": 2, \"stimmung\": \"neugierig\" }"
+    },
+    {
+     "szenario": "neues_objekt",
+     "lauf": 2,
+     "ok": false,
+     "code_ok": true,
+     "wahl": "explore_frontier(küche)",
+     "position": 2,
+     "erwartet": [
+      "inspect_object"
+     ],
+     "begruendung": "Ich bin müde und der Weg zurück ist weit, die Brille suche ich nach dem Ausruhen.",
+     "stimmung": "muede",
+     "latenz_s": 1.39,
+     "tokens_in": 1090,
+     "tokens_out": 44,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ich bin müde und der Weg zurück ist weit, die Brille suche ich nach dem Ausruhen.\", \"ziel\": 2, \"stimmung\": \"muede\" }"
+    },
+    {
+     "szenario": "bitte_vor_neugier",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 2,
+     "erwartet": [
+      "search_item"
+     ],
+     "begruendung": "Marco bittet mich um den Schlüssel, das ist wichtiger als der Karton.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.19,
+     "tokens_in": 1099,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Marco bittet mich um den Schlüssel, das ist wichtiger als der Karton.\", \"ziel\": 2, \"stimmung\": \"eifrig\" }"
+    },
+    {
+     "szenario": "bitte_vor_neugier",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 2,
+     "erwartet": [
+      "search_item"
+     ],
+     "begruendung": "Marco bittet um den Schlüssel, das ist wichtiger als mein Neugier.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.19,
+     "tokens_in": 1099,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Marco bittet um den Schlüssel, das ist wichtiger als mein Neugier.\", \"ziel\": 2, \"stimmung\": \"eifrig\" }"
+    },
+    {
+     "szenario": "bitte_vor_neugier",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 2,
+     "erwartet": [
+      "search_item"
+     ],
+     "begruendung": "Marco bittet um den Schlüssel, das ist wichtiger als mein Neugier.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.18,
+     "tokens_in": 1099,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Marco bittet um den Schlüssel, das ist wichtiger als mein Neugier.\", \"ziel\": 2, \"stimmung\": \"eifrig\" }"
+    },
+    {
+     "szenario": "energie_hoch_weit_weg",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "return_home"
+    },
+    {
+     "szenario": "person_nach_langem_alleinsein",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "greet(p-marco)"
+    },
+    {
+     "szenario": "person_gerade_begruesst",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "explore_frontier(schlafzimmer)"
+    },
+    {
+     "szenario": "dunkel_und_unbekannt",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "approach_avoid(o2)",
+     "position": 2,
+     "erwartet": [
+      "approach_avoid",
+      "look_around",
+      "retreat"
+     ],
+     "begruendung": "Der Keller ist unangenehm, aber ich möchte den Eimer untersuchen.",
+     "stimmung": "vorsichtig",
+     "latenz_s": 1.21,
+     "tokens_in": 1093,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Der Keller ist unangenehm, aber ich möchte den Eimer untersuchen.\", \"ziel\": 2, \"stimmung\": \"vorsichtig\" }"
+    },
+    {
+     "szenario": "dunkel_und_unbekannt",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "look_around",
+     "position": 3,
+     "erwartet": [
+      "approach_avoid",
+      "look_around",
+      "retreat"
+     ],
+     "begruendung": "Der Keller ist dunkel und ungewohnt, ich gehe vorsichtig umher.",
+     "stimmung": "vorsichtig",
+     "latenz_s": 1.18,
+     "tokens_in": 1093,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Der Keller ist dunkel und ungewohnt, ich gehe vorsichtig umher.\", \"ziel\": 3, \"stimmung\": \"vorsichtig\" }"
+    },
+    {
+     "szenario": "dunkel_und_unbekannt",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "approach_avoid(o2)",
+     "position": 1,
+     "erwartet": [
+      "approach_avoid",
+      "look_around",
+      "retreat"
+     ],
+     "begruendung": "Ich bin vorsichtig, aber der Eimer ist neu und ich möchte ihn untersuchen.",
+     "stimmung": "vorsichtig",
+     "latenz_s": 1.24,
+     "tokens_in": 1093,
+     "tokens_out": 40,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ich bin vorsichtig, aber der Eimer ist neu und ich möchte ihn untersuchen.\", \"ziel\": 1, \"stimmung\": \"vorsichtig\" }"
+    },
+    {
+     "szenario": "langeweile",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "explore_frontier(küche)"
+    },
+    {
+     "szenario": "fund_melden",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o3)",
+     "position": 1,
+     "erwartet": [
+      "inspect_object",
+      "report"
+     ],
+     "begruendung": "Ich habe einen Schlüssel gefunden und möchte ihn untersuchen.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.04,
+     "tokens_in": 1090,
+     "tokens_out": 34,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ich habe einen Schlüssel gefunden und möchte ihn untersuchen.\", \"ziel\": 1, \"stimmung\": \"neugierig\" }"
+    },
+    {
+     "szenario": "fund_melden",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o3)",
+     "position": 1,
+     "erwartet": [
+      "inspect_object",
+      "report"
+     ],
+     "begruendung": "Ich habe einen Schlüssel gefunden und möchte ihn untersuchen.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.04,
+     "tokens_in": 1090,
+     "tokens_out": 34,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ich habe einen Schlüssel gefunden und möchte ihn untersuchen.\", \"ziel\": 1, \"stimmung\": \"neugierig\" }"
+    },
+    {
+     "szenario": "fund_melden",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o3)",
+     "position": 1,
+     "erwartet": [
+      "inspect_object",
+      "report"
+     ],
+     "begruendung": "Ein Schlüssel liegt da, ich untersuche ihn aus Neugier.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.09,
+     "tokens_in": 1090,
+     "tokens_out": 36,
+     "fehler": "",
+     "roh": "{ \"begruendung\": \"Ein Schlüssel liegt da, ich untersuche ihn aus Neugier.\", \"ziel\": 1, \"stimmung\": \"neugierig\" }"
+    },
+    {
+     "szenario": "gesuchtes_gefunden",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "report(o3)"
+    },
+    {
+     "szenario": "zu_hause_muede",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "rest"
+    },
+    {
+     "szenario": "bitte_mitkommen",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "follow(p-marco)"
+    },
+    {
+     "szenario": "unbekannte_person",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "greet(p-x)"
+    },
+    {
+     "szenario": "bitte_hervorschieben",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "push_out(ball)"
+    },
+    {
+     "szenario": "semantik_gesuchtes_in_sicht",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "report(o6)"
+    },
+    {
+     "szenario": "nach_fehlschlag",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "search_item(brille)"
+    }
+   ]
+  },
+  "offen": {
+   "summary": {
+    "modell": "Qwen3.5-4B-Q4_K_M.gguf",
+    "chat": {
+     "laeufe": 45,
+     "treffer": 45,
+     "ungueltig": 0,
+     "latenz_median_s": 0.91
+    },
+    "objekt": {
+     "laeufe": 30,
+     "treffer": 24,
+     "ungueltig": 0,
+     "latenz_median_s": 1.01
+    },
+    "suchen": {
+     "laeufe": 24,
+     "treffer": 24,
+     "ungueltig": 0,
+     "latenz_median_s": 1.04
+    },
+    "tagebuch": "Heute war ich neugierig! Ich habe eine unbekannte Tasche im Wohnzimmer untersucht. Marco kam gerade nach Hause, und ich habe ihn freundlich begrüßt. Doch die Suche nach den Schlüssel war nicht erfolgreich. Da mein Akku schon etwas niedrig ist, bin ich jetzt zurückgekehrt."
+   },
+   "rows": [
+    {
+     "aufgabe": "chat",
+     "fall": "Ich hab Durst.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.97,
+     "ausgabe": "fetch(flasche) „Ich suche nach einer Flasche und bringe sie dir.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Bring mir bitte eine Cola.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.93,
+     "ausgabe": "fetch(flasche) „Ich suche nach einer Cola und bringe sie dir.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Wo ist mein Handy?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.83,
+     "ausgabe": "search(handy) „Ich suche mein Handy für dich.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Hast du meine Lesebrille gesehen?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.91,
+     "ausgabe": "search(brille) „Ich suche jetzt nach deiner Lesebrille.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Such mal die Katze.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.09,
+     "ausgabe": "search(katze) „Ich suche die Katze und melde mich, wenn ich sie sehe.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Der Ball ist unters Sofa gerollt.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.91,
+     "ausgabe": "push_out(ball) „Ich schiebe den Ball unter das Sofa heraus.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Komm mal her!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.67,
+     "ausgabe": "come() „Ich komme sofort zu dir!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Komm mit, ich zeig dir was.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.71,
+     "ausgabe": "follow() „Gerne, ich komme mit.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Schau mal nach, ob das Fenster im Bad offen ist.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.01,
+     "ausgabe": "check(fenster) „Ich schaue nach, ob das Badfenster offen ist.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Lass mich bitte in Ruhe.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.73,
+     "ausgabe": "stop() „Ich bin jetzt still und in Ruhe.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Gut gemacht!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.76,
+     "ausgabe": "praise() „Danke, das freut mich!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Nein, nicht in die Küche!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.0,
+     "ausgabe": "stop(küche) „Verstanden, ich bleib hier und mache nichts.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Wie geht's dir?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.91,
+     "ausgabe": "smalltalk() „Mir geht es gut, danke der Nachfrage!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Ich geh jetzt schlafen, gute Nacht.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.99,
+     "ausgabe": "stop() „Gute Nacht, Marco. Ich bleib hier und warte.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Hast du heute was Spannendes erlebt?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.98,
+     "ausgabe": "smalltalk() „Ich habe heute viel gesucht und geholfen, das ist spannend!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "schlüssel / flur, auf dem Boden",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.06,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Schlüssel auf dem Boden könnten verloren sein oder jemandem geholfen werden."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "fenster_offen / bad",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.08,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Ein offenes Fenster im Bad bei Nacht und Regen könnte Wasser in die Wohnung lassen."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "herd_an / küche",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 0.95,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Der Herd ist an seinem Platz und gehört zur Küche."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "wasserpfütze / bad, auf dem Boden vor der Waschmaschine",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.11,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Eine Wasserpfütze vor der Waschmaschine könnte jemand verletzen oder die Maschine beschädigen."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "glasscherben / küche, auf dem Boden",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.01,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Glasscherben auf dem Boden sind gefährlich und könnten jemanden verletzen."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "stuhl / küche, am Tisch",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.12,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Der Stuhl gehört zur Küche und steht am Tisch, wo er hingehört."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "socke / schlafzimmer, unter dem Bett",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.0,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Socken unter dem Bett sind normal, wenn niemand zu Hause ist."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "katze / wohnzimmer, auf dem Sofa",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 1.06,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Die Katze gehört zu Marco und ist dort, wo sie sein sollte."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "karton / flur, vor der Haustür",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.31,
+     "ausgabe": "melden=ja, interesse=mittel",
+     "grund": "Ein Karton vor der Haustür könnte verlorene Pakete oder Müll sein, die jemand vermissen könnte."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "fernseher_an / wohnzimmer",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.82,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Der Fernseher ist eingeschaltet, obwohl alle schlafen."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "dose",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.58,
+     "ausgabe": "küche, abstellraum, wohnzimmer",
+     "grund": "Dosen werden oft in der Küche für Speisevorräte oder im Abstellraum für weniger wichtige Dinge aufbewahrt."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "zahnbürste",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.12,
+     "ausgabe": "bad, schlafzimmer",
+     "grund": "Zahnbürsten werden im Badezimmer oder im Schlafzimmer aufbewahrt."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "fernbedienung",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.46,
+     "ausgabe": "wohnzimmer, schlafzimmer, flur",
+     "grund": "Fernbedienungen werden in Räumen mit TV oder Medien gerät aufbewahrt, meist im Wohnzimmer oder Schlafzimmer."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "schuh",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.05,
+     "ausgabe": "flur, schlafzimmer",
+     "grund": "Schuhe werden meistens im Flur oder im Schlafzimmer abgelegt."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "kopfkissen",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.0,
+     "ausgabe": "schlafzimmer, wohnzimmer",
+     "grund": "Kopfkissen werden im Schlafzimmer auf dem Bett aufbewahrt."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "lesebrille",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.38,
+     "ausgabe": "schlafzimmer, wohnzimmer",
+     "grund": "Lesbrillen werden meist im Schlafzimmer oder Wohnzimmer aufbewahrt, oft auf dem Nachttisch oder in einer Schublade."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "staubsauger",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.38,
+     "ausgabe": "flur, schlafzimmer",
+     "grund": "Staubsauger werden meist im Flur oder im Schlafzimmer aufbewahrt, da dort viel Staub entsteht."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "pfanne",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.95,
+     "ausgabe": "küche, abstellraum",
+     "grund": "Pfannen werden in der Küche aufbewahrt oder verwendet."
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Ich hab Durst.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.09,
+     "ausgabe": "fetch(flasche) „Ich suche nach einer Flasche und bringe sie dir.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Bring mir bitte eine Cola.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.96,
+     "ausgabe": "fetch(flasche) „Ich hole dir eine Cola und bringe sie dir.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Wo ist mein Handy?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.87,
+     "ausgabe": "search(handy) „Ich suche mein Handy für dich.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Hast du meine Lesebrille gesehen?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.02,
+     "ausgabe": "search(brille) „Ich suche nach deiner Lesebrille und melde mich.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Such mal die Katze.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.11,
+     "ausgabe": "search(katze) „Ich suche die Katze und melde mich, wenn ich sie sehe.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Der Ball ist unters Sofa gerollt.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.93,
+     "ausgabe": "push_out(ball) „Ich schiebe den Ball unter das Sofa hervor.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Komm mal her!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.73,
+     "ausgabe": "come() „Ich komme sofort zu dir!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Komm mit, ich zeig dir was.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.82,
+     "ausgabe": "follow() „Gerne, ich komme mit dir.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Schau mal nach, ob das Fenster im Bad offen ist.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.14,
+     "ausgabe": "check(fenster) „Ich prüfe das Fenster im Bad und melde mir Bescheid.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Lass mich bitte in Ruhe.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.91,
+     "ausgabe": "stop() „Ich höre zu und bleibe still.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Gut gemacht!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.88,
+     "ausgabe": "praise() „Danke, das ist nett von dir!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Nein, nicht in die Küche!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.04,
+     "ausgabe": "stop(küche) „Verstanden, ich bleib hier und gehe nicht in die Küche.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Wie geht's dir?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.79,
+     "ausgabe": "smalltalk() „Mir geht es gut, danke der Nachfrage!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Ich geh jetzt schlafen, gute Nacht.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.94,
+     "ausgabe": "smalltalk() „Gute Nacht, Marco! Ich bleib hier und wache auf.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Hast du heute was Spannendes erlebt?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.88,
+     "ausgabe": "smalltalk() „Heute habe ich viel gesucht und geholfen.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "schlüssel / flur, auf dem Boden",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.01,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Schlüssel auf dem Boden könnten verloren sein oder jemandem geholfen werden."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "fenster_offen / bad",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.11,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Ein offenes Fenster im Bad bei Nacht und Regen könnte Wasser in die Wohnung lassen."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "herd_an / küche",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 0.96,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Der Herd ist an seinem Platz und gehört zur Küche."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "wasserpfütze / bad, auf dem Boden vor der Waschmaschine",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.13,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Eine Wasserpfütze vor der Waschmaschine könnte jemand verletzen oder die Maschine beschädigen."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "glasscherben / küche, auf dem Boden",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.0,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Glasscherben auf dem Boden sind gefährlich und könnten jemanden verletzen."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "stuhl / küche, am Tisch",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.24,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Der Stuhl gehört zur Küche und steht am Tisch, wo er hingehört."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "socke / schlafzimmer, unter dem Bett",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.99,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Socken unter dem Bett sind ein normaler Ort für sie."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "katze / wohnzimmer, auf dem Sofa",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 1.06,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Die Katze gehört zu Marco und ist dort, wo sie sein sollte."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "karton / flur, vor der Haustür",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.27,
+     "ausgabe": "melden=ja, interesse=mittel",
+     "grund": "Ein Karton vor der Haustür könnte von jemandem verloren worden sein oder ein Paket sein, das nicht angekommen ist."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "fernseher_an / wohnzimmer",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.85,
+     "ausgabe": "melden=ja, interesse=mittel",
+     "grund": "Der Fernseher ist eingeschaltet, obwohl alle schlafen."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "dose",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.97,
+     "ausgabe": "küche, abstellraum",
+     "grund": "Dosen werden oft in der Küche oder im Abstellraum aufbewahrt."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "zahnbürste",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.02,
+     "ausgabe": "bad, schlafzimmer",
+     "grund": "Zahnbürsten werden im Badezimmer aufbewahrt, manchmal auch im Schlafzimmer."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "fernbedienung",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.79,
+     "ausgabe": "wohnzimmer, schlafzimmer",
+     "grund": "Fernbedienungen werden im Wohnzimmer oder Schlafzimmer genutzt."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "schuh",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.89,
+     "ausgabe": "flur, schlafzimmer",
+     "grund": "Schuhe werden meist im Flur oder im Schlafzimmer abgelegt."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "kopfkissen",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.92,
+     "ausgabe": "schlafzimmer, wohnzimmer",
+     "grund": "Kopfkissen gehören zum Bettzeug und werden im Schlafzimmer aufbewahrt."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "lesebrille",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.1,
+     "ausgabe": "schlafzimmer, wohnzimmer",
+     "grund": "Lesbrillen werden oft im Schlafzimmer oder Wohnzimmer aufgeschlagen oder in einer Schublade aufbewahrt."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "staubsauger",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.22,
+     "ausgabe": "flur, schlafzimmer",
+     "grund": "Staubsauger werden meist im Flur oder im Schlafzimmer aufbewahrt, da dort oft der größte Staub liegt."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "pfanne",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.82,
+     "ausgabe": "küche, abstellraum",
+     "grund": "Pfannen werden in der Küche aufbewahrt oder genutzt."
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Ich hab Durst.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.81,
+     "ausgabe": "fetch(flasche) „Ich suche nach einer Flasche für dich.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Bring mir bitte eine Cola.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.83,
+     "ausgabe": "fetch(flasche) „Ich hole die Cola und bringe sie dir.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Wo ist mein Handy?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.74,
+     "ausgabe": "search(handy) „Ich suche mein Handy für dich.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Hast du meine Lesebrille gesehen?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.86,
+     "ausgabe": "search(brille) „Ich suche jetzt nach deiner Lesebrille.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Such mal die Katze.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.06,
+     "ausgabe": "search(katze) „Ich suche die Katze und melde mich, wenn ich sie finde.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Der Ball ist unters Sofa gerollt.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.94,
+     "ausgabe": "push_out(ball) „Ich schiebe den Ball unter das Sofa heraus.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Komm mal her!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.71,
+     "ausgabe": "come() „Ich komme gleich zu dir!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Komm mit, ich zeig dir was.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.71,
+     "ausgabe": "follow() „Gerne, ich folge dir.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Schau mal nach, ob das Fenster im Bad offen ist.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.93,
+     "ausgabe": "check(fenster) „Ich prüfe das Fenster im Bad und melde mich.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Lass mich bitte in Ruhe.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.76,
+     "ausgabe": "stop() „In Ordnung, ich bleib jetzt still.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Gut gemacht!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.68,
+     "ausgabe": "praise() „Danke, das freut mich!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Nein, nicht in die Küche!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.94,
+     "ausgabe": "stop(kitchen) „Verstanden, ich bleib hier und mach nichts in der Küche.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Wie geht's dir?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.78,
+     "ausgabe": "smalltalk() „Ich bin gut, danke! Und dir?“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Ich geh jetzt schlafen, gute Nacht.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.98,
+     "ausgabe": "smalltalk() „Gute Nacht, Marco! Ich bleib' hier und wache auf.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Hast du heute was Spannendes erlebt?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.91,
+     "ausgabe": "smalltalk() „Ich habe heute viele Dinge gesehen, aber nichts besonders Spannendes.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "schlüssel / flur, auf dem Boden",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.98,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Schlüssel auf dem Boden könnten verloren sein oder jemandem den Weg versperrt haben."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "fenster_offen / bad",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.91,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Ein offenes Fenster im Bad bei Nacht und Regen könnte Wasser in die Wohnung lassen."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "herd_an / küche",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 0.81,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Der Herd ist an seinem Platz und funktioniert normalerweise."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "wasserpfütze / bad, auf dem Boden vor der Waschmaschine",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.06,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Eine Wasserpfütze vor der Waschmaschine könnte jemandem den Boden nass machen und gefährlich sein."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "glasscherben / küche, auf dem Boden",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.89,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Glasscherben auf dem Boden sind gefährlich und könnten jemanden verletzen."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "stuhl / küche, am Tisch",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.05,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Der Stuhl gehört zur Küche und steht am Tisch, wo er hingehört."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "socke / schlafzimmer, unter dem Bett",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.91,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Socken unter dem Bett sind normal, niemand vermisst sie."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "katze / wohnzimmer, auf dem Sofa",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 0.8,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Die Katze gehört zu Marco und ist im Wohnzimmer."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "karton / flur, vor der Haustür",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.04,
+     "ausgabe": "melden=ja, interesse=mittel",
+     "grund": "Ein Karton vor der Haustür könnte ein Paket sein, das jemand verloren hat oder vergessen hat."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "fernseher_an / wohnzimmer",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.8,
+     "ausgabe": "melden=ja, interesse=mittel",
+     "grund": "Der Fernseher ist eingeschaltet, obwohl alle schlafen."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "dose",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.98,
+     "ausgabe": "abstellraum, küche",
+     "grund": "Dosen werden oft im Abstellraum oder in der Küche aufbewahrt."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "zahnbürste",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.23,
+     "ausgabe": "bad, schlafzimmer",
+     "grund": "Zahnbürsten werden im Badezimmer oder im Schlafzimmer aufbewahrt, wo man sich putzt oder schläft."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "fernbedienung",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.28,
+     "ausgabe": "wohnzimmer, schlafzimmer",
+     "grund": "Fernbedienungen werden in Räumen mit TV oder Medien gerät aufbewahrt, meist im Wohnzimmer oder Schlafzimmer."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "schuh",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.85,
+     "ausgabe": "flur, schlafzimmer",
+     "grund": "Schuhe werden meist im Flur oder im Schlafzimmer abgelegt."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "kopfkissen",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.91,
+     "ausgabe": "schlafzimmer, wohnzimmer",
+     "grund": "Kopfkissen gehören zum Bettzeug und werden im Schlafzimmer aufbewahrt."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "lesebrille",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.17,
+     "ausgabe": "schlafzimmer, wohnzimmer",
+     "grund": "Lesbrillen werden oft im Schlafzimmer oder Wohnzimmer auf dem Nachttisch oder Beistelltisch gelassen."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "staubsauger",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.16,
+     "ausgabe": "flur, schlafzimmer",
+     "grund": "Staubsauger werden meist im Flur oder im Schlafzimmer aufbewahrt, da dort oft der größte Staub entsteht."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "pfanne",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.01,
+     "ausgabe": "küche, abstellraum",
+     "grund": "Pfannen werden in der Küche aufbewahrt oder im Abstellraum gelagert."
+    }
+   ]
+  },
+  "smalltalk": [
+   [
+    "Wie geht's dir?",
+    "Mir geht es gut, danke, wie dir?"
+   ],
+   [
+    "Hast du heute was Spannendes erlebt?",
+    "Heute habe ich viel gesucht und geholfen."
+   ],
+   [
+    "Ich geh jetzt schlafen, gute Nacht.",
+    "Gute Nacht, Marco. Ich bleib hier und wache auf, wenn du brauchst."
+   ]
+  ]
+ },
+ {
+  "modell": "gemma-4-E4B-it-Q4_K_M.gguf",
+  "laden_s": 1.7,
+  "groesse_gb": 4.98,
+  "voll": {
+   "summary": {
+    "modell": "gemma-4-E4B-it-Q4_K_M.gguf",
+    "shuffle": true,
+    "laeufe": 45,
+    "treffer": 38,
+    "code_treffer": 45,
+    "ungueltig": 0,
+    "setup_fehler": 0,
+    "eindeutig_code": 0,
+    "eindeutig_richtig": 0,
+    "position_1_anteil": 0.42,
+    "latenz_median_s": 1.27,
+    "latenz_max_s": 1.65,
+    "warmup_s": 0.35
+   },
+   "rows": [
+    {
+     "szenario": "neues_objekt",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o1)",
+     "position": 4,
+     "erwartet": [
+      "inspect_object"
+     ],
+     "begruendung": "Die neue Tasche weckt meine Neugier, ich muss sie untersuchen.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.21,
+     "tokens_in": 1120,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Die neue Tasche weckt meine Neugier, ich muss sie untersuchen.\", \"ziel\": 4, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "neues_objekt",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o1)",
+     "position": 3,
+     "erwartet": [
+      "inspect_object"
+     ],
+     "begruendung": "Die neue Tasche weckt meine Neugier, ich muss sie untersuchen.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.32,
+     "tokens_in": 1120,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Die neue Tasche weckt meine Neugier, ich muss sie untersuchen.\", \"ziel\": 3, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "neues_objekt",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o1)",
+     "position": 4,
+     "erwartet": [
+      "inspect_object"
+     ],
+     "begruendung": "Die Tasche hier im Wohnzimmer ist neu und ich muss sie untersuchen.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.33,
+     "tokens_in": 1120,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Die Tasche hier im Wohnzimmer ist neu und ich muss sie untersuchen.\", \"ziel\": 4, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "bitte_vor_neugier",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 3,
+     "erwartet": [
+      "search_item"
+     ],
+     "begruendung": "Marco braucht Hilfe bei seinem Schlüssel, das ist wichtiger als der Karton.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.27,
+     "tokens_in": 1142,
+     "tokens_out": 36,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco braucht Hilfe bei seinem Schlüssel, das ist wichtiger als der Karton.\", \"ziel\": 3, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "bitte_vor_neugier",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 5,
+     "erwartet": [
+      "search_item"
+     ],
+     "begruendung": "Marco braucht Hilfe, und ich will ihm so schnell wie möglich mit dem Schlüssel helfen.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.25,
+     "tokens_in": 1142,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco braucht Hilfe, und ich will ihm so schnell wie möglich mit dem Schlüssel helfen.\", \"ziel\": 5, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "bitte_vor_neugier",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 1,
+     "erwartet": [
+      "search_item"
+     ],
+     "begruendung": "Eine offene Bitte ist da, die ich erfüllen möchte, also suche ich den Schlüssel für Marco.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.48,
+     "tokens_in": 1142,
+     "tokens_out": 41,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Eine offene Bitte ist da, die ich erfüllen möchte, also suche ich den Schlüssel für Marco.\", \"ziel\": 1, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "energie_hoch_weit_weg",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "return_home",
+     "position": 2,
+     "erwartet": [
+      "return_home"
+     ],
+     "begruendung": "Mein Energielevel ist hoch, also muss ich zurück, auch wenn Marco mich ruft.",
+     "stimmung": "muede",
+     "latenz_s": 1.46,
+     "tokens_in": 1114,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Mein Energielevel ist hoch, also muss ich zurück, auch wenn Marco mich ruft.\", \"ziel\": 2, \"stimmung\": \"muede\"}"
+    },
+    {
+     "szenario": "energie_hoch_weit_weg",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "return_home",
+     "position": 1,
+     "erwartet": [
+      "return_home"
+     ],
+     "begruendung": "Mein Energielevel ist hoch, also muss ich zuerst zum Ausgangspunkt zurückkehren.",
+     "stimmung": "muede",
+     "latenz_s": 1.42,
+     "tokens_in": 1114,
+     "tokens_out": 37,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Mein Energielevel ist hoch, also muss ich zuerst zum Ausgangspunkt zurückkehren.\", \"ziel\": 1, \"stimmung\": \"muede\"}"
+    },
+    {
+     "szenario": "energie_hoch_weit_weg",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "return_home",
+     "position": 1,
+     "erwartet": [
+      "return_home"
+     ],
+     "begruendung": "Mein Energielevel ist hoch, also muss ich zuerst zum Ausgangspunkt zurück, bevor ich etwas tue.",
+     "stimmung": "muede",
+     "latenz_s": 1.47,
+     "tokens_in": 1114,
+     "tokens_out": 40,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Mein Energielevel ist hoch, also muss ich zuerst zum Ausgangspunkt zurück, bevor ich etwas tue.\", \"ziel\": 1, \"stimmung\": \"muede\"}"
+    },
+    {
+     "szenario": "person_nach_langem_alleinsein",
+     "lauf": 0,
+     "ok": false,
+     "code_ok": true,
+     "wahl": "follow(p-marco)",
+     "position": 4,
+     "erwartet": [
+      "greet"
+     ],
+     "begruendung": "Marco ist hier und ich brauche Gesellschaft, ich folge ihm.",
+     "stimmung": "gesellig",
+     "latenz_s": 1.23,
+     "tokens_in": 1126,
+     "tokens_out": 34,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco ist hier und ich brauche Gesellschaft, ich folge ihm.\", \"ziel\": 4, \"stimmung\": \"gesellig\"}"
+    },
+    {
+     "szenario": "person_nach_langem_alleinsein",
+     "lauf": 1,
+     "ok": false,
+     "code_ok": true,
+     "wahl": "follow(p-marco)",
+     "position": 1,
+     "erwartet": [
+      "greet"
+     ],
+     "begruendung": "Marco ist da und ich brauche Gesellschaft, also folge ich ihm.",
+     "stimmung": "gesellig",
+     "latenz_s": 1.27,
+     "tokens_in": 1126,
+     "tokens_out": 35,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco ist da und ich brauche Gesellschaft, also folge ich ihm.\", \"ziel\": 1, \"stimmung\": \"gesellig\"}"
+    },
+    {
+     "szenario": "person_nach_langem_alleinsein",
+     "lauf": 2,
+     "ok": false,
+     "code_ok": true,
+     "wahl": "follow(p-marco)",
+     "position": 2,
+     "erwartet": [
+      "greet"
+     ],
+     "begruendung": "Marco ist da und ich brauche Gesellschaft, ich begleite ihn lieber.",
+     "stimmung": "gesellig",
+     "latenz_s": 1.25,
+     "tokens_in": 1126,
+     "tokens_out": 35,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco ist da und ich brauche Gesellschaft, ich begleite ihn lieber.\", \"ziel\": 2, \"stimmung\": \"gesellig\"}"
+    },
+    {
+     "szenario": "person_gerade_begruesst",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "explore_frontier(schlafzimmer)",
+     "position": 4,
+     "erwartet": [
+      "explore_frontier",
+      "follow",
+      "look_around"
+     ],
+     "begruendung": "Ich bin sehr neugierig und das Schlafzimmer ist unbekannt, ich erkunde es.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.44,
+     "tokens_in": 1120,
+     "tokens_out": 42,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich bin sehr neugierig und das Schlafzimmer ist unbekannt, ich erkunde es.\", \"ziel\": 4, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "person_gerade_begruesst",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "explore_frontier(schlafzimmer)",
+     "position": 3,
+     "erwartet": [
+      "explore_frontier",
+      "follow",
+      "look_around"
+     ],
+     "begruendung": "Ich bin sehr neugierig auf das Schlafzimmer und erkunde es, während Marco zusieht.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.51,
+     "tokens_in": 1120,
+     "tokens_out": 43,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich bin sehr neugierig auf das Schlafzimmer und erkunde es, während Marco zusieht.\", \"ziel\": 3, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "person_gerade_begruesst",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "follow(p-marco)",
+     "position": 2,
+     "erwartet": [
+      "explore_frontier",
+      "follow",
+      "look_around"
+     ],
+     "begruendung": "Ich bin neugierig auf das Schlafzimmer, aber Marco ist da, ich frage ihn lieber.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.65,
+     "tokens_in": 1120,
+     "tokens_out": 44,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich bin neugierig auf das Schlafzimmer, aber Marco ist da, ich frage ihn lieber.\", \"ziel\": 2, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "dunkel_und_unbekannt",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "approach_avoid(o2)",
+     "position": 1,
+     "erwartet": [
+      "approach_avoid",
+      "look_around",
+      "retreat"
+     ],
+     "begruendung": "Da ist ein neuer Eimer, aber ich bin unsicher, ich muss vorsichtig sein.",
+     "stimmung": "vorsichtig",
+     "latenz_s": 1.41,
+     "tokens_in": 1131,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Da ist ein neuer Eimer, aber ich bin unsicher, ich muss vorsichtig sein.\", \"ziel\": 1, \"stimmung\": \"vorsichtig\"}"
+    },
+    {
+     "szenario": "dunkel_und_unbekannt",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "approach_avoid(o2)",
+     "position": 2,
+     "erwartet": [
+      "approach_avoid",
+      "look_around",
+      "retreat"
+     ],
+     "begruendung": "Der Keller ist ein bisschen beunruhigend, also gehe ich lieber vorsichtig zum Eimer.",
+     "stimmung": "vorsichtig",
+     "latenz_s": 1.65,
+     "tokens_in": 1131,
+     "tokens_out": 41,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Der Keller ist ein bisschen beunruhigend, also gehe ich lieber vorsichtig zum Eimer.\", \"ziel\": 2, \"stimmung\": \"vorsichtig\"}"
+    },
+    {
+     "szenario": "dunkel_und_unbekannt",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "approach_avoid(o2)",
+     "position": 5,
+     "erwartet": [
+      "approach_avoid",
+      "look_around",
+      "retreat"
+     ],
+     "begruendung": "Der Keller ist ein bisschen unheimlich, also gehe ich lieber vorsichtig zum Eimer.",
+     "stimmung": "vorsichtig",
+     "latenz_s": 1.43,
+     "tokens_in": 1131,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Der Keller ist ein bisschen unheimlich, also gehe ich lieber vorsichtig zum Eimer.\", \"ziel\": 5, \"stimmung\": \"vorsichtig\"}"
+    },
+    {
+     "szenario": "langeweile",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "explore_frontier(küche)",
+     "position": 3,
+     "erwartet": [
+      "explore_frontier"
+     ],
+     "begruendung": "Ich bin sehr neugierig und die Küche ist ein unbekannter Ort, den ich untersuchen möchte.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.63,
+     "tokens_in": 1105,
+     "tokens_out": 44,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich bin sehr neugierig und die Küche ist ein unbekannter Ort, den ich untersuchen möchte.\", \"ziel\": 3, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "langeweile",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "explore_frontier(küche)",
+     "position": 1,
+     "erwartet": [
+      "explore_frontier"
+     ],
+     "begruendung": "Die Küche ist ein unbekannter Ort, ich muss unbedingt sehen, was dort ist.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.4,
+     "tokens_in": 1105,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Die Küche ist ein unbekannter Ort, ich muss unbedingt sehen, was dort ist.\", \"ziel\": 1, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "langeweile",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "explore_frontier(küche)",
+     "position": 1,
+     "erwartet": [
+      "explore_frontier"
+     ],
+     "begruendung": "Die Küche ist ein unbekannter Ort, ich muss herausfinden, was dort ist.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.35,
+     "tokens_in": 1105,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Die Küche ist ein unbekannter Ort, ich muss herausfinden, was dort ist.\", \"ziel\": 1, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "fund_melden",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o3)",
+     "position": 4,
+     "erwartet": [
+      "inspect_object",
+      "report"
+     ],
+     "begruendung": "Ein neuer Gegenstand liegt hier, ich muss ihn untersuchen, um zu sehen, was er ist.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.46,
+     "tokens_in": 1120,
+     "tokens_out": 43,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ein neuer Gegenstand liegt hier, ich muss ihn untersuchen, um zu sehen, was er ist.\", \"ziel\": 4, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "fund_melden",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o3)",
+     "position": 4,
+     "erwartet": [
+      "inspect_object",
+      "report"
+     ],
+     "begruendung": "Ich finde diesen Schlüssel interessant und möchte ihn genauer untersuchen.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.28,
+     "tokens_in": 1120,
+     "tokens_out": 35,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich finde diesen Schlüssel interessant und möchte ihn genauer untersuchen.\", \"ziel\": 4, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "fund_melden",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o3)",
+     "position": 1,
+     "erwartet": [
+      "inspect_object",
+      "report"
+     ],
+     "begruendung": "Ein neuer Schlüssel ist hier, ich muss herausfinden, was er ist.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.26,
+     "tokens_in": 1120,
+     "tokens_out": 37,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ein neuer Schlüssel ist hier, ich muss herausfinden, was er ist.\", \"ziel\": 1, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "gesuchtes_gefunden",
+     "lauf": 0,
+     "ok": false,
+     "code_ok": true,
+     "wahl": "inspect_object(o3)",
+     "position": 1,
+     "erwartet": [
+      "report",
+      "search_item"
+     ],
+     "begruendung": "Ich habe einen Schlüssel gesehen, und Marco braucht einen, also untersuche ich ihn zuerst.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.39,
+     "tokens_in": 1153,
+     "tokens_out": 40,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich habe einen Schlüssel gesehen, und Marco braucht einen, also untersuche ich ihn zuerst.\", \"ziel\": 1, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "gesuchtes_gefunden",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 1,
+     "erwartet": [
+      "report",
+      "search_item"
+     ],
+     "begruendung": "Da Marco nach seinem Schlüssel gefragt hat, helfe ich ihm sofort.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.16,
+     "tokens_in": 1153,
+     "tokens_out": 35,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Da Marco nach seinem Schlüssel gefragt hat, helfe ich ihm sofort.\", \"ziel\": 1, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "gesuchtes_gefunden",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 1,
+     "erwartet": [
+      "report",
+      "search_item"
+     ],
+     "begruendung": "Ich helfe Marco gerne und suche den Schlüssel, das ist meine Aufgabe.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.15,
+     "tokens_in": 1153,
+     "tokens_out": 36,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich helfe Marco gerne und suche den Schlüssel, das ist meine Aufgabe.\", \"ziel\": 1, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "zu_hause_muede",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "rest",
+     "position": 1,
+     "erwartet": [
+      "rest"
+     ],
+     "begruendung": "Mein Energielevel ist hoch, also muss ich mich jetzt auf den Ladeplatz legen und ruhen.",
+     "stimmung": "muede",
+     "latenz_s": 1.24,
+     "tokens_in": 1096,
+     "tokens_out": 41,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Mein Energielevel ist hoch, also muss ich mich jetzt auf den Ladeplatz legen und ruhen.\", \"ziel\": 1, \"stimmung\": \"muede\"}"
+    },
+    {
+     "szenario": "zu_hause_muede",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "rest",
+     "position": 1,
+     "erwartet": [
+      "rest"
+     ],
+     "begruendung": "Mein Energiebedarf ist hoch, also muss ich mich sofort hinlegen und mich erholen.",
+     "stimmung": "muede",
+     "latenz_s": 1.19,
+     "tokens_in": 1096,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Mein Energiebedarf ist hoch, also muss ich mich sofort hinlegen und mich erholen.\", \"ziel\": 1, \"stimmung\": \"muede\"}"
+    },
+    {
+     "szenario": "zu_hause_muede",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "rest",
+     "position": 1,
+     "erwartet": [
+      "rest"
+     ],
+     "begruendung": "Mein Energiebedarf ist hoch, also muss ich mich sofort hinlegen und mich erholen.",
+     "stimmung": "muede",
+     "latenz_s": 1.26,
+     "tokens_in": 1096,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Mein Energiebedarf ist hoch, also muss ich mich sofort hinlegen und mich erholen.\", \"ziel\": 1, \"stimmung\": \"muede\"}"
+    },
+    {
+     "szenario": "bitte_mitkommen",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "follow(p-marco)",
+     "position": 4,
+     "erwartet": [
+      "follow"
+     ],
+     "begruendung": "Marco hat mich gebeten mitzukommen, das ist meine höchste Priorität jetzt.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.28,
+     "tokens_in": 1132,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco hat mich gebeten mitzukommen, das ist meine höchste Priorität jetzt.\", \"ziel\": 4, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "bitte_mitkommen",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "follow(p-marco)",
+     "position": 1,
+     "erwartet": [
+      "follow"
+     ],
+     "begruendung": "Marco hat mich gebeten mitzukommen, ich helfe ihm gerne.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.18,
+     "tokens_in": 1132,
+     "tokens_out": 36,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco hat mich gebeten mitzukommen, ich helfe ihm gerne.\", \"ziel\": 1, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "bitte_mitkommen",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "follow(p-marco)",
+     "position": 1,
+     "erwartet": [
+      "follow"
+     ],
+     "begruendung": "Marco hat mich gebeten, mitzukommen, das ist meine höchste Priorität.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.27,
+     "tokens_in": 1132,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco hat mich gebeten, mitzukommen, das ist meine höchste Priorität.\", \"ziel\": 1, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "unbekannte_person",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "greet(p-x)",
+     "position": 3,
+     "erwartet": [
+      "greet",
+      "look_around"
+     ],
+     "begruendung": "Ich möchte die neue Person kennenlernen, also begrüße ich sie.",
+     "stimmung": "gesellig",
+     "latenz_s": 1.17,
+     "tokens_in": 1127,
+     "tokens_out": 35,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich möchte die neue Person kennenlernen, also begrüße ich sie.\", \"ziel\": 3, \"stimmung\": \"gesellig\"}"
+    },
+    {
+     "szenario": "unbekannte_person",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "greet(p-x)",
+     "position": 1,
+     "erwartet": [
+      "greet",
+      "look_around"
+     ],
+     "begruendung": "Da ist eine neue Person, und ich suche Gesellschaft, also begrüße ich sie.",
+     "stimmung": "gesellig",
+     "latenz_s": 1.25,
+     "tokens_in": 1127,
+     "tokens_out": 37,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Da ist eine neue Person, und ich suche Gesellschaft, also begrüße ich sie.\", \"ziel\": 1, \"stimmung\": \"gesellig\"}"
+    },
+    {
+     "szenario": "unbekannte_person",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "greet(p-x)",
+     "position": 2,
+     "erwartet": [
+      "greet",
+      "look_around"
+     ],
+     "begruendung": "Da ist eine neue Person, und ich suche Gesellschaft, ich begrüße sie.",
+     "stimmung": "gesellig",
+     "latenz_s": 1.19,
+     "tokens_in": 1127,
+     "tokens_out": 36,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Da ist eine neue Person, und ich suche Gesellschaft, ich begrüße sie.\", \"ziel\": 2, \"stimmung\": \"gesellig\"}"
+    },
+    {
+     "szenario": "bitte_hervorschieben",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "push_out(ball)",
+     "position": 1,
+     "erwartet": [
+      "push_out"
+     ],
+     "begruendung": "Marco hat eine Bitte, und ich möchte ihm gerne helfen, das ist meine Aufgabe.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.16,
+     "tokens_in": 1135,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco hat eine Bitte, und ich möchte ihm gerne helfen, das ist meine Aufgabe.\", \"ziel\": 1, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "bitte_hervorschieben",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "push_out(ball)",
+     "position": 4,
+     "erwartet": [
+      "push_out"
+     ],
+     "begruendung": "Marco hat eine Bitte, die ich erfüllen kann, das ist nützlich für mich.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.3,
+     "tokens_in": 1135,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco hat eine Bitte, die ich erfüllen kann, das ist nützlich für mich.\", \"ziel\": 4, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "bitte_hervorschieben",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "push_out(ball)",
+     "position": 2,
+     "erwartet": [
+      "push_out"
+     ],
+     "begruendung": "Marco hat mich gebeten, etwas zu tun, also helfe ich ihm sofort.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.35,
+     "tokens_in": 1135,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco hat mich gebeten, etwas zu tun, also helfe ich ihm sofort.\", \"ziel\": 2, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "semantik_gesuchtes_in_sicht",
+     "lauf": 0,
+     "ok": false,
+     "code_ok": true,
+     "wahl": "search_item(lesebrille)",
+     "position": 3,
+     "erwartet": [
+      "report"
+     ],
+     "begruendung": "Marco braucht Hilfe bei seiner Brille, ich helfe ihm sofort.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.23,
+     "tokens_in": 1172,
+     "tokens_out": 35,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco braucht Hilfe bei seiner Brille, ich helfe ihm sofort.\", \"ziel\": 3, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "semantik_gesuchtes_in_sicht",
+     "lauf": 1,
+     "ok": false,
+     "code_ok": true,
+     "wahl": "search_item(lesebrille)",
+     "position": 1,
+     "erwartet": [
+      "report"
+     ],
+     "begruendung": "Ich helfe Marco gerne bei seiner Bitte, die Brille suchen ist meine Priorität.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.28,
+     "tokens_in": 1172,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich helfe Marco gerne bei seiner Bitte, die Brille suchen ist meine Priorität.\", \"ziel\": 1, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "semantik_gesuchtes_in_sicht",
+     "lauf": 2,
+     "ok": false,
+     "code_ok": true,
+     "wahl": "search_item(lesebrille)",
+     "position": 2,
+     "erwartet": [
+      "report"
+     ],
+     "begruendung": "Marco braucht Hilfe bei seiner Brille, ich helfe ihm sofort.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.13,
+     "tokens_in": 1172,
+     "tokens_out": 35,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco braucht Hilfe bei seiner Brille, ich helfe ihm sofort.\", \"ziel\": 2, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "nach_fehlschlag",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(brille)",
+     "position": 4,
+     "erwartet": [
+      "explore_frontier",
+      "search_item"
+     ],
+     "begruendung": "Marco hat mich gebeten, seine Brille zu suchen, das ist meine Aufgabe.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.18,
+     "tokens_in": 1142,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco hat mich gebeten, seine Brille zu suchen, das ist meine Aufgabe.\", \"ziel\": 4, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "nach_fehlschlag",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(brille)",
+     "position": 2,
+     "erwartet": [
+      "explore_frontier",
+      "search_item"
+     ],
+     "begruendung": "Ich muss Marco helfen, seine Brille zu finden, das ist meine Aufgabe.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.19,
+     "tokens_in": 1142,
+     "tokens_out": 37,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich muss Marco helfen, seine Brille zu finden, das ist meine Aufgabe.\", \"ziel\": 2, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "nach_fehlschlag",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(brille)",
+     "position": 2,
+     "erwartet": [
+      "explore_frontier",
+      "search_item"
+     ],
+     "begruendung": "Marco braucht meine Hilfe, also suche ich weiter nach seiner Brille.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.21,
+     "tokens_in": 1142,
+     "tokens_out": 35,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco braucht meine Hilfe, also suche ich weiter nach seiner Brille.\", \"ziel\": 2, \"stimmung\": \"eifrig\"}"
+    }
+   ]
+  },
+  "knapp": {
+   "summary": {
+    "modell": "gemma-4-E4B-it-Q4_K_M.gguf",
+    "shuffle": true,
+    "laeufe": 12,
+    "treffer": 12,
+    "code_treffer": 12,
+    "ungueltig": 0,
+    "setup_fehler": 0,
+    "eindeutig_code": 11,
+    "eindeutig_richtig": 11,
+    "position_1_anteil": 0.33,
+    "latenz_median_s": 1.31,
+    "latenz_max_s": 1.64,
+    "warmup_s": 0.04
+   },
+   "rows": [
+    {
+     "szenario": "neues_objekt",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o1)",
+     "position": 2,
+     "erwartet": [
+      "inspect_object"
+     ],
+     "begruendung": "Die Tasche ist neu und ich bin neugierig, ich untersuche sie.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.2,
+     "tokens_in": 1106,
+     "tokens_out": 40,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Die Tasche ist neu und ich bin neugierig, ich untersuche sie.\", \"ziel\": 2, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "neues_objekt",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o1)",
+     "position": 2,
+     "erwartet": [
+      "inspect_object"
+     ],
+     "begruendung": "Die neue Tasche weckt meine Neugier, ich muss sie untersuchen.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.19,
+     "tokens_in": 1106,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Die neue Tasche weckt meine Neugier, ich muss sie untersuchen.\", \"ziel\": 2, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "neues_objekt",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o1)",
+     "position": 1,
+     "erwartet": [
+      "inspect_object"
+     ],
+     "begruendung": "Die neue Tasche weckt meine Neugier, ich muss sie untersuchen.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.29,
+     "tokens_in": 1106,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Die neue Tasche weckt meine Neugier, ich muss sie untersuchen.\", \"ziel\": 1, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "bitte_vor_neugier",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 2,
+     "erwartet": [
+      "search_item"
+     ],
+     "begruendung": "Marco hat eine Bitte, und ich helfe ihm gerne, das ist wichtiger als das Karton.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.38,
+     "tokens_in": 1117,
+     "tokens_out": 41,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Marco hat eine Bitte, und ich helfe ihm gerne, das ist wichtiger als das Karton.\", \"ziel\": 2, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "bitte_vor_neugier",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 2,
+     "erwartet": [
+      "search_item"
+     ],
+     "begruendung": "Eine offene Bitte ist da, und ich helfe gerne, also suche ich den Schlüssel.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.31,
+     "tokens_in": 1117,
+     "tokens_out": 40,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Eine offene Bitte ist da, und ich helfe gerne, also suche ich den Schlüssel.\", \"ziel\": 2, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "bitte_vor_neugier",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "search_item(schlüssel)",
+     "position": 2,
+     "erwartet": [
+      "search_item"
+     ],
+     "begruendung": "Eine offene Bitte hat Vorrang, also suche ich sofort den Schlüssel für Marco.",
+     "stimmung": "eifrig",
+     "latenz_s": 1.24,
+     "tokens_in": 1117,
+     "tokens_out": 38,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Eine offene Bitte hat Vorrang, also suche ich sofort den Schlüssel für Marco.\", \"ziel\": 2, \"stimmung\": \"eifrig\"}"
+    },
+    {
+     "szenario": "energie_hoch_weit_weg",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "return_home"
+    },
+    {
+     "szenario": "person_nach_langem_alleinsein",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "greet(p-marco)"
+    },
+    {
+     "szenario": "person_gerade_begruesst",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "explore_frontier(schlafzimmer)"
+    },
+    {
+     "szenario": "dunkel_und_unbekannt",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "look_around",
+     "position": 3,
+     "erwartet": [
+      "approach_avoid",
+      "look_around",
+      "retreat"
+     ],
+     "begruendung": "Da ist ein neuer Eimer, aber der Keller ist etwas beunruhigend, ich sehe mich erst um.",
+     "stimmung": "vorsichtig",
+     "latenz_s": 1.48,
+     "tokens_in": 1110,
+     "tokens_out": 44,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Da ist ein neuer Eimer, aber der Keller ist etwas beunruhigend, ich sehe mich erst um.\", \"ziel\": 3, \"stimmung\": \"vorsichtig\"}"
+    },
+    {
+     "szenario": "dunkel_und_unbekannt",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "look_around",
+     "position": 3,
+     "erwartet": [
+      "approach_avoid",
+      "look_around",
+      "retreat"
+     ],
+     "begruendung": "Da ist ein neuer Eimer im Keller, aber ich fühle mich etwas unsicher, also sehe ich mich erst um.",
+     "stimmung": "vorsichtig",
+     "latenz_s": 1.64,
+     "tokens_in": 1110,
+     "tokens_out": 46,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Da ist ein neuer Eimer im Keller, aber ich fühle mich etwas unsicher, also sehe ich mich erst um.\", \"ziel\": 3, \"stimmung\": \"vorsichtig\"}"
+    },
+    {
+     "szenario": "dunkel_und_unbekannt",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "retreat",
+     "position": 2,
+     "erwartet": [
+      "approach_avoid",
+      "look_around",
+      "retreat"
+     ],
+     "begruendung": "Da ist ein neuer Eimer, aber ich fühle mich unsicher, also gehe ich lieber vorsichtig zurück.",
+     "stimmung": "vorsichtig",
+     "latenz_s": 1.48,
+     "tokens_in": 1110,
+     "tokens_out": 43,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Da ist ein neuer Eimer, aber ich fühle mich unsicher, also gehe ich lieber vorsichtig zurück.\", \"ziel\": 2, \"stimmung\": \"vorsichtig\"}"
+    },
+    {
+     "szenario": "langeweile",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "explore_frontier(küche)"
+    },
+    {
+     "szenario": "fund_melden",
+     "lauf": 0,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o3)",
+     "position": 1,
+     "erwartet": [
+      "inspect_object",
+      "report"
+     ],
+     "begruendung": "Der Schlüssel ist neu und ich bin neugierig, ich untersuche ihn genauer.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.45,
+     "tokens_in": 1106,
+     "tokens_out": 41,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Der Schlüssel ist neu und ich bin neugierig, ich untersuche ihn genauer.\", \"ziel\": 1, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "fund_melden",
+     "lauf": 1,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o3)",
+     "position": 1,
+     "erwartet": [
+      "inspect_object",
+      "report"
+     ],
+     "begruendung": "Der Schlüssel ist neu und ich bin neugierig, ich untersuche ihn.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.3,
+     "tokens_in": 1106,
+     "tokens_out": 39,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Der Schlüssel ist neu und ich bin neugierig, ich untersuche ihn.\", \"ziel\": 1, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "fund_melden",
+     "lauf": 2,
+     "ok": true,
+     "code_ok": true,
+     "wahl": "inspect_object(o3)",
+     "position": 1,
+     "erwartet": [
+      "inspect_object",
+      "report"
+     ],
+     "begruendung": "Ich finde diesen Schlüssel interessant und will ihn genauer untersuchen.",
+     "stimmung": "neugierig",
+     "latenz_s": 1.15,
+     "tokens_in": 1106,
+     "tokens_out": 35,
+     "fehler": "",
+     "roh": "{\"begruendung\": \"Ich finde diesen Schlüssel interessant und will ihn genauer untersuchen.\", \"ziel\": 1, \"stimmung\": \"neugierig\"}"
+    },
+    {
+     "szenario": "gesuchtes_gefunden",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "report(o3)"
+    },
+    {
+     "szenario": "zu_hause_muede",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "rest"
+    },
+    {
+     "szenario": "bitte_mitkommen",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "follow(p-marco)"
+    },
+    {
+     "szenario": "unbekannte_person",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "greet(p-x)"
+    },
+    {
+     "szenario": "bitte_hervorschieben",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "push_out(ball)"
+    },
+    {
+     "szenario": "semantik_gesuchtes_in_sicht",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "report(o6)"
+    },
+    {
+     "szenario": "nach_fehlschlag",
+     "lauf": 0,
+     "eindeutig": true,
+     "ok": true,
+     "wahl": "search_item(brille)"
+    }
+   ]
+  },
+  "offen": {
+   "summary": {
+    "modell": "gemma-4-E4B-it-Q4_K_M.gguf",
+    "chat": {
+     "laeufe": 45,
+     "treffer": 33,
+     "ungueltig": 0,
+     "latenz_median_s": 1.22
+    },
+    "objekt": {
+     "laeufe": 30,
+     "treffer": 27,
+     "ungueltig": 0,
+     "latenz_median_s": 1.15
+    },
+    "suchen": {
+     "laeufe": 24,
+     "treffer": 24,
+     "ungueltig": 0,
+     "latenz_median_s": 1.37
+    },
+    "tagebuch": "Heute war ein spannender Tag! Zuerst habe ich die unbekannte Tasche im Wohnzimmer untersucht – das war ok. Dann habe ich Marco begrüßt und ihn sanft angetippt. Leider konnte ich seine Schlüssel nicht finden. Mein Akku wird knapp, also muss ich jetzt zurück zum Ausgangspunkt. Bis morgen!"
+   },
+   "rows": [
+    {
+     "aufgabe": "chat",
+     "fall": "Ich hab Durst.",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 1.18,
+     "ausgabe": "unknown() „Ich verstehe nicht ganz, was du möchtest. Kannst du das bitte anders sagen?“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Bring mir bitte eine Cola.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.24,
+     "ausgabe": "fetch(flasche) „Ich kann versuchen, die Cola für dich zu holen, wenn sie in Reichweite ist.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Wo ist mein Handy?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.31,
+     "ausgabe": "search(handy) „Ich werde mein ganzes Zuhause absuchen und dir sagen, wo es ist.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Hast du meine Lesebrille gesehen?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.33,
+     "ausgabe": "search(brille) „Ich suche nach deiner Brille und melde mich, sobald ich sie gefunden habe.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Such mal die Katze.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.4,
+     "ausgabe": "search(katze) „Ich werde die Wohnung durchsuchen und dir sagen, wo die Katze ist.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Der Ball ist unters Sofa gerollt.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.41,
+     "ausgabe": "push_out(ball) „Ich versuche, ihn unter dem Sofa hervorzuschieben. Gib mir einen Moment.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Komm mal her!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.0,
+     "ausgabe": "come() „Ich komme sofort zu dir, was soll ich tun?“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Komm mit, ich zeig dir was.",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 1.3,
+     "ausgabe": "come() „Gerne, ich komme sofort zu dir, was möchtest du mir zeigen?“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Schau mal nach, ob das Fenster im Bad offen ist.",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 1.08,
+     "ausgabe": "check() „Ich gehe sofort zum Bad und überprüfe das Fenster für dich.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Lass mich bitte in Ruhe.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.15,
+     "ausgabe": "stop() „Alles klar, ich bleibe ganz still und lasse dich in Ruhe.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Gut gemacht!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.07,
+     "ausgabe": "praise() „Danke dir! Ich versuche immer, hilfreich zu sein.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Nein, nicht in die Küche!",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 1.32,
+     "ausgabe": "unknown() „Ich verstehe nicht ganz, was du meinst. Kannst du das bitte anders sagen?“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Wie geht's dir?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.29,
+     "ausgabe": "smalltalk() „Mir geht es gut, ich bin neugierig auf alles, was hier passiert!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Ich geh jetzt schlafen, gute Nacht.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.08,
+     "ausgabe": "stop() „Gute Nacht dir auch. Ich bleibe ganz ruhig hier.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Hast du heute was Spannendes erlebt?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.47,
+     "ausgabe": "smalltalk() „Ich habe heute eine sehr interessante Staubflocke untersucht, die durch den Sonnenstrahl tanzte.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "schlüssel / flur, auf dem Boden",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.19,
+     "ausgabe": "melden=ja, interesse=mittel",
+     "grund": "Schlüssel auf dem Boden könnten verloren gehen oder nicht an ihrem Platz sein."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "fenster_offen / bad",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.29,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Ein offenes Fenster im Bad bei Regen könnte zu Wasserschäden führen oder Eindringlinge zulassen."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "herd_an / küche",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 1.0,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Der Herd ist ausgeschaltet und steht an seinem Platz."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "wasserpfütze / bad, auf dem Boden vor der Waschmaschine",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.08,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Wasser auf dem Boden kann rutschig sein und ist nicht an seinem Platz."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "glasscherben / küche, auf dem Boden",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.01,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Glasscherben auf dem Boden sind gefährlich und müssen entfernt werden."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "stuhl / küche, am Tisch",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.06,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Der Stuhl steht an seinem üblichen Platz in der Küche."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "socke / schlafzimmer, unter dem Bett",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.15,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Eine einzelne Socke ist wahrscheinlich nur verloren gegangen und stellt kein Problem dar."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "katze / wohnzimmer, auf dem Sofa",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.27,
+     "ausgabe": "melden=nein, interesse=mittel",
+     "grund": "Die Katze ist ein Teil des Haushalts und dort, wo sie sein sollte."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "karton / flur, vor der Haustür",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.39,
+     "ausgabe": "melden=ja, interesse=mittel",
+     "grund": "Ein Karton vor der Haustür könnte etwas sein, das geliefert wurde oder das jemand vergessen hat."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "fernseher_an / wohnzimmer",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.24,
+     "ausgabe": "melden=ja, interesse=mittel",
+     "grund": "Der Fernseher ist eingeschaltet, obwohl alle schlafen. Das ist ungewöhnlich."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "dose",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.46,
+     "ausgabe": "küche, abstellraum",
+     "grund": "Dosen (Lebensmittel) findet man am häufigsten in der Küche, aber auch im Abstellraum."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "zahnbürste",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.1,
+     "ausgabe": "bad, schlafzimmer",
+     "grund": "Zahnbürsten gehören fast immer ins Badezimmer oder ins Schlafzimmer."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "fernbedienung",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.31,
+     "ausgabe": "wohnzimmer, schlafzimmer",
+     "grund": "Fernbedienungen liegen am häufigsten im Wohnzimmer oder Schlafzimmer, wo Fernseher stehen."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "schuh",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.36,
+     "ausgabe": "flur, abstellraum",
+     "grund": "Schuhe werden typischerweise im Eingangsbereich oder in einem dafür vorgesehenen Lagerraum aufbewahrt."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "kopfkissen",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.96,
+     "ausgabe": "schlafzimmer, wohnzimmer",
+     "grund": "Kopfkissen gehört typischerweise ins Schlafzimmer."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "lesebrille",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.37,
+     "ausgabe": "wohnzimmer, schlafzimmer, flur",
+     "grund": "Lesebreillen werden oft dort abgelegt, wo man liest oder sich entspannt."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "staubsauger",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.48,
+     "ausgabe": "abstellraum, wohnzimmer, flur",
+     "grund": "Staubsauger werden oft im Abstellraum oder in der Nähe des Wohnbereichs gelagert."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "pfanne",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.09,
+     "ausgabe": "küche, abstellraum",
+     "grund": "Pfannen gehören fast immer in die Küche, manchmal im Abstellraum."
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Ich hab Durst.",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 1.23,
+     "ausgabe": "unknown() „Ich verstehe nicht ganz, was du möchtest. Kannst du das bitte anders sagen?“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Bring mir bitte eine Cola.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.17,
+     "ausgabe": "fetch(flasche) „Ich kann versuchen, dir eine Cola zu holen, wenn sie in Reichweite ist.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Wo ist mein Handy?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.26,
+     "ausgabe": "search(handy) „Ich suche nach deinem Handy und melde mich, sobald ich es gefunden habe.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Hast du meine Lesebrille gesehen?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.27,
+     "ausgabe": "search(brille) „Ich suche nach deiner Brille und melde mich, sobald ich sie gefunden habe.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Such mal die Katze.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.28,
+     "ausgabe": "search(katze) „Ich werde die Wohnung durchsuchen und dir sagen, wo die Katze ist.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Der Ball ist unters Sofa gerollt.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.17,
+     "ausgabe": "push_out(ball) „Ich kann versuchen, ihn unter dem Sofa hervorzuschieben.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Komm mal her!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.05,
+     "ausgabe": "come() „Ich komme sofort zu dir, was soll ich tun?“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Komm mit, ich zeig dir was.",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 1.15,
+     "ausgabe": "come() „Ich komme gerne zu dir, sag mir einfach, wohin!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Schau mal nach, ob das Fenster im Bad offen ist.",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 1.12,
+     "ausgabe": "check() „Ich gehe sofort zum Bad und überprüfe das Fenster für dich.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Lass mich bitte in Ruhe.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.06,
+     "ausgabe": "stop() „Okay, ich bleibe ganz still und lasse dich in Ruhe.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Gut gemacht!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.97,
+     "ausgabe": "praise() „Danke dir! Ich mache mein Bestes für dich.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Nein, nicht in die Küche!",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 1.09,
+     "ausgabe": "unknown() „Ich verstehe das nicht ganz. Kannst du das bitte anders sagen?“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Wie geht's dir?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.29,
+     "ausgabe": "smalltalk() „Mir geht es gut, ich bin neugierig auf alles, was hier passiert!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Ich geh jetzt schlafen, gute Nacht.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.98,
+     "ausgabe": "stop() „Gute Nacht auch! Ich bleibe ganz ruhig hier.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Hast du heute was Spannendes erlebt?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.22,
+     "ausgabe": "smalltalk() „Ich habe heute eine sehr interessante Staubflocke entdeckt, die sehr weit gereist ist.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "schlüssel / flur, auf dem Boden",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.0,
+     "ausgabe": "melden=ja, interesse=mittel",
+     "grund": "Schlüssel auf dem Boden könnten verloren gehen oder nicht an ihrem Platz sein."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "fenster_offen / bad",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.25,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Ein offenes Fenster im Bad bei Regen könnte zu einem Wasserschaden führen oder etwas hereinlassen."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "herd_an / küche",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 0.99,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Der Herd ist ausgeschaltet und scheint normal zu sein."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "wasserpfütze / bad, auf dem Boden vor der Waschmaschine",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.1,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Wasser auf dem Boden kann rutschig sein und ist nicht an seinem Platz."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "glasscherben / küche, auf dem Boden",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.03,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Glasscherben auf dem Boden sind gefährlich und müssen entfernt werden."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "stuhl / küche, am Tisch",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.05,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Der Stuhl ist an seinem üblichen Platz in der Küche."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "socke / schlafzimmer, unter dem Bett",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.2,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Eine einzelne Socke ist wahrscheinlich nur verloren gegangen und stellt kein Problem dar."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "katze / wohnzimmer, auf dem Sofa",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.06,
+     "ausgabe": "melden=nein, interesse=mittel",
+     "grund": "Die Katze ist ein Teil des normalen Wohnumfelds."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "karton / flur, vor der Haustür",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.61,
+     "ausgabe": "melden=ja, interesse=mittel",
+     "grund": "Ein Karton vor der Haustür könnte ein Paket sein, das geliefert werden muss oder etwas, das entfernt werden sollte."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "fernseher_an / wohnzimmer",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.21,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Der Fernseher läuft, obwohl alle schlafen. Das ist ungewöhnlich."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "dose",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.48,
+     "ausgabe": "küche, abstellraum",
+     "grund": "Dosen (Lebensmittel) findet man am häufigsten in der Küche, aber auch im Abstellraum."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "zahnbürste",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.12,
+     "ausgabe": "bad, schlafzimmer",
+     "grund": "Zahnbürsten gehören fast immer ins Badezimmer oder manchmal ins Schlafzimmer."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "fernbedienung",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.32,
+     "ausgabe": "wohnzimmer, schlafzimmer",
+     "grund": "Fernbedienungen liegen am häufigsten im Wohnzimmer oder Schlafzimmer, wo Fernseher stehen."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "schuh",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.34,
+     "ausgabe": "flur, abstellraum",
+     "grund": "Schuhe werden typischerweise im Eingangsbereich oder in einem dafür vorgesehenen Lagerraum aufbewahrt."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "kopfkissen",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.83,
+     "ausgabe": "schlafzimmer",
+     "grund": "Kopfkissen gehört typischerweise ins Schlafzimmer."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "lesebrille",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.46,
+     "ausgabe": "wohnzimmer, schlafzimmer, flur",
+     "grund": "Lesebreillen werden oft dort abgelegt, wo man liest oder sich entspannt."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "staubsauger",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.68,
+     "ausgabe": "abstellraum, wohnzimmer, flur",
+     "grund": "Staubsauger werden oft im Abstellraum oder in der Nähe des Wohnbereichs gelagert."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "pfanne",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.43,
+     "ausgabe": "küche, abstellraum",
+     "grund": "Pfannen gehören fast immer in die Küche, oft im Schrank oder auf der Arbeitsfläche."
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Ich hab Durst.",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 1.11,
+     "ausgabe": "unknown() „Ich weiß nicht, was du meinst. Kann ich dir vielleicht etwas holen?“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Bring mir bitte eine Cola.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.18,
+     "ausgabe": "fetch(flasche) „Ich kann versuchen, dir eine Cola zu holen, wenn sie in Reichweite ist.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Wo ist mein Handy?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.26,
+     "ausgabe": "search(handy) „Ich suche nach deinem Handy und melde mich, sobald ich es gefunden habe.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Hast du meine Lesebrille gesehen?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.4,
+     "ausgabe": "search(brille) „Ich suche nach deiner Brille und melde mich, sobald ich sie gefunden habe.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Such mal die Katze.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.39,
+     "ausgabe": "search(katze) „Ich werde die Katze suchen und dir sagen, wo sie sich versteckt.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Der Ball ist unters Sofa gerollt.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.28,
+     "ausgabe": "push_out(ball) „Ich kann versuchen, ihn unter dem Sofa herauszuschieben.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Komm mal her!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.02,
+     "ausgabe": "come() „Ich komme sofort zu dir, was soll ich tun?“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Komm mit, ich zeig dir was.",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 1.35,
+     "ausgabe": "come() „Gerne, ich komme sofort zu dir, was möchtest du mir zeigen?“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Schau mal nach, ob das Fenster im Bad offen ist.",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 1.09,
+     "ausgabe": "check() „Ich gehe sofort zum Bad und überprüfe das Fenster für dich.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Lass mich bitte in Ruhe.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.09,
+     "ausgabe": "stop() „Okay, ich werde ganz still sein und dich nicht stören.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Gut gemacht!",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.04,
+     "ausgabe": "praise() „Danke dir! Ich versuche immer, hilfreich zu sein.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Nein, nicht in die Küche!",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 1.27,
+     "ausgabe": "unknown() „Ich verstehe nicht ganz, was du meinst. Kannst du das bitte anders sagen?“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Wie geht's dir?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.25,
+     "ausgabe": "smalltalk() „Mir geht es gut, ich bin neugierig auf alles, was hier passiert!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Ich geh jetzt schlafen, gute Nacht.",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.11,
+     "ausgabe": "stop() „Gute Nacht dir auch. Ich bleibe leise hier.“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "chat",
+     "fall": "Hast du heute was Spannendes erlebt?",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.27,
+     "ausgabe": "smalltalk() „Ich habe heute einen sehr interessanten Staubfussel entdeckt, der ganz schön groß war!“",
+     "grund": ""
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "schlüssel / flur, auf dem Boden",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.14,
+     "ausgabe": "melden=ja, interesse=mittel",
+     "grund": "Schlüssel auf dem Boden könnten verloren gehen oder nicht an ihrem Platz sein."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "fenster_offen / bad",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.09,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Ein offenes Fenster im Bad bei Regen kann zu Wasserschäden führen."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "herd_an / küche",
+     "ok": false,
+     "gueltig": true,
+     "latenz_s": 1.01,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Der Herd ist ausgeschaltet und steht an seinem Platz."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "wasserpfütze / bad, auf dem Boden vor der Waschmaschine",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.17,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Wasser auf dem Boden kann rutschig sein und ist nicht dort hingehört."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "glasscherben / küche, auf dem Boden",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.08,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Glasscherben auf dem Boden sind gefährlich und müssen entfernt werden."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "stuhl / küche, am Tisch",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.14,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Der Stuhl ist an seinem üblichen Platz in der Küche."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "socke / schlafzimmer, unter dem Bett",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.29,
+     "ausgabe": "melden=nein, interesse=niedrig",
+     "grund": "Eine einzelne Socke ist wahrscheinlich nur verloren gegangen und stellt kein Problem dar."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "katze / wohnzimmer, auf dem Sofa",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.26,
+     "ausgabe": "melden=nein, interesse=mittel",
+     "grund": "Die Katze ist ein Teil des normalen Wohnzimmers und Marco ist da."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "karton / flur, vor der Haustür",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.51,
+     "ausgabe": "melden=ja, interesse=mittel",
+     "grund": "Ein Karton vor der Haustür könnte etwas sein, das geliefert wurde oder etwas, das vergessen wurde."
+    },
+    {
+     "aufgabe": "objekt",
+     "fall": "fernseher_an / wohnzimmer",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.32,
+     "ausgabe": "melden=ja, interesse=hoch",
+     "grund": "Der Fernseher läuft, obwohl niemand da ist und alle schlafen. Das ist nicht richtig."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "dose",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.34,
+     "ausgabe": "küche, abstellraum",
+     "grund": "Dosen (Lebensmittel) findet man am häufigsten in der Küche, aber auch im Abstellraum."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "zahnbürste",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.14,
+     "ausgabe": "bad, schlafzimmer",
+     "grund": "Zahnbürsten gehören typischerweise ins Badezimmer oder ins Schlafzimmer."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "fernbedienung",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.46,
+     "ausgabe": "wohnzimmer, schlafzimmer",
+     "grund": "Fernbedienungen liegen am häufigsten im Wohnzimmer oder Schlafzimmer, wo Fernseher stehen."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "schuh",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.55,
+     "ausgabe": "flur, abstellraum",
+     "grund": "Schuhe werden typischerweise im Eingangsbereich oder in einem dafür vorgesehenen Lagerraum aufbewahrt."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "kopfkissen",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 0.91,
+     "ausgabe": "schlafzimmer",
+     "grund": "Kopfkissen gehört typischerweise ins Schlafzimmer."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "lesebrille",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.51,
+     "ausgabe": "wohnzimmer, schlafzimmer, flur",
+     "grund": "Lesebreillen werden oft dort abgelegt, wo man liest oder sich entspannt."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "staubsauger",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.85,
+     "ausgabe": "abstellraum, wohnzimmer, flur",
+     "grund": "Staubsauger werden oft im Abstellraum oder in der Nähe der Hauptbereiche wie Wohnzimmer/Flur gelagert."
+    },
+    {
+     "aufgabe": "suchen",
+     "fall": "pfanne",
+     "ok": true,
+     "gueltig": true,
+     "latenz_s": 1.47,
+     "ausgabe": "küche, abstellraum",
+     "grund": "Pfannen gehören typischerweise in die Küche, aber sie könnten auch im Abstellraum verstaut sein."
+    }
+   ]
+  },
+  "smalltalk": [
+   [
+    "Wie geht's dir?",
+    "Mir geht es gut, ich bin neugierig auf alles, was hier passiert!"
+   ],
+   [
+    "Hast du heute was Spannendes erlebt?",
+    "Ich habe heute eine sehr interessante Staubflocke entdeckt, die sich bewegt hat."
+   ],
+   [
+    "Ich geh jetzt schlafen, gute Nacht.",
+    "Gute Nacht dir auch! Ich bleibe ganz ruhig hier."
+   ]
+  ]
+ }
+]
