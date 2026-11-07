@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SLARC – MANUELLE Teleop + AUFNAHME/REPLAY   (slarc_manual V3, 07.11.2026)
+SLARC – MANUELLE Teleop + AUFNAHME/REPLAY   (slarc_manual V4, 07.11.2026)
 =========================================================================
 Zwei Modi:
   FUSS-Modus   Fuß-ZIELE fest im Körperframe (Servos halten stur), Tasten bewegen
@@ -11,11 +11,16 @@ Fußpositionen, Kontakt, Fußlast, Gelenkwinkel, Momente, Körperpose, Auswahl,
 Modus, Tripod-Verlagerung) in eine JSONL-Datei; 'k' markiert Keyframes.
 Replay fährt die kommandierten Servowinkel nach (V1/V2-Dateien: Fußziele).
 
+V4: Rückenlage-Start (--start-back), Startpose in der Aufnahme (Meta-Zeile), Replay startet
+    exakt dort; --start-yaw/-tilt/-dx/-dy variieren den Start (Robustheitstest:
+    slarc_replay_robust.py), Replay endet mit einer RESULT-Zeile.
 V3: Tripod-Verlagerung (u/i/o), Gruppen-Auswahl (7/8/9/0/b), Gelenkmodus (e).
 V2: CAD-URDF-Prüfung, Kontakt als Fußfarbe, Last-/Momenttabelle, a/d.
 
 Aufnahme:  python3 slarc_manual.py --rise 0.17
-Replay:    python3 slarc_manual.py --rise 0.17 --replay slarc_demo.jsonl
+Rücken:    python3 slarc_manual.py --no-stairs --start-back --out slarc_roll.jsonl
+Replay:    python3 slarc_manual.py --replay slarc_demo.jsonl      (Gelände + Start aus der Datei)
+Robust:    python3 slarc_replay_robust.py slarc_roll.jsonl
 
 TASTEN (Fenster-Fokus nötig)
  Auswahl (beide Modi):
@@ -61,6 +66,11 @@ ap.add_argument("--tri-pair", type=float, default=0.030,
                 help="Verlagerung voll: Vorder-/Hinterbein des tragenden Tripods länger um [m] (negativ = kürzer)")
 ap.add_argument("--tri-mid", type=float, default=0.030,
                 help="Verlagerung voll: Mittelbein des tragenden Tripods länger um [m]")
+ap.add_argument("--start-back", action="store_true", help="[V4] in Rückenlage starten")
+ap.add_argument("--start-yaw", type=float, default=0.0, help="[V4] Start um Hochachse drehen [°]")
+ap.add_argument("--start-tilt", type=float, default=0.0, help="[V4] Start um Körper-Längsachse kippen [°]")
+ap.add_argument("--start-dx", type=float, default=0.0, help="[V4] Start verschieben x [m]")
+ap.add_argument("--start-dy", type=float, default=0.0, help="[V4] Start verschieben y [m]")
 ap.add_argument("--no-hud", action="store_true", help="keine Terminal-Tabelle (nur Log-Zeilen)")
 ap.add_argument("--no-gui", action="store_true", help="[Test] ohne Fenster")
 ap.add_argument("--frames", type=int, default=0, help="[Test] nach N Frames beenden")
@@ -69,6 +79,18 @@ a = ap.parse_args()
 # [V2] CAD-URDF erzwingen: ohne sie keine Aussage über reale Lasten
 if not (sim.USE_CAD_URDF and sim._os.path.isfile(sim.CAD_URDF)):
     sys.exit("  FEHLER: CAD-URDF fehlt: %s (meshes/ daneben nötig)" % sim.CAD_URDF)
+
+# [V4] Replay: Datei vorab lesen; Meta-Zeile (ab V4) legt Gelände und Startpose fest
+seq = None; meta = None
+if a.replay:
+    with open(a.replay) as fh:
+        seq = [json.loads(ln) for ln in fh if ln.strip()]
+    if seq and "meta" in seq[0]:
+        meta = seq.pop(0)["meta"]
+        a.rise, a.run, a.stair_x, a.no_stairs = meta["rise"], meta["run"], meta["stair_x"], meta["no_stairs"]
+        print("  Replay-Gelände aus Datei: %s" % ("eben" if a.no_stairs else
+              "Treppe rise %.3f run %.3f x %.2f" % (a.rise, a.run, a.stair_x)))
+        if a.start_back: print("  --start-back ignoriert: Startpose kommt aus der Datei")
 
 sim.STAIR_RISE = a.rise; sim.STAIR_RUN = a.run; sim.STAIR_X = a.stair_x
 GUI = not a.no_gui
@@ -317,28 +339,82 @@ def step_sim():
     p.stepSimulation()
     if GUI: time.sleep(1.0/240.0)
 
+# ─────────────────────── [V4] STARTPOSE ───────────────────────
+def place(pos, orn, q=None, settle=360):
+    """Basis auf pos/orn setzen, dann --start-* anwenden: Kippen um die Körper-Längsachse,
+    Drehen um die Welt-Hochachse, Verschieben. q: Gelenkwinkel je Bein (sonst unverändert).
+    Danach settle Frames halten (aktuelle Soll-Winkel bzw. Fußziele)."""
+    qt = p.getQuaternionFromEuler([math.radians(a.start_tilt), 0, 0])
+    qy = p.getQuaternionFromEuler([0, 0, math.radians(a.start_yaw)])
+    orn = p.multiplyTransforms([0, 0, 0], orn, [0, 0, 0], qt)[1]
+    orn = p.multiplyTransforms([0, 0, 0], qy, [0, 0, 0], orn)[1]
+    pos = [pos[0] + a.start_dx, pos[1] + a.start_dy, pos[2] + 0.01]
+    p.resetBasePositionAndOrientation(robot.robot_id, pos, orn)
+    p.resetBaseVelocity(robot.robot_id, [0, 0, 0], [0, 0, 0])
+    if q:
+        for n in NAMES:
+            for j, v in zip(JIDX[n], q[n]): p.resetJointState(robot.robot_id, j, v)
+    for _ in range(settle):
+        for n in NAMES: command(n)
+        step_sim(); measure()
+    peak.clear(); lim_cnt.update({n: 0 for n in NAMES})   # Absetzen nicht in die Spitzen zählen
+
+def start_meta():
+    bpos, born = p.getBasePositionAndOrientation(robot.robot_id)
+    return {"meta": {"ver": "V4", "rise": a.rise, "run": a.run, "stair_x": a.stair_x,
+                     "no_stairs": bool(a.no_stairs),
+                     "base_pos": [round(v, 5) for v in bpos], "base_orn": [round(v, 6) for v in born],
+                     "q": {n: [round(p.getJointState(robot.robot_id, j)[0], 5) for j in JIDX[n]] for n in NAMES},
+                     "qcmd": {n: [round(v, 5) for v in qcmd[n]] for n in NAMES},
+                     "cpr": [round(robot._g_pitch_eff, 4), round(robot._g_roll_eff, 4)]}}
+
+def up_z():
+    return p.getMatrixFromQuaternion(p.getBasePositionAndOrientation(robot.robot_id)[1])[8]
+
+START_VAR = any((a.start_yaw, a.start_tilt, a.start_dx, a.start_dy))
+
 # ─────────────────────────── REPLAY-MODUS ───────────────────────────
 if a.replay:
-    with open(a.replay) as fh:
-        seq = [json.loads(ln) for ln in fh if ln.strip()]
     print("  Replay: %d Samples aus %s" % (len(seq), a.replay))
     mode = "joint"            # [V3] Servowinkel direkt; ältere Dateien: Fußziele -> IK
+    if meta:                  # [V4] exakt an der Startpose der Aufnahme beginnen
+        robot._g_pitch_eff, robot._g_roll_eff = meta["cpr"]
+        for n in NAMES: qcmd[n] = list(meta["qcmd"][n])
+        place(meta["base_pos"], meta["base_orn"], meta["q"])
+    elif a.start_back or START_VAR:
+        bpos, born = p.getBasePositionAndOrientation(robot.robot_id)
+        if a.start_back: bpos = [bpos[0], bpos[1], 0.25]; born = p.getQuaternionFromEuler([math.pi, 0, 0])
+        place(bpos, born)
     frame = 0
     for s in seq:
         cpr = s.get("cpr", [0.0, 0.0])
         robot._g_pitch_eff = cpr[0]; robot._g_roll_eff = cpr[1]
+        q0 = {n: list(qcmd[n]) for n in NAMES}; q1 = {}
         for e in s["feet"]:
-            qcmd[e[0]] = e[12] if len(e) > 12 else body_to_q(e[0], [e[1], e[2], e[3]])[0]
+            q1[e[0]] = e[12] if len(e) > 12 else body_to_q(e[0], [e[1], e[2], e[3]])[0]
         sel = s.get("sel", 0); sel = [NAMES[sel]] if isinstance(sel, int) else sel
         tri_s = s.get("tri", 0.0)
-        for _ in range(REC_EVERY):
-            for n in NAMES: command(n)
+        for i in range(REC_EVERY):
+            w = (i + 1) / REC_EVERY   # [V4] linear zwischen den Samples statt 30-Hz-Treppe
+            for n in NAMES:
+                qcmd[n] = [x0 + (x1 - x0) * w for x0, x1 in zip(q0[n], q1[n])]
+                command(n)
             step_sim(); measure(); frame += 1
             if frame % 8 == 0: update_gui(sel)
             if frame % 24 == 0: hud(s.get("grp", "-"), sel, False, 0)
         if s.get("kf"): msg("Keyframe bei Sample-Frame %d" % s["f"])
     msg("Replay fertig.")
     for ln in peak_report(): msg(ln) if not ANSI else print(ln)
+    # [V4] maschinenlesbares Ergebnis (für slarc_replay_robust.py)
+    bpos, born = p.getBasePositionAndOrientation(robot.robot_id)
+    rl, pt, yw = p.getEulerFromQuaternion(born)
+    kmax = max(peak, key=peak.get) if peak else None
+    print("RESULT " + json.dumps({
+        "end_pos": [round(v, 4) for v in bpos], "end_rpy_deg": [round(math.degrees(v), 1) for v in (rl, pt, yw)],
+        "up_z": round(up_z(), 3), "rec_end_body": seq[-1]["body"] if seq else None,
+        "peak_pct": round(100 * peak[kmax] / TAU_MAX) if kmax else 0,
+        "peak_at": ("%s %s" % (SHORT[kmax[0]], kmax[1])) if kmax else "",
+        "lim": sum(lim_cnt.values()), "contacts": [contact_state(n) for n in NAMES]}), flush=True)
     while GUI:
         step_sim(); measure()
     raise SystemExit
@@ -361,8 +437,13 @@ def to_neutral(names):
         foot[n] = neutral(n)
         if mode == "joint": qcmd[n] = body_to_q(n, foot[n])[0]
 
+if a.start_back or START_VAR:   # [V4]
+    bpos, born = p.getBasePositionAndOrientation(robot.robot_id)
+    if a.start_back: bpos = [bpos[0], bpos[1], 0.25]; born = p.getQuaternionFromEuler([math.pi, 0, 0])
+    place(bpos, born)
+
 print(__doc__)
-msg("Auswahl: %s | Fußmodus" % gname)
+msg("Auswahl: %s | Fußmodus%s" % (gname, " | Rückenlage" if a.start_back else ""))
 DOWN = p.KEY_IS_DOWN; frame = 0
 while True:
     keys = p.getKeyboardEvents()
@@ -387,6 +468,7 @@ while True:
         elif k == ord('j'):
             if not recording:
                 rec_fh = open(a.out, "w"); recording = True; n_samples = 0
+                rec_fh.write(json.dumps(start_meta()) + "\n")   # [V4] Startpose + Gelände
                 msg("AUFNAHME an -> %s" % a.out)
             else:
                 recording = False; rec_fh.close()
