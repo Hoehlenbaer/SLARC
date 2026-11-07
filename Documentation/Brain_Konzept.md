@@ -361,3 +361,17 @@ Auf dem Pi entscheidet der Cache: Ohne ihn wird bei jedem Wechsel der Aufgabe de
 
 Außerdem setzen mehrere Sätze voraus, dass SLARC Personen unterscheidet (Sophia, Laura) und weiß, welches Zimmer wem gehört. Die Perzeption kennt bisher nur „Person“; das Gedächtnis kennt keine Zimmer-Zuordnung (offen).
 
+**Lauf V0.3** (Marco, 07.11.2026 21:46, PC/GPU, 3 Wiederholungen):
+
+| Modell | Chat | Chat eigen (Holdout) | Objekt (LLM allein) | Suchen | knapp |
+|---|---|---|---|---|---|
+| Qwen3-4B-2507 | 37/45 | 18/24 | 30/30 (12/12) | 24/24 | 12/12 |
+| Qwen3.5-4B | 35/45 | 24/24 | 27/30 (9/12) | 24/24 | 11/12 |
+| Gemma 4 E4B | 37/45 | 17/24 | 30/30 (12/12) | 24/24 | 12/12 |
+
+- Das Tagebuch im Chat-Prompt hat geschadet (Qwen3 42 → 37, Qwen3.5 45 → 35): „Suche nach Laura!“ wurde zu `search(schlüssel)`, Antworten behaupteten Ergebnisse („Ball gefunden“). Fehler im Vorgehen: zwei Änderungen auf einmal und Tagebuch auch bei Befehlen.
+- Holdout: Qwen3.5 löst alle 8 wertbaren Sätze in allen Durchläufen. Bei den Lücken (überwachen, zu Ort gehen) presst jedes Modell die Bitte in einen vorhandenen Dienst, keines sagt „kann ich noch nicht“.
+- Mit Gefahren per Regel spricht der unabgestimmte Test eher für Qwen3.5; dagegen stehen 10 Sätze als kleine Stichprobe und ~1,7× Latenz auf dem PC. Entscheidung nach dem nächsten Lauf und der Messung auf dem Pi.
+
+**V0.4 (eine Änderung): Chat zweistufig.** Stufe 1 deutet die Nachricht ohne Tagebuch; die Antwort ist nur eine Bestätigung und darf kein Ergebnis behaupten. Stufe 2 (`talk_reply`) nur bei Smalltalk, mit Tagebuch. Das Few-Shot mit dem erfundenen Ausflug ist entfernt.
+

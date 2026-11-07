@@ -76,6 +76,8 @@ def test_semantic_grammars_with_llama_cpp():
     for _, a in S.SEARCH_SHOTS:
         assert _accepts(L, vocab, S.search_gbnf(places), a)
     assert _accepts(L, vocab, S.NARRATE_GBNF, '{"text": "Heute war ich neugierig."}')
+    for _, a in S.TALK_SHOTS:
+        assert _accepts(L, vocab, S.TALK_GBNF, a)
     assert not _accepts(L, vocab, S.CHAT_GBNF, '{"dienst": "tanzen"')
     assert not _accepts(L, vocab, S.search_gbnf(places), '{"grund": "x", "orte": ["keller"')
 
@@ -90,13 +92,24 @@ def test_rule_assessment_skips_llm():
     assert calls and r.source == "llm"
 
 
-def test_chat_gets_diary_context():
-    seen = {}
+def test_chat_two_stage_diary_only_for_smalltalk():
+    calls = []
     def resp(msgs, g):
-        seen["user"] = msgs[-1]["content"]
-        return '{"dienst": "smalltalk", "gegenstand": "", "antwort": "Ok."}'
+        task = msgs[0]["content"].split("\n", 1)[0]
+        calls.append((task, msgs[-1]["content"]))
+        if task == "AUFGABE: chat":
+            svc = "smalltalk" if "erlebt" in msgs[-1]["content"] else "search"
+            return '{"dienst": "%s", "gegenstand": "", "antwort": "Ok."}' % svc
+        return '{"antwort": "Ich habe eine Tasche untersucht."}'
     b = MockBrain(responder=resp)
-    S.interpret_chat(b, "Was hast du erlebt?", diary=[{"kind": "entscheidung", "text": "Tasche untersucht"}])
-    assert seen["user"].startswith("ERLEBT: Tasche untersucht")
+    diary = [{"kind": "entscheidung", "text": "Tasche untersucht"}]
+    r = S.interpret_chat(b, "Suche nach Laura!", diary=diary)
+    assert r.service == "search" and not r.talk and len(calls) == 1
+    assert "ERLEBT" not in calls[0][1]                      # Stufe 1 ohne Tagebuch
+    calls.clear()
+    r = S.interpret_chat(b, "Was hast du erlebt?", diary=diary)
+    assert r.talk and r.reply.startswith("Ich habe") and len(calls) == 2
+    assert calls[1][1].startswith("ERLEBT: Tasche untersucht")
+    calls.clear()
     S.interpret_chat(b, "Was hast du erlebt?")
-    assert seen["user"].startswith("ERLEBT: noch nichts")
+    assert calls[1][1].startswith("ERLEBT: noch nichts")
