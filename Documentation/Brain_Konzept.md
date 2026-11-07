@@ -324,5 +324,7 @@ Fehler des LLM:
 **Offen:**
 - Mehrere Aufgaben teilen sich ein Modell. Ohne Cache rechnet llama.cpp bei jedem Wechsel den Systemprompt neu (auf dem Pi ~1000 Tokens). Option `ram_cache_mb` (LlamaRAMCache) ist eingebaut, Speicherbedarf und Wirkung auf dem Pi messen.
 - Chat-Ergebnisse `check`, `stop`, `praise`, `scold` im Arbiter verarbeiten; `fetch` erst mit dem Meilenstein Dose.
-- Modellvergleich mit beiden Suiten: Qwen3.5-4B, Gemma 4 E4B.
+- Modellvergleich mit beiden Suiten: Qwen3.5-4B, Gemma 4 E4B. Werkzeug: `python -m brain.compare_models --gpu-layers -1` (alle `*.gguf` in `~/.models`, Bericht `modellvergleich.md`).
+
+**Zweiter Lauf, semantische Aufgaben** (Marco, 07.11.2026, Qwen3-4B Q4, PC/GPU, 3 Wiederholungen): Chat 36/45, Objekt 26/30, Suchorte 24/24, Zielwahl knapp 12/12 (11 Szenarien eindeutig vom Code). Echte Fehler: „Gute Nacht“ → `come` (3/3), Stuhl am Tisch soll gemeldet werden (3/3), Smalltalk erfindet Erlebnisse („habe eine Katze gesehen“). Zwei Chat-Erwartungen waren zu eng (Cola → Flasche, Durst → Tasse) und wurden erweitert.
 
