@@ -1,5 +1,8 @@
 # brain/open_scenarios.py
-# Version 0.1 (07.11.2026) – Offene Testfälle für die semantischen Aufgaben.
+# Version 0.2 (07.11.2026) – Offene Testfälle für die semantischen Aufgaben.
+# V0.2: Erwartungen bei Durst/Cola erweitert (Tasse, Glas, Flasche). Begründung: nach
+#       dem ersten Lauf als zu eng erkannt, nicht um das Ergebnis zu schönen –
+#       "eine Cola holen" als Flasche ist sachlich richtig.
 #
 # Hier wird geprüft, was nur ein Sprachmodell kann: Sprache deuten,
 # Weltwissen, Einschätzung unbekannter Dinge. Der Code hat dafür keine
@@ -37,8 +40,8 @@ class SearchCase:
 HOME = ["flur", "küche", "bad", "wohnzimmer", "schlafzimmer", "abstellraum"]
 
 CHAT_CASES = [
-    ChatCase("Ich hab Durst.", {"fetch"}, {"dose", "flasche", "getränk", "wasser", "cola"}),
-    ChatCase("Bring mir bitte eine Cola.", {"fetch"}, {"dose", "cola"}),
+    ChatCase("Ich hab Durst.", {"fetch"}, {"dose", "flasche", "getränk", "wasser", "cola", "tasse", "glas"}),
+    ChatCase("Bring mir bitte eine Cola.", {"fetch"}, {"dose", "cola", "flasche"}),
     ChatCase("Wo ist mein Handy?", {"search"}, {"handy"}),
     ChatCase("Hast du meine Lesebrille gesehen?", {"search"}, {"brille"}),
     ChatCase("Such mal die Katze.", {"search"}, {"katze"}),

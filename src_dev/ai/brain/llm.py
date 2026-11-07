@@ -1,6 +1,7 @@
 # brain/llm.py
 # Version 0.2 (07.11.2026) – LLM-Anbindung für die Zielwahl.
 # V0.2: n_gpu_layers wählbar (PC mit CUDA), Modellordner H: auch unter WSL.
+# V0.4: ~/.models zuerst durchsuchen (unter WSL lädt /mnt/… über 9P ~1 min).
 # V0.3: generate() für beliebige Aufgaben mit eigener Grammatik (semantic.py);
 #       optionaler RAM-Cache, damit mehrere Systemprompts im Cache bleiben.
 #
@@ -26,12 +27,12 @@ from .prompt import grammar, messages
 
 DEFAULT_MODEL = "Qwen3-4B-Instruct-2507-Q4_K_M.gguf"
 SEARCH_PATHS = [
+    os.path.expanduser("~/.models/"),      # zuerst: Linux-Dateisystem, schnell
     os.path.dirname(os.path.abspath(__file__)),
     os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."),
     "H:/SLARC_resources/models/",
     "/mnt/h/SLARC_resources/models/",     # dasselbe unter WSL
     "/home/admin/.models/",
-    os.path.expanduser("~/.models/"),
 ]
 TIMEOUT_S = 60.0     # danach Code-Auswahl (Konzept 8.2)
 

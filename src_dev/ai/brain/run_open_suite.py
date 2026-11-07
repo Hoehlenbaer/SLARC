@@ -1,5 +1,6 @@
 # brain/run_open_suite.py
-# Version 0.1 (07.11.2026) – Testsuite für die semantischen Aufgaben (semantic.py).
+# Version 0.2 (07.11.2026) – Testsuite für die semantischen Aufgaben (semantic.py).
+# V0.2: run(..., rows_out=False) für compare_models.py.
 #
 # Aufruf aus src_dev/ai:
 #   python -m brain.run_open_suite --mock
@@ -37,14 +38,15 @@ def _item_ok(item: str, wanted: set[str]) -> bool:
     return not wanted or any(w in item for w in wanted)
 
 
-def run(b, repeat: int) -> dict:
+def run(b, repeat: int, rows_out: bool = True) -> dict:
     rows = []
+    say = print if rows_out else (lambda *a, **k: None)
 
     def row(task, case, ok, valid, lat, out, reason=""):
         rows.append({"aufgabe": task, "fall": case, "ok": ok, "gueltig": valid,
                      "latenz_s": round(lat, 2), "ausgabe": out, "grund": reason})
         mark = "ok " if ok else "FALSCH" if valid else "UNGÜLTIG"
-        print(f"{mark:8} {task:7} {case[:44]:44} -> {out}", flush=True)
+        say(f"{mark:8} {task:7} {case[:44]:44} -> {out}", flush=True)
 
     for k in range(repeat):
         for c in CHAT_CASES:
@@ -63,7 +65,7 @@ def run(b, repeat: int) -> dict:
             row("suchen", c.item, ok, bool(r.places), r.latency_s, ", ".join(r.places), r.reason)
 
     text, lat, err = S.narrate(b, DIARY_SAMPLE)
-    print("\nTagebuch-Beispiel:\n" + (text or f"(Fehler: {err})") + f"\n({lat:.1f} s)")
+    say("\nTagebuch-Beispiel:\n" + (text or f"(Fehler: {err})") + f"\n({lat:.1f} s)")
 
     summary = {"modell": b.name}
     for task in ("chat", "objekt", "suchen"):

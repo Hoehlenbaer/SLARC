@@ -2,6 +2,7 @@
 # Version 0.2 (07.11.2026) – Entscheidungs-Testsuite für den Modellvergleich.
 # V0.2: --gpu-layers für den PC (Latenzen dann nicht mit dem Pi vergleichbar).
 # V0.3: Statusmeldungen beim Laden/Aufwärmen, --verbose (Ausgabe von llama.cpp).
+# V0.5: run(..., rows_out=False) für compare_models.py (ohne Zeilenausgabe).
 # V0.4: --close: wie im Betrieb ab Arbiter V0.2 bekommt das LLM nur die knappen
 #       Fälle (close_options); eindeutige Szenarien entscheidet der Code.
 #
@@ -44,12 +45,14 @@ def build(sc, shuffle_rng=None, close=False):
     return needs, menu, state_text(sc.obs, needs, menu, sc.triggers), code_best
 
 
-def run(brain, repeat: int, shuffle: bool, show: bool, only: list[str], close: bool = False) -> dict:
+def run(brain, repeat: int, shuffle: bool, show: bool, only: list[str], close: bool = False,
+        rows_out: bool = True) -> dict:
+    say = print if rows_out else (lambda *a, **k: None)
     rng = random.Random(42)
     rows = []
-    print("Wärme Systemprompt und Few-Shot auf …", flush=True)
+    say("Wärme Systemprompt und Few-Shot auf …", flush=True)
     t_warm = brain.warmup()
-    print(f"Aufgewärmt in {t_warm:.1f} s", flush=True)
+    say(f"Aufgewärmt in {t_warm:.1f} s", flush=True)
     for sc in SCENARIOS:
         if only and sc.name not in only:
             continue
@@ -59,16 +62,16 @@ def run(brain, repeat: int, shuffle: bool, show: bool, only: list[str], close: b
                 ok = code_best is not None and code_best.behavior in sc.expected
                 rows.append({"szenario": sc.name, "lauf": k, "eindeutig": True, "ok": ok,
                              "wahl": code_best.key if code_best else None})
-                print(f"{'ok ' if ok else 'FALSCH':8} {sc.name:30} -> {code_best.key:32}  (Code, eindeutig)")
+                say(f"{'ok ' if ok else 'FALSCH':8} {sc.name:30} -> {code_best.key:32}  (Code, eindeutig)")
                 break
             in_menu = {o.behavior for o in menu}
             if not sc.expected & in_menu:
                 rows.append({"szenario": sc.name, "lauf": k, "setup_fehler": True,
                              "menue": [o.key for o in menu]})
-                print(f"[SETUP] {sc.name}: erwartetes Verhalten nicht im Menü: {sorted(in_menu)}")
+                say(f"[SETUP] {sc.name}: erwartetes Verhalten nicht im Menü: {sorted(in_menu)}")
                 break
             if show and k == 0:
-                print("-" * 60 + f"\n{sc.name}\n{state}")
+                say("-" * 60 + f"\n{sc.name}\n{state}")
             res = brain.decide(state, len(menu))
             chosen = menu[res.choice - 1] if res.choice else None
             ok = chosen is not None and chosen.behavior in sc.expected
@@ -81,7 +84,7 @@ def run(brain, repeat: int, shuffle: bool, show: bool, only: list[str], close: b
                 "tokens_out": res.tokens_out, "fehler": res.error, "roh": res.raw,
             })
             mark = "ok " if ok else "FALSCH" if res.choice else "UNGÜLTIG"
-            print(f"{mark:8} {sc.name:30} -> {chosen.key if chosen else '-':32} "
+            say(f"{mark:8} {sc.name:30} -> {chosen.key if chosen else '-':32} "
                   f"{res.latency_s:5.1f} s  {res.reason}", flush=True)
     clear = [r for r in rows if r.get("eindeutig")]
     valid = [r for r in rows if not r.get("setup_fehler") and not r.get("eindeutig")]
