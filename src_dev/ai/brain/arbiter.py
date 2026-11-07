@@ -1,0 +1,159 @@
+# brain/arbiter.py
+# Version 0.1 (07.11.2026) – Entscheidungszyklus im 1-Hz-Takt (Konzept 8).
+#
+# Reihenfolge je Takt:
+#   1. Bedürfnisse aktualisieren
+#   2. Sicherheits-Veto -> Stopp
+#   3. Energie "dringend" -> return_home (Regel, ohne LLM)
+#   4. Auslöser prüfen -> LLM fragen (Denk-Zustand) oder
+#   5. laufendes Verhalten weiter, sonst Code-Auswahl
+#
+# Der Arbiter ruft das LLM nicht selbst auf. Er liefert eine Decision mit
+# action="ask_llm" samt Menü; der Aufrufer (Brain-Prozess) schaltet in den
+# Denk-Zustand, fragt das LLM und meldet das Ergebnis mit apply_llm() zurück.
+
+from __future__ import annotations
+
+import random
+from dataclasses import dataclass, field
+from typing import Optional
+
+from .behaviors import build_options, select_fallback
+from .datatypes import Observation, Option
+from .memory import HABIT_GAIN_INSPECT, Memory
+from .needs import NeedsModel, NeedsState
+from .safety import SafetyState, check
+
+LLM_MIN_INTERVAL_S = 120.0     # höchstens alle 2 min nachdenken (Ausnahme: Chat)
+LEVEL_TRIGGER_MIN = 2          # Stufenanstieg löst erst ab "mittel" aus
+PERSON_REVISIT_S = 600.0       # Person gilt nach 10 min ohne Sicht als wiedergesehen
+
+
+@dataclass
+class Decision:
+    action: str                          # "stop" | "start" | "continue" | "ask_llm"
+    option: Optional[Option] = None
+    menu: list[Option] = field(default_factory=list)
+    triggers: list[str] = field(default_factory=list)
+    reason: str = ""
+
+
+class Arbiter:
+    def __init__(self, memory: Memory, rng: Optional[random.Random] = None):
+        self.mem = memory
+        self.needs = NeedsModel(memory)
+        self.rng = rng or random.Random()
+        self.current: Optional[Option] = None
+        self.t_llm: float = -1e9
+        self.last_safety = SafetyState()
+        self.last_needs: Optional[NeedsState] = None
+        self._seen: dict[str, float] = {}
+
+    # ------------------------------------------------------------------
+    def step(self, obs: Observation) -> Decision:
+        now = obs.t
+        needs, risen = self.needs.update(obs)
+        self.last_needs = needs
+        safety = check(obs)
+        self.last_safety = safety
+
+        self._process_feedback(obs)
+
+        # 2. Sicherheit
+        if safety.stop:
+            self.current = None
+            return Decision("stop", reason=", ".join(safety.reasons))
+        if self.current and not safety.allows(self.current.behavior):
+            self.current = None     # laufendes Verhalten abbrechen, neu wählen
+
+        menu = build_options(obs, needs, self.mem, safety)
+
+        # 3. Energie dringend -> heim, ohne LLM
+        if needs.level_name("energie") == "dringend":
+            if not obs.at_home:
+                opt = next((o for o in menu if o.behavior == "return_home"), None)
+                if opt:
+                    return self._start(opt, now, "Energie dringend")
+            else:
+                opt = next((o for o in menu if o.behavior == "rest"), None)
+                if opt:
+                    return self._start(opt, now, "Energie dringend, zu Hause")
+
+        # 4. Auslöser
+        triggers = self._triggers(obs, risen)
+        cooldown_ok = now - self.t_llm >= LLM_MIN_INTERVAL_S
+        if triggers and menu and (cooldown_ok or "chat" in triggers):
+            self.t_llm = now
+            return Decision("ask_llm", menu=menu, triggers=triggers)
+
+        # 5. weiter oder Code-Auswahl
+        if self.current is not None:
+            return Decision("continue", option=self.current)
+        opt = select_fallback(menu, self.rng)
+        if opt is None:
+            return Decision("stop", reason="kein machbares Ziel")
+        return self._start(opt, now, "Code-Auswahl")
+
+    def apply_llm(self, menu: list[Option], choice: Optional[int], now: float,
+                  reason: str = "", mood: str = "") -> Decision:
+        """Ergebnis des LLM übernehmen. choice ist 1-basiert; None = Zeitüberschreitung
+        oder ungültig -> Code-Auswahl."""
+        if choice is None or not 1 <= choice <= len(menu):
+            opt = select_fallback(menu, self.rng)
+            return self._start(opt, now, "LLM ohne gültige Antwort, Code-Auswahl") if opt else Decision("stop")
+        opt = menu[choice - 1]
+        if not self.last_safety.allows(opt.behavior):     # doppelt hält besser
+            return Decision("stop", reason="Veto nach LLM-Wahl")
+        self.mem.log(now, "entscheidung", reason, ziel=opt.key, stimmung=mood)
+        return self._start(opt, now, reason)
+
+    # ------------------------------------------------------------------
+    def _start(self, opt: Option, now: float, reason: str) -> Decision:
+        self.current = opt
+        if opt.behavior == "greet" and opt.arg:
+            self.mem.last_greet[opt.arg] = now
+        return Decision("start", option=opt, reason=reason)
+
+    def _triggers(self, obs: Observation, risen: list[str]) -> list[str]:
+        t = []
+        if obs.chat_new:
+            t.append("chat")
+        t += [f"stufe:{n}" for n in risen if self.needs.s.levels[n] >= LEVEL_TRIGGER_MIN]
+        if obs.last_result:
+            t.append(f"ergebnis:{obs.last_result[0]}:{obs.last_result[1]}")
+        for o in obs.objects:
+            if o.oid not in self.mem.known_objects:
+                self.mem.known_objects.add(o.oid)
+                t.append(f"neu:{o.cls}")
+        for p in obs.persons:
+            # neu oder nach mindestens 10 min wiedergesehen
+            if p.pid not in self.mem.known_persons or obs.t - self._seen.get(p.pid, -1e9) > PERSON_REVISIT_S:
+                self.mem.known_persons.add(p.pid)
+                t.append(f"person:{p.name or p.pid}")
+            self._seen[p.pid] = obs.t
+        return t
+
+    def _process_feedback(self, obs: Observation) -> None:
+        now = obs.t
+        # Lob durch Antippen gilt dem laufenden Verhalten
+        if obs.tapped and self.current is not None:
+            self.mem.praise(self.current.service, True)
+            self.mem.log(now, "lob", f"Antippen bei {self.current.key}")
+        if obs.last_result and self.current is not None:
+            beh, res = obs.last_result
+            if res == "ok":
+                if beh in ("inspect_object", "approach_avoid") and self.current.arg:
+                    self.mem.habituate(f"obj:{self.current.arg}", now, HABIT_GAIN_INSPECT)
+                    self.needs.note_new_info(now)
+                if beh in ("explore_frontier", "look_around"):
+                    if self.current.arg:
+                        self.mem.habituate(f"area:{self.current.arg}", now, HABIT_GAIN_INSPECT)
+                    self.needs.note_new_info(now)
+                if self.current.service:
+                    self.needs.note_useful(now)
+                if beh == "report" and self.current.arg:
+                    self.mem.reported[self.current.arg] = now
+                if beh in ("greet", "follow"):
+                    self.needs.note_contact(now)
+            self.mem.log(now, "ergebnis", f"{self.current.key}: {res}")
+            self.current = None
