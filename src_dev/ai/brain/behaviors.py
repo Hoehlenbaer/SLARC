@@ -1,5 +1,7 @@
 # brain/behaviors.py
-# Version 0.1 (07.11.2026) – Verhaltenskatalog, Menübau und Code-Auswahl.
+# Version 0.2 (07.11.2026) – Verhaltenskatalog, Menübau und Code-Auswahl.
+# V0.2: Bitte <-> Fund im Code verknüpft, Energie "hoch" filtert das Menü,
+#       close_options() für knappe Fälle (nur diese gehen ans LLM).
 #
 # Der Code baut aus Beobachtung, Bedürfnissen und Gedächtnis ein Menü
 # machbarer Ziele (Konzept Abschnitt 5). Das LLM wählt daraus nur per
@@ -34,6 +36,10 @@ REPORTABLE = {"schlüssel", "handy", "geldbörse", "brille", "fernbedienung",
 REPORT_REPEAT_S = 3600.0        # dasselbe Objekt frühestens nach 1 h wieder melden
 GREET_REPEAT_S = 600.0          # dieselbe Person frühestens nach 10 min wieder begrüßen
 ENERGY_EXEMPT = {"return_home", "rest", "retreat", "idle"}
+ENERGY_FILTER_LEVEL = 3         # ab "hoch" nur noch ENERGY_EXEMPT im Menü (Test 07.11.: LLM ignorierte Regel 3)
+CLOSE_MARGIN = 0.15             # knapp = Nutzen höchstens so weit unter dem besten
+CLOSE_MAX = 3
+MATCH_BONUS = 0.15              # Fund passt zu offener Bitte: vor der weiteren Suche
 MENU_MAX = 7                    # mehr Optionen überfordern ein 4B-Modell (Annahme, testen)
 INSPECT_MAX = 2
 FRONTIER_MAX = 2
@@ -54,6 +60,22 @@ MOODS = {
 
 def _w(mem: Memory, service: Optional[str]) -> float:
     return mem.weight(service)
+
+
+def _norm(s: str) -> str:
+    return s.lower().replace("_", " ").replace("-", " ").strip()
+
+
+def matches(cls: str, wanted: Optional[str]) -> bool:
+    """Passt eine erkannte Klasse zum gesuchten Gegenstand? Einfacher Teilwort-
+    Vergleich ("brille" passt zu "lesebrille"). Synonyme ("Cola" -> "dose") liefert
+    später semantic.normalize_item() über das LLM."""
+    if not wanted:
+        return False
+    a, b = _norm(cls), _norm(wanted)
+    if len(a) < 3 or len(b) < 3:
+        return a == b
+    return a in b or b in a
 
 
 def build_options(obs: Observation, needs: NeedsState, mem: Memory,
@@ -109,7 +131,12 @@ def build_options(obs: Observation, needs: NeedsState, mem: Memory,
         who = f" für {r.from_person}" if r.from_person else ""
         u = (0.5 + 0.5 * v["nuetzlichkeit"]) * _w(mem, r.service)
         if r.service == "search":
-            add(Option("search_item", r.arg, f"Bitte{who}: {r.arg} suchen", u, "search"))
+            found = [o for o in obs.objects if matches(o.cls, r.arg)]
+            for o in found:
+                # das Gesuchte ist schon im Bild: melden statt weitersuchen
+                add(Option("report", o.oid, f"Melden: {o.cls} gefunden ({o.place}) – passt zur Bitte{who} ({r.arg})",
+                           u + MATCH_BONUS, "search"))
+            add(Option("search_item", r.arg, f"Bitte{who}: {r.arg} suchen", u * (0.7 if found else 1.0), "search"))
         elif r.service == "push_out":
             add(Option("push_out", r.arg, f"Bitte{who}: {r.arg} hervorschieben", u, "push_out"))
         elif r.service == "follow":
@@ -117,6 +144,8 @@ def build_options(obs: Observation, needs: NeedsState, mem: Memory,
 
     # --- Meldenswertes (Nützlichkeit) ---
     for o in obs.objects:
+        if any(x.behavior == "report" and x.arg == o.oid for x in opts):
+            continue    # schon als Treffer zu einer Bitte im Menü
         if o.cls in REPORTABLE and now - mem.reported.get(o.oid, -1e9) > REPORT_REPEAT_S:
             u = (0.3 + 0.6 * v["nuetzlichkeit"]) * _w(mem, "report")
             add(Option("report", o.oid, f"Melden: {o.cls} gefunden ({o.place})", u, "report"))
@@ -147,6 +176,9 @@ def build_options(obs: Observation, needs: NeedsState, mem: Memory,
         if o.behavior not in ENERGY_EXEMPT:
             o.utility *= damp
 
+    if needs.levels["energie"] >= ENERGY_FILTER_LEVEL:
+        opts = [o for o in opts if o.behavior in ENERGY_EXEMPT]
+
     opts.sort(key=lambda o: o.utility, reverse=True)
     menu = opts[:MENU_MAX]
     # Heimweg nie aus dem Menü fallen lassen, wenn Energie spürbar ist
@@ -154,6 +186,18 @@ def build_options(obs: Observation, needs: NeedsState, mem: Memory,
     if home and home not in menu:
         menu[-1] = home
     return menu
+
+
+def close_options(menu: list[Option], margin: float = CLOSE_MARGIN,
+                  k: int = CLOSE_MAX) -> list[Option]:
+    """Die knappen Fälle: Optionen nahe am besten Nutzen (Menü ist sortiert).
+    Nur wenn hier mehr als eine übrig bleibt, lohnt sich das LLM als Schiedsrichter."""
+    if not menu:
+        return []
+    best = max(o.utility for o in menu)
+    close = [o for o in menu if o.utility >= best - margin]
+    close.sort(key=lambda o: o.utility, reverse=True)
+    return close[:k]
 
 
 def select_fallback(menu: list[Option], rng: Optional[random.Random] = None,

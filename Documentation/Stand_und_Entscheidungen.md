@@ -152,7 +152,8 @@ Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. N
 - Akku knapp → Rückkehr zum Ausgangspunkt. Die Schwelle berücksichtigt den Rückweg.
 - Denk-Zustand: Während das LLM rechnet, pausieren Perzeption und Motion auf dem Pi. Der ESP32 hält Reflexe aktiv und zeigt eine Denk-Pose.
 - Pi 5 hat 8 GB RAM. Modell vorerst Qwen3-4B-Instruct-2507 Q4_K_M über llama.cpp. Qwen3.5-4B/2B und Gemma 4 E2B/E4B werden mit einer eigenen Testsuite auf dem Pi verglichen.
-- Erste Umsetzung in `src_dev/ai/brain/` (V0.1): Bedürfnismodell, Sicherheits-Veto, Menü, Arbiter, Prompt mit GBNF, Testsuite. Noch nicht mit echtem Modell gelaufen.
+- Erste Umsetzung in `src_dev/ai/brain/` (V0.1): Bedürfnismodell, Sicherheits-Veto, Menü, Arbiter, Prompt mit GBNF, Testsuite.
+- Erster Modelltest (07.11.2026, Qwen3-4B Q4, PC/GPU): Als Entscheider schlechter als der Code (36/45 gegen 42/45), Regel "Energie hoch" 0/3 eingehalten. Daher (fest): Handlungswahl beim Code, LLM nur für knappe Fälle und semantische Aufgaben (Chat deuten, Objekte einschätzen, Suchorte, Tagebuch). Energie ab "hoch" ist jetzt eine Regel. Details: `Brain_Konzept.md`, Abschnitt 15.
 - Interaktion zunächst ohne Audio: Web-Chat, Handy-Meldungen, Körpersprache, LEDs, Antippen als Lob. Audio später über USB, weil I²S mit dem Kameratrigger an GPIO18 kollidiert.
 
 ---

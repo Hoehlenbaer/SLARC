@@ -1,11 +1,13 @@
 # brain/arbiter.py
-# Version 0.1 (07.11.2026) – Entscheidungszyklus im 1-Hz-Takt (Konzept 8).
+# Version 0.2 (07.11.2026) – Entscheidungszyklus im 1-Hz-Takt (Konzept 8).
+# V0.2: Energie ab "hoch" per Regel (vorher erst "dringend"); das LLM bekommt nur
+#       knappe Fälle (close_options), sonst entscheidet der Code.
 #
 # Reihenfolge je Takt:
 #   1. Bedürfnisse aktualisieren
 #   2. Sicherheits-Veto -> Stopp
-#   3. Energie "dringend" -> return_home (Regel, ohne LLM)
-#   4. Auslöser prüfen -> LLM fragen (Denk-Zustand) oder
+#   3. Energie ab "hoch" -> return_home bzw. rest (Regel, ohne LLM)
+#   4. Auslöser und knapper Fall -> LLM als Schiedsrichter (Denk-Zustand), oder
 #   5. laufendes Verhalten weiter, sonst Code-Auswahl
 #
 # Der Arbiter ruft das LLM nicht selbst auf. Er liefert eine Decision mit
@@ -18,13 +20,14 @@ import random
 from dataclasses import dataclass, field
 from typing import Optional
 
-from .behaviors import build_options, select_fallback
+from .behaviors import build_options, close_options, select_fallback
 from .datatypes import Observation, Option
 from .memory import HABIT_GAIN_INSPECT, Memory
 from .needs import NeedsModel, NeedsState
 from .safety import SafetyState, check
 
 LLM_MIN_INTERVAL_S = 120.0     # höchstens alle 2 min nachdenken (Ausnahme: Chat)
+ENERGY_RULE_LEVEL = 3          # ab "hoch": heim/ruhen per Regel
 LEVEL_TRIGGER_MIN = 2          # Stufenanstieg löst erst ab "mittel" aus
 PERSON_REVISIT_S = 600.0       # Person gilt nach 10 min ohne Sicht als wiedergesehen
 
@@ -68,23 +71,27 @@ class Arbiter:
 
         menu = build_options(obs, needs, self.mem, safety)
 
-        # 3. Energie dringend -> heim, ohne LLM
-        if needs.level_name("energie") == "dringend":
+        # 3. Energie hoch/dringend -> heim, ohne LLM
+        if needs.levels["energie"] >= ENERGY_RULE_LEVEL:
             if not obs.at_home:
                 opt = next((o for o in menu if o.behavior == "return_home"), None)
                 if opt:
-                    return self._start(opt, now, "Energie dringend")
+                    return self._start(opt, now, "Energie hoch")
             else:
                 opt = next((o for o in menu if o.behavior == "rest"), None)
                 if opt:
-                    return self._start(opt, now, "Energie dringend, zu Hause")
+                    return self._start(opt, now, "Energie hoch, zu Hause")
 
         # 4. Auslöser
         triggers = self._triggers(obs, risen)
         cooldown_ok = now - self.t_llm >= LLM_MIN_INTERVAL_S
         if triggers and menu and (cooldown_ok or "chat" in triggers):
-            self.t_llm = now
-            return Decision("ask_llm", menu=menu, triggers=triggers)
+            close = close_options(menu)
+            if len(close) >= 2:
+                self.t_llm = now
+                return Decision("ask_llm", menu=close, triggers=triggers)
+            # eindeutiger Fall: der Code entscheidet sofort, kein Denk-Zustand nötig
+            return self._start(close[0], now, "eindeutig: " + ", ".join(triggers))
 
         # 5. weiter oder Code-Auswahl
         if self.current is not None:

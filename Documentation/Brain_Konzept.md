@@ -1,6 +1,6 @@
 # SLARC – Konzept High-Level-Brain
 
-Stand: 07.11.2026, Entwurf V0.2 (V0.2: Bedürfnis Gesellschaft, erste Umsetzung in `src_dev/ai/brain/`). Ergebnis aus dem Brain-Chat. Ersetzt das Prinzip "klare Aufgabe → Behavior-Tree-JSON" (`src_dev/ai/exploration_manager_V4.py`) durch ein System, das eigenen Bedürfnissen folgt.
+Stand: 07.11.2026, Entwurf V0.3 (V0.2: Bedürfnis Gesellschaft, erste Umsetzung in `src_dev/ai/brain/`; V0.3: neue Rollenverteilung Code/LLM nach dem ersten Modelltest, Abschnitt 15). Ergebnis aus dem Brain-Chat. Ersetzt das Prinzip "klare Aufgabe → Behavior-Tree-JSON" (`src_dev/ai/exploration_manager_V4.py`) durch ein System, das eigenen Bedürfnissen folgt.
 
 Kennzeichnung wie in `Hardware_Interfaces.md`: **(fest)** entschieden, **(Annahme)** Startwert, **(offen)** noch zu entscheiden.
 
@@ -281,6 +281,48 @@ python -m brain.run_decision_suite --mock
 python -m brain.run_decision_suite --model Qwen3-4B-Instruct-2507-Q4_K_M.gguf --repeat 3 --out qwen3.json
 ```
 
-**Prüfstand (07.11.2026):** Unit-Tests grün. Die Grammatik wurde mit dem llama.cpp-Parser (Qwen2-Vokabular) geprüft: Sie nimmt die Few-Shot-Antworten an und lehnt ungültige Nummern und erfundene Stimmungen ab. Mit einem echten Modell ist noch nichts gelaufen, weil die Modelldatei in der Claude-Umgebung nicht herunterladbar war. Der erste Lauf gehört auf den Pi.
+**Prüfstand (07.11.2026):** Unit-Tests grün. Die Grammatik wurde mit dem llama.cpp-Parser (Qwen2-Vokabular) geprüft: Sie nimmt die Few-Shot-Antworten an und lehnt ungültige Nummern und erfundene Stimmungen ab. Erster Lauf mit echtem Modell: Abschnitt 15.
 
 **Wichtig für die Bewertung:** Die Suite mischt die Menü-Reihenfolge standardmäßig und gibt als Vergleich an, wie oft die beste Code-Option schon richtig wäre. In 14 von 15 Szenarien trifft das der Code bereits. Das LLM lohnt sich also nur, wenn es mindestens gleich gut ist und die semantischen Fälle löst (`semantik_gesuchtes_in_sicht`: die gesuchte Lesebrille liegt schon im Bild). Dafür braucht es mehr semantische Szenarien.
+
+---
+
+## 15. Erster Modelltest und neue Rollenverteilung (07.11.2026, V0.3)
+
+**Messung** (Marco, PC unter WSL, RTX 3080 Ti, Qwen3-4B-Instruct-2507 Q4_K_M, Menü gemischt, 15 Szenarien × 3):
+
+| Größe | Wert |
+|---|---|
+| Treffer LLM | 36/45 |
+| Treffer Code allein | 42/45 |
+| ungültige Antworten | 0 |
+| Wahl auf Position 1 | 20 % (liest das Menü, keine Positionsneigung) |
+| Latenz Median / max (GPU) | 0,74 s / 1,06 s; Prompt ~1220 Tokens. Für den Pi nicht aussagekräftig |
+
+Fehler des LLM:
+- `energie_hoch_weit_weg` 0/3: wählt trotz Regel und passendem Few-Shot-Beispiel die Bitte ("Ich bin müde, aber die Bitte ist wichtig"). Sicherheitsrelevant.
+- `bitte_vor_neugier` 1/3: untersucht lieber den Karton und begründet das nachträglich.
+- `semantik_gesuchtes_in_sicht` 0/3: verbindet "Brille in Sicht" nicht mit der Bitte "Lesebrille".
+- Begründungen meist natürlich, teils inhaltlich falsch ("Ich wollte lange allein sein") oder grammatisch holprig.
+
+**Entscheidung (fest):** Die Handlungswahl liegt beim Code, wie die Aktionsauswahl bei Tieren nicht im sprachlichen Teil liegt (verhaltensbasierte Robotik, Drei-Schichten-Architektur). Das LLM bekommt die Fragen, die nur es beantworten kann.
+
+**Umsetzung V0.2 des Brain:**
+- Energie ab "hoch" ist eine Regel im Arbiter (heim bzw. ruhen); das Menü enthält dann nur Heimweg, Ruhe, Rückzug, Abwarten.
+- Bitte und Fund verknüpft der Code (`matches()`, Teilwort: "brille" ↔ "lesebrille"). Das Menü bietet dann "Melden: … passt zur Bitte".
+- Das LLM entscheidet nur noch knappe Fälle: höchstens 3 Optionen innerhalb 0,15 Nutzen vom besten (`close_options`). Eindeutige Fälle entscheidet der Code sofort, ohne Denk-Zustand.
+- Neue semantische Aufgaben in `semantic.py`, je mit eigenem Prompt, Few-Shot und GBNF:
+  - `interpret_chat`: Nachricht → Dienst (search, fetch, follow, come, push_out, check, stop, praise, scold, smalltalk, unknown), Gegenstand, kurze Antwort. Daraus macht `to_request()` eine Bitte fürs Menü.
+  - `assess_object`: Interesse (niedrig/mittel/hoch) und ob gemeldet werden soll.
+  - `search_places`: wahrscheinlichste Orte für einen Gegenstand aus den bekannten Orten.
+  - `narrate`: Tagebuch erzählen.
+- Testsuite dafür: `open_scenarios.py` (15 Chat-, 10 Objekt-, 8 Such-Fälle) und `run_open_suite.py`. Hier gibt es keine Code-Vergleichsbasis; Maßstab ist, ob die Antwort für einen Menschen stimmt.
+- `run_decision_suite.py --close` prüft die Zielwahl so, wie sie jetzt im Betrieb läuft.
+
+**Ehrliche Einschränkung:** Die 15 Entscheidungs-Szenarien hat der Code nach diesen Änderungen alle richtig. Das ist teilweise zirkulär, weil die Regeln aus genau diesen Fehlern abgeleitet sind. Neue Szenarien, die nicht zum Abstimmen benutzt wurden, sind nötig, bevor man daraus Schlüsse zieht.
+
+**Offen:**
+- Mehrere Aufgaben teilen sich ein Modell. Ohne Cache rechnet llama.cpp bei jedem Wechsel den Systemprompt neu (auf dem Pi ~1000 Tokens). Option `ram_cache_mb` (LlamaRAMCache) ist eingebaut, Speicherbedarf und Wirkung auf dem Pi messen.
+- Chat-Ergebnisse `check`, `stop`, `praise`, `scold` im Arbiter verarbeiten; `fetch` erst mit dem Meilenstein Dose.
+- Modellvergleich mit beiden Suiten: Qwen3.5-4B, Gemma 4 E4B.
+
