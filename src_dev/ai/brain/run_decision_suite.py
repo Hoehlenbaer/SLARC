@@ -1,6 +1,9 @@
 # brain/run_decision_suite.py
 # Version 0.2 (07.11.2026) – Entscheidungs-Testsuite für den Modellvergleich.
 # V0.2: --gpu-layers für den PC (Latenzen dann nicht mit dem Pi vergleichbar).
+# V0.3: Statusmeldungen beim Laden/Aufwärmen, --verbose (Ausgabe von llama.cpp).
+# V0.4: --close: wie im Betrieb ab Arbiter V0.2 bekommt das LLM nur die knappen
+#       Fälle (close_options); eindeutige Szenarien entscheidet der Code.
 #
 # Aufruf aus src_dev/ai:
 #   python -m brain.run_decision_suite --mock
@@ -23,31 +26,41 @@ import random
 import statistics
 import time
 
-from .behaviors import build_options
+from .behaviors import build_options, close_options
 from .llm import LlamaBrain, MockBrain
 from .prompt import state_text
 from .safety import check
 from .scenarios import SCENARIOS, prepare
 
 
-def build(sc, shuffle_rng=None):
+def build(sc, shuffle_rng=None, close=False):
     mem, nm, needs = prepare(sc)
     menu = build_options(sc.obs, needs, mem, check(sc.obs))
     code_best = menu[0] if menu else None       # vor dem Mischen: höchster Code-Nutzen
+    if close:
+        menu = close_options(menu)
     if shuffle_rng is not None:
         shuffle_rng.shuffle(menu)
     return needs, menu, state_text(sc.obs, needs, menu, sc.triggers), code_best
 
 
-def run(brain, repeat: int, shuffle: bool, show: bool, only: list[str]) -> dict:
+def run(brain, repeat: int, shuffle: bool, show: bool, only: list[str], close: bool = False) -> dict:
     rng = random.Random(42)
     rows = []
+    print("Wärme Systemprompt und Few-Shot auf …", flush=True)
     t_warm = brain.warmup()
+    print(f"Aufgewärmt in {t_warm:.1f} s", flush=True)
     for sc in SCENARIOS:
         if only and sc.name not in only:
             continue
         for k in range(repeat):
-            needs, menu, state, code_best = build(sc, rng if shuffle else None)
+            needs, menu, state, code_best = build(sc, rng if shuffle else None, close)
+            if close and len(menu) < 2:
+                ok = code_best is not None and code_best.behavior in sc.expected
+                rows.append({"szenario": sc.name, "lauf": k, "eindeutig": True, "ok": ok,
+                             "wahl": code_best.key if code_best else None})
+                print(f"{'ok ' if ok else 'FALSCH':8} {sc.name:30} -> {code_best.key:32}  (Code, eindeutig)")
+                break
             in_menu = {o.behavior for o in menu}
             if not sc.expected & in_menu:
                 rows.append({"szenario": sc.name, "lauf": k, "setup_fehler": True,
@@ -69,8 +82,9 @@ def run(brain, repeat: int, shuffle: bool, show: bool, only: list[str]) -> dict:
             })
             mark = "ok " if ok else "FALSCH" if res.choice else "UNGÜLTIG"
             print(f"{mark:8} {sc.name:30} -> {chosen.key if chosen else '-':32} "
-                  f"{res.latency_s:5.1f} s  {res.reason}")
-    valid = [r for r in rows if not r.get("setup_fehler")]
+                  f"{res.latency_s:5.1f} s  {res.reason}", flush=True)
+    clear = [r for r in rows if r.get("eindeutig")]
+    valid = [r for r in rows if not r.get("setup_fehler") and not r.get("eindeutig")]
     lat = [r["latenz_s"] for r in valid if r["position"]]
     summary = {
         "modell": brain.name,
@@ -80,6 +94,7 @@ def run(brain, repeat: int, shuffle: bool, show: bool, only: list[str]) -> dict:
         "code_treffer": sum(r["code_ok"] for r in valid),
         "ungueltig": sum(1 for r in valid if not r["position"]),
         "setup_fehler": sum(1 for r in rows if r.get("setup_fehler")),
+        "eindeutig_code": len(clear), "eindeutig_richtig": sum(r["ok"] for r in clear),
         "position_1_anteil": round(sum(1 for r in valid if r["position"] == 1) / max(1, len(valid)), 2),
         "latenz_median_s": round(statistics.median(lat), 2) if lat else None,
         "latenz_max_s": round(max(lat), 2) if lat else None,
@@ -93,8 +108,10 @@ def main() -> None:
     ap.add_argument("--model", action="append", default=[], help="GGUF-Datei oder Name (mehrfach möglich)")
     ap.add_argument("--mock", action="store_true", help="ohne Modell, regelbasiert")
     ap.add_argument("--repeat", type=int, default=1)
+    ap.add_argument("--close", action="store_true", help="nur knappe Fälle ans LLM (Betrieb ab Arbiter V0.2)")
     ap.add_argument("--sorted", action="store_true", help="Menü nach Code-Nutzen sortiert lassen (wie im Betrieb)")
     ap.add_argument("--threads", type=int, default=4)
+    ap.add_argument("--verbose", action="store_true", help="Ausgabe von llama.cpp zeigen (Laden, GPU-Schichten)")
     ap.add_argument("--gpu-layers", type=int, default=0, help="-1 = alle Schichten auf die GPU (nur PC)")
     ap.add_argument("--temperature", type=float, default=0.3)
     ap.add_argument("--show", action="store_true", help="Zustandstext je Szenario ausgeben")
@@ -107,20 +124,23 @@ def main() -> None:
         brains.append(lambda: MockBrain())
     for m in a.model:
         brains.append(lambda m=m: LlamaBrain(m, n_threads=a.threads, temperature=a.temperature,
-                                                     n_gpu_layers=a.gpu_layers))
+                                                     n_gpu_layers=a.gpu_layers, verbose=a.verbose))
 
     results = []
     for make in brains:
         t0 = time.perf_counter()
+        print("Lade Modell … (von /mnt/… unter WSL sehr langsam, besser ~/.models)", flush=True)
         b = make()
         print(f"=== {b.name} (geladen in {time.perf_counter() - t0:.1f} s) ===")
-        r = run(b, a.repeat, not a.sorted, a.show, a.only)
+        r = run(b, a.repeat, not a.sorted, a.show, a.only, a.close)
         results.append(r)
         s = r["summary"]
         print(f"--> {s['modell']}: {s['treffer']}/{s['laeufe']} richtig (Code allein: {s['code_treffer']}), "
               f"{s['ungueltig']} ungültig, "
               f"Position 1: {s['position_1_anteil']:.0%}, Latenz Median {s['latenz_median_s']} s, "
               f"max {s['latenz_max_s']} s")
+        if a.close:
+            print(f"    eindeutig, vom Code entschieden: {s['eindeutig_richtig']}/{s['eindeutig_code']} Szenarien richtig")
     if a.out:
         with open(a.out, "w", encoding="utf-8") as f:
             json.dump(results, f, ensure_ascii=False, indent=1)

@@ -1,5 +1,5 @@
 # brain – bedürfnisgesteuertes High-Level-Brain von SLARC
-# Version 0.1 (07.11.2026). Konzept: Documentation/Brain_Konzept.md
+# Version 0.2 (07.11.2026). Konzept: Documentation/Brain_Konzept.md (Abschnitt 15: Rollen Code/LLM)
 #
 # Module:
 #   datatypes  Beobachtung, Objekte, Personen, Bitten, Menü-Optionen
@@ -10,3 +10,6 @@
 #   arbiter    Entscheidungszyklus 1 Hz, Auslöser fürs LLM
 #   prompt     Systemprompt, Few-Shot, Zustandstext, GBNF-Grammatik
 #   llm        llama.cpp-Anbindung und Mock-Backend
+#   semantic   LLM-Aufgaben: Chat deuten, Objekt einschätzen, Suchorte, Tagebuch
+#   scenarios / run_decision_suite       Zielwahl (Code gegen LLM)
+#   open_scenarios / run_open_suite      semantische Aufgaben

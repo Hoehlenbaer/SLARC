@@ -17,7 +17,7 @@ import random
 import pytest
 
 from brain.arbiter import Arbiter, LLM_MIN_INTERVAL_S
-from brain.behaviors import MENU_MAX, MOODS, build_options, select_fallback
+from brain.behaviors import MENU_MAX, MOODS, build_options, close_options, matches, select_fallback
 from brain.datatypes import ObjectSeen, Observation, Option, Person, Request
 from brain.llm import MockBrain, parse
 from brain.memory import Memory
@@ -169,17 +169,54 @@ def test_praise_raises_weight():
     assert mem.weight("greet") > 1.0
 
 
-def test_llm_cooldown_and_chat_exception():
+def _close_obs(t, oid):
+    # zwei fast gleich interessante neue Objekte -> knapper Fall
+    return obs(t=t, objects=[ObjectSeen(oid + "a", "tasche", "flur", 1.0),
+                             ObjectSeen(oid + "b", "karton", "flur", 1.0)])
+
+
+def test_llm_only_for_close_cases_and_cooldown():
     arb = Arbiter(Memory(), random.Random(0))
-    d1 = arb.step(obs(t=T, objects=[ObjectSeen("o1", "tasche", "flur", 1.0)]))
-    assert d1.action == "ask_llm"
-    d2 = arb.step(obs(t=T + 10, objects=[ObjectSeen("o2", "karton", "flur", 1.0)]))
+    d1 = arb.step(_close_obs(T, "o1"))
+    assert d1.action == "ask_llm" and 2 <= len(d1.menu) <= 3
+    d2 = arb.step(_close_obs(T + 10, "o2"))
     assert d2.action != "ask_llm"                     # Abkühlzeit
-    d3 = arb.step(obs(t=T + 20, chat_new=True,
-                      requests=[Request("r", "komm her", "follow", "p1", "Marco", T + 19)]))
-    assert d3.action == "ask_llm"                     # Chat darf sofort
-    d4 = arb.step(obs(t=T + 20 + LLM_MIN_INTERVAL_S, objects=[ObjectSeen("o3", "ball", "flur", 1.0)]))
-    assert d4.action == "ask_llm"
+    d3 = arb.step(_close_obs(T + 10 + LLM_MIN_INTERVAL_S, "o3"))
+    assert d3.action == "ask_llm"
+
+
+def test_clear_chat_request_decided_by_code():
+    arb = Arbiter(Memory(), random.Random(0))
+    arb.step(_close_obs(T, "o1"))                     # LLM gerade benutzt
+    d = arb.step(obs(t=T + 20, chat_new=True, persons=[Person("p1", "Marco", 1.5)],
+                     requests=[Request("r", "komm her", "follow", "p1", "Marco", T + 19)]))
+    assert d.action == "start" and d.option.behavior == "follow"
+
+
+def test_energy_high_is_rule():
+    arb = Arbiter(Memory(), random.Random(0))
+    d = arb.step(obs(battery_v=11.0, home_dist_m=60.0, chat_new=True,
+                     requests=[Request("r", "such die Fernbedienung", "search", "fernbedienung", "Marco", T - 60)]))
+    assert d.action == "start" and d.option.behavior == "return_home"
+
+
+def test_request_matches_object_in_view():
+    o = obs(objects=[ObjectSeen("o6", "brille", "wohnzimmer", 1.0)],
+            requests=[Request("r", "hast du meine Lesebrille gesehen?", "search", "lesebrille", "Marco", T - 300)])
+    mem = Memory()
+    s, _ = NeedsModel(mem).update(o)
+    menu = build_options(o, s, mem, check(o))
+    assert menu[0].behavior == "report" and menu[0].arg == "o6" and "Bitte" in menu[0].label
+
+
+def test_matches():
+    assert matches("brille", "Lesebrille") and matches("fernbedienung", "fernbedienung")
+    assert not matches("tür_offen", "schlüssel") and not matches("ei", "eimer")
+
+
+def test_close_options():
+    menu = [Option("a", None, "A", 0.8), Option("b", None, "B", 0.7), Option("c", None, "C", 0.4)]
+    assert [o.behavior for o in close_options(menu)] == ["a", "b"]
 
 
 def test_apply_llm_invalid_falls_back():

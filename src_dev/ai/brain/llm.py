@@ -1,6 +1,8 @@
 # brain/llm.py
 # Version 0.2 (07.11.2026) – LLM-Anbindung für die Zielwahl.
 # V0.2: n_gpu_layers wählbar (PC mit CUDA), Modellordner H: auch unter WSL.
+# V0.3: generate() für beliebige Aufgaben mit eigener Grammatik (semantic.py);
+#       optionaler RAM-Cache, damit mehrere Systemprompts im Cache bleiben.
 #
 # LlamaBrain: llama.cpp über llama-cpp-python, Ausgabe per GBNF erzwungen.
 #   Systemprompt und Few-Shot sind konstant; llama.cpp verwendet den
@@ -32,6 +34,15 @@ SEARCH_PATHS = [
     os.path.expanduser("~/.models/"),
 ]
 TIMEOUT_S = 60.0     # danach Code-Auswahl (Konzept 8.2)
+
+
+@dataclass
+class Generation:
+    raw: str
+    latency_s: float
+    tokens_in: int = 0
+    tokens_out: int = 0
+    error: str = ""
 
 
 @dataclass
@@ -75,23 +86,49 @@ def parse(raw: str, n_options: int) -> tuple[Optional[int], str, str, str]:
 class LlamaBrain:
     def __init__(self, model: str = DEFAULT_MODEL, n_threads: int = 4,
                  n_ctx: int = 3072, temperature: float = 0.3, n_gpu_layers: int = 0,
-                 verbose: bool = False):
+                 verbose: bool = False, ram_cache_mb: int = 0):
         from llama_cpp import Llama, LlamaGrammar   # erst hier, damit Tests ohne llama_cpp laufen
         path = find_model(model)
         if path is None:
             raise FileNotFoundError(f"Modell nicht gefunden: {model}")
         self.name = os.path.basename(path)
         self._grammar_cls = LlamaGrammar
-        self._grammars: dict[int, object] = {}
+        self._grammars: dict = {}
         self.temperature = temperature
         self.llm = Llama(model_path=path, n_ctx=n_ctx, n_threads=n_threads,
                          n_gpu_layers=n_gpu_layers, use_mmap=True, verbose=verbose)
         self._pool = ThreadPoolExecutor(max_workers=1)
+        if ram_cache_mb > 0:
+            # Ohne Cache rechnet llama.cpp den Systemprompt neu, sobald zwischen
+            # Aufgaben (Entscheidung, Chat, Objekt …) gewechselt wird. Auf dem Pi
+            # kostet das je Wechsel ~1000 Tokens. KV-Zustand je Präfix bei 4B grob
+            # 150 MB, also für 5 Aufgaben ~800 MB (Annahme, messen).
+            from llama_cpp import LlamaRAMCache
+            self.llm.set_cache(LlamaRAMCache(capacity_bytes=ram_cache_mb << 20))
 
-    def _grammar(self, n: int):
-        if n not in self._grammars:
-            self._grammars[n] = self._grammar_cls.from_string(grammar(n), verbose=False)
-        return self._grammars[n]
+    def _grammar(self, key):
+        """key: Anzahl Menüoptionen (Zielwahl) oder ein GBNF-Text."""
+        if key not in self._grammars:
+            gbnf = grammar(key) if isinstance(key, int) else key
+            self._grammars[key] = self._grammar_cls.from_string(gbnf, verbose=False)
+        return self._grammars[key]
+
+    def _gen(self, msgs: list[dict], gbnf: str, max_tokens: int, temperature: float) -> Generation:
+        t0 = time.perf_counter()
+        r = self.llm.create_chat_completion(msgs, grammar=self._grammar(gbnf), temperature=temperature,
+                                            top_p=0.9, top_k=40, max_tokens=max_tokens)
+        u = r.get("usage", {})
+        return Generation(r["choices"][0]["message"]["content"].strip(), time.perf_counter() - t0,
+                          u.get("prompt_tokens", 0), u.get("completion_tokens", 0))
+
+    def generate(self, msgs: list[dict], gbnf: str, max_tokens: int = 160,
+                 temperature: float = 0.2, timeout_s: float = TIMEOUT_S) -> Generation:
+        """Beliebige Aufgabe mit erzwungener Grammatik (semantic.py)."""
+        fut = self._pool.submit(self._gen, msgs, gbnf, max_tokens, temperature)
+        try:
+            return fut.result(timeout=timeout_s)
+        except FutTimeout:
+            return Generation("", timeout_s, error="Zeitüberschreitung")
 
     def warmup(self) -> float:
         """Systemprompt und Few-Shot einmal rechnen, damit sie im Cache liegen."""
@@ -127,8 +164,15 @@ class MockBrain:
     sonst Ziel 1 (= höchster Code-Nutzen). Nur für Tests der Kette."""
     name = "mock"
 
-    def __init__(self, prefer: tuple[str, ...] = ("Bitte", "begrüßen", "untersuchen")):
+    def __init__(self, prefer: tuple[str, ...] = ("Bitte", "begrüßen", "untersuchen"), responder=None):
         self.prefer = prefer
+        self.responder = responder    # f(msgs, gbnf) -> str, für generate()
+
+    def generate(self, msgs: list[dict], gbnf: str, max_tokens: int = 160,
+                 temperature: float = 0.2, timeout_s: float = TIMEOUT_S) -> Generation:
+        if self.responder is None:
+            return Generation("", 0.0, error="Mock ohne responder")
+        return Generation(self.responder(msgs, gbnf), 0.0)
 
     def warmup(self) -> float:
         return 0.0
