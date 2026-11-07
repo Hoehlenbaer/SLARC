@@ -1,6 +1,6 @@
 # SLARC – Konzept High-Level-Brain
 
-Stand: 07.11.2026, Entwurf V0.1. Ergebnis aus dem Brain-Chat. Ersetzt das Prinzip "klare Aufgabe → Behavior-Tree-JSON" (`src_dev/ai/exploration_manager_V4.py`) durch ein System, das eigenen Bedürfnissen folgt.
+Stand: 07.11.2026, Entwurf V0.2 (V0.2: Bedürfnis Gesellschaft, erste Umsetzung in `src_dev/ai/brain/`). Ergebnis aus dem Brain-Chat. Ersetzt das Prinzip "klare Aufgabe → Behavior-Tree-JSON" (`src_dev/ai/exploration_manager_V4.py`) durch ein System, das eigenen Bedürfnissen folgt.
 
 Kennzeichnung wie in `Hardware_Interfaces.md`: **(fest)** entschieden, **(Annahme)** Startwert, **(offen)** noch zu entscheiden.
 
@@ -8,7 +8,7 @@ Kennzeichnung wie in `Hardware_Interfaces.md`: **(fest)** entschieden, **(Annahm
 
 ## 1. Ziel
 
-SLARC soll sich selbstständig bewegen und entscheiden und dabei wie ein Lebewesen wirken, nicht wie eine Sprachfernsteuerung. Bisher braucht er Aufträge wie "Laufe nach Norden, bis der Akku leer ist". Künftig handelt er aus Bedürfnissen heraus: Neugier, Wunsch nützlich zu sein, Energiebedarf, dazu ein Sicherheitsempfinden. Menschen können Bitten äußern, die er in diese Bedürfnisse einordnet.
+SLARC soll sich selbstständig bewegen und entscheiden und dabei wie ein Lebewesen wirken, nicht wie eine Sprachfernsteuerung. Bisher braucht er Aufträge wie "Laufe nach Norden, bis der Akku leer ist". Künftig handelt er aus Bedürfnissen heraus: Neugier, Wunsch nützlich zu sein, Wunsch nach Gesellschaft, Energiebedarf, dazu ein Sicherheitsempfinden. Menschen können Bitten äußern, die er in diese Bedürfnisse einordnet.
 
 ---
 
@@ -42,7 +42,7 @@ Jedes Bedürfnis ist ein Wert 0…1, der im Takt von 1 Hz aus Messwerten und Zei
 
 ### 4.1 Energie (fest: Rückkehr zum Ausgangspunkt)
 
-- **Eingänge:** Akkuspannung unter Last (Treiber-INA219), daraus Ladezustand; geschätzter Energiebedarf für den Rückweg zum Ausgangspunkt aus Weglänge (SLAM) und mittlerem Verbrauch je Meter.
+- **Eingänge:** Akkuspannung unter Last (Treiber-INA219), daraus Ladezustand über eine stückweise lineare Zellkurve (Annahme, mit echter Entladekurve ersetzen); geschätzter Energiebedarf für den Rückweg zum Ausgangspunkt aus Weglänge (SLAM) und mittlerem Verbrauch je Meter.
 - **Wert:** steigt, je kleiner die Reserve über dem Rückwegbedarf ist. Feste Schwellen in Volt reichen nicht: weit weg vom Start muss er früher umkehren.
 - **Verhalten:** ab "hoch" bevorzugt er Ziele in Richtung Ausgangspunkt, bei "dringend" kehrt er ohne LLM zurück (Code-Regel, nicht verhandelbar). Am Ausgangspunkt legt er sich hin, meldet sich und fährt herunter.
 - **Harte Grenzen** aus `Hardware_Interfaces.md`: Warnung 10,5 V unter Last, Bewegung beenden bei 9,9 V.
@@ -61,7 +61,14 @@ Jedes Bedürfnis ist ein Wert 0…1, der im Takt von 1 Hz aus Messwerten und Zei
 - **Lernen durch Lob:** jeder Dienst hat ein Gewicht. Lob (Antippen des Panzers, "gut gemacht" im Chat) erhöht es dauerhaft, Tadel senkt es. So entstehen über Wochen Vorlieben, also eine Persönlichkeit.
 - **Wichtig:** Das LLM darf nur Dienste aus der Liste wählen. Ohne feste Liste erfindet es welche.
 
-### 4.4 Sicherheit
+### 4.4 Gesellschaft (fest, ergänzt 07.11.2026)
+
+- **Eingänge:** Zeit seit dem letzten Kontakt zu einem Menschen, Menschen in der Nähe (≤ 2 m).
+- **Wert:** steigt beim Alleinsein langsam (Annahme: ~63 % nach 20 min), sinkt in der Nähe eines Menschen schnell (Zeitkonstante ~1 min). Begrüßen und Begleiten zählen als Kontakt.
+- **Verhalten:** Menschen begrüßen (dieselbe Person frühestens nach 10 min wieder), begleiten, sich in die Nähe begeben.
+- **Ausdruck:** gesellig = leicht aufgerichtet, lebhafte Idle-Bewegung, gelbe LEDs.
+
+### 4.5 Sicherheit
 
 Zwei getrennte Teile:
 
@@ -69,9 +76,9 @@ Zwei getrennte Teile:
 - **Unbehagen (Bedürfnis):** steigt bei Dunkelheit, unbekanntem Untergrund, Enge, schnell bewegten Objekten, kurz nach einem Sturz oder Rutschen. Es senkt die Bereitschaft für Neugier-Verhalten und erzeugt Zögern.
 - **Ausdruck:** geduckt, breiter Stand, langsamer, bei Schreck kurzer Rückzug.
 
-### 4.5 Konflikte
+### 4.6 Konflikte
 
-Liegen zwei Bedürfnisse nahe beieinander, entscheidet nicht der Größere hart. Typisch ist Neugier gegen Unbehagen bei einem unbekannten Objekt: annähern, zurückweichen, wieder annähern. Dieses sichtbare Zögern wirkt stark lebendig und wird als eigenes Verhalten modelliert.
+Liegen zwei Bedürfnisse nahe beieinander, entscheidet nicht der Größere hart. Energie dämpft alle anderen Ziele außer Heimweg, Ruhe, Rückzug und Abwarten, damit auch die Code-Auswahl Regel 3 aus dem Prompt einhält. Typisch ist Neugier gegen Unbehagen bei einem unbekannten Objekt: annähern, zurückweichen, wieder annähern. Dieses sichtbare Zögern wirkt stark lebendig und wird als eigenes Verhalten modelliert.
 
 ---
 
@@ -86,8 +93,8 @@ Liegen zwei Bedürfnisse nahe beieinander, entscheidet nicht der Größere hart.
 | `approach_avoid(obj)` | Neugier + Unbehagen | Konflikt | annähern, zurück, wieder |
 | `search_item(klasse)` | Nützlichkeit | Klasse in der Detektion | systematisch absuchen |
 | `report(text)` | Nützlichkeit | etwas Meldenswertes | anhalten, Vorderbein heben, Meldung senden |
-| `greet(person)` | Nützlichkeit | Person erkannt | hinwenden, kurz aufrichten, LED |
-| `follow(person)` | Nützlichkeit | Bitte oder Einladung | Abstand halten |
+| `greet(person)` | Gesellschaft, Nützlichkeit | Person erkannt | hinwenden, kurz aufrichten, LED |
+| `follow(person)` | Gesellschaft, Nützlichkeit | Bitte oder Gesellschaft hoch | Abstand halten |
 | `push_out(obj)` | Nützlichkeit | Objekt unter Möbel, flach genug | tief gehen, schieben |
 | `fetch(obj)` | Nützlichkeit | Meilenstein Dose | später |
 | `return_home` | Energie | Rückweg bekannt | müder Gang |
@@ -152,13 +159,14 @@ Liefert das LLM nicht in der Zeit (Annahme: 60 s) oder ungültig, entscheidet di
 
 ### 9.1 Eingabe (Beispiel)
 
-Kurz und in Stufen, keine Fließkommazahlen. Der Systemprompt bleibt gleich und wird gecacht; nur dieser Teil ist neu.
+Kurz und in Stufen, keine Fließkommazahlen. Der Systemprompt bleibt gleich und wird gecacht; nur dieser Teil ist neu. Stufenwechsel mit Hysterese (±0,05 um jede Grenze), damit ein Wert an der Grenze nicht zwischen zwei Stufen flackert und ständig das LLM auslöst.
 
 ```
 ZUSTAND
 Energie: leicht (Rückweg 12 m)
 Neugier: hoch
 Nützlichkeit: mittel
+Gesellschaft: leicht
 Unbehagen: ruhig
 Ort: Flur, nahe Wohnzimmertür
 ZULETZT: explore_frontier erfolgreich beendet
@@ -178,11 +186,11 @@ MÖGLICHE ZIELE
 Per Grammatik (llama.cpp GBNF) erzwungen:
 
 ```json
-{"ziel": 2, "begruendung": "Marco sucht seinen Schlüssel; die Tasche liegt auf dem Weg, ich schaue sie dabei an.", "stimmung": "eifrig"}
+{"begruendung": "Marco sucht seinen Schlüssel; die Tasche liegt auf dem Weg, ich schaue sie dabei an.", "ziel": 2, "stimmung": "eifrig"}
 ```
 
+- `begruendung`: ein Satz, geht ins Tagebuch. Steht **vor** der Zielnummer, damit das Modell erst abwägt und dann wählt.
 - `ziel`: nur Nummern aus dem Menü.
-- `begruendung`: ein Satz, geht ins Tagebuch.
 - `stimmung`: aus fester Liste, steuert Ausdrucksparameter.
 
 ### 9.3 Regeln für den Prompt
@@ -243,5 +251,36 @@ Das LLM bekommt in jeder Stufe Text; das Konzept ändert sich durch den Kanal ni
 5. Erkennung von Antippen und Hochheben auf dem ESP32 (ESP32-Chat).
 6. Web-Oberfläche mit Chat und Tagebuch (Pi-Software).
 7. Liste der Dienste für "Nützlichkeit" mit Marco festlegen.
-8. Weiteres Bedürfnis "Gesellschaft" (Nähe zu Menschen suchen)? Entscheidung offen.
-9. Audio-Hardware (Stufe 2/3) im Hardware-Chat.
+8. Audio-Hardware (Stufe 2/3) im Hardware-Chat.
+9. Bitten aus dem Chat in Dienste übersetzen (eigener kleiner LLM-Aufruf oder Regeln). Bisher kommen Bitten schon strukturiert als `Request` an.
+10. Brain-Prozess mit Denk-Zustand in `launch_all.py` einhängen; Simulation eines ganzen "Tages" mit dem MockBlackboard, um Abwechslung und Rhythmus zu beurteilen.
+
+---
+
+## 14. Umsetzung V0.1 (`src_dev/ai/brain/`)
+
+| Datei | Inhalt |
+|---|---|
+| `datatypes.py` | Beobachtung, Objekte, Personen, Bitten, Menü-Optionen |
+| `memory.py` | Gewöhnung (Halbwertszeit 6 h), Gewichte der Dienste, Tagebuch, JSON-Persistenz |
+| `needs.py` | Bedürfnismodell mit fünf Bedürfnissen und Stufen mit Hysterese |
+| `safety.py` | harte Grenzen mit Veto |
+| `behaviors.py` | Verhaltenskatalog, Menübau (höchstens 7 Ziele), Code-Auswahl (Softmax), Stimmungen → Ausdrucksparameter |
+| `arbiter.py` | 1-Hz-Zyklus, Regeln, Auslöser, Abkühlzeit 2 min (Chat sofort), Lob durch Antippen |
+| `prompt.py` | Systemprompt, drei Few-Shot-Beispiele, Zustandstext, GBNF-Grammatik |
+| `llm.py` | llama.cpp-Anbindung mit Zeitlimit, Mock-Backend |
+| `scenarios.py` | 15 Entscheidungs-Szenarien |
+| `run_decision_suite.py` | Modellvergleich auf dem Pi |
+| `tests/test_brain.py` | Unit-Tests (ohne Modell) |
+
+**Aufrufe** (aus `src_dev/ai`):
+
+```
+python -m pytest brain/tests -q
+python -m brain.run_decision_suite --mock
+python -m brain.run_decision_suite --model Qwen3-4B-Instruct-2507-Q4_K_M.gguf --repeat 3 --out qwen3.json
+```
+
+**Prüfstand (07.11.2026):** Unit-Tests grün. Die Grammatik wurde mit dem llama.cpp-Parser (Qwen2-Vokabular) geprüft: Sie nimmt die Few-Shot-Antworten an und lehnt ungültige Nummern und erfundene Stimmungen ab. Mit einem echten Modell ist noch nichts gelaufen, weil die Modelldatei in der Claude-Umgebung nicht herunterladbar war. Der erste Lauf gehört auf den Pi.
+
+**Wichtig für die Bewertung:** Die Suite mischt die Menü-Reihenfolge standardmäßig und gibt als Vergleich an, wie oft die beste Code-Option schon richtig wäre. In 14 von 15 Szenarien trifft das der Code bereits. Das LLM lohnt sich also nur, wenn es mindestens gleich gut ist und die semantischen Fälle löst (`semantik_gesuchtes_in_sicht`: die gesuchte Lesebrille liegt schon im Bild). Dafür braucht es mehr semantische Szenarien.

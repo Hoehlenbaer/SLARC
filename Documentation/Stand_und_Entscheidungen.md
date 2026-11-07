@@ -147,11 +147,12 @@ Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. N
 
 ### 9a. High-Level-Brain (07.11.2026, Konzept in `Documentation/Brain_Konzept.md`)
 
-- SLARC folgt Bedürfnissen (Energie, Neugier, Nützlichkeit, Sicherheit) statt klarer Aufträge. Grund: Aufträge wie "laufe nach Norden" sind im Prinzip eine Sprachfernsteuerung.
+- SLARC folgt Bedürfnissen (Energie, Neugier, Nützlichkeit, Gesellschaft, Sicherheit) statt klarer Aufträge. Grund: Aufträge wie "laufe nach Norden" sind im Prinzip eine Sprachfernsteuerung.
 - Bedürfnisse und Sicherheitsgrenzen laufen als Code auf dem Pi. Das LLM wählt nur bei Ereignissen ein Ziel aus einem vom Code erzeugten Menü. Grund: Ein 4B-Modell wägt Zahlen nicht zuverlässig ab.
 - Akku knapp → Rückkehr zum Ausgangspunkt. Die Schwelle berücksichtigt den Rückweg.
 - Denk-Zustand: Während das LLM rechnet, pausieren Perzeption und Motion auf dem Pi. Der ESP32 hält Reflexe aktiv und zeigt eine Denk-Pose.
 - Pi 5 hat 8 GB RAM. Modell vorerst Qwen3-4B-Instruct-2507 Q4_K_M über llama.cpp. Qwen3.5-4B/2B und Gemma 4 E2B/E4B werden mit einer eigenen Testsuite auf dem Pi verglichen.
+- Erste Umsetzung in `src_dev/ai/brain/` (V0.1): Bedürfnismodell, Sicherheits-Veto, Menü, Arbiter, Prompt mit GBNF, Testsuite. Noch nicht mit echtem Modell gelaufen.
 - Interaktion zunächst ohne Audio: Web-Chat, Handy-Meldungen, Körpersprache, LEDs, Antippen als Lob. Audio später über USB, weil I²S mit dem Kameratrigger an GPIO18 kollidiert.
 
 ---

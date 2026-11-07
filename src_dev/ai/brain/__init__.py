@@ -1,0 +1,12 @@
+# brain – bedürfnisgesteuertes High-Level-Brain von SLARC
+# Version 0.1 (07.11.2026). Konzept: Documentation/Brain_Konzept.md
+#
+# Module:
+#   datatypes  Beobachtung, Objekte, Personen, Bitten, Menü-Optionen
+#   memory     Gewöhnung, Gewichte der Dienste, Tagebuch, Persistenz
+#   needs      Bedürfnismodell (energie, neugier, nuetzlichkeit, gesellschaft, unbehagen)
+#   safety     harte Grenzen mit Veto
+#   behaviors  Verhaltenskatalog, Menübau, Code-Auswahl, Stimmungen
+#   arbiter    Entscheidungszyklus 1 Hz, Auslöser fürs LLM
+#   prompt     Systemprompt, Few-Shot, Zustandstext, GBNF-Grammatik
+#   llm        llama.cpp-Anbindung und Mock-Backend
