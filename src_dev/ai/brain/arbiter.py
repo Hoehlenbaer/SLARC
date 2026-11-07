@@ -1,5 +1,6 @@
 # brain/arbiter.py
 # Version 0.2 (07.11.2026) – Entscheidungszyklus im 1-Hz-Takt (Konzept 8).
+# V0.3: Gefahr im Bild -> sofort melden (Regel, vor Energie und LLM).
 # V0.2: Energie ab "hoch" per Regel (vorher erst "dringend"); das LLM bekommt nur
 #       knappe Fälle (close_options), sonst entscheidet der Code.
 #
@@ -70,6 +71,11 @@ class Arbiter:
             self.current = None     # laufendes Verhalten abbrechen, neu wählen
 
         menu = build_options(obs, needs, self.mem, safety)
+
+        # 2b. Gefahr -> sofort melden, ohne LLM
+        hazard = next((o for o in menu if o.service == "hazard"), None)
+        if hazard is not None and (self.current is None or self.current.service != "hazard"):
+            return self._start(hazard, now, "Gefahr")
 
         # 3. Energie hoch/dringend -> heim, ohne LLM
         if needs.levels["energie"] >= ENERGY_RULE_LEVEL:

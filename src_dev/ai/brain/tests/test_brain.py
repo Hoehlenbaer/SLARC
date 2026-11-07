@@ -322,3 +322,10 @@ def test_grammar_parses_and_accepts_examples():
     assert not _accepts(L, vocab, grammar(3), '{"begruendung": "x", "ziel": 5')
     assert not _accepts(L, vocab, grammar(3), '{"begruendung": "x", "ziel": 1, "stimmung": "wütend"')
     assert json.loads(FEW_SHOT[0][1])
+
+
+def test_hazard_reported_by_rule_even_when_tired():
+    arb = Arbiter(Memory(), random.Random(0))
+    d = arb.step(obs(battery_v=11.0, home_dist_m=60.0,
+                     objects=[ObjectSeen("h1", "herd_an", "küche", 3.0)]))
+    assert d.action == "start" and d.option.service == "hazard" and d.option.arg == "h1"

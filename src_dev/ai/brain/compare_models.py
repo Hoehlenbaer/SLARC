@@ -1,5 +1,6 @@
 # brain/compare_models.py
-# Version 0.1 (07.11.2026) – Alle Modelle mit beiden Testsuiten gegeneinander.
+# Version 0.2 (07.11.2026) – Alle Modelle mit beiden Testsuiten gegeneinander.
+# V0.2: Smalltalk mit und ohne Tagebuch; Objekt-Spalte "LLM allein" (ohne Regel-Fälle).
 #
 # Aufruf aus src_dev/ai:
 #   python -m brain.compare_models --gpu-layers -1                 # alle *.gguf in ~/.models
@@ -28,8 +29,11 @@ from . import run_decision_suite as DS
 from . import run_open_suite as OS
 from . import semantic as S
 from .llm import LlamaBrain, MockBrain
+from .open_scenarios import DIARY_SAMPLE
 
-SMALLTALK_SAMPLES = ["Wie geht's dir?", "Hast du heute was Spannendes erlebt?", "Ich geh jetzt schlafen, gute Nacht."]
+# (Frage, mit Tagebuch?) – ohne Tagebuch darf SLARC nichts erzählen, was er nicht erlebt hat
+SMALLTALK_SAMPLES = [("Wie geht's dir?", False), ("Hast du heute was Spannendes erlebt?", False),
+                     ("Hast du heute was Spannendes erlebt?", True), ("Ich geh jetzt schlafen, gute Nacht.", False)]
 
 
 def _free(b) -> None:
@@ -66,7 +70,8 @@ def evaluate(make, repeat: int) -> dict:
     print(f"    Chat {s['chat']['treffer']}/{s['chat']['laeufe']}, Objekt {s['objekt']['treffer']}/"
           f"{s['objekt']['laeufe']}, Suchen {s['suchen']['treffer']}/{s['suchen']['laeufe']} "
           f"({time.perf_counter() - t:.0f} s)", flush=True)
-    talk = [(q, S.interpret_chat(b, q).reply) for q in SMALLTALK_SAMPLES]
+    talk = [(q + (" [mit Tagebuch]" if d else " [ohne Tagebuch]"),
+             S.interpret_chat(b, q, diary=DIARY_SAMPLE if d else None).reply) for q, d in SMALLTALK_SAMPLES]
     name = b.name
     path = getattr(getattr(b, "llm", None), "model_path", None)
     size_gb = os.path.getsize(path) / 1e9 if path and os.path.exists(path) else None
@@ -85,7 +90,7 @@ def _lat(*vals) -> str:
 
 
 def table(results: list[dict]) -> list[str]:
-    head = ("| Modell | GB | Laden s | Zielwahl voll (Code) | knapp | ungültig | Chat | Objekt | Suchen | Latenz s |\n"
+    head = ("| Modell | GB | Laden s | Zielwahl voll (Code) | knapp | ungültig | Chat | Objekt (LLM allein) | Suchen | Latenz s |\n"
             "|---|---|---|---|---|---|---|---|---|---|")
     lines = [head]
     for r in results:
@@ -96,7 +101,8 @@ def table(results: list[dict]) -> list[str]:
         inval = f["ungueltig"] + k["ungueltig"] + sum(o[t]["ungueltig"] for t in ("chat", "objekt", "suchen"))
         lines.append(
             f"| {r['modell']} | {r['groesse_gb'] or '-'} | {r['laden_s']} | {_rate(f)} ({f['code_treffer']}) | "
-            f"{_rate(k)} | {inval} | {_rate(o['chat'])} | {_rate(o['objekt'])} | {_rate(o['suchen'])} | "
+            f"{_rate(k)} | {inval} | {_rate(o['chat'])} | {_rate(o['objekt'])} "
+            f"({o['objekt'].get('llm_treffer', '-')}/{o['objekt'].get('llm_laeufe', '-')}) | {_rate(o['suchen'])} | "
             f"{_lat(f['latenz_median_s'], o['chat']['latenz_median_s'], o['objekt']['latenz_median_s'])} |")
     return lines
 

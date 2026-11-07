@@ -1,5 +1,6 @@
 # brain/open_scenarios.py
 # Version 0.2 (07.11.2026) – Offene Testfälle für die semantischen Aufgaben.
+# V0.3: Objekt-Fälle zählen jetzt getrennt nach Regel und LLM (run_open_suite).
 # V0.2: Erwartungen bei Durst/Cola erweitert (Tasse, Glas, Flasche). Begründung: nach
 #       dem ersten Lauf als zu eng erkannt, nicht um das Ergebnis zu schönen –
 #       "eine Cola holen" als Flasche ist sachlich richtig.
