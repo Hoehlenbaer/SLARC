@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – obere + untere Baseplate inkl. Coxa-Servo-Aufnahme, Elektronik und Energieversorgung.   V2.13 (Servo-Wiege)
+SLARC – obere + untere Baseplate inkl. Coxa-Servo-Aufnahme, Elektronik und Energieversorgung.   V2.14 (Elektronik-Testbrett)
 FreeCAD 0.21 / 1.0: Makro ausführen. Parameter in P (unten) ändern und Makro neu ausführen
 (die Plattenkontur mit den Schwenkfreigängen ist hier bewusst als Python-Geometrie gebaut,
 nicht über Spreadsheet-Ausdrücke).
 
 Koordinaten (wie slarc_sim_V10): X = vorn, Y = links, Z = oben, Ursprung = Körpermitte,
 Z = 0 = Oberkante Hüllmaß der Coxa-Servos (ST3215 liegt mit Horn nach oben zwischen den Platten).
+
+V2.14
+- Elektronik-Testbrett bench_board() für den Prüfstand: Relaismodul, Treiber, Power-Platine C und eine
+  Bein-Platine A auf einer PLA-Platte (220 x 175 x 4) mit denselben Befestigungen wie im Roboter
+  (M3-Gewindeeinsätze Relais, M2 direkt in Bunde, Treiber mit den mitgelieferten Hülsen und M2.5x7 von unten).
+  Rand als Versteifung, Kabelbinder-Schlitze. Im Modell ausgeblendet bei y = +400.
 
 V2.13
 - Servo-Wiege auf der unteren Platte (und im Prüfstand): zwei Seitenwangen 5 mm + hinterer Anschlag 4 mm,
@@ -181,6 +187,14 @@ P = dict(
                 legs=("FR", "FL", "MR", "ML", "RR", "RL")),
     # V2.13: Gewichtsersparnis: Fenster in der oberen Platte unter Pi und Treiber (Abstand zu den Bohrungen)
     lighten=dict(margin=6.0, r=5.0),
+    # V2.14: Elektronik-Testbrett (lokal, Ecke 0/0, Oberseite z = t)
+    bench=dict(L=220.0, W=175.0, t=4.0, rim=3.0, rim_h=5.0,
+               relay=(40.0, 90.0),          # Lochbild-Mitte Relaismodul (Löcher ±25.4 / ±66.1)
+               gdr=(140.0, 125.0),          # Lochbild-Mitte Treiber (±24.5 / ±29)
+               pwr=(105.0, 15.0),           # Ecke Power-Platine C (Lochende links)
+               leg=(170.0, 15.0),           # Ecke Bein-Platine A (Lochende links)
+               cb=(5.5, 2.2),               # Senkung unten für M2.5-Köpfe (Ø, Tiefe)
+               ties=[(90.0, 12.0), (90.0, 163.0), (210.0, 70.0), (100.0, 72.0), (165.0, 72.0)]),
     split_x=-40.0, lap=24.0, lap_screws=[-65.0, -32.0, 32.0, 65.0],   # Vorderteil 252 x 209 mm
     # V2.12: Bein-Prüfstand (ein Coxa-Servo wie im Roboter zwischen zwei Plattenstücken, Achse vor der Tischkante)
     stand=dict(edge_x=-60.0,        # Tischkante im Servo-Frame: Achse 60 mm vor der Kante -> alles mit r > 0 frei
@@ -806,6 +820,41 @@ def dcdc_shape():
     return cut(fuse([body] + tabs), slots)
 
 
+# ============================================================ V2.14 Elektronik-Testbrett
+def bench_board():
+    """Testbrett für die Elektronik am Bein-Prüfstand. Lokale Lage, Platte von z 0 bis t."""
+    B, c = P["bench"], P["pcb"]
+    t = B["t"]
+    pos = [box(0, 0, 0, B["L"], B["W"], t)]
+    r, rh = B["rim"], B["rim_h"]
+    pos += [box(0, 0, t - 0.1, B["L"], r, rh), box(0, B["W"] - r, t - 0.1, B["L"], r, rh),
+            box(0, 0, t - 0.1, r, B["W"], rh), box(B["L"] - r, 0, t - 0.1, r, B["W"], rh)]
+    neg = []
+    # Relaismodul: Bunde mit M3-Einsatz (wie untere Platte)
+    rx, ry = B["relay"]
+    di, depth, bd = P["relay_insert"]
+    for dx in (-25.4, 25.4):
+        for dy in (-66.1, 66.1):
+            pos.append(cyl(rx + dx, ry + dy, t - 0.5, bd / 2, P["relay_so"] + 0.5))
+            neg.append(cyl(rx + dx, ry + dy, t + P["relay_so"] - depth, di / 2, depth + 1))
+    # Treiber: Durchgang + Senkung von unten (Hülsen 16 mm oben aufgeschraubt)
+    gx, gy = B["gdr"]
+    for dx in (-24.5, 24.5):
+        for dy in (-29.0, 29.0):
+            neg.append(cyl(gx + dx, gy + dy, -1, P["gdr_hole_d"] / 2, t + 2))
+            neg.append(cyl(gx + dx, gy + dy, -1, B["cb"][0] / 2, B["cb"][1] + 1))
+    # Power-Platine C (½ 5×7) und Bein-Platine A (½ 3×7): M2-Bunde am Lochende, Stütze am freien Ende
+    for (x0, y0), g in ((B["pwr"], c["pwr"]), (B["leg"], c["leg"])):
+        for sy in (c["hole_in"], g["W"] - c["hole_in"]):
+            pos.append(cyl(x0 + c["hole_in"], y0 + sy, t - 0.5, c["boss_d"] / 2, g["so"] + 0.5))
+            neg.append(cyl(x0 + c["hole_in"], y0 + sy, t, c["m2_pilot"] / 2, g["so"] + 0.1))
+        pos.append(box(x0 + g["L"] - 6, y0 + 4, t - 0.5, 4, g["W"] - 8, g["so"] + 0.5))
+    for tx, ty in B["ties"]:                              # Kabelbinder-Schlitzpaare
+        for s in (-1, 1):
+            neg.append(box(tx - 1.5 + s * 4.0, ty - 2.0, -1, 3.0, 4.0, t + 2))
+    return cut(fuse(pos), neg)
+
+
 # ============================================================ V2.12 Bein-Prüfstand
 def test_stand():
     """Prüfstand für ein Bein: Unterteil (Platte + Wände, liegt auf dem Tisch) und Deckel (M3 in Gewindeeinsätze).
@@ -973,6 +1022,7 @@ def run_freecad():
     m_st = m_rz(0, 0, -300.0, 0)
     add("Leg_Test_Stand_Base", xform(sb, m_st), (0.2, 0.3, 0.6), False)
     add("Leg_Test_Stand_Cap", xform(sc, m_st), (0.2, 0.3, 0.6), False)
+    add("Bench_Board", xform(bench_board(), m_rz(0, -110.0, 400.0, 0)), (0.2, 0.3, 0.6), False)   # V2.14
     for i, y in enumerate(P["lat"]["ys"]):                          # V2.7: Akku-Riegel (eingerastet, Nase nach außen)
         add("Battery_Latch_%d" % (i + 1), latch_pin(P["lat"]["x"], y, 90.0 if y > 0 else 270.0), (0.85, 0.35, 0.1))
     cache = {}
