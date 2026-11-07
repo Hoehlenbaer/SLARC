@@ -78,3 +78,25 @@ def test_semantic_grammars_with_llama_cpp():
     assert _accepts(L, vocab, S.NARRATE_GBNF, '{"text": "Heute war ich neugierig."}')
     assert not _accepts(L, vocab, S.CHAT_GBNF, '{"dienst": "tanzen"')
     assert not _accepts(L, vocab, S.search_gbnf(places), '{"grund": "x", "orte": ["keller"')
+
+
+def test_rule_assessment_skips_llm():
+    calls = []
+    b = MockBrain(responder=lambda m, g: calls.append(1) or '{"grund": "x", "interesse": "niedrig", "melden": "nein"}')
+    assert S.assess_object(b, "herd_an", "küche").report is True
+    assert S.assess_object(b, "stuhl", "küche").report is False
+    assert not calls                                   # beides ohne LLM
+    r = S.assess_object(b, "herd_an", "küche", use_rules=False)
+    assert calls and r.source == "llm"
+
+
+def test_chat_gets_diary_context():
+    seen = {}
+    def resp(msgs, g):
+        seen["user"] = msgs[-1]["content"]
+        return '{"dienst": "smalltalk", "gegenstand": "", "antwort": "Ok."}'
+    b = MockBrain(responder=resp)
+    S.interpret_chat(b, "Was hast du erlebt?", diary=[{"kind": "entscheidung", "text": "Tasche untersucht"}])
+    assert seen["user"].startswith("ERLEBT: Tasche untersucht")
+    S.interpret_chat(b, "Was hast du erlebt?")
+    assert seen["user"].startswith("ERLEBT: noch nichts")

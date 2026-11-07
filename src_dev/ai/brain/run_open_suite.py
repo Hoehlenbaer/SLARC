@@ -1,6 +1,8 @@
 # brain/run_open_suite.py
 # Version 0.2 (07.11.2026) – Testsuite für die semantischen Aufgaben (semantic.py).
 # V0.2: run(..., rows_out=False) für compare_models.py.
+# V0.3: Chat mit Tagebuch-Kontext (ERLEBT); Objekte mit Regeln, Zählung Regel/LLM;
+#       --no-rules prüft das LLM allein an allen Objekt-Fällen.
 #
 # Aufruf aus src_dev/ai:
 #   python -m brain.run_open_suite --mock
@@ -38,27 +40,28 @@ def _item_ok(item: str, wanted: set[str]) -> bool:
     return not wanted or any(w in item for w in wanted)
 
 
-def run(b, repeat: int, rows_out: bool = True) -> dict:
+def run(b, repeat: int, rows_out: bool = True, use_rules: bool = True) -> dict:
     rows = []
     say = print if rows_out else (lambda *a, **k: None)
 
-    def row(task, case, ok, valid, lat, out, reason=""):
+    def row(task, case, ok, valid, lat, out, reason="", source="llm"):
         rows.append({"aufgabe": task, "fall": case, "ok": ok, "gueltig": valid,
-                     "latenz_s": round(lat, 2), "ausgabe": out, "grund": reason})
+                     "latenz_s": round(lat, 2), "ausgabe": out, "grund": reason, "quelle": source})
         mark = "ok " if ok else "FALSCH" if valid else "UNGÜLTIG"
         say(f"{mark:8} {task:7} {case[:44]:44} -> {out}", flush=True)
 
     for k in range(repeat):
         for c in CHAT_CASES:
-            r = S.interpret_chat(b, c.text)
+            r = S.interpret_chat(b, c.text, diary=DIARY_SAMPLE)
             ok = r.service in c.services and _item_ok(r.item, c.item_any)
             row("chat", c.text, ok, r.service is not None, r.latency_s,
                 f"{r.service}({r.item}) „{r.reply}“")
         for c in OBJECT_CASES:
-            r = S.assess_object(b, c.cls, c.place, c.context)
+            r = S.assess_object(b, c.cls, c.place, c.context, use_rules=use_rules)
             ok = r.report == c.report and r.interest in c.interest
             row("objekt", f"{c.cls} / {c.place}", ok, r.interest is not None, r.latency_s,
-                f"melden={'ja' if r.report else 'nein'}, interesse={r.interest}", r.reason)
+                f"melden={'ja' if r.report else 'nein'}, interesse={r.interest} [{r.source}]",
+                r.reason, r.source)
         for c in SEARCH_CASES:
             r = S.search_places(b, c.item, c.places)
             ok = bool(r.places) and r.places[0] in c.first_any
@@ -70,10 +73,13 @@ def run(b, repeat: int, rows_out: bool = True) -> dict:
     summary = {"modell": b.name}
     for task in ("chat", "objekt", "suchen"):
         rs = [r for r in rows if r["aufgabe"] == task]
-        lats = [r["latenz_s"] for r in rs if r["gueltig"]]
+        lats = [r["latenz_s"] for r in rs if r["gueltig"] and r["quelle"] == "llm"]
         summary[task] = {
             "laeufe": len(rs), "treffer": sum(r["ok"] for r in rs),
             "ungueltig": sum(not r["gueltig"] for r in rs),
+            "per_regel": sum(r["quelle"] == "regel" for r in rs),
+            "llm_treffer": sum(r["ok"] for r in rs if r["quelle"] == "llm"),
+            "llm_laeufe": sum(r["quelle"] == "llm" for r in rs),
             "latenz_median_s": round(statistics.median(lats), 2) if lats else None,
         }
     summary["tagebuch"] = text
@@ -89,6 +95,7 @@ def main() -> None:
     ap.add_argument("--gpu-layers", type=int, default=0)
     ap.add_argument("--ram-cache-mb", type=int, default=0, help="RAM-Cache für mehrere Systemprompts (Pi: z. B. 1024)")
     ap.add_argument("--verbose", action="store_true")
+    ap.add_argument("--no-rules", action="store_true", help="Objekte nur vom LLM einschätzen lassen")
     ap.add_argument("--out", default=None)
     a = ap.parse_args()
 
@@ -104,13 +111,15 @@ def main() -> None:
         print("Lade Modell …", flush=True)
         b = make()
         print(f"=== {b.name} (geladen in {time.perf_counter() - t0:.1f} s) ===", flush=True)
-        r = run(b, a.repeat)
+        r = run(b, a.repeat, use_rules=not a.no_rules)
         results.append(r)
         s = r["summary"]
         for task in ("chat", "objekt", "suchen"):
             t = s[task]
             print(f"--> {task:7}: {t['treffer']}/{t['laeufe']} richtig, {t['ungueltig']} ungültig, "
-                  f"Latenz Median {t['latenz_median_s']} s")
+                  f"Latenz Median {t['latenz_median_s']} s"
+                  + (f", davon {t['per_regel']} per Regel; LLM allein {t['llm_treffer']}/{t['llm_laeufe']}"
+                     if t['per_regel'] else ""))
     if a.out:
         with open(a.out, "w", encoding="utf-8") as f:
             json.dump(results, f, ensure_ascii=False, indent=1)

@@ -328,3 +328,30 @@ Fehler des LLM:
 
 **Zweiter Lauf, semantische Aufgaben** (Marco, 07.11.2026, Qwen3-4B Q4, PC/GPU, 3 Wiederholungen): Chat 36/45, Objekt 26/30, Suchorte 24/24, Zielwahl knapp 12/12 (11 Szenarien eindeutig vom Code). Echte Fehler: „Gute Nacht“ → `come` (3/3), Stuhl am Tisch soll gemeldet werden (3/3), Smalltalk erfindet Erlebnisse („habe eine Katze gesehen“). Zwei Chat-Erwartungen waren zu eng (Cola → Flasche, Durst → Tasse) und wurden erweitert.
 
+**Modellvergleich** (Marco, 07.11.2026, PC/GPU, 3 Wiederholungen; nur die im Betrieb relevanten Teile):
+
+| Modell | GB | knapp | Chat | Objekt | Suchen | gesamt |
+|---|---|---|---|---|---|---|
+| Qwen3-4B-Instruct-2507 Q4_K_M | 2,5 | 12/12 | 42/45 | 26/30 | 24/24 | 104/111 |
+| Qwen3.5-4B Q4_K_M | 2,7 | 11/12 | 45/45 | 24/30 | 24/24 | 104/111 |
+| Gemma 4 E4B Q4_K_M | 5,0 | 12/12 | 33/45 | 27/30 | 24/24 | 96/111 |
+
+Qwen3.5 und Gemma meldeten den eingeschalteten Herd 3/3 nicht. Qwen3.5 antwortet im Smalltalk am ehrlichsten. Gemma ist doppelt so groß und deutet Chat am schlechtesten. Bei 10 Objekt-Fällen sind Unterschiede von 2–3 Treffern Rauschen. **Entscheidung (vorläufig):** Qwen3-4B-Instruct-2507 bleibt (kleinstes Modell, schnellstes, kein Sicherheitsfehler).
+
+**V0.3 des Brain:**
+- Gefahren (`HAZARDS`: Herd an, Wasser auf dem Boden, Scherben, Rauch …) meldet der Code immer und sofort, vor Energie und LLM.
+- `assess_object` fragt das LLM nur für unbekannte Klassen; Gefahren, Meldenswertes und Alltägliches (`ROUTINE`, Möbel) entscheidet eine Regel. Die Suite zählt Regel- und LLM-Fälle getrennt.
+- Chat bekommt die letzten Tagebuch-Einträge (`ERLEBT`) und die Regel, nur davon zu erzählen. Neues Few-Shot für Verabschiedungen (bewusst anders formuliert als der Testfall „Gute Nacht“).
+
+**Prompt-Größen** (Qwen-Tokenizer, ChatML):
+
+| Aufgabe | gesamt | fester Teil (System + Beispiele) | neu je Aufruf |
+|---|---|---|---|
+| Zielwahl (7 Optionen) | 1236 | 1072 | 164 |
+| Chat (mit Tagebuch) | 775 | 699 | 76 |
+| Objekt | 368 | 334 | 34 |
+| Suchorte | 247 | 208 | 39 |
+| Tagebuch | 234 | 131 | 103 |
+
+Auf dem Pi entscheidet der Cache: Ohne ihn wird bei jedem Wechsel der Aufgabe der feste Teil neu gerechnet (bis ~1100 Tokens), mit ihm nur 34–164 Tokens. Alle festen Teile zusammen sind ~2400 Tokens; bei Qwen3-4B (36 Schichten, 8 KV-Köpfe à 128, f16) sind das grob 150 kB je Token, also ~360 MB im RAM-Cache (Rechnung, nicht gemessen).
+

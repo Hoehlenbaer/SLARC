@@ -1,5 +1,7 @@
 # brain/behaviors.py
-# Version 0.2 (07.11.2026) – Verhaltenskatalog, Menübau und Code-Auswahl.
+# Version 0.3 (07.11.2026) – Verhaltenskatalog, Menübau und Code-Auswahl.
+# V0.3: Gefahren (HAZARDS) immer melden, unabhängig von Energie und LLM;
+#       ROUTINE-Klassen (Möbel) gelten als nicht meldenswert.
 # V0.2: Bitte <-> Fund im Code verknüpft, Energie "hoch" filtert das Menü,
 #       close_options() für knappe Fälle (nur diese gehen ans LLM).
 #
@@ -33,7 +35,14 @@ SERVICES_ENABLED = {"search", "report", "greet", "follow", "push_out"}   # fetch
 # Klassen, deren Fund gemeldet wird (Annahme, an die 41 Detektionsklassen anpassen)
 REPORTABLE = {"schlüssel", "handy", "geldbörse", "brille", "fernbedienung",
               "fenster_offen", "tür_offen", "licht_an", "dose"}
+# Gefahren: immer und sofort melden, per Regel (Modellvergleich 07.11.: Qwen3.5 und
+# Gemma meldeten den eingeschalteten Herd 3/3 nicht). Annahme, an die Detektion anpassen.
+HAZARDS = {"herd_an", "bügeleisen_an", "wasserpfütze", "glasscherben", "rauch", "feuer"}
+# Alltägliches am festen Platz: nicht melden, kaum interessant (Annahme)
+ROUTINE = {"stuhl", "tisch", "sofa", "bett", "schrank", "regal", "lampe", "tür", "fenster",
+           "teppich", "pflanze", "fernseher", "kühlschrank", "waschmaschine"}
 REPORT_REPEAT_S = 3600.0        # dasselbe Objekt frühestens nach 1 h wieder melden
+HAZARD_REPEAT_S = 600.0         # Gefahr alle 10 min erneut, solange sie besteht
 GREET_REPEAT_S = 600.0          # dieselbe Person frühestens nach 10 min wieder begrüßen
 ENERGY_EXEMPT = {"return_home", "rest", "retreat", "idle"}
 ENERGY_FILTER_LEVEL = 3         # ab "hoch" nur noch ENERGY_EXEMPT im Menü (Test 07.11.: LLM ignorierte Regel 3)
@@ -142,6 +151,11 @@ def build_options(obs: Observation, needs: NeedsState, mem: Memory,
         elif r.service == "follow":
             add(Option("follow", r.arg, f"Bitte{who}: mitkommen", u, "follow"))
 
+    # --- Gefahren: immer melden (Regel, nicht gedämpft, nicht gefiltert) ---
+    for o in obs.objects:
+        if o.cls in HAZARDS and now - mem.reported.get(o.oid, -1e9) > HAZARD_REPEAT_S:
+            add(Option("report", o.oid, f"GEFAHR melden: {o.cls} ({o.place})", 1.0, "hazard"))
+
     # --- Meldenswertes (Nützlichkeit) ---
     for o in obs.objects:
         if any(x.behavior == "report" and x.arg == o.oid for x in opts):
@@ -173,11 +187,11 @@ def build_options(obs: Observation, needs: NeedsState, mem: Memory,
     # Müdigkeit dämpft alles außer Heimweg, Ruhe, Rückzug und Abwarten (Regel 3 auch für die Code-Auswahl)
     damp = 1.0 - 0.6 * v["energie"]
     for o in opts:
-        if o.behavior not in ENERGY_EXEMPT:
+        if o.behavior not in ENERGY_EXEMPT and o.service != "hazard":
             o.utility *= damp
 
     if needs.levels["energie"] >= ENERGY_FILTER_LEVEL:
-        opts = [o for o in opts if o.behavior in ENERGY_EXEMPT]
+        opts = [o for o in opts if o.behavior in ENERGY_EXEMPT or o.service == "hazard"]
 
     opts.sort(key=lambda o: o.utility, reverse=True)
     menu = opts[:MENU_MAX]

@@ -1,5 +1,8 @@
 # brain/semantic.py
-# Version 0.1 (07.11.2026) – Semantische Aufgaben für das LLM.
+# Version 0.2 (07.11.2026) – Semantische Aufgaben für das LLM.
+# V0.2: assess_object fragt das LLM nur für unbekannte Klassen (Gefahren, Meldenswertes
+#       und Möbel per Regel); Chat bekommt die letzten Tagebuch-Einträge (ERLEBT),
+#       damit Smalltalk nichts erfindet; Few-Shot für Verabschiedung.
 #
 # Ergebnis des ersten Tests (07.11.2026, Qwen3-4B Q4): Als Entscheider ist das
 # LLM schlechter als die Code-Auswahl (36/45 gegen 42/45, Regel "Energie hoch"
@@ -19,6 +22,7 @@ import json
 from dataclasses import dataclass, field
 from typing import Optional
 
+from .behaviors import HAZARDS, REPORTABLE, ROUTINE
 from .datatypes import Request
 
 # ---------------------------------------------------------------- Grammatik-Bausteine
@@ -81,15 +85,20 @@ CHAT_SYSTEM = (
     "Wenn es passt, nimm einen dieser Namen: " + ", ".join(KNOWN_ITEMS) + ".\n"
     "Antwort: ein kurzer, freundlicher Satz von dir in der Ich-Form, höchstens 20 Wörter. "
     "Versprich nichts, was du nicht kannst.\n"
+    "Unter ERLEBT steht, was du heute wirklich getan hast. Erzähle von Erlebnissen nur, was dort steht; "
+    "steht dort nichts, sag ehrlich, dass noch nicht viel passiert ist.\n"
+    "Eine Verabschiedung oder ein Gute-Nacht-Gruß ist smalltalk, keine Aufforderung zu kommen.\n"
     'Antworte nur mit JSON: {"dienst": "...", "gegenstand": "...", "antwort": "..."}'
 )
 CHAT_SHOTS = [
-    ("Marco: Wo hab ich nur mein Portemonnaie hingelegt?",
+    ("ERLEBT: noch nichts\nMarco: Wo hab ich nur mein Portemonnaie hingelegt?",
      '{"dienst": "search", "gegenstand": "geldbörse", "antwort": "Ich schaue mich um und sage dir Bescheid, wenn ich es sehe."}'),
-    ("Marco: Super gemacht, Kleiner!",
+    ("ERLEBT: Flur erkundet\nMarco: Super gemacht, Kleiner!",
      '{"dienst": "praise", "gegenstand": "", "antwort": "Danke, das freut mich!"}'),
-    ("Marco: Bist du müde?",
-     '{"dienst": "smalltalk", "gegenstand": "", "antwort": "Ein bisschen, aber für einen kleinen Ausflug reicht es noch."}'),
+    ("ERLEBT: Küche erkundet; Ball im Wohnzimmer untersucht\nMarco: Und, was hast du so getrieben?",
+     '{"dienst": "smalltalk", "gegenstand": "", "antwort": "Ich war in der Küche und habe im Wohnzimmer einen Ball untersucht."}'),
+    ("ERLEBT: noch nichts\nMarco: Ich bin dann mal weg, bis später!",
+     '{"dienst": "smalltalk", "gegenstand": "", "antwort": "Bis später! Ich passe hier auf."}'),
 ]
 CHAT_GBNF = (_obj([("dienst", "dienst"), ("gegenstand", "item"), ("antwort", "text")])
              + _enum("dienst", CHAT_SERVICES) + _str("item", 0, 40) + _str("text", 1, 160) + WS)
@@ -109,8 +118,18 @@ class ChatResult:
     error: str = ""
 
 
-def interpret_chat(backend, text: str, sender: str = "Marco") -> ChatResult:
-    g = backend.generate(_messages(CHAT_SYSTEM, CHAT_SHOTS, f"{sender}: {text}"), CHAT_GBNF, 100)
+def _erlebt(diary: Optional[list[dict]], n: int = 5) -> str:
+    """Kurze Zusammenfassung der letzten Entscheidungen und Ergebnisse fürs Chat-Prompt."""
+    if not diary:
+        return "noch nichts"
+    items = [e.get("text", "") for e in diary if e.get("kind") in ("entscheidung", "ergebnis", "lob")]
+    return "; ".join(items[-n:]) or "noch nichts"
+
+
+def interpret_chat(backend, text: str, sender: str = "Marco",
+                   diary: Optional[list[dict]] = None) -> ChatResult:
+    user = f"ERLEBT: {_erlebt(diary)}\n{sender}: {text}"
+    g = backend.generate(_messages(CHAT_SYSTEM, CHAT_SHOTS, user), CHAT_GBNF, 100)
     if g.error:
         return ChatResult(None, raw=g.raw, latency_s=g.latency_s, error=g.error)
     try:
@@ -163,9 +182,26 @@ class ObjectAssessment:
     raw: str = ""
     latency_s: float = 0.0
     error: str = ""
+    source: str = "llm"          # "regel" oder "llm"
 
 
-def assess_object(backend, cls: str, place: str, context: str = "") -> ObjectAssessment:
+def rule_assessment(cls: str) -> Optional[ObjectAssessment]:
+    """Bekannte Klassen entscheidet der Code; das LLM nur den offenen Rest."""
+    if cls in HAZARDS:
+        return ObjectAssessment("hoch", True, "Gefahr (Regel)", source="regel")
+    if cls in REPORTABLE:
+        return ObjectAssessment("mittel", True, "meldenswert (Regel)", source="regel")
+    if cls in ROUTINE:
+        return ObjectAssessment("niedrig", False, "Alltägliches (Regel)", source="regel")
+    return None
+
+
+def assess_object(backend, cls: str, place: str, context: str = "",
+                  use_rules: bool = True) -> ObjectAssessment:
+    if use_rules:
+        r = rule_assessment(cls)
+        if r is not None:
+            return r
     user = f"GEGENSTAND: {cls}\nORT: {place}" + (f"\nZEIT: {context}" if context else "")
     g = backend.generate(_messages(OBJECT_SYSTEM, OBJECT_SHOTS, user), OBJECT_GBNF, 100)
     if g.error:
