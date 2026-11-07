@@ -8,6 +8,7 @@
 # Die Blätter sprechen hier mit der simulierten Welt (world.py). Auf dem Roboter
 # sprechen dieselben Teilbäume über das Protokoll mit dem ESP32 bzw. mit SLAM
 # und Perzeption; dafür werden nur die Blätter ausgetauscht.
+# V0.2: Gesellschaft suchen (seek_company); Dösen und Ausruhen liegend mit wenig Leistung.
 
 from __future__ import annotations
 
@@ -18,7 +19,7 @@ from py_trees.common import Status
 
 from ..datatypes import Option
 from ..perception_classes import ROOM_ANCHORS, normalize_item, typical_rooms
-from .world import World
+from .world import LYING_W, World
 
 DT = 0.5            # Tick der Bäume in der Simulation, s
 
@@ -42,15 +43,19 @@ class Leaf(py_trees.behaviour.Behaviour):
 class Wait(Leaf):
     """Etwas tun, das nur Zeit kostet (Geste, Pause, Nachricht senden)."""
 
-    def __init__(self, name: str, ctx: Ctx, seconds: float):
+    def __init__(self, name: str, ctx: Ctx, seconds: float, lying: bool = False):
         super().__init__(name, ctx)
         self.seconds = seconds
+        self.lying = lying
 
     def initialise(self):
         self.left = self.seconds
 
     def update(self):
-        self.ctx.world.advance(DT)
+        if self.lying:
+            self.ctx.world.advance(DT, power_w=LYING_W)
+        else:
+            self.ctx.world.advance(DT)
         self.left -= DT
         return Status.SUCCESS if self.left <= 0 else Status.RUNNING
 
@@ -187,7 +192,7 @@ class LieDown(Leaf):
         super().__init__("Hinlegen", ctx)
 
     def update(self):
-        self.ctx.world.advance(DT)
+        self.ctx.world.advance(DT, power_w=LYING_W)
         return Status.RUNNING
 
 
@@ -225,7 +230,9 @@ def build_tree(opt: Option, ctx: Ctx, rng, places_fn=None, last_seen=None) -> py
     if b == "wander":
         return _seq(f"Rundgang: {a}", GoTo(ctx, a), LookAround(ctx, 5.0))
     if b == "doze":
-        return _seq("Dösen", Wait("Hinlegen, Augen halb zu", ctx, 300.0))
+        return _seq("Dösen", Wait("Hinlegen, Augen halb zu", ctx, 300.0, lying=True))
+    if b == "seek_company":
+        return _seq(f"Gesellschaft suchen: {a}", GoTo(ctx, a), LookAround(ctx, 4.0))
     if b in ("inspect_object", "approach_avoid"):
         room = w.objects[a].room if a in w.objects else w.room
         if b == "inspect_object":

@@ -6,6 +6,7 @@
 # ist, und nur Klassen der Detektion V5.0 (perception_classes.py). Personen
 # erscheinen ohne Namen ("person"), weil die Perzeption sie nicht unterscheidet.
 # Alle Zahlen sind Annahmen.
+# V0.2: Liegen (Dösen, Ausruhen) mit geringerer Leistung, weil die Servos kein Moment halten.
 
 from __future__ import annotations
 
@@ -19,6 +20,7 @@ from ..needs import BATTERY_WH, CELLS, SOC_CURVE
 
 SPEED_M_S = 0.12          # Gehgeschwindigkeit in der Wohnung (Annahme)
 BASE_W = 15.0             # Grundlast: Pi, ESP32, Servos halten (Annahme)
+LYING_W = 8.0             # liegend, Drehmoment aus: nur Pi und ESP32 (Annahme, messen)
 WALK_WH_PER_M = 0.2       # Mehrverbrauch beim Gehen (wie needs.WH_PER_M)
 
 
@@ -94,9 +96,9 @@ class World:
         self.messages: list[tuple] = []   # (t, text) – was SLARC den Menschen meldet
 
     # ---------------------------------------------------------------- Zeit und Akku
-    def advance(self, dt: float, walking_m: float = 0.0) -> None:
+    def advance(self, dt: float, walking_m: float = 0.0, power_w: float = BASE_W) -> None:
         self.t += dt
-        self.energy_wh -= BASE_W * dt / 3600.0 + WALK_WH_PER_M * walking_m
+        self.energy_wh -= power_w * dt / 3600.0 + WALK_WH_PER_M * walking_m
         self.walked_m += walking_m
         self._move_things(dt)
 

@@ -254,7 +254,7 @@ Das LLM bekommt in jeder Stufe Text; das Konzept ändert sich durch den Kanal ni
 8. Audio-Hardware (Stufe 2/3) im Hardware-Chat.
 9. Bitten aus dem Chat in Dienste übersetzen (eigener kleiner LLM-Aufruf oder Regeln). Bisher kommen Bitten schon strukturiert als `Request` an.
 10. Brain-Prozess mit Denk-Zustand in `launch_all.py` einhängen; Simulation eines ganzen "Tages" mit dem MockBlackboard, um Abwechslung und Rhythmus zu beurteilen.
-11. **Vision-Sprachmodell für seltene Bildfragen** (notiert 07.11.2026): Qwen3.5-4B nimmt laut Modellkarte auch Bilder, braucht dafür zusätzlich `mmproj-Qwen3.5-4B-f16.gguf` (~0,7 GB). Idee: Zustände, die die Detektion nicht kennt („Fenster offen?“, „Licht an?“, „Welcher Raum ist das?“), mit einem einzelnen Kamerabild fragen statt je eine Klasse zu trainieren. Offen: Unterstützung in llama-cpp-python (sonst `llama-server` über HTTP), Dauer je Bild auf dem Pi, Qualität. Erster Test auf dem PC mit Fotos aus der Wohnung.
+11. **Vision-Sprachmodell für seltene Bildfragen** (notiert 07.11.2026): Qwen3.5-4B nimmt laut Modellkarte auch Bilder, braucht dafür zusätzlich `mmproj-Qwen3.5-4B-f16.gguf` (~0,7 GB). Idee: Zustände, die die Detektion nicht kennt („Fenster offen?“, „Licht an?“, „Welcher Raum ist das?“), mit einem einzelnen Kamerabild fragen statt je eine Klasse zu trainieren. Offen: Unterstützung in llama-cpp-python (sonst `llama-server` über HTTP), Dauer je Bild auf dem Pi, Qualität. Erster Test auf dem PC mit Fotos aus der Wohnung. Werkzeug: `brain/vision/compare_vlm.py` (Qwen3.5-4B gegen ein größeres Modell, z. B. Qwen3.5-9B, auf COCO als Wahrheit und mit eigenen Fotos; Vorlage `questions_template.json`). Kein Vergleich mit dem YOLO-Head: der liefert Boxen, das VLM Antworten. Größenordnung: Bild-Encoder (mmproj, ~0,3 Mrd. Parameter) + 4 Mrd. Sprachmodell gegen ~5 Mio. für Backbone und YOLO-Head zusammen.
 12. **Perzeption kennt keine Türen, Fenster, Dosen** (07.11.2026): Die Detektion V5.0 hat 40 COCO-Klassen + „unbekannt“ (`ROBOT_CAT_IDS` in `FusedHexapodModel_V5_0-Phase-1.py`), davon 10 Außenklassen (Auto, Ampel …). Für Navigation an benennbaren Ankern und für den Meilenstein Dose fehlen Tür, Fenster, Dose. Anforderung an den KI-Chat; Quellen z. B. ADE20K, Open Images.
 
 ---
@@ -402,4 +402,11 @@ python -m brain.sim.day --model Qwen3.5-4B-Q4_K_M.gguf --gpu-layers -1
 - Ergebnis danach: 125 von 180 min dösend, 6 Rundgänge, Suche direkt am letzten Fundort, keine doppelten Meldungen außer auf Nachfrage. Ob so viel Dösen gewollt ist, ist eine Einstellung (`DOZE_UTILITY`).
 - Raum-Anker sind mehrdeutig: das Kinderzimmer mit Bett wird als Schlafzimmer erkannt. Zimmernamen müssen von Menschen kommen.
 - Noch nicht gelaufen: Tag mit echtem LLM (`--model`).
+
+**V0.6 nach dem Lauf mit Qwen3.5 (Marco, 07.11.2026):** SLARC döste 125 von 180 min, auch mit LLM; Gesellschaft stand über eine Stunde auf „dringend“, während Marco im Nebenraum saß. Das LLM begründete fast jede Wahl mit Müdigkeit (Energie war „ruhig“) und übernahm „der Weg zurück ist weit“ aus einem Few-Shot-Beispiel.
+- Gesellschaft suchen (`seek_company`): ist niemand im Raum, dorthin, wo zuletzt Menschen waren, sonst Wohnzimmer/Küche. Ein Raum, in dem eben niemand war, 15 min nicht erneut (sonst Pendeln Wohnzimmer ↔ Küche).
+- Liegen (Dösen, Ausruhen) mit 8 statt 15 W, weil die Servos kein Moment halten (Annahme, messen).
+- Dösen sättigt (nach 20 min Dösen in der letzten Stunde nur noch ~37 % Reiz) und lockt mehr bei Energiebedarf.
+- Ergebnis ohne LLM: Dösen 45 statt 125 min, Marco wird gesucht, gefunden, begrüßt und begleitet.
+- Offen: Few-Shot im Entscheidungs-Prompt ohne konkrete Inhalte; nur Bedürfnisse ab „mittel“ als Grund.
 

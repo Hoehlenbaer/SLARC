@@ -37,7 +37,7 @@ class DetClass:
 
 
 DET_CLASSES = [
-    DetClass(0, 1, "person", "person", LIVING),
+    DetClass(0, 1, "person", "person", LIVING, False, ("wohnzimmer", "küche")),
     DetClass(1, 2, "bicycle", "fahrrad", OUTDOOR),
     DetClass(2, 3, "car", "auto", OUTDOOR),
     DetClass(3, 4, "motorcycle", "motorrad", OUTDOOR),

@@ -2,6 +2,7 @@
 # Version 0.1 (07.11.2026) – Gedächtnis des Brain: Gewöhnung, Gewichte
 # der Dienste (Lernen durch Lob), Kontakte, Meldungen, Tagebuch.
 # Persistenz als JSON (Annahme, später ggf. SQLite).
+# V0.3: doze_log für die Sättigung beim Dösen.
 # V0.2: Orte gewöhnen schneller ab (1 h) als Objekte; last_seen merkt sich, wo eine
 #       Klasse zuletzt gesehen wurde (Suche beginnt dort); Meldungen je Objekt und Ort.
 
@@ -37,6 +38,12 @@ class Memory:
     last_greet: dict[str, float] = field(default_factory=dict)
     reported: dict[str, float] = field(default_factory=dict)       # "oid@ort" -> Zeit der Meldung
     last_seen: dict[str, list] = field(default_factory=dict)       # Klasse -> [ort, zeit]
+    doze_log: list[list] = field(default_factory=list)             # [[start, ende], …] der letzten Stunden
+    seek_checked: dict[str, float] = field(default_factory=dict)   # Raum -> Zeit, zu der dort niemand war
+
+    def dozed_s(self, now: float, window_s: float = 3600.0) -> float:
+        """Wie lange in den letzten window_s Sekunden gedöst wurde."""
+        return sum(max(0.0, min(e, now) - max(s, now - window_s)) for s, e in self.doze_log)
     known_objects: set[str] = field(default_factory=set)
     known_persons: set[str] = field(default_factory=set)
     diary: list[dict] = field(default_factory=list)
@@ -85,6 +92,8 @@ class Memory:
             "known_objects": sorted(self.known_objects),
             "known_persons": sorted(self.known_persons),
             "last_seen": self.last_seen,
+            "doze_log": self.doze_log,
+            "seek_checked": self.seek_checked,
             "diary": self.diary,
         }
 
@@ -99,6 +108,8 @@ class Memory:
         m.known_objects = set(d.get("known_objects", []))
         m.known_persons = set(d.get("known_persons", []))
         m.last_seen = dict(d.get("last_seen", {}))
+        m.doze_log = list(d.get("doze_log", []))
+        m.seek_checked = dict(d.get("seek_checked", {}))
         m.diary = list(d.get("diary", []))
         return m
 
