@@ -1,5 +1,10 @@
 # brain/arbiter.py
 # Version 0.2 (07.11.2026) – Entscheidungszyklus im 1-Hz-Takt (Konzept 8).
+# V0.5: Auslöser unterbrechen ein laufendes Verhalten nur bei Chat oder deutlich besserem
+#       Ziel (INTERRUPT_MARGIN); dasselbe Ziel wird nie neu gestartet; last_seen pflegen;
+#       Umsehen gewöhnt an den Raum, bringt aber keine neue Information.
+# V0.4: Regeln starten ein laufendes Verhalten nicht neu (Heimweg wurde jede Sekunde
+#       neu gestartet); jede Entscheidung kommt ins Tagebuch, nicht nur die des LLM.
 # V0.3: Gefahr im Bild -> sofort melden (Regel, vor Energie und LLM).
 # V0.2: Energie ab "hoch" per Regel (vorher erst "dringend"); das LLM bekommt nur
 #       knappe Fälle (close_options), sonst entscheidet der Code.
@@ -30,6 +35,7 @@ from .safety import SafetyState, check
 LLM_MIN_INTERVAL_S = 120.0     # höchstens alle 2 min nachdenken (Ausnahme: Chat)
 ENERGY_RULE_LEVEL = 3          # ab "hoch": heim/ruhen per Regel
 LEVEL_TRIGGER_MIN = 2          # Stufenanstieg löst erst ab "mittel" aus
+INTERRUPT_MARGIN = 0.2         # so viel besser muss ein neues Ziel sein, um zu unterbrechen
 PERSON_REVISIT_S = 600.0       # Person gilt nach 10 min ohne Sicht als wiedergesehen
 
 
@@ -62,6 +68,8 @@ class Arbiter:
         self.last_safety = safety
 
         self._process_feedback(obs)
+        for o in obs.objects:
+            self.mem.last_seen[o.cls] = [o.place, now]
 
         # 2. Sicherheit
         if safety.stop:
@@ -82,10 +90,14 @@ class Arbiter:
             if not obs.at_home:
                 opt = next((o for o in menu if o.behavior == "return_home"), None)
                 if opt:
+                    if self.current is not None and self.current.behavior == "return_home":
+                        return Decision("continue", option=self.current)
                     return self._start(opt, now, "Energie hoch")
             else:
                 opt = next((o for o in menu if o.behavior == "rest"), None)
                 if opt:
+                    if self.current is not None and self.current.behavior == "rest":
+                        return Decision("continue", option=self.current)
                     return self._start(opt, now, "Energie hoch, zu Hause")
 
         # 4. Auslöser
@@ -93,10 +105,16 @@ class Arbiter:
         cooldown_ok = now - self.t_llm >= LLM_MIN_INTERVAL_S
         if triggers and menu and (cooldown_ok or "chat" in triggers):
             close = close_options(menu)
+            if self.current is not None and "chat" not in triggers:
+                best = close[0]
+                if best.key == self.current.key or best.utility < self.current.utility + INTERRUPT_MARGIN:
+                    return Decision("continue", option=self.current, triggers=triggers)
             if len(close) >= 2:
                 self.t_llm = now
                 return Decision("ask_llm", menu=close, triggers=triggers)
             # eindeutiger Fall: der Code entscheidet sofort, kein Denk-Zustand nötig
+            if self.current is not None and close[0].key == self.current.key:
+                return Decision("continue", option=self.current)
             return self._start(close[0], now, "eindeutig: " + ", ".join(triggers))
 
         # 5. weiter oder Code-Auswahl
@@ -117,12 +135,16 @@ class Arbiter:
         opt = menu[choice - 1]
         if not self.last_safety.allows(opt.behavior):     # doppelt hält besser
             return Decision("stop", reason="Veto nach LLM-Wahl")
-        self.mem.log(now, "entscheidung", reason, ziel=opt.key, stimmung=mood)
-        return self._start(opt, now, reason)
+        if self.current is not None and opt.key == self.current.key:
+            return Decision("continue", option=self.current)
+        self.mem.log(now, "entscheidung", f"{opt.label} – {reason}", ziel=opt.key, stimmung=mood)
+        return self._start(opt, now, reason, log=False)
 
     # ------------------------------------------------------------------
-    def _start(self, opt: Option, now: float, reason: str) -> Decision:
+    def _start(self, opt: Option, now: float, reason: str, log: bool = True) -> Decision:
         self.current = opt
+        if log:
+            self.mem.log(now, "entscheidung", opt.label, ziel=opt.key)
         if opt.behavior == "greet" and opt.arg:
             self.mem.last_greet[opt.arg] = now
         return Decision("start", option=opt, reason=reason)
@@ -158,14 +180,17 @@ class Arbiter:
                 if beh in ("inspect_object", "approach_avoid") and self.current.arg:
                     self.mem.habituate(f"obj:{self.current.arg}", now, HABIT_GAIN_INSPECT)
                     self.needs.note_new_info(now)
-                if beh in ("explore_frontier", "look_around"):
-                    if self.current.arg:
-                        self.mem.habituate(f"area:{self.current.arg}", now, HABIT_GAIN_INSPECT)
+                if beh in ("explore_frontier", "wander"):
+                    self.mem.habituate(f"area:{self.current.arg}", now, HABIT_GAIN_INSPECT)
                     self.needs.note_new_info(now)
+                if beh == "look_around":
+                    # im selben Raum wird Umsehen langweilig; neue Information gibt es nur,
+                    # wenn dabei etwas Neues auftaucht (Auslöser "neu:")
+                    self.mem.habituate(f"area:{obs.place}", now, HABIT_GAIN_INSPECT)
                 if self.current.service:
                     self.needs.note_useful(now)
                 if beh == "report" and self.current.arg:
-                    self.mem.reported[self.current.arg] = now
+                    self.mem.reported[f"{self.current.arg}@{obs.place}"] = now
                 if beh in ("greet", "follow"):
                     self.needs.note_contact(now)
             self.mem.log(now, "ergebnis", f"{self.current.key}: {res}")

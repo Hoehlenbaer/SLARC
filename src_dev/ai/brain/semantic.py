@@ -1,5 +1,7 @@
 # brain/semantic.py
 # Version 0.3 (07.11.2026) – Semantische Aufgaben für das LLM.
+# V0.4: Gegenstandsliste im Chat-Prompt und Regeln aus perception_classes.py (echte
+#       Klassen); item_problem() erkennt Bitten um Dinge, die SLARC nicht sehen kann.
 # V0.3: Chat zweistufig. Stufe 1 deutet die Nachricht OHNE Tagebuch (Lauf 07.11.: mit
 #       Tagebuch wurde "Suche nach Laura" zu search(schlüssel), Chat Qwen3 42->37/45);
 #       die Antwort ist nur eine Bestätigung. Stufe 2 nur bei Smalltalk: Antwort MIT
@@ -26,7 +28,8 @@ import json
 from dataclasses import dataclass, field
 from typing import Optional
 
-from .behaviors import HAZARDS, REPORTABLE, ROUTINE
+from .behaviors import HAZARDS
+from .perception_classes import INDOOR, REPORTABLE, ROUTINE, normalize_item
 from .datatypes import Request
 
 # ---------------------------------------------------------------- Grammatik-Bausteine
@@ -61,10 +64,8 @@ def _messages(system: str, shots: list[tuple[str, str]], user: str) -> list[dict
 PERSONA = ("Du bist SLARC, ein sechsbeiniger Roboter, der in einer Wohnung lebt. "
            "Du bist kein Assistent, sondern ein kleines, neugieriges Wesen, das Menschen gern hilft.")
 
-# Gegenstände, die die Perzeption erkennen kann (Annahme, an die 41 Klassen anpassen).
-# Das LLM soll Gegenstände möglichst auf diese Namen abbilden ("Cola" -> "dose").
-KNOWN_ITEMS = ["dose", "schlüssel", "handy", "geldbörse", "brille", "fernbedienung", "ball",
-               "socke", "schuh", "tasche", "karton", "katze", "hund", "buch", "tasse", "flasche"]
+# Gegenstände, die die Perzeption erkennen kann (perception_classes.py).
+KNOWN_ITEMS = INDOOR
 
 # ================================================================= 1. Chat deuten
 CHAT_SERVICES = {
@@ -86,7 +87,7 @@ CHAT_SYSTEM = (
     "Ein Mensch schreibt dir. Erkenne, was er von dir will.\n"
     "Mögliche Dienste:\n" + "\n".join(f"- {k}: {v}" for k, v in CHAT_SERVICES.items()) + "\n"
     "Gegenstand: das Ding oder der Ort, um den es geht, kurz und klein geschrieben, sonst leer. "
-    "Wenn es passt, nimm einen dieser Namen: " + ", ".join(KNOWN_ITEMS) + ".\n"
+    "Wenn es passt, nimm einen dieser Namen, sonst das Wort des Menschen: " + ", ".join(KNOWN_ITEMS) + ".\n"
     "Antwort: ein kurzer, freundlicher Satz von dir in der Ich-Form, höchstens 20 Wörter. "
     "Bei einer Bitte ist das nur eine Bestätigung, bevor du handelst: Behaupte kein Ergebnis "
     "(nicht \"gefunden\", nicht \"nicht gefunden\"). Versprich nichts, was du nicht kannst.\n"
@@ -183,13 +184,23 @@ def interpret_chat(backend, text: str, sender: str = "Marco",
     return res
 
 
+
+def item_problem(res: ChatResult) -> Optional[str]:
+    """Antwort, wenn SLARC das Gewünschte nicht erkennen kann, sonst None.
+    Ehrlich ablehnen statt endlos suchen."""
+    if res.service in ("search", "fetch", "push_out") and res.item and normalize_item(res.item) is None:
+        return f"{res.item.capitalize()} kann ich leider noch nicht erkennen."
+    return None
+
+
 def to_request(res: ChatResult, text: str, sender: str, sender_pid: Optional[str],
                now: float) -> Optional[Request]:
-    """Chat-Ergebnis -> Bitte fürs Menü. praise/scold/stop behandelt der Arbiter direkt."""
+    """Chat-Ergebnis -> Bitte fürs Menü. praise/scold/stop behandelt der Arbiter direkt.
+    Gegenstände werden auf Klassennamen abgebildet ("smartphone" -> "handy")."""
     svc = CHAT_TO_REQUEST.get(res.service or "")
     if svc is None:
         return None
-    arg = sender_pid if svc == "follow" else (res.item or None)
+    arg = sender_pid if svc == "follow" else (normalize_item(res.item) or res.item or None)
     return Request(rid=f"chat-{int(now)}", text=text, service=svc, arg=arg,
                    from_person=sender, t_created=now)
 

@@ -1,5 +1,6 @@
 # brain/needs.py
-# Version 0.1 (07.11.2026) – Bedürfnismodell.
+# Version 0.2 (07.11.2026) – Bedürfnismodell.
+# V0.2: Möbel und Anker (ROUTINE) zählen nicht zur Neugier.
 #
 # Fünf Bedürfnisse, je ein Wert 0…1, im 1-Hz-Takt aus Messwerten und Zeit
 # berechnet (Konzept Abschnitt 4):
@@ -17,6 +18,7 @@ from dataclasses import dataclass, field
 
 from .datatypes import Observation
 from .memory import HABIT_GAIN_SEEN, Memory
+from .perception_classes import ROUTINE
 
 NEEDS = ("energie", "neugier", "nuetzlichkeit", "gesellschaft", "unbehagen")
 LEVELS = ("ruhig", "leicht", "mittel", "hoch", "dringend")
@@ -167,6 +169,8 @@ class NeedsModel:
         bored = 1.0 - math.exp(-(now - self.s.t_new_info) / TAU_BORED_S)
         novelty = 0.0
         for o in obs.objects:
+            if o.cls in ROUTINE:
+                continue              # Möbel und Anker sind nicht spannend
             key = f"obj:{o.oid}"
             h = self.mem.habituation(key, now)
             prox = clamp(1.0 - o.dist_m / NOVELTY_RANGE_M, 0.2, 1.0)

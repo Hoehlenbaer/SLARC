@@ -172,3 +172,4 @@ Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. N
 9. PR #20 (Verkabelung) mergen.
 10. Sprache der Doku (notiert 01.11.2026): Im Moment sind Doku, Kommentare und Stückliste gemischt Deutsch/Englisch. In der finalen Version soll die ganze Doku auf Englisch sein (inkl. Stückliste und Code-Kommentare). Bis dahin gilt die Regel aus `CLAUDE.md` (Deutsch, `README.md` Englisch).
 11. Akku-Kabel zum Steckerhalter (linke Seite, x −140), gemessen 02.11.2026: Deans reicht, Balancer nur ~45 mm → Verlängerung JST-XH 4-pol. (3S) 1:1, bleibt am Akku. Mit Schrumpfschlauch oder Klebeband sichern.
+12. Brain/Perzeption (07.11.2026): Detektion V5.0 kennt keine Türen, Fenster und Dosen (nur Flasche/Tasse); Meilenstein Dose braucht eine neue Klasse. Idee zum Prüfen: Qwen3.5-4B mit Bildeingabe (mmproj) für seltene Fragen wie „Fenster offen?“. Details: `Brain_Konzept.md`, Abschnitt 13.

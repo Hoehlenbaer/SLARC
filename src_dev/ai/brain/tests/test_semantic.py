@@ -85,10 +85,10 @@ def test_semantic_grammars_with_llama_cpp():
 def test_rule_assessment_skips_llm():
     calls = []
     b = MockBrain(responder=lambda m, g: calls.append(1) or '{"grund": "x", "interesse": "niedrig", "melden": "nein"}')
-    assert S.assess_object(b, "herd_an", "küche").report is True
-    assert S.assess_object(b, "stuhl", "küche").report is False
+    assert S.assess_object(b, "handy", "flur").report is True       # meldenswert (Regel)
+    assert S.assess_object(b, "stuhl", "küche").report is False     # Möbel (Regel)
     assert not calls                                   # beides ohne LLM
-    r = S.assess_object(b, "herd_an", "küche", use_rules=False)
+    r = S.assess_object(b, "handy", "flur", use_rules=False)
     assert calls and r.source == "llm"
 
 
@@ -113,3 +113,11 @@ def test_chat_two_stage_diary_only_for_smalltalk():
     calls.clear()
     S.interpret_chat(b, "Was hast du erlebt?")
     assert calls[1][1].startswith("ERLEBT: noch nichts")
+
+
+def test_item_problem_for_undetectable():
+    r = S.ChatResult("search", "schlüssel")
+    assert "nicht erkennen" in S.item_problem(r)
+    assert S.item_problem(S.ChatResult("search", "smartphone")) is None
+    req = S.to_request(S.ChatResult("search", "smartphone"), "Wo ist mein Smartphone?", "Marco", None, 1.0)
+    assert req.arg == "handy"

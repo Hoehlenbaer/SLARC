@@ -2,6 +2,8 @@
 # Version 0.1 (07.11.2026) – Gedächtnis des Brain: Gewöhnung, Gewichte
 # der Dienste (Lernen durch Lob), Kontakte, Meldungen, Tagebuch.
 # Persistenz als JSON (Annahme, später ggf. SQLite).
+# V0.2: Orte gewöhnen schneller ab (1 h) als Objekte; last_seen merkt sich, wo eine
+#       Klasse zuletzt gesehen wurde (Suche beginnt dort); Meldungen je Objekt und Ort.
 
 from __future__ import annotations
 
@@ -11,7 +13,8 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 # Annahmen, im Betrieb einstellen
-HABIT_HALF_LIFE_S = 6 * 3600.0     # Gewöhnung an ein Objekt/einen Ort klingt in 6 h auf die Hälfte ab
+HABIT_HALF_LIFE_S = 6 * 3600.0     # Gewöhnung an ein Objekt klingt in 6 h auf die Hälfte ab
+AREA_HALF_LIFE_S = 3600.0          # an einen Raum in 1 h (dort ändert sich öfter etwas)
 HABIT_GAIN_INSPECT = 0.6           # Zuwachs nach gründlichem Untersuchen
 HABIT_GAIN_SEEN = 0.005            # Zuwachs je Takt (1 Hz), in dem es nur gesehen wird: halb gewohnt nach ~2,5 min
 WEIGHT_PRAISE = 0.15               # Lob erhöht das Gewicht eines Dienstes
@@ -32,7 +35,8 @@ class Memory:
     service_weights: dict[str, float] = field(default_factory=dict)
     last_contact: dict[str, float] = field(default_factory=dict)   # Person-ID -> Zeit
     last_greet: dict[str, float] = field(default_factory=dict)
-    reported: dict[str, float] = field(default_factory=dict)       # Objekt-ID -> Zeit der Meldung
+    reported: dict[str, float] = field(default_factory=dict)       # "oid@ort" -> Zeit der Meldung
+    last_seen: dict[str, list] = field(default_factory=dict)       # Klasse -> [ort, zeit]
     known_objects: set[str] = field(default_factory=set)
     known_persons: set[str] = field(default_factory=set)
     diary: list[dict] = field(default_factory=list)
@@ -43,7 +47,8 @@ class Memory:
         h = self.habits.get(key)
         if h is None:
             return 0.0
-        decay = 0.5 ** ((now - h.t) / HABIT_HALF_LIFE_S)
+        half = AREA_HALF_LIFE_S if key.startswith("area:") else HABIT_HALF_LIFE_S
+        decay = 0.5 ** ((now - h.t) / half)
         return h.value * decay
 
     def habituate(self, key: str, now: float, gain: float) -> None:
@@ -79,6 +84,7 @@ class Memory:
             "reported": self.reported,
             "known_objects": sorted(self.known_objects),
             "known_persons": sorted(self.known_persons),
+            "last_seen": self.last_seen,
             "diary": self.diary,
         }
 
@@ -92,6 +98,7 @@ class Memory:
         m.reported = dict(d.get("reported", {}))
         m.known_objects = set(d.get("known_objects", []))
         m.known_persons = set(d.get("known_persons", []))
+        m.last_seen = dict(d.get("last_seen", {}))
         m.diary = list(d.get("diary", []))
         return m
 

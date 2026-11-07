@@ -13,3 +13,5 @@
 #   semantic   LLM-Aufgaben: Chat deuten, Objekt einschätzen, Suchorte, Tagebuch
 #   scenarios / run_decision_suite       Zielwahl (Code gegen LLM)
 #   open_scenarios / run_open_suite      semantische Aufgaben
+#   perception_classes  die 41 Klassen der Detektion V5.0, Synonyme, Raum-Anker
+#   sim/world, sim/bt, sim/day           simulierte Wohnung, Behavior-Tree-Schicht, Tageslauf

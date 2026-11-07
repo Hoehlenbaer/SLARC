@@ -50,6 +50,7 @@ class Observation:
     at_home: bool
     place: str
     frontier: list[str] = field(default_factory=list)   # Bereiche mit unerkundeter Grenze in der Nähe
+    known_places: list[str] = field(default_factory=list)  # schon erkundete Bereiche (für Rundgänge)
     unknown_frac: float = 0.0                           # Anteil unbekannter Fläche im Umkreis, 0…1
     objects: list[ObjectSeen] = field(default_factory=list)
     persons: list[Person] = field(default_factory=list)

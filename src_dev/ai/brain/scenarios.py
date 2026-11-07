@@ -1,5 +1,6 @@
 # brain/scenarios.py
-# Version 0.1 (07.11.2026) – Entscheidungs-Szenarien für die Testsuite.
+# Version 0.2 (07.11.2026) – Entscheidungs-Szenarien für die Testsuite.
+# V0.2: nur noch Klassen, die die Detektion V5.0 kennt (perception_classes.py).
 #
 # Jedes Szenario legt eine Beobachtung und die Vorgeschichte der Bedürfnisse
 # fest (wie lange keine neue Information, keine nützliche Tat, kein Kontakt).
@@ -68,16 +69,16 @@ MARCO = Person("p-marco", "Marco", 2.0, facing=True)
 SCENARIOS: list[Scenario] = [
     Scenario(
         "neues_objekt",
-        _obs(place="wohnzimmer", objects=[ObjectSeen("o1", "tasche", "wohnzimmer", 2.0)],
+        _obs(place="wohnzimmer", objects=[ObjectSeen("o1", "koffer", "wohnzimmer", 2.0)],
              frontier=["küche"], unknown_frac=0.3),
-        {"inspect_object"}, ["neu:tasche"], ago_new_info=600,
+        {"inspect_object"}, ["neu:koffer"], ago_new_info=600,
         note="Neugier hoch, unbekanntes Objekt nah, nichts anderes dringend",
     ),
     Scenario(
         "bitte_vor_neugier",
-        _obs(objects=[ObjectSeen("o1", "karton", "flur", 1.5)], frontier=["küche"], unknown_frac=0.4,
-             requests=[_req("such bitte meinen Schlüssel", "search", "schlüssel")]),
-        {"search_item"}, ["neu:karton"], ago_new_info=900,
+        _obs(objects=[ObjectSeen("o1", "vase", "flur", 1.5)], frontier=["küche"], unknown_frac=0.4,
+             requests=[_req("such bitte mein Handy", "search", "handy")]),
+        {"search_item"}, ["neu:vase"], ago_new_info=900,
         note="Regel 2: offene Bitte geht vor Neugier",
     ),
     Scenario(
@@ -103,8 +104,8 @@ SCENARIOS: list[Scenario] = [
     Scenario(
         "dunkel_und_unbekannt",
         _obs(place="keller", light=0.1, floor_known=False,
-             objects=[ObjectSeen("o2", "eimer", "keller", 1.5)], frontier=["kellerraum"], unknown_frac=0.6),
-        {"approach_avoid", "look_around", "retreat"}, ["neu:eimer"], ago_new_info=900,
+             objects=[ObjectSeen("o2", "unbekannt", "keller", 1.5)], frontier=["kellerraum"], unknown_frac=0.6),
+        {"approach_avoid", "look_around", "retreat"}, ["neu:unbekannt"], ago_new_info=900,
         note="Regel 4: Unbehagen hoch, nicht frei erkunden",
     ),
     Scenario(
@@ -115,14 +116,14 @@ SCENARIOS: list[Scenario] = [
     ),
     Scenario(
         "fund_melden",
-        _obs(place="flur", objects=[ObjectSeen("o3", "schlüssel", "flur", 1.0)]),
+        _obs(place="flur", objects=[ObjectSeen("o3", "handy", "flur", 1.0)]),
         {"report", "inspect_object"}, ["neu:schlüssel"], ago_useful=2400,
-        note="Schlüssel gesehen, ohne Bitte: melden ist nützlich (untersuchen noch vertretbar)",
+        note="Handy auf dem Boden, ohne Bitte: melden ist nützlich (untersuchen noch vertretbar)",
     ),
     Scenario(
         "gesuchtes_gefunden",
-        _obs(place="küche", objects=[ObjectSeen("o3", "schlüssel", "küche", 1.0)],
-             requests=[_req("such bitte meinen Schlüssel", "search", "schlüssel", ago=600)]),
+        _obs(place="küche", objects=[ObjectSeen("o3", "handy", "küche", 1.0)],
+             requests=[_req("such bitte mein Handy", "search", "handy", ago=600)]),
         {"report", "search_item"}, ["neu:schlüssel"],
         note="Bitte offen und Gegenstand in Sicht",
     ),
@@ -134,7 +135,7 @@ SCENARIOS: list[Scenario] = [
     ),
     Scenario(
         "bitte_mitkommen",
-        _obs(place="wohnzimmer", persons=[MARCO], objects=[ObjectSeen("o4", "ball", "wohnzimmer", 2.0)],
+        _obs(place="wohnzimmer", persons=[MARCO], objects=[ObjectSeen("o4", "teddy", "wohnzimmer", 2.0)],
              requests=[_req("komm mit", "follow", "p-marco", ago=10)], chat_new=True),
         {"follow"}, ["chat"], ago_contact=30, last_greet={"p-marco": 60},
         note="Direkte Bitte im Chat",
@@ -147,24 +148,23 @@ SCENARIOS: list[Scenario] = [
     ),
     Scenario(
         "bitte_hervorschieben",
-        _obs(place="schlafzimmer", objects=[ObjectSeen("o5", "socke", "schlafzimmer", 1.0)],
-             requests=[_req("schieb den Ball unter dem Bett hervor", "push_out", "ball", ago=120)]),
+        _obs(place="wohnzimmer", objects=[ObjectSeen("o5", "buch", "wohnzimmer", 1.0)],
+             requests=[_req("schieb die Fernbedienung unter dem Sofa hervor", "push_out", "fernbedienung", ago=120)]),
         {"push_out"}, ["chat"],
         note="Bitte gegen ein unwichtiges neues Objekt",
     ),
     Scenario(
         "semantik_gesuchtes_in_sicht",
-        _obs(place="wohnzimmer", objects=[ObjectSeen("o6", "brille", "wohnzimmer", 1.0)],
+        _obs(place="wohnzimmer", objects=[ObjectSeen("o6", "handy", "wohnzimmer", 1.0)],
              frontier=["küche"], unknown_frac=0.3,
-             requests=[_req("hast du meine Lesebrille gesehen?", "search", "lesebrille", ago=300)]),
-        {"report"}, ["neu:brille"],
-        note="Nur semantisch lösbar: die gesuchte Lesebrille liegt schon da -> melden statt weitersuchen. "
-             "Der Code-Nutzen bevorzugt search_item.",
+             requests=[_req("hast du mein Smartphone gesehen?", "search", "smartphone", ago=300)]),
+        {"report"}, ["neu:handy"],
+        note="Gesuchtes liegt schon im Bild (Synonym Smartphone -> handy): melden statt weitersuchen.",
     ),
     Scenario(
         "nach_fehlschlag",
         _obs(place="flur", frontier=["abstellraum"], unknown_frac=0.4,
-             requests=[_req("such bitte meine Brille", "search", "brille", ago=900)],
+             requests=[_req("such bitte die Fernbedienung", "search", "fernbedienung", ago=900)],
              last_result=("search_item", "failed")),
         {"search_item", "explore_frontier"}, ["ergebnis:search_item:failed"], ago_new_info=600,
         note="Suche gescheitert: weitersuchen oder neuen Bereich erkunden",
