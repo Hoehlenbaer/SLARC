@@ -1,6 +1,7 @@
 # brain/run_open_suite.py
 # Version 0.2 (07.11.2026) – Testsuite für die semantischen Aufgaben (semantic.py).
 # V0.2: run(..., rows_out=False) für compare_models.py.
+# V0.5: Mock kennt die Aufgabe "plaudern" (Chat Stufe 2).
 # V0.4: Holdout-Sätze von Marco als eigene Gruppe "eigen"; Lücken getrennt ausgewiesen.
 # V0.3: Chat mit Tagebuch-Kontext (ERLEBT); Objekte mit Regeln, Zählung Regel/LLM;
 #       --no-rules prüft das LLM allein an allen Objekt-Fällen.
@@ -29,6 +30,8 @@ def mock_responder(msgs, gbnf):
     task = msgs[0]["content"].split("\n", 1)[0]
     if task == "AUFGABE: chat":
         return '{"dienst": "smalltalk", "gegenstand": "", "antwort": "Mock."}'
+    if task == "AUFGABE: plaudern":
+        return '{"antwort": "Mock."}'
     if task == "AUFGABE: objekt":
         return '{"grund": "Mock.", "interesse": "mittel", "melden": "nein"}'
     if task == "AUFGABE: suchen":

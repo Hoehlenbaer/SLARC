@@ -1,5 +1,9 @@
 # brain/semantic.py
-# Version 0.2 (07.11.2026) – Semantische Aufgaben für das LLM.
+# Version 0.3 (07.11.2026) – Semantische Aufgaben für das LLM.
+# V0.3: Chat zweistufig. Stufe 1 deutet die Nachricht OHNE Tagebuch (Lauf 07.11.: mit
+#       Tagebuch wurde "Suche nach Laura" zu search(schlüssel), Chat Qwen3 42->37/45);
+#       die Antwort ist nur eine Bestätigung. Stufe 2 nur bei Smalltalk: Antwort MIT
+#       Tagebuch (talk_reply). Few-Shot mit erfundenem Ausflug entfernt.
 # V0.2: assess_object fragt das LLM nur für unbekannte Klassen (Gefahren, Meldenswertes
 #       und Möbel per Regel); Chat bekommt die letzten Tagebuch-Einträge (ERLEBT),
 #       damit Smalltalk nichts erfindet; Few-Shot für Verabschiedung.
@@ -84,20 +88,19 @@ CHAT_SYSTEM = (
     "Gegenstand: das Ding oder der Ort, um den es geht, kurz und klein geschrieben, sonst leer. "
     "Wenn es passt, nimm einen dieser Namen: " + ", ".join(KNOWN_ITEMS) + ".\n"
     "Antwort: ein kurzer, freundlicher Satz von dir in der Ich-Form, höchstens 20 Wörter. "
-    "Versprich nichts, was du nicht kannst.\n"
-    "Unter ERLEBT steht, was du heute wirklich getan hast. Erzähle von Erlebnissen nur, was dort steht; "
-    "steht dort nichts, sag ehrlich, dass noch nicht viel passiert ist.\n"
+    "Bei einer Bitte ist das nur eine Bestätigung, bevor du handelst: Behaupte kein Ergebnis "
+    "(nicht \"gefunden\", nicht \"nicht gefunden\"). Versprich nichts, was du nicht kannst.\n"
     "Eine Verabschiedung oder ein Gute-Nacht-Gruß ist smalltalk, keine Aufforderung zu kommen.\n"
     'Antworte nur mit JSON: {"dienst": "...", "gegenstand": "...", "antwort": "..."}'
 )
 CHAT_SHOTS = [
-    ("ERLEBT: noch nichts\nMarco: Wo hab ich nur mein Portemonnaie hingelegt?",
+    ("Marco: Wo hab ich nur mein Portemonnaie hingelegt?",
      '{"dienst": "search", "gegenstand": "geldbörse", "antwort": "Ich schaue mich um und sage dir Bescheid, wenn ich es sehe."}'),
-    ("ERLEBT: Flur erkundet\nMarco: Super gemacht, Kleiner!",
+    ("Marco: Super gemacht, Kleiner!",
      '{"dienst": "praise", "gegenstand": "", "antwort": "Danke, das freut mich!"}'),
-    ("ERLEBT: Küche erkundet; Ball im Wohnzimmer untersucht\nMarco: Und, was hast du so getrieben?",
-     '{"dienst": "smalltalk", "gegenstand": "", "antwort": "Ich war in der Küche und habe im Wohnzimmer einen Ball untersucht."}'),
-    ("ERLEBT: noch nichts\nMarco: Ich bin dann mal weg, bis später!",
+    ("Marco: Bist du müde?",
+     '{"dienst": "smalltalk", "gegenstand": "", "antwort": "Ein bisschen, aber für einen kleinen Ausflug reicht es noch."}'),
+    ("Marco: Ich bin dann mal weg, bis später!",
      '{"dienst": "smalltalk", "gegenstand": "", "antwort": "Bis später! Ich passe hier auf."}'),
 ]
 CHAT_GBNF = (_obj([("dienst", "dienst"), ("gegenstand", "item"), ("antwort", "text")])
@@ -114,8 +117,28 @@ class ChatResult:
     item: str = ""
     reply: str = ""
     raw: str = ""
-    latency_s: float = 0.0
+    latency_s: float = 0.0          # beide Stufen zusammen
     error: str = ""
+    talk: bool = False              # Antwort aus Stufe 2 (mit Tagebuch)
+
+
+# Stufe 2: Smalltalk-Antwort mit Tagebuch. Beispiele bewusst mit Inhalten, die nicht im
+# Test-Tagebuch vorkommen, und eines mit leerem Tagebuch.
+TALK_SYSTEM = (
+    "AUFGABE: plaudern\n" + PERSONA + "\n"
+    "Ein Mensch plaudert mit dir. Unter ERLEBT steht, was du heute wirklich getan hast. "
+    "Antworte in einem kurzen, freundlichen Satz in der Ich-Form, höchstens 25 Wörter. "
+    "Erzähle von Erlebnissen nur, was unter ERLEBT steht. Steht dort \"noch nichts\", "
+    "erfinde nichts und sag ehrlich, dass noch nicht viel passiert ist.\n"
+    'Antworte nur mit JSON: {"antwort": "..."}'
+)
+TALK_SHOTS = [
+    ("ERLEBT: noch nichts\nMarco: Na, was hast du heute gemacht?",
+     '{"antwort": "Bisher noch nicht viel, ich habe gerade erst angefangen."}'),
+    ("ERLEBT: Abstellraum erkundet; Eimer im Abstellraum untersucht\nMarco: Erzähl mal, wie war dein Tag?",
+     '{"antwort": "Ich war im Abstellraum und habe mir einen Eimer genau angesehen."}'),
+]
+TALK_GBNF = _obj([("antwort", "text")]) + _str("text", 1, 180) + WS
 
 
 def _erlebt(diary: Optional[list[dict]], n: int = 5) -> str:
@@ -126,19 +149,38 @@ def _erlebt(diary: Optional[list[dict]], n: int = 5) -> str:
     return "; ".join(items[-n:]) or "noch nichts"
 
 
+def talk_reply(backend, text: str, sender: str = "Marco",
+               diary: Optional[list[dict]] = None) -> tuple[str, float, str]:
+    """Stufe 2: Smalltalk-Antwort mit Tagebuch. Rückgabe: Antwort, Latenz, Fehler."""
+    user = f"ERLEBT: {_erlebt(diary)}\n{sender}: {text}"
+    g = backend.generate(_messages(TALK_SYSTEM, TALK_SHOTS, user), TALK_GBNF, 80, temperature=0.4)
+    if g.error:
+        return "", g.latency_s, g.error
+    try:
+        return json.loads(g.raw)["antwort"].strip(), g.latency_s, ""
+    except (json.JSONDecodeError, KeyError) as e:
+        return "", g.latency_s, str(e)
+
+
 def interpret_chat(backend, text: str, sender: str = "Marco",
                    diary: Optional[list[dict]] = None) -> ChatResult:
-    user = f"ERLEBT: {_erlebt(diary)}\n{sender}: {text}"
-    g = backend.generate(_messages(CHAT_SYSTEM, CHAT_SHOTS, user), CHAT_GBNF, 100)
+    """Stufe 1 ohne Tagebuch; bei Smalltalk Stufe 2 mit Tagebuch für die Antwort."""
+    g = backend.generate(_messages(CHAT_SYSTEM, CHAT_SHOTS, f"{sender}: {text}"), CHAT_GBNF, 100)
     if g.error:
         return ChatResult(None, raw=g.raw, latency_s=g.latency_s, error=g.error)
     try:
         d = json.loads(g.raw)
         svc = d["dienst"] if d.get("dienst") in CHAT_SERVICES else None
-        return ChatResult(svc, d.get("gegenstand", "").strip().lower(), d.get("antwort", "").strip(),
-                          g.raw, g.latency_s, "" if svc else "dienst ungültig")
+        res = ChatResult(svc, d.get("gegenstand", "").strip().lower(), d.get("antwort", "").strip(),
+                         g.raw, g.latency_s, "" if svc else "dienst ungültig")
     except (json.JSONDecodeError, KeyError) as e:
         return ChatResult(None, raw=g.raw, latency_s=g.latency_s, error=str(e))
+    if svc == "smalltalk":
+        reply, lat, err = talk_reply(backend, text, sender, diary)
+        res.latency_s += lat
+        if reply and not err:          # sonst bleibt die Antwort aus Stufe 1
+            res.reply, res.talk = reply, True
+    return res
 
 
 def to_request(res: ChatResult, text: str, sender: str, sender_pid: Optional[str],
