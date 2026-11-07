@@ -1,6 +1,7 @@
 # brain/run_decision_suite.py
 # Version 0.2 (07.11.2026) – Entscheidungs-Testsuite für den Modellvergleich.
 # V0.2: --gpu-layers für den PC (Latenzen dann nicht mit dem Pi vergleichbar).
+# V0.3: Statusmeldungen beim Laden/Aufwärmen, --verbose (Ausgabe von llama.cpp).
 #
 # Aufruf aus src_dev/ai:
 #   python -m brain.run_decision_suite --mock
@@ -42,7 +43,9 @@ def build(sc, shuffle_rng=None):
 def run(brain, repeat: int, shuffle: bool, show: bool, only: list[str]) -> dict:
     rng = random.Random(42)
     rows = []
+    print("Wärme Systemprompt und Few-Shot auf …", flush=True)
     t_warm = brain.warmup()
+    print(f"Aufgewärmt in {t_warm:.1f} s", flush=True)
     for sc in SCENARIOS:
         if only and sc.name not in only:
             continue
@@ -69,7 +72,7 @@ def run(brain, repeat: int, shuffle: bool, show: bool, only: list[str]) -> dict:
             })
             mark = "ok " if ok else "FALSCH" if res.choice else "UNGÜLTIG"
             print(f"{mark:8} {sc.name:30} -> {chosen.key if chosen else '-':32} "
-                  f"{res.latency_s:5.1f} s  {res.reason}")
+                  f"{res.latency_s:5.1f} s  {res.reason}", flush=True)
     valid = [r for r in rows if not r.get("setup_fehler")]
     lat = [r["latenz_s"] for r in valid if r["position"]]
     summary = {
@@ -95,6 +98,7 @@ def main() -> None:
     ap.add_argument("--repeat", type=int, default=1)
     ap.add_argument("--sorted", action="store_true", help="Menü nach Code-Nutzen sortiert lassen (wie im Betrieb)")
     ap.add_argument("--threads", type=int, default=4)
+    ap.add_argument("--verbose", action="store_true", help="Ausgabe von llama.cpp zeigen (Laden, GPU-Schichten)")
     ap.add_argument("--gpu-layers", type=int, default=0, help="-1 = alle Schichten auf die GPU (nur PC)")
     ap.add_argument("--temperature", type=float, default=0.3)
     ap.add_argument("--show", action="store_true", help="Zustandstext je Szenario ausgeben")
@@ -107,11 +111,12 @@ def main() -> None:
         brains.append(lambda: MockBrain())
     for m in a.model:
         brains.append(lambda m=m: LlamaBrain(m, n_threads=a.threads, temperature=a.temperature,
-                                                     n_gpu_layers=a.gpu_layers))
+                                                     n_gpu_layers=a.gpu_layers, verbose=a.verbose))
 
     results = []
     for make in brains:
         t0 = time.perf_counter()
+        print("Lade Modell … (von /mnt/… unter WSL sehr langsam, besser ~/.models)", flush=True)
         b = make()
         print(f"=== {b.name} (geladen in {time.perf_counter() - t0:.1f} s) ===")
         r = run(b, a.repeat, not a.sorted, a.show, a.only)
