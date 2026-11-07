@@ -1,5 +1,7 @@
 # brain/behaviors.py
 # Version 0.4 (07.11.2026) – Verhaltenskatalog, Menübau und Code-Auswahl.
+# V0.6: Gesellschaft suchen (seek_company), wenn niemand im Raum ist; Dösen sättigt
+#       (je mehr in der letzten Stunde gedöst, desto weniger reizvoll) und lockt bei Energiebedarf.
 # V0.5: Rundgang (wander) und Dösen (doze) als Beschäftigung, wenn alles erkundet ist;
 #       Umsehen wird im selben Raum langweilig; Meldung je Objekt und Ort nur einmal.
 # V0.4: Anker und Möbel (ROUTINE) lösen keine Neugier aus und werden nicht untersucht.
@@ -38,7 +40,7 @@ SERVICES = {
 SERVICES_ENABLED = {"search", "report", "greet", "follow", "push_out"}   # fetch erst mit Meilenstein Dose
 
 # Klassenlisten aus der Detektion (perception_classes.py ist die einzige Quelle)
-from .perception_classes import REPORTABLE, ROUTINE, normalize_item  # noqa: E402
+from .perception_classes import REPORTABLE, ROUTINE, normalize_item, typical_rooms  # noqa: E402
 # Gefahren: immer und sofort melden, per Regel (Modellvergleich 07.11.: Qwen3.5 und
 # Gemma meldeten den eingeschalteten Herd 3/3 nicht). Die Detektion V5.0 erkennt aber
 # keine Gefahrenzustände (Herd an, Wasser, Rauch …), daher bleibt die Liste leer, bis
@@ -50,6 +52,9 @@ GREET_REPEAT_S = 600.0          # dieselbe Person frühestens nach 10 min wieder
 ENERGY_EXEMPT = {"return_home", "rest", "retreat", "idle", "doze"}
 WANDER_MAX = 2
 DOZE_UTILITY = 0.3              # Dösen, wenn sonst nichts reizt (Annahme)
+DOZE_SAT_MIN = 20.0             # Sättigung: nach 20 min Dösen in der letzten Stunde nur noch ~37 % Reiz
+SEEK_MIN = 0.4                  # Gesellschaft suchen ab diesem Bedürfniswert
+SEEK_RETRY_S = 900.0            # Raum, in dem eben niemand war, 15 min nicht erneut absuchen (Sim: Pendeln)
 ENERGY_FILTER_LEVEL = 3         # ab "hoch" nur noch ENERGY_EXEMPT im Menü (Test 07.11.: LLM ignorierte Regel 3)
 CLOSE_MARGIN = 0.15             # knapp = Nutzen höchstens so weit unter dem besten
 CLOSE_MAX = 3
@@ -113,7 +118,8 @@ def build_options(obs: Observation, needs: NeedsState, mem: Memory,
     h_here = mem.habituation(f"area:{obs.place}", now)
     add(Option("look_around", None, "Sich umsehen", 0.15 + 0.3 * v["neugier"] * (1 - h_here) + 0.2 * unease))
     if unease < 0.5:
-        add(Option("doze", None, "Hinlegen und dösen", DOZE_UTILITY))
+        sat = math.exp(-mem.dozed_s(now) / 60.0 / DOZE_SAT_MIN)
+        add(Option("doze", None, "Hinlegen und dösen", DOZE_UTILITY * sat + 0.3 * v["energie"]))
 
     # --- Neugier ---
     for area in obs.frontier[:FRONTIER_MAX]:
@@ -181,6 +187,18 @@ def build_options(obs: Observation, needs: NeedsState, mem: Memory,
             add(Option("report", o.oid, f"Melden: {o.cls} gefunden ({o.place})", u, "report"))
 
     # --- Gesellschaft ---
+    # niemand da: dorthin gehen, wo zuletzt Menschen waren (Sim 07.11.: Gesellschaft "dringend"
+    # über eine Stunde, Marco nebenan, SLARC döste, weil es keinen Weg zu ihm gab)
+    if not obs.persons and v["gesellschaft"] >= SEEK_MIN:
+        seen = mem.last_seen.get("person")
+        # zuerst, wo zuletzt Menschen waren, sonst wo sie meist sind (Wohnzimmer, Küche)
+        cands = ([seen[0]] if seen else []) + list(typical_rooms("person"))
+        target = next((r for r in cands if r != obs.place and r in obs.known_places
+                       and now - mem.seek_checked.get(r, -1e9) > SEEK_RETRY_S), None)
+        if target:
+            why = "zuletzt Menschen" if seen and target == seen[0] else "meist Menschen"
+            u = 0.8 * v["gesellschaft"] * (1 - 0.5 * unease)
+            add(Option("seek_company", target, f"Gesellschaft suchen: {why} im Raum {target}", u))
     for p in obs.persons:
         name = p.name or "unbekannte Person"
         if now - mem.last_greet.get(p.pid, -1e9) > GREET_REPEAT_S:

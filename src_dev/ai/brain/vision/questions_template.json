@@ -1,0 +1,12 @@
+[
+  {"bild": "fotos/flur_tag.jpg", "frage": "Welcher Raum ist das?",
+   "antworten": ["flur", "küche", "bad", "wohnzimmer", "schlafzimmer", "kinderzimmer", "abstellraum"], "richtig": "flur"},
+  {"bild": "fotos/wohnzimmer_fenster.jpg", "frage": "Ist ein Fenster geöffnet?",
+   "antworten": ["ja", "nein", "kein Fenster zu sehen"], "richtig": "ja"},
+  {"bild": "fotos/schlafzimmer_abend.jpg", "frage": "Ist im Raum eine Lampe eingeschaltet?",
+   "antworten": ["ja", "nein"], "richtig": "nein"},
+  {"bild": "fotos/flur_tuer.jpg", "frage": "Ist eine Tür zu sehen, und ist sie offen?",
+   "antworten": ["offene Tür", "geschlossene Tür", "keine Tür"], "richtig": "offene Tür"},
+  {"bild": "fotos/kueche_boden.jpg", "frage": "Liegt etwas auf dem Boden, das im Weg sein könnte?",
+   "antworten": ["ja", "nein"], "richtig": "ja"}
+]

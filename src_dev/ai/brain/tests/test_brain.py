@@ -333,3 +333,30 @@ def test_hazard_reported_by_rule_even_when_tired(monkeypatch):
     d = arb.step(obs(battery_v=11.0, home_dist_m=60.0,
                      objects=[ObjectSeen("h1", "herd_an", "küche", 3.0)]))
     assert d.action == "start" and d.option.service == "hazard" and d.option.arg == "h1"
+
+
+def _opts(o, mem, ago_contact=3600):
+    nm = NeedsModel(mem)
+    nm.s.t_last, nm.s.t_new_info, nm.s.t_useful, nm.s.t_contact = o.t - 1, o.t - 60, o.t - 60, o.t - ago_contact
+    s, _ = nm.update(o)
+    return {x.behavior: x for x in build_options(o, s, mem, check(o))}
+
+
+def test_seek_company_when_alone_and_not_twice():
+    mem = Memory()
+    o = obs(place="flur", known_places=["flur", "wohnzimmer", "küche"])
+    opts = _opts(o, mem)
+    assert opts["seek_company"].arg == "wohnzimmer"           # meist Menschen dort
+    mem.seek_checked["wohnzimmer"] = T - 60                     # eben niemand gewesen
+    assert _opts(o, Memory.from_dict(mem.to_dict()))["seek_company"].arg == "küche"
+    mem.last_seen["person"] = ["küche", T - 30]
+    mem.seek_checked["küche"] = T - 10
+    assert "seek_company" not in _opts(o, mem)
+
+
+def test_doze_saturates():
+    mem = Memory()
+    o = obs(place="flur")
+    fresh = _opts(o, mem, ago_contact=60)["doze"].utility
+    mem.doze_log.append([T - 40 * 60, T - 5 * 60])              # 35 min gedöst
+    assert _opts(o, mem, ago_contact=60)["doze"].utility < 0.3 * fresh

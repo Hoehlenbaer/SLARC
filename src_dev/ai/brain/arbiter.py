@@ -1,5 +1,6 @@
 # brain/arbiter.py
 # Version 0.2 (07.11.2026) – Entscheidungszyklus im 1-Hz-Takt (Konzept 8).
+# V0.6: Personen in last_seen merken (für seek_company); Dösezeiten ins doze_log.
 # V0.5: Auslöser unterbrechen ein laufendes Verhalten nur bei Chat oder deutlich besserem
 #       Ziel (INTERRUPT_MARGIN); dasselbe Ziel wird nie neu gestartet; last_seen pflegen;
 #       Umsehen gewöhnt an den Raum, bringt aber keine neue Information.
@@ -58,6 +59,7 @@ class Arbiter:
         self.last_safety = SafetyState()
         self.last_needs: Optional[NeedsState] = None
         self._seen: dict[str, float] = {}
+        self.t_current: float = 0.0
 
     # ------------------------------------------------------------------
     def step(self, obs: Observation) -> Decision:
@@ -70,6 +72,8 @@ class Arbiter:
         self._process_feedback(obs)
         for o in obs.objects:
             self.mem.last_seen[o.cls] = [o.place, now]
+        if obs.persons:
+            self.mem.last_seen["person"] = [obs.place, now]
 
         # 2. Sicherheit
         if safety.stop:
@@ -142,7 +146,9 @@ class Arbiter:
 
     # ------------------------------------------------------------------
     def _start(self, opt: Option, now: float, reason: str, log: bool = True) -> Decision:
+        self._close_doze(now)
         self.current = opt
+        self.t_current = now
         if log:
             self.mem.log(now, "entscheidung", opt.label, ziel=opt.key)
         if opt.behavior == "greet" and opt.arg:
@@ -167,6 +173,12 @@ class Arbiter:
                 t.append(f"person:{p.name or p.pid}")
             self._seen[p.pid] = obs.t
         return t
+
+    def _close_doze(self, now: float) -> None:
+        """Endet ein Dösen (fertig oder unterbrochen), kommt es ins doze_log."""
+        if self.current is not None and self.current.behavior == "doze":
+            self.mem.doze_log.append([self.t_current, now])
+            self.mem.doze_log[:] = [x for x in self.mem.doze_log if x[1] > now - 4 * 3600]
 
     def _process_feedback(self, obs: Observation) -> None:
         now = obs.t
@@ -193,5 +205,8 @@ class Arbiter:
                     self.mem.reported[f"{self.current.arg}@{obs.place}"] = now
                 if beh in ("greet", "follow"):
                     self.needs.note_contact(now)
+                if beh == "seek_company" and not obs.persons:
+                    self.mem.seek_checked[obs.place] = now      # hier ist gerade niemand
             self.mem.log(now, "ergebnis", f"{self.current.key}: {res}")
+            self._close_doze(now)
             self.current = None
