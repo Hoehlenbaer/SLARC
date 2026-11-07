@@ -1,5 +1,6 @@
 # brain/llm.py
-# Version 0.1 (07.11.2026) – LLM-Anbindung für die Zielwahl.
+# Version 0.2 (07.11.2026) – LLM-Anbindung für die Zielwahl.
+# V0.2: n_gpu_layers wählbar (PC mit CUDA), Modellordner H: auch unter WSL.
 #
 # LlamaBrain: llama.cpp über llama-cpp-python, Ausgabe per GBNF erzwungen.
 #   Systemprompt und Few-Shot sind konstant; llama.cpp verwendet den
@@ -26,6 +27,7 @@ SEARCH_PATHS = [
     os.path.dirname(os.path.abspath(__file__)),
     os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."),
     "H:/SLARC_resources/models/",
+    "/mnt/h/SLARC_resources/models/",     # dasselbe unter WSL
     "/home/admin/.models/",
     os.path.expanduser("~/.models/"),
 ]
@@ -72,7 +74,8 @@ def parse(raw: str, n_options: int) -> tuple[Optional[int], str, str, str]:
 
 class LlamaBrain:
     def __init__(self, model: str = DEFAULT_MODEL, n_threads: int = 4,
-                 n_ctx: int = 3072, temperature: float = 0.3, verbose: bool = False):
+                 n_ctx: int = 3072, temperature: float = 0.3, n_gpu_layers: int = 0,
+                 verbose: bool = False):
         from llama_cpp import Llama, LlamaGrammar   # erst hier, damit Tests ohne llama_cpp laufen
         path = find_model(model)
         if path is None:
@@ -82,7 +85,7 @@ class LlamaBrain:
         self._grammars: dict[int, object] = {}
         self.temperature = temperature
         self.llm = Llama(model_path=path, n_ctx=n_ctx, n_threads=n_threads,
-                         n_gpu_layers=0, use_mmap=True, verbose=verbose)
+                         n_gpu_layers=n_gpu_layers, use_mmap=True, verbose=verbose)
         self._pool = ThreadPoolExecutor(max_workers=1)
 
     def _grammar(self, n: int):

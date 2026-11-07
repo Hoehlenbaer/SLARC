@@ -1,5 +1,6 @@
 # brain/run_decision_suite.py
-# Version 0.1 (07.11.2026) – Entscheidungs-Testsuite für den Modellvergleich.
+# Version 0.2 (07.11.2026) – Entscheidungs-Testsuite für den Modellvergleich.
+# V0.2: --gpu-layers für den PC (Latenzen dann nicht mit dem Pi vergleichbar).
 #
 # Aufruf aus src_dev/ai:
 #   python -m brain.run_decision_suite --mock
@@ -94,6 +95,7 @@ def main() -> None:
     ap.add_argument("--repeat", type=int, default=1)
     ap.add_argument("--sorted", action="store_true", help="Menü nach Code-Nutzen sortiert lassen (wie im Betrieb)")
     ap.add_argument("--threads", type=int, default=4)
+    ap.add_argument("--gpu-layers", type=int, default=0, help="-1 = alle Schichten auf die GPU (nur PC)")
     ap.add_argument("--temperature", type=float, default=0.3)
     ap.add_argument("--show", action="store_true", help="Zustandstext je Szenario ausgeben")
     ap.add_argument("--only", action="append", default=[], help="nur dieses Szenario")
@@ -104,7 +106,8 @@ def main() -> None:
     if a.mock or not a.model:
         brains.append(lambda: MockBrain())
     for m in a.model:
-        brains.append(lambda m=m: LlamaBrain(m, n_threads=a.threads, temperature=a.temperature))
+        brains.append(lambda m=m: LlamaBrain(m, n_threads=a.threads, temperature=a.temperature,
+                                                     n_gpu_layers=a.gpu_layers))
 
     results = []
     for make in brains:
