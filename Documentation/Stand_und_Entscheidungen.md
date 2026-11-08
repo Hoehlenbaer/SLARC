@@ -146,6 +146,22 @@ Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. N
 - INT8-Check: EPE FP32 1,134 px / INT8 1,121 px.
 - Schwäche Himmel → Nachtraining mit echten SLARC-Bildern.
 
+### 9b. Wiedererkennen von Objekten und Personen (08.11.2026, fest)
+
+Reihenfolge (Marco, Perzeptions-Chat):
+1. **Objekt + Ort im Gedächtnis:** Klasse, letzte Position (SLAM), Raum und Kontext. Das ist die Basis, wie bei Tieren.
+2. **Veränderungen erkennen:** neu, fehlt, umgestellt. „Verschoben“ nur bei unverwechselbaren Objekten (keine ähnlichen derselben Klasse im Gedächtnis) und nach Gegenprobe am alten Ort: Steht dort noch das alte Objekt, ist das neue ein zweites. Aussagen mit abgestufter Sicherheit.
+3. **Gesichter über einen Ausschnitt aus dem Rohbild:** Die volle Auflösung 1440 × 1080 liegt je Frame im Shared Memory (`cam0_buffer`/`cam1_buffer`, unrektifiziert); verkleinert wird erst im Shader. Personen-Box aus dem 640er-Bild ins Rohbild zurückrechnen (Rektifikation rückwärts für die Ecken), Kopf ausschneiden, kleines Gesichtsmodell (z. B. MobileFaceNet) auf der Pi-CPU, nur bei Bedarf. Gesicht in 2 m: ~29 px im 640er-Bild, ~65 px im Rohbild. Setzt Kalibrierung voraus.
+4. **Embedding-Head auf dem Hailo** nur, wenn 1–3 im Betrieb nicht reichen. Dann zusammen mit dem Klassen-Refinement (beides ändert nur die Detection-HEF) und mit echten SLARC-Bildern.
+
+Begründung (Erwartung, Messung offen):
+- Die Merkmalskarten s16/s32 trennen Klassen, nicht Einzelstücke. Eine Tasse in 1 m ist ~36 px groß, das sind ~2 × 2 Zellen in s16. Muster gehen verloren.
+- Die Kameras sind monochrom (wegen Stereo). Farbe fehlt für jedes Verfahren; Unterschiede nur über Helligkeit, Textur und Form.
+- Personen sind über s16-Merkmale nur innerhalb einer Sitzung unterscheidbar (Kleidung), nicht dauerhaft.
+- Vergleich Katze: geringe Sehschärfe, kaum Farbe, erkennt Menschen vor allem an Geruch und Stimme, bemerkt Veränderungen im Revier sehr gut. Punkte 1 und 2 erreichen dieses Niveau.
+
+Messung (offen): ~5 Gegenstände (darunter zwei ähnliche Tassen) und zwei Personen, je 5–10 Blickwinkel und Abstände; Kosinus-Ähnlichkeit gleich/anders für s8, s16, s32 (ROI-Pooling, auch räumlich 2 × 2) und Rohbild-Ausschnitt mit vortrainiertem kleinen Netz.
+
 ### 9a. High-Level-Brain (07.11.2026, Konzept in `Documentation/Brain_Konzept.md`)
 
 - SLARC folgt Bedürfnissen (Energie, Neugier, Nützlichkeit, Gesellschaft, Sicherheit) statt klarer Aufträge. Grund: Aufträge wie "laufe nach Norden" sind im Prinzip eine Sprachfernsteuerung.
@@ -177,4 +193,4 @@ Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. N
 10. Sprache der Doku (notiert 01.11.2026): Im Moment sind Doku, Kommentare und Stückliste gemischt Deutsch/Englisch. In der finalen Version soll die ganze Doku auf Englisch sein (inkl. Stückliste und Code-Kommentare). Bis dahin gilt die Regel aus `CLAUDE.md` (Deutsch, `README.md` Englisch).
 11. Akku-Kabel zum Steckerhalter (linke Seite, x −140), gemessen 02.11.2026: Deans reicht, Balancer nur ~45 mm → Verlängerung JST-XH 4-pol. (3S) 1:1, bleibt am Akku. Mit Schrumpfschlauch oder Klebeband sichern.
 12. Brain/Perzeption (07.11.2026): Detektion V5.0 kennt keine Türen, Fenster und Dosen (nur Flasche/Tasse); Meilenstein Dose braucht eine neue Klasse. Idee zum Prüfen: Qwen3.5-4B mit Bildeingabe (mmproj) für seltene Fragen wie „Fenster offen?“. Gemessen 08.11.2026: auf dem Pi ~10 s je Frage bei 320 px (Q8-mmproj), F1 0,78; als seltene Rückfrage nutzbar. Details: `Brain_Konzept.md`, Abschnitt 13.
-13. Brain/Perzeption (08.11.2026): Objekte wiedererkennen. Brain gleicht über Klasse + Raum + Position ab (sofort möglich); für Aussehen braucht es ein Embedding je Detektion, falls CLIP-artig als weiterer Head auf dem Hailo (Perzeptions-Chat). Details: `Brain_Konzept.md`, Abschnitt 13, Punkt 13.
+13. Brain/Perzeption (08.11.2026): Objekte wiedererkennen. Brain gleicht über Klasse + Raum + Position ab (sofort möglich); für Aussehen braucht es ein Embedding je Detektion, falls CLIP-artig als weiterer Head auf dem Hailo (Perzeptions-Chat). Details: `Brain_Konzept.md`, Abschnitt 13, Punkt 13. Festgelegte Reihenfolge (08.11.2026): Abschnitt 9b; Embedding-Head zurückgestellt.
