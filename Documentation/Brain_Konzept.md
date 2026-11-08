@@ -264,6 +264,8 @@ Das LLM bekommt in jeder Stufe Text; das Konzept ändert sich durch den Kanal ni
     Abgleich im Brain (Vorschlag): Klasse bzw. VLM-Name passend + gleicher Raum + Position nah + Embedding ähnlich = dasselbe Objekt; alles außer Position = verschoben; sonst neu. Je Objekt ein unsicherer und ein bestätigter Name aus „Was ist das?“ (Abschnitt 17), zwei übereinstimmende Blicke bestätigen. Grenze: wirklich gleiche Dinge (zwei Tassen aus einem Service) bleiben ununterscheidbar; für SLARC meist egal. Test: COCO taugt nicht (jedes Objekt nur einmal); eigene Fotos aus SLARCs Kamera, dieselben Dinge aus 2–3 Blickwinkeln und Entfernungen plus ähnliche andere Dinge.
     Schnittstelle zur Perzeption (Wunsch): je Detektion zusätzlich ein Embedding-Vektor (fester Länge, normiert), auch für „unbekannt“.
 
+    **Antwort Perzeptions-Chat (08.11.2026, fest):** Reihenfolge 1. Objekt + Ort, 2. Veränderungen erkennen (neu/fehlt/umgestellt; „verschoben“ nur bei unverwechselbaren Objekten und nach Gegenprobe am alten Ort), 3. Gesichter über einen Ausschnitt aus dem Rohbild (1440 × 1080 liegt im Shared Memory, ~65 px Gesicht in 2 m statt ~29 px), 4. Embedding-Head nur, wenn 1–3 nicht reichen. Die Kameras sind monochrom: Rot und Weiß sind nur über die Helligkeit unterscheidbar, nicht über die Farbe. Merkmalskarten s16/s32 trennen Klassen, nicht Einzelstücke. Punkte 1 und 2 liegen beim Brain/SLAM. Details: `Stand_und_Entscheidungen.md`, Abschnitt 9b.
+
 ---
 
 ## 14. Umsetzung V0.1 (`src_dev/ai/brain/`)
