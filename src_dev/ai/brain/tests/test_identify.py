@@ -1,5 +1,6 @@
 # brain/tests/test_identify.py
-# Version 0.1 (08.11.2026) – identify.py und crops_vlm.py gegen nachgebauten Server und Mini-COCO.
+# Version 0.2 (08.11.2026) – identify.py und crops_vlm.py gegen nachgebauten Server und Mini-COCO.
+# V0.2: roter Rahmen, Wortliste haushalt.
 
 import json
 import sys
@@ -89,10 +90,25 @@ def test_crops_main_on_mini_coco(url, tmp_path, monkeypatch):
     (tmp_path / "ann.json").write_text(json.dumps(ann))
     monkeypatch.setattr(C, "out_paths", lambda s: (str(tmp_path / "r.md"), str(tmp_path / "r.json")))
     monkeypatch.setattr(sys, "argv", ["x", "--server", f"4B={url}", "--coco-ann", str(tmp_path / "ann.json"),
-                                      "--coco-img", str(img), "--sides", "160,224", "--known"])
+                                      "--coco-img", str(img), "--sides", "160,224", "--known",
+                                      "--marks", "nein,ja", "--vocabs", "voll,haushalt"])
     C.main()
     r = json.loads((tmp_path / "r.json").read_text())
-    s = r["laeufe"]["4B|liste|160"]["summary"]
+    assert len(r["laeufe"]) == 12                     # (2 Listen + frei) x 2 Rahmen x 2 Größen
+    s = r["laeufe"]["4B|liste-haushalt|rahmen|160"]["summary"]
     assert r["boxen"] == 3 and s["n_unbekannt"] == 2 and s["treffer_unbekannt"] == 0.5   # gabel richtig, schere nicht
-    assert r["laeufe"]["4B|frei|224"]["summary"]["treffer_unbekannt"] == 0.5             # schere richtig, gabel nicht
+    assert r["laeufe"]["4B|frei|224"]["summary"]["treffer_unbekannt"] == 0.5
+    assert "rot umrandet" in SEEN[-1]["messages"][0]["content"][0]["text"]             # schere richtig, gabel nicht
     assert "Je Klasse" in (tmp_path / "r.md").read_text()
+
+
+def test_mark_draws_red_box_and_short_vocab():
+    import io
+    im = PIL.new("RGB", (200, 200), "white")
+    plain = PIL.open(io.BytesIO(I.crop_jpeg(im, (50, 50, 100, 100), 0.25, 224)))
+    marked = PIL.open(io.BytesIO(I.crop_jpeg(im, (50, 50, 100, 100), 0.25, 224, mark=True)))
+    def reds(x):
+        return sum(1 for p in x.getdata() if p[0] > 200 and p[1] < 80 and p[2] < 80)
+    assert reds(plain) == 0 and reds(marked) > 500
+    assert set(I.VOCAB_HAUSHALT) < set(I.VOCAB) and "giraffe" not in I.VOCAB_HAUSHALT and "gabel" in I.VOCAB_HAUSHALT
+    assert len(I.prompt_liste(True, "haushalt")) < len(I.prompt_liste(False, "voll"))

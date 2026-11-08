@@ -1,5 +1,6 @@
 # brain/vision/crops_vlm.py
-# Version 0.1 (08.11.2026) – Test: Ausschnitt um ein unbekanntes Objekt -> "Was ist das?"
+# Version 0.2 (08.11.2026) – Test: Ausschnitt um ein unbekanntes Objekt -> "Was ist das?"
+# V0.2: --marks nein,ja (roter Rahmen) und --vocabs voll,haushalt als weitere Achsen.
 #
 # COCO hat 80 Klassen, SLARCs Detektion 40. Die übrigen 40 (Gabel, Schere, Banane,
 # Zahnbürste …) sind für SLARC genau die "Unbekannten". Je Klasse bis zu k Boxen
@@ -114,6 +115,8 @@ def main() -> None:
     ap.add_argument("--margin", type=float, default=0.25, help="Rand je Seite als Anteil der Boxgröße")
     ap.add_argument("--sides", default="224", help="Kantenlänge des Ausschnitts in px, kommagetrennt")
     ap.add_argument("--modes", default="liste,frei", help="liste und/oder frei")
+    ap.add_argument("--marks", default="nein", help="nein und/oder ja: Box rot einrahmen")
+    ap.add_argument("--vocabs", default="voll", help="voll und/oder haushalt (nur Antwortform liste)")
     ap.add_argument("--known", action="store_true", help="Kontrolle: auch SLARCs eigene Klassen")
     ap.add_argument("--seed", type=int, default=7)
     a = ap.parse_args()
@@ -127,23 +130,27 @@ def main() -> None:
     boxes = pick_boxes(a.coco_ann, a.k, a.min_px, a.seed, a.known)
     sides = [int(s) for s in a.sides.split(",") if s.strip()]
     modes = [m.strip() for m in a.modes.split(",") if m.strip()]
+    marks = [m.strip() == "ja" for m in a.marks.split(",") if m.strip()]
+    vocabs = [v.strip() for v in a.vocabs.split(",") if v.strip()]
     print(f"{len(boxes)} Ausschnitte ({sum(b['unbekannt'] for b in boxes)} unbekannt), Größen {sides}, Formen {modes}")
 
     res = {"boxen": len(boxes), "k": a.k, "min_px": a.min_px, "margin": a.margin, "seed": a.seed, "laeufe": {}}
+    combos = [(m, v, mk, sd) for m in modes for v in (vocabs if m == "liste" else ["-"])
+              for mk in marks for sd in sides]
     for sname, url in servers.items():
-        for mode in modes:
-            for side in sides:
-                key = f"{sname}|{mode}|{side}"
-                rows = []
-                for i, b in enumerate(boxes, 1):
-                    jpg = crop_jpeg(os.path.join(a.coco_img, b["file"]), tuple(b["box"]), a.margin, side)
-                    r = identify(url, jpg, mode)
-                    ok = correct(b["cls"], r.name)
-                    rows.append({**b, "antwort": r.name, "sicher": r.sure, "ok": ok,
-                                 "latenz_s": round(r.latency_s, 2), "prompt_n": r.prompt_n})
-                    print(f"[{key} {i}/{len(boxes)}] {'ok ' if ok else '-- '} {b['cls']:>14} -> {r.name} "
-                          f"({'sicher' if r.sure else 'unsicher'}) {r.latency_s:.1f} s", flush=True)
-                res["laeufe"][key] = {"summary": summarize(rows), "rows": rows}
+        for mode, vocab, mark, side in combos:
+            key = f"{sname}|{mode}" + (f"-{vocab}" if mode == "liste" else "") + \
+                  ("|rahmen" if mark else "") + f"|{side}"
+            rows = []
+            for i, b in enumerate(boxes, 1):
+                jpg = crop_jpeg(os.path.join(a.coco_img, b["file"]), tuple(b["box"]), a.margin, side, mark)
+                r = identify(url, jpg, mode, mark=mark, vocab=vocab if mode == "liste" else "voll")
+                ok = correct(b["cls"], r.name)
+                rows.append({**b, "antwort": r.name, "sicher": r.sure, "ok": ok,
+                             "latenz_s": round(r.latency_s, 2), "prompt_n": r.prompt_n})
+                print(f"[{key} {i}/{len(boxes)}] {'ok ' if ok else '-- '} {b['cls']:>14} -> {r.name} "
+                      f"({'sicher' if r.sure else 'unsicher'}) {r.latency_s:.1f} s", flush=True)
+            res["laeufe"][key] = {"summary": summarize(rows), "rows": rows}
 
     md, js = out_paths("vision_ausschnitt")
     lines = [f"# Was ist das? Ausschnitte ans VLM ({time.strftime('%d.%m.%Y %H:%M')})", "",
