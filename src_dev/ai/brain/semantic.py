@@ -6,7 +6,8 @@
 #       steht im Wohnzimmer.“ (Lauf 08.11.2026), also mit erfundenem Ergebnis.
 #       item_problem() gilt auch für check (Räume ausgenommen); claims_result() erkennt
 #       Antworten, die ein Ergebnis behaupten (Heuristik, für die Testsuite). Bekannte
-#       Personennamen (persons) gelten nicht als unerkennbar.
+#       Personennamen (persons) gelten nicht als unerkennbar. come/follow mit einem Raum
+#       („Gehe ins Badezimmer!“) wird ehrlich abgelehnt, bis es einen Dienst „zu Ort gehen“ gibt.
 # V0.5: Gegenstandsliste inkl. Außenklassen (SLARC soll auch draußen laufen).
 # V0.4: Gegenstandsliste im Chat-Prompt und Regeln aus perception_classes.py (echte
 #       Klassen); item_problem() erkennt Bitten um Dinge, die SLARC nicht sehen kann.
@@ -264,6 +265,8 @@ def interpret_chat(backend, text: str, sender: str = "Marco",
 def item_problem(res: ChatResult, persons: tuple = ()) -> Optional[str]:
     """Antwort, wenn SLARC das Gewünschte nicht erkennen kann, sonst None.
     Ehrlich ablehnen statt endlos suchen."""
+    if res.service in ("come", "follow") and res.item and any(w in res.item for w in ROOM_WORDS):
+        return "Allein in einen bestimmten Raum gehen kann ich noch nicht."      # [V0.6]
     if not res.item or normalize_item(res.item) is not None:
         return None
     if res.item in {p.lower() for p in persons}:     # [V0.6] bekannte Namen: Personensuche

@@ -149,6 +149,8 @@ def test_confirmation_replaces_claimed_result():
 
 def test_check_rooms_and_persons():
     assert S.item_problem(S.ChatResult("check", "zimmer")) is None
+    assert "Raum" in S.item_problem(S.ChatResult("come", "badezimmer"))
+    assert S.item_problem(S.ChatResult("come", "")) is None
     assert S.item_problem(S.ChatResult("check", "licht"))
     assert S.item_problem(S.ChatResult("search", "laura"))
     assert S.item_problem(S.ChatResult("search", "laura"), ("Marco", "Laura")) is None
