@@ -1,5 +1,7 @@
 # brain/vision/bench_pi.py
 # Version 0.3 (08.11.2026) – Geschwindigkeit von Qwen3.5-4B (Text und Bild) auf dem Pi 5.
+# V0.5: Server-Speicher getrennt: RssAnon (echter Arbeitsspeicher: KV-Cache, Puffer, mmproj)
+#       und RssFile (eingeblendete Modelldatei). VmRSS zählte beides zusammen.
 # V0.4: --slots N (ein Slot je Aufgabe wie ServerBrain; Server mit -np N): erst alle Aufgaben
 #       einmal rechnen, dann misst „nach Wechsel“, ob der Slot-Cache den Wechsel übersteht.
 #       Text-Aufgaben mit den echten Grammatiken (GBNF) wie im Betrieb.
@@ -134,13 +136,16 @@ def system_state() -> dict:
     for line in mem.splitlines():
         if line.startswith("MemAvailable:"):
             st["mem_frei_mb"] = int(line.split()[1]) // 1024
-    rss = 0
+    vals = {"VmRSS:": 0, "RssAnon:": 0, "RssFile:": 0}
     for pid in filter(str.isdigit, os.listdir("/proc") if os.path.isdir("/proc") else []):
         if (_read(f"/proc/{pid}/comm") or "").startswith("llama-server"):
             for line in (_read(f"/proc/{pid}/status") or "").splitlines():
-                if line.startswith("VmRSS:"):
-                    rss += int(line.split()[1]) // 1024
-    st["server_rss_mb"] = rss or None
+                k = line.split(":", 1)[0] + ":"
+                if k in vals:
+                    vals[k] += int(line.split()[1]) // 1024
+    st["server_rss_mb"] = vals["VmRSS:"] or None
+    st["server_anon_mb"] = vals["RssAnon:"] or None      # [V0.5]
+    st["server_datei_mb"] = vals["RssFile:"] or None
     return st
 
 
@@ -182,7 +187,7 @@ def summarize(paths: list[str]) -> str:
     sizes = sorted({int(k) for r in runs for k in r.get("bild", {})})
     tasks = ["zielwahl", "chat", "objekt", "suchorte"]
     head = ["Lauf", "Modell", "mmproj", "Slots"] + [f"Dose {s} px" for s in sizes] + \
-           [f"{t} Wechsel / wiederholt" for t in tasks] + ["Prompt tok/s (Zielwahl)", "Erzeugung tok/s", "frei MB", "°C Ende"]
+           [f"{t} Wechsel / wiederholt" for t in tasks] + ["Prompt tok/s (Zielwahl)", "Erzeugung tok/s", "Server anon MB", "Server Datei MB", "frei MB", "°C Ende"]
     lines = ["| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
     for r in runs:
         b, t, en = r.get("bild", {}), r.get("text", {}), r.get("ende", {})
@@ -192,7 +197,8 @@ def summarize(paths: list[str]) -> str:
             x = t.get(k)
             row.append(f"{x['wechsel']['wall_s']} / {x['wiederholt']['wall_s']} s" if x else "–")
         z = t.get("zielwahl") or {}
-        row += [str(z.get("prompt_tok_s")), str(z.get("gen_tok_s")), str(en.get("mem_frei_mb")), str(en.get("cpu_temp_c"))]
+        row += [str(z.get("prompt_tok_s")), str(z.get("gen_tok_s")), str(en.get("server_anon_mb")),
+                str(en.get("server_datei_mb")), str(en.get("mem_frei_mb")), str(en.get("cpu_temp_c"))]
         lines.append("| " + " | ".join(row) + " |")
     return "\n".join(lines)
 
@@ -288,7 +294,7 @@ def main() -> None:
     lines = [f"# VLM/LLM-Geschwindigkeit auf {res['rechner']} ({res['maschine']}, {time.strftime('%d.%m.%Y %H:%M')})", "",
              f"Modell `{res.get('modell')}`, mmproj `{res['mmproj']}`" + (f", Lauf `{a.label}`" if a.label else "") + ".", "",
              f"{len(files)} Bilder. Temperatur {st['cpu_temp_c']} → {en['cpu_temp_c']} °C, Drosselung "
-             f"{st['throttled']} → {en['throttled']}, Server {en['server_rss_mb']} MB, frei {en['mem_frei_mb']} MB.", "",
+             f"{st['throttled']} → {en['throttled']}, Server {en['server_rss_mb']} MB (davon Arbeitsspeicher {en.get('server_anon_mb')} MB, Modelldatei {en.get('server_datei_mb')} MB), frei {en['mem_frei_mb']} MB.", "",
              ]
     if res["bild"]:
         lines += ["**Bildfragen** (Median je Bild)", "",

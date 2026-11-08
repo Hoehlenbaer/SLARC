@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # brain/vision/run_pi_matrix.sh
-# Version 0.4 (08.11.2026) – Alle Pi-Messungen nacheinander gegen einen llama-server ohne BLAS.
+# Version 0.5 (08.11.2026) – Alle Pi-Messungen nacheinander gegen einen llama-server ohne BLAS.
+# V0.5: Läufe mem-… (Speicher unter 4 GB): kleinerer Kontext, KV-Cache q8_0, kleinere Puffer.
+#       Ohne ONLY/ALL laufen jetzt die mem-Läufe.
 # V0.4: -np/-c nur einmal an den Server (doppelt gab eine DEPRECATED-Warnung).
 # V0.3: Zusatzspalten für Server- und bench-Optionen; Läufe „slots-…“ vergleichen einen Slot
 #       mit einem Slot je Aufgabe (-np 4). Standard ohne ONLY: nur die slots-Läufe, ALL=1 für alle.
@@ -15,7 +17,7 @@
 # Anpassbar über Umgebungsvariablen, z. B.:
 #   N=3 SIZES=320,448 COOL=60 IMAGES=~/vlm_pi_subset/val2017 bash run_pi_matrix.sh
 #   ONLY=q35-2b bash run_pi_matrix.sh          # nur Läufe, deren Label so beginnt
-#   ALL=1 bash run_pi_matrix.sh                # alle Läufe (ohne ONLY/ALL: nur slots-…)
+#   ALL=1 bash run_pi_matrix.sh                # alle Läufe (ohne ONLY/ALL: nur mem-…)
 # Dauer grob 10–15 min je Konfiguration mit Bild (4B), weniger fürs 2B und Text allein.
 
 set -u
@@ -28,7 +30,7 @@ SIZES=${SIZES:-320,448}
 COOL=${COOL:-60}
 PORT=${PORT:-8080}
 ONLY=${ONLY:-}
-[ -z "$ONLY" ] && [ -z "${ALL:-}" ] && ONLY=slots
+[ -z "$ONLY" ] && [ -z "${ALL:-}" ] && ONLY=mem
 Q40=${Q40:-$(ls "$M"/Qwen3.5-4B-Q4_0*.gguf 2>/dev/null | head -1)}
 
 Q4KM=$M/Qwen3.5-4B-Q4_K_M.gguf
@@ -37,6 +39,11 @@ Q8MM=$M/mmproj-Qwen3.5-4B-Q8_0.gguf
 CONFIGS=(
   "slots-1|$Q4KM|$Q8MM||--text-only"
   "slots-4|$Q4KM|$Q8MM|-np 4 -c 12288|--text-only --slots 4"
+  "mem-1-c12k|$Q4KM|$Q8MM|-np 4 -c 12288|--text-only --slots 4"
+  "mem-2-c8k|$Q4KM|$Q8MM|-np 4 -c 8192|--text-only --slots 4"
+  "mem-3-c8k-kvq8|$Q4KM|$Q8MM|-np 4 -c 8192 -fa on -ctk q8_0 -ctv q8_0|--text-only --slots 4"
+  "mem-4-c8k-kvq8-ub256|$Q4KM|$Q8MM|-np 4 -c 8192 -fa on -ctk q8_0 -ctv q8_0 -ub 256|--text-only --slots 4"
+  "mem-5-ohne-mmproj|$Q4KM||-np 4 -c 8192 -fa on -ctk q8_0 -ctv q8_0 -ub 256|--text-only --slots 4"
   "q35-4b-q4km-f16|$M/Qwen3.5-4B-Q4_K_M.gguf|$M/mmproj-Qwen3.5-4B-f16.gguf"
   "q35-4b-q4km-q8|$M/Qwen3.5-4B-Q4_K_M.gguf|$M/mmproj-Qwen3.5-4B-Q8_0.gguf"
   "q35-4b-q40-q8|${Q40:-$M/Qwen3.5-4B-Q4_0.gguf}|$M/mmproj-Qwen3.5-4B-Q8_0.gguf"
