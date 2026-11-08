@@ -146,4 +146,5 @@ def test_server_brain_slots(url):
     BODIES.clear()
     one.generate([{"role": "user", "content": "x"}], None, 5)
     assert "id_slot" not in BODIES[0]
-    assert ServerBrain("http://127.0.0.1:9").generate([{"role": "user", "content": "x"}], None).error
+    with pytest.raises(ConnectionError):
+        ServerBrain("http://127.0.0.1:9", wait_s=1)

@@ -4,6 +4,7 @@
 # V0.5 (08.11.2026): ServerBrain – llama-server über HTTP mit festem Slot je Aufgabe.
 #       Grund: Pi-Messung 08.11.2026, mit einem Slot kostet jeder Aufgabenwechsel 30–70 s
 #       (fester Prompt-Teil neu), im Cache 9–14 s. Server dazu mit -np N starten.
+#       Wartet beim Anlegen bis zu wait_s auf /health (sonst Fehler statt lauter Fehlantworten).
 # V0.4: ~/.models zuerst durchsuchen (unter WSL lädt /mnt/… über 9P ~1 min).
 # V0.3: generate() für beliebige Aufgaben mit eigener Grammatik (semantic.py);
 #       optionaler RAM-Cache, damit mehrere Systemprompts im Cache bleiben.
@@ -189,11 +190,23 @@ class ServerBrain:
     einen festen Slot (id_slot), damit ihr fester Prompt-Teil im Cache bleibt.
     Server: llama-server -m … -np 4 -c 12288 --cache-ram 0 (je Slot c/np Tokens)."""
 
-    def __init__(self, url: str = "http://127.0.0.1:8080", n_slots: int = 1, temperature: float = 0.3):
+    def __init__(self, url: str = "http://127.0.0.1:8080", n_slots: int = 1, temperature: float = 0.3,
+                 wait_s: float = 120.0):
         self.url = url.rstrip("/")
         self.n_slots = max(1, n_slots)
         self.temperature = temperature
         self.name = "server"
+        t_end = time.monotonic() + wait_s
+        while True:                                   # Server lädt evtl. noch das Modell
+            try:
+                with urllib.request.urlopen(self.url + "/health", timeout=5) as r:
+                    if r.status == 200:
+                        break
+            except (OSError, ValueError):
+                pass
+            if time.monotonic() > t_end:
+                raise ConnectionError(f"llama-server unter {self.url} nach {wait_s:.0f} s nicht bereit")
+            time.sleep(1.0)
         try:
             with urllib.request.urlopen(self.url + "/props", timeout=10) as r:
                 self.name = os.path.basename(json.loads(r.read()).get("model_path") or "") or "server"
