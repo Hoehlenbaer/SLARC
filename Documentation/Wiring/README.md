@@ -222,7 +222,7 @@ Lagerung über Wochen: hinten Deans und Balancer abziehen, beide sind bei geschl
 
 Mechanik: `Leg_Test_Stand_Base` + `_Cap` aus dem Baseplate-Makro (V2.12). Der Coxa-Servo sitzt wie im Roboter (gleiche Tasche, Bohrungen und Senkungen). Die Kerben an den Seiten auf die Tischkante legen, dann liegt die Coxa-Achse 60 mm vor der Kante und das Bein schwingt frei. Hinten mit einer Schraubzwinge klemmen.
 
-Elektronik-Testbrett (Baseplates V2.14, `SLARC_Bench_Board`, PLA, 220 × 175 mm): Relaismodul, Treiber, Power-Platine C und eine Bein-Platine A mit denselben Befestigungen wie im Roboter. Damit lassen sich die echten Platinen und der Ein/Aus-Ablauf schon am Tisch testen. Der Akku liegt daneben.
+Elektronik-Testbrett (Baseplates V2.14, `SLARC_Bench_Board`, PLA, 220 × 175 mm): Relaismodul, Treiber, Power-Platine C und eine Bein-Platine A mit denselben Befestigungen wie im Roboter. Damit lassen sich die echten Platinen und der Ein/Aus-Ablauf schon am Tisch testen. Der Akku liegt daneben. Für das bereits gedruckte Testbrett V2.14 (falsches Relais-Lochbild, Power C falsch gelocht) gibt es zwei Adapter: `SLARC_Bench_Adapter_Relay` (4× M3x8 in die alten Einsätze, Modul mit 4× M3x12 und Muttern im Sechskant unten) und `SLARC_Bench_Adapter_PowerC` (2× M2x6 in die alten Bunde, Platine mit 2× M2x10 und Muttern, seitlich eingeschoben).
 
 Elektrik (provisorisch, ohne Relais und Platinen):
 
