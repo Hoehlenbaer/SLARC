@@ -458,5 +458,22 @@ Das 2B nennt fast zwei von drei Klassen zu Unrecht (Flasche 18-mal, Tasse 15-mal
   Q4_0 verliert vor allem bei den Suchorten (Koffer dreimal Flur/Kinderzimmer) und gibt bei Bildern viermal eine leere Liste. Das 2B fällt auch bei Text ab (Holdout: „Sophia im Zimmer“ → follow, „Laura“ → person, einmal `check(luz)`).
 - **(Annahme)** Qwen3.5-4B Q4_K_M mit mmproj Q8_0. Q4_0 spart nur ohne Cache Zeit (nach Wechsel 53 statt 70 s, mit Cache gleich), kostet aber Treffer. Kommt der Cache je Aufgabe nicht zustande, Q4_0 neu abwägen.
 - **(offen)** Bestätigungen im Chat behaupten Ergebnisse: „Steht der Staubsauger im Wohnzimmer?“ → „Ja, der Staubsauger steht im Wohnzimmer.“, ebenso „Licht an?“. Beides kann SLARC gar nicht erkennen; `item_problem` griff nur bei `search`. Die Zählung im Holdout wertete nur den Dienst. Behoben in PR #64 (semantic V0.6): Bestätigungen für Aufträge aus Code-Vorlagen, `item_problem` auch für `check`, die Suite zählt behauptete Ergebnisse.
-- **(offen)** Aufgabenwechsel kosten 30–70 s, das ist für den Betrieb zu langsam. Mit Cache sind es 9–14 s. Wege: mehrere Slots (`-np 4`, ein Slot je Aufgabe; Speicher messen) oder Slots je Aufgabe mit `--slot-save-path` sichern und laden. Umgesetzt in PR #64: `ServerBrain` (`brain/llm.py`) mit festem Slot je Aufgabe, Messung mit `run_pi_matrix.sh` (Läufe `slots-1`, `slots-4`) steht aus.
+- **(offen)** Aufgabenwechsel kosten 30–70 s, das ist für den Betrieb zu langsam. Mit Cache sind es 9–14 s. Wege: mehrere Slots (`-np 4`, ein Slot je Aufgabe; Speicher messen) oder Slots je Aufgabe mit `--slot-save-path` sichern und laden. Umgesetzt in PR #64: `ServerBrain` (`brain/llm.py`) mit festem Slot je Aufgabe. Gemessen siehe unten (Slot je Aufgabe).
 - **(offen)** Mit Cache bestimmt die Erzeugung die Zeit (~40 Tokens bei ~3 tok/s ≈ 12 s für die Zielwahl). Hebel: kürzere `begruendung` in der Ausgabe und kürzere Beispiele im Prompt (die ohnehin aufgeräumt werden müssen, Abschnitt 15).
+
+**Slot je Aufgabe (Pi, 08.11.2026 17:48, `pi_matrix_1748.md`)**
+
+Qwen3.5-4B Q4_K_M + mmproj Q8_0, ohne BLAS, `--cache-ram 0`, Text-Aufgaben mit den echten Grammatiken. `slots-1`: `-np 1 -c 4096`. `slots-4`: `-np 4 -c 12288` (3072 Tokens je Slot), `ServerBrain`-Zuordnung (Zielwahl 0, Chat 1, Objekt 2, Suchorte und Rest 3).
+
+| Lauf | Zielwahl Wechsel / wiederholt | Chat | Objekt | Suchorte | frei MB |
+|---|---|---|---|---|---|
+| slots-1 | 71,7 / 12,6 s | 43,7 / 9,4 s | 29,0 / 12,0 s | 23,1 / 12,2 s | 3938 |
+| slots-4 | 12,3 / 12,3 s | 8,9 / 8,8 s | 11,2 / 11,3 s | 11,5 / 11,4 s | 2909 |
+
+Der Server-Log bestätigt „selected slot by id“ und nach dem ersten Lauf je Aufgabe nur noch 4 neue Prompt-Tokens. Aufgabenwechsel kosten damit nichts mehr; Preis rund 1 GB RAM.
+
+- **(fest)** llama-server mit `-np 4 -c 12288` und `ServerBrain(n_slots=4)`.
+- **(offen)** Beim Start muss jeder Slot einmal seinen festen Prompt rechnen (Zielwahl ~60 s, Chat ~35 s, Objekt ~17 s, Suchorte ~11 s, zusammen gut 2 min). Das gehört in den Start des Brain-Prozesses (vorwärmen, solange SLARC noch steht), nicht in die erste echte Anfrage.
+- **(offen)** Mit Cache bestimmt allein die Erzeugung die Zeit: 28–38 Tokens bei ~3,1 tok/s = 9–12 s. Die Zielwahl erzeugt 38 Tokens, davon ist der größte Teil `begruendung`. Kürzere oder gestrichene Begründung würde die Denkpause auf ~3–5 s senken; ob die Trefferquote leidet, auf dem PC mit `compare_models` prüfen.
+- **(offen)** 2,9 GB frei mit Modell und vier Slots, ohne Perzeption und Motion. Ob das neben dem vollen Stack reicht, ist ungemessen. Reserven: `-c 8192` (2048 je Slot, Zielwahl braucht ~1170) oder KV-Cache in q8_0.
+

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # brain/vision/run_pi_matrix.sh
-# Version 0.3 (08.11.2026) – Alle Pi-Messungen nacheinander gegen einen llama-server ohne BLAS.
+# Version 0.4 (08.11.2026) – Alle Pi-Messungen nacheinander gegen einen llama-server ohne BLAS.
+# V0.4: -np/-c nur einmal an den Server (doppelt gab eine DEPRECATED-Warnung).
 # V0.3: Zusatzspalten für Server- und bench-Optionen; Läufe „slots-…“ vergleichen einen Slot
 #       mit einem Slot je Aufgabe (-np 4). Standard ohne ONLY: nur die slots-Läufe, ALL=1 für alle.
 # V0.2: BLAS-Prüfung schlug wegen des Ordnernamens build-noblas fälschlich an.
@@ -86,10 +87,12 @@ for c in "${CONFIGS[@]}"; do
   echo; echo "== $LABEL: $(basename "$MODEL") ${MMPROJ:+ + $(basename "$MMPROJ")}  ($(date +%H:%M))"
   echo "   Swap belegt: $(free -m | awk '/Swap/ {print $3}') MB"
 
-  ARGS=(-m "$MODEL" -t 4 -c 4096 -np 1 --cache-ram 0 --port "$PORT")
+  ARGS=(-m "$MODEL" -t 4 --cache-ram 0 --port "$PORT")
+  [[ " ${SXTRA:-} " == *" -np "* ]] || ARGS+=(-np 1)
+  [[ " ${SXTRA:-} " == *" -c "* ]] || ARGS+=(-c 4096)
   [ -n "$MMPROJ" ] && ARGS+=(--mmproj "$MMPROJ")
   # shellcheck disable=SC2206
-  [ -n "${SXTRA:-}" ] && ARGS+=($SXTRA)          # spätere Angaben gelten (-np, -c)
+  [ -n "${SXTRA:-}" ] && ARGS+=($SXTRA)
   "$BIN" "${ARGS[@]}" > "$LOGDIR/server_$LABEL.log" 2>&1 &
   SRV=$!
 
