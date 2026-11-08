@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # brain/vision/run_pi_matrix.sh
-# Version 0.1 (08.11.2026) – Alle Pi-Messungen nacheinander gegen einen llama-server ohne BLAS.
+# Version 0.2 (08.11.2026) – Alle Pi-Messungen nacheinander gegen einen llama-server ohne BLAS.
+# V0.2: BLAS-Prüfung schlug wegen des Ordnernamens build-noblas fälschlich an.
 #
 # Startet für jede Konfiguration selbst einen llama-server, wartet auf /health, lässt
 # bench_pi laufen, beendet den Server, lässt den Pi kurz abkühlen. Am Ende eine Übersicht
@@ -47,7 +48,9 @@ else PY=python3; fi
 
 # Läuft der Server wirklich ohne BLAS?
 [ -x "$BIN" ] || { echo "llama-server nicht gefunden: $BIN"; exit 1; }
-BLAS=$( { ldd "$BIN" 2>/dev/null; ls "$(dirname "$BIN")" 2>/dev/null; } | grep -i blas )
+# [V0.2] nur Bibliotheksnamen prüfen, nicht den Pfad (der heißt selbst "build-noblas")
+BLAS=$( { ldd "$BIN" 2>/dev/null | awk '{print $1}'; ls "$(dirname "$BIN")" 2>/dev/null; } \
+        | grep -iE '^lib(ggml-blas|openblas|blas|cblas|blis|mkl)' )
 if [ -n "$BLAS" ] && [ -z "${ALLOW_BLAS:-}" ]; then
   echo "Achtung, $BIN hängt an BLAS:"; echo "$BLAS"; echo "Abbruch (ALLOW_BLAS=1 erzwingt)."; exit 1
 fi
