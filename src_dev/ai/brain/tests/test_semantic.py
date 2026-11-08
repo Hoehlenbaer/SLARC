@@ -152,6 +152,7 @@ def test_check_rooms_and_persons():
     assert "Raum" in S.item_problem(S.ChatResult("come", "badezimmer"))
     assert S.item_problem(S.ChatResult("come", "")) is None
     assert S.item_problem(S.ChatResult("check", "licht"))
+    assert S.item_problem(S.ChatResult("check", "wohnbereich")) is None
     assert S.item_problem(S.ChatResult("search", "laura"))
     assert S.item_problem(S.ChatResult("search", "laura"), ("Marco", "Laura")) is None
     assert S.confirmation(S.ChatResult("search", "laura")) == "Ich suche nach Laura und sage dir Bescheid."

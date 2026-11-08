@@ -6,7 +6,8 @@
 #       steht im Wohnzimmer.“ (Lauf 08.11.2026), also mit erfundenem Ergebnis.
 #       item_problem() gilt auch für check (Räume ausgenommen); claims_result() erkennt
 #       Antworten, die ein Ergebnis behaupten (Heuristik, für die Testsuite). Bekannte
-#       Personennamen (persons) gelten nicht als unerkennbar. come/follow mit einem Raum
+#       Personennamen (persons) gelten nicht als unerkennbar. Ortswörter auch „…bereich“, „…raum“
+#       („Überwache das Wohnzimmer“ → check(wohnbereich), Lauf 08.11.2026 20:11). come/follow mit einem Raum
 #       („Gehe ins Badezimmer!“) wird ehrlich abgelehnt, bis es einen Dienst „zu Ort gehen“ gibt.
 # V0.5: Gegenstandsliste inkl. Außenklassen (SLARC soll auch draußen laufen).
 # V0.4: Gegenstandsliste im Chat-Prompt und Regeln aus perception_classes.py (echte
@@ -148,7 +149,7 @@ _ART = {"dat": {"m": "dem", "n": "dem", "f": "der"}, "akk": {"m": "den", "n": "d
 
 # Räume und Orte: bei check kein "kann ich nicht erkennen" (es geht um den Ort, nicht ein Ding)
 ROOM_WORDS = ("zimmer", "küche", "bad", "flur", "diele", "keller", "balkon", "garten", "terrasse",
-              "abstellraum", "wohnung", "garage", "dachboden", "treppe")
+              "abstellraum", "wohnung", "garage", "dachboden", "treppe", "bereich", "raum", "haus")
 
 
 def _np(item: str, case: str) -> str:
