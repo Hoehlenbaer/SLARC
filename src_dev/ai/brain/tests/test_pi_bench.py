@@ -1,5 +1,6 @@
 # brain/tests/test_pi_bench.py
-# Version 0.1 (08.11.2026) – bench_pi und export_subset gegen nachgebauten Server bzw. Mini-COCO.
+# Version 0.2 (08.11.2026) – bench_pi und export_subset gegen nachgebauten Server bzw. Mini-COCO.
+# V0.2: Label, /props und Übersicht mehrerer Läufe (run_pi_matrix.sh).
 
 import json
 import os
@@ -21,7 +22,8 @@ class Fake(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200)
         self.end_headers()
-        self.wfile.write(b"{}")
+        p = {"model_path": "/m/Qwen3.5-2B-Q4_K_M.gguf", "modalities": {"vision": True}} if self.path == "/props" else {}
+        self.wfile.write(json.dumps(p).encode())
 
     def do_POST(self):
         body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
@@ -87,3 +89,24 @@ def test_bench_text_only(url, tmp_path, monkeypatch):
     res = json.loads((tmp_path / "t.json").read_text())
     assert res["bild"] == {} and "zielwahl" in res["text"]
     assert "Bildfragen" not in (tmp_path / "t.md").read_text()
+
+
+def test_label_props_and_summary(url, tmp_path, monkeypatch):
+    img = tmp_path / "img"
+    img.mkdir()
+    PIL.new("RGB", (800, 600)).save(img / "a.jpg", "JPEG")
+    paths = {"pi_bench_q35-2b": tmp_path / "a", "pi_bench_q3-text": tmp_path / "b", "pi_matrix": tmp_path / "m"}
+    monkeypatch.setattr(bench_pi, "out_paths", lambda s: (str(paths[s]) + ".md", str(paths[s]) + ".json"))
+    monkeypatch.setattr(sys, "argv", ["x", "--url", url, "--images", str(img), "-n", "1", "--sizes", "320",
+                                      "--label", "q35-2b", "--mmproj", "mm-q8.gguf"])
+    bench_pi.main()
+    monkeypatch.setattr(sys, "argv", ["x", "--url", url, "--text-only", "--label", "q3-text"])
+    bench_pi.main()
+    a = json.loads((tmp_path / "a.json").read_text())
+    assert a["modell"] == "Qwen3.5-2B-Q4_K_M.gguf" and a["label"] == "q35-2b"
+    assert a["text"]["zielwahl"]["prompt_tok_s"] == 400.0
+    assert "mm-q8.gguf" in (tmp_path / "a.md").read_text()
+    monkeypatch.setattr(sys, "argv", ["x", "--summarize", str(tmp_path / "a.json"), str(tmp_path / "b.json")])
+    bench_pi.main()
+    m = (tmp_path / "m.md").read_text()
+    assert "| q35-2b |" in m and "| q3-text |" in m and "Dose 320 px" in m

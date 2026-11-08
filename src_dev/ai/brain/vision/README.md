@@ -1,12 +1,13 @@
 # Vision-Sprachmodell (VLM) testen
 
-Stand 08.11.2026. Hintergrund: `Documentation/Brain_Konzept.md`, Abschnitt 13, Punkt 11.
+Stand 08.11.2026 (--cache-ram 0 ergänzt). Hintergrund: `Documentation/Brain_Konzept.md`, Abschnitt 13, Punkt 11.
 
 | Skript | Wo | Zweck |
 |---|---|---|
 | `compare_vlm.py` | PC oder Pi | Genauigkeit: welche der 40 Klassen sind im Bild (COCO als Wahrheit), Beschreibungen, Fragen an eigene Fotos; mehrere Modelle nebeneinander |
 | `export_subset.py` | PC | kleine Auswahl echter Innenraumbilder + Mini-Annotation zum Kopieren auf den Pi |
 | `bench_pi.py` | Pi | Geschwindigkeit: Bildfragen bei mehreren Bildgrößen und die Brain-Aufgaben ohne Bild |
+| `run_pi_matrix.sh` | Pi | alle Modell-/mmproj-Varianten nacheinander mit `bench_pi`, Übersichtstabelle |
 
 ## 1. Bilder für den Pi (PC, WSL)
 
@@ -48,10 +49,13 @@ Perzeption und Motion vorher beenden (Messbedingung wie im Denk-Zustand). Termin
 
 ```
 ~/llama.cpp/build-server/bin/llama-server -m ~/.models/Qwen3.5-4B-Q4_K_M.gguf \
-    --mmproj ~/.models/mmproj-Qwen3.5-4B-f16.gguf -t 4 -c 4096 -np 1 --port 8080
+    --mmproj ~/.models/mmproj-Qwen3.5-4B-f16.gguf -t 4 -c 4096 -np 1 --cache-ram 0 --port 8080
 ```
 
 `-np 1`: nur ein Platz, damit der Speicher reicht und der Cache realistisch ist.
+`--cache-ram 0`: Neuere llama-server legen zusätzlich einen Prompt-Cache im RAM an, Standard 8192 MiB.
+Auf dem Pi (8 GB) lief damit am 08.11.2026 der Swap voll (2 GB), und neue Bilder zeigten nur
+4 Prompt-Tokens (vermutlich falsch wiederverwendete Zustände). Der Slot-Cache (`--cache-prompt`) bleibt aktiv.
 Terminal 2, im Repo-Klon auf dem Pi, venv `ai` aktiv:
 
 ```
@@ -60,7 +64,19 @@ cd ~/projects/SLARC/src_dev/ai
 python -m brain.vision.bench_pi --images ~/vlm_pi_subset/val2017 -n 10 --sizes 320,448,640
 ```
 
-Vergleich mit dem bisherigen Qwen3-4B (nur Text): Server mit
+Alle Konfigurationen in einem Rutsch (startet und beendet den Server selbst, prüft, dass er ohne BLAS
+gebaut ist, überspringt fehlende Modelle, schreibt am Ende `pi_matrix_<Uhrzeit>.md`):
+
+```
+bash ~/projects/SLARC/src_dev/ai/brain/vision/run_pi_matrix.sh
+N=3 SIZES=320,448 COOL=60 ONLY=q35-2b bash …/run_pi_matrix.sh     # Optionen über Umgebungsvariablen
+```
+
+Läufe: Qwen3.5-4B Q4_K_M mit mmproj F16 und Q8_0, Qwen3.5-4B Q4_0 mit Q8_0, Qwen3.5-2B mit F16 und Q8_0,
+Qwen3-4B nur Text. Die Genauigkeit bei kleiner Bildkante misst man schneller auf dem PC:
+`compare_vlm … --max-side 320`.
+
+Einzeln, Vergleich mit dem bisherigen Qwen3-4B (nur Text): Server mit
 `-m ~/.models/Qwen3-4B-Instruct-2507-Q4_K_M.gguf` ohne `--mmproj` starten, dann
 `python -m brain.vision.bench_pi --text-only`.
 

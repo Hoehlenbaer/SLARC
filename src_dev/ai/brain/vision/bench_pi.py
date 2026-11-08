@@ -1,5 +1,7 @@
 # brain/vision/bench_pi.py
-# Version 0.2 (08.11.2026) – Geschwindigkeit von Qwen3.5-4B (Text und Bild) auf dem Pi 5.
+# Version 0.3 (08.11.2026) – Geschwindigkeit von Qwen3.5-4B (Text und Bild) auf dem Pi 5.
+# V0.3: --label, Modell und mmproj aus /props im Bericht, Prompt-Rate der Text-Aufgaben,
+#       Kennzahlen kompakt im JSON (für run_pi_matrix.sh).
 # V0.2: --text-only für Modelle ohne Bildeingabe (Vergleich mit Qwen3-4B).
 #
 # Frage: Ist die Inferenz auf dem Pi für die Pipeline praktisch nutzbar?
@@ -76,6 +78,17 @@ def call(url: str, msgs: list, schema: dict | None, max_tokens: int, timeout: fl
             "text": out["choices"][0]["message"]["content"]}
 
 
+def server_props(url: str) -> dict:
+    """Modell und mmproj, die der Server geladen hat (llama-server /props). [V0.3]"""
+    try:
+        with urllib.request.urlopen(url.rstrip("/") + "/props", timeout=10) as r:
+            p = json.loads(r.read())
+    except (OSError, ValueError):
+        return {}
+    return {"modell": os.path.basename(p.get("model_path") or "") or None,
+            "vision": (p.get("modalities") or {}).get("vision")}
+
+
 def image_msgs(b64: str, prompt: str) -> list:
     return [{"role": "user", "content": [
         {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + b64}},
@@ -137,6 +150,30 @@ def rate(n, ms):
     return round(n / (ms / 1000), 1) if n and ms else None
 
 
+def summarize(paths: list[str]) -> str:
+    """Mehrere pi_bench_*.json nebeneinander (für run_pi_matrix.sh). [V0.3]"""
+    runs = []
+    for p in paths:
+        with open(p, encoding="utf-8") as f:
+            runs.append(json.load(f))
+    sizes = sorted({int(k) for r in runs for k in r.get("bild", {})})
+    tasks = ["zielwahl", "chat", "objekt", "suchorte"]
+    head = ["Lauf", "Modell", "mmproj"] + [f"Dose {s} px" for s in sizes] + \
+           [f"{t} Wechsel / wiederholt" for t in tasks] + ["Prompt tok/s (Zielwahl)", "Erzeugung tok/s", "frei MB", "°C Ende"]
+    lines = ["| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
+    for r in runs:
+        b, t, en = r.get("bild", {}), r.get("text", {}), r.get("ende", {})
+        row = [r.get("label") or "-", r.get("modell") or "?", r.get("mmproj") or "–"]
+        row += [f"{b[str(s)]['dose_s']} s" if str(s) in b else "–" for s in sizes]
+        for k in tasks:
+            x = t.get(k)
+            row.append(f"{x['wechsel']['wall_s']} / {x['wiederholt']['wall_s']} s" if x else "–")
+        z = t.get("zielwahl") or {}
+        row += [str(z.get("prompt_tok_s")), str(z.get("gen_tok_s")), str(en.get("mem_frei_mb")), str(en.get("cpu_temp_c"))]
+        lines.append("| " + " | ".join(row) + " |")
+    return "\n".join(lines)
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description="SLARC Brain: VLM- und LLM-Geschwindigkeit auf dem Pi 5")
     ap.add_argument("--url", default="http://127.0.0.1:8080")
@@ -146,7 +183,17 @@ def main() -> None:
     ap.add_argument("--sizes", default="320,448,640", help="längste Bildkante in px, kommagetrennt")
     ap.add_argument("--no-text", action="store_true", help="Brain-Aufgaben ohne Bild überspringen")
     ap.add_argument("--timeout", type=float, default=600.0)
+    ap.add_argument("--label", default="", help="Name des Laufs in Bericht und Dateiname, z. B. q35-4b-q8")
+    ap.add_argument("--mmproj", default="", help="nur für den Bericht: welches mmproj der Server nutzt")
+    ap.add_argument("--summarize", nargs="+", metavar="JSON", help="nur Übersicht aus vorhandenen pi_bench-JSONs")
     a = ap.parse_args()
+    if a.summarize:
+        table = summarize(a.summarize)
+        md, _ = out_paths("pi_matrix")
+        with open(md, "w", encoding="utf-8") as f:
+            f.write(f"# Pi-Messreihe {time.strftime('%d.%m.%Y %H:%M')}\n\n{table}\n")
+        print(table + f"\n\nÜbersicht: {md}")
+        return
     if a.text_only:
         a.no_text, files, sizes = False, [], []
     else:
@@ -161,7 +208,8 @@ def main() -> None:
         sizes = [int(x) for x in a.sizes.split(",")]
     check_server(a.url)
     res = {"rechner": platform.node(), "maschine": platform.machine(), "bilder": len(files), "start": system_state(),
-           "bild": {}, "text": {}}
+           "label": a.label, "mmproj": a.mmproj or None, **server_props(a.url), "bild": {}, "text": {}}
+    print(f"Modell: {res.get('modell')}, mmproj: {res['mmproj']}, Label: {a.label or '-'}", flush=True)
     print(f"{len(files)} Bilder, Größen {sizes}. Start: {res['start']}", flush=True)
 
     # Aufwärmen (Modell in den Speicher, erste Kernel), nicht gewertet
@@ -199,14 +247,17 @@ def main() -> None:
             call(a.url, other[0], None, 5, a.timeout)                     # anderer Prompt: Cache verdrängen
             cold = call(a.url, msgs, schema, mt, a.timeout)               # nach Aufgabenwechsel
             warm = call(a.url, msgs, schema, mt, a.timeout)               # gleicher Prompt direkt wieder
-            res["text"][name] = {"wechsel": cold, "wiederholt": warm}
+            res["text"][name] = {"wechsel": cold, "wiederholt": warm,
+                                 "prompt_tok_s": rate(cold["prompt_n"], cold["prompt_ms"]),
+                                 "gen_tok_s": rate(warm["gen_n"], warm["gen_ms"])}
             print(f"[text] {name}: nach Wechsel {cold['wall_s']} s ({cold['prompt_n']} Tokens neu), "
                   f"wiederholt {warm['wall_s']} s ({warm['prompt_n']} Tokens neu)", flush=True)
     res["ende"] = system_state()
 
-    md, js = out_paths("pi_bench")
+    md, js = out_paths("pi_bench_" + a.label if a.label else "pi_bench")
     st, en = res["start"], res["ende"]
     lines = [f"# VLM/LLM-Geschwindigkeit auf {res['rechner']} ({res['maschine']}, {time.strftime('%d.%m.%Y %H:%M')})", "",
+             f"Modell `{res.get('modell')}`, mmproj `{res['mmproj']}`" + (f", Lauf `{a.label}`" if a.label else "") + ".", "",
              f"{len(files)} Bilder. Temperatur {st['cpu_temp_c']} → {en['cpu_temp_c']} °C, Drosselung "
              f"{st['throttled']} → {en['throttled']}, Server {en['server_rss_mb']} MB, frei {en['mem_frei_mb']} MB.", "",
              ]
@@ -219,12 +270,12 @@ def main() -> None:
                      f"{b['dose_s']} s | {b['liste_s']} s |")
     if res["text"]:
         lines += ["", "**Brain-Aufgaben ohne Bild**", "",
-                  "| Aufgabe | nach Wechsel | Tokens neu | wiederholt (Cache) | Tokens neu | Erzeugung tok/s |",
-                  "|---|---|---|---|---|---|"]
+                  "| Aufgabe | nach Wechsel | Tokens neu | Prompt tok/s | wiederholt (Cache) | Tokens neu | Erzeugung tok/s |",
+                  "|---|---|---|---|---|---|---|"]
         for name, t in res["text"].items():
             c, w = t["wechsel"], t["wiederholt"]
-            lines.append(f"| {name} | {c['wall_s']} s | {c['prompt_n']} | {w['wall_s']} s | {w['prompt_n']} | "
-                         f"{rate(w['gen_n'], w['gen_ms'])} |")
+            lines.append(f"| {name} | {c['wall_s']} s | {c['prompt_n']} | {t['prompt_tok_s']} | {w['wall_s']} s | "
+                         f"{w['prompt_n']} | {t['gen_tok_s']} |")
     lines += ["", "Hinweis: „nach Wechsel“ = der feste Teil des Prompts musste neu gerechnet werden "
               "(mit -np 1 hält der Server nur einen Prompt im Cache)."]
     with open(md, "w", encoding="utf-8") as f:

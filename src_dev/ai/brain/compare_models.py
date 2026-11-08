@@ -1,5 +1,6 @@
 # brain/compare_models.py
-# Version 0.2 (07.11.2026) – Alle Modelle mit beiden Testsuiten gegeneinander.
+# Version 0.4 (08.11.2026) – Alle Modelle mit beiden Testsuiten gegeneinander.
+# V0.4: mmproj-*.gguf (Bild-Encoder) nicht als Sprachmodell laden.
 # V0.3: Ergebnisse standardmäßig nach brain/ergebnisse/<Datum>/ (nicht ins Arbeitsverzeichnis).
 # V0.3: Spalte "Chat eigen" (Holdout von Marco) und Liste aller Antworten darauf.
 # V0.2: Smalltalk mit und ohne Tagebuch; Objekt-Spalte "LLM allein" (ohne Regel-Fälle).
@@ -165,7 +166,8 @@ def main() -> None:
         mk.label = "mock"
         makers.append(mk)
     else:
-        models = a.model or sorted(glob.glob(os.path.expanduser("~/.models/*.gguf")))
+        models = a.model or sorted(m for m in glob.glob(os.path.expanduser("~/.models/*.gguf"))
+                                  if not os.path.basename(m).lower().startswith("mmproj"))  # [V0.4]
         if not models:
             raise SystemExit("Keine Modelle gefunden (~/.models/*.gguf oder --model).")
         print("Modelle:\n  " + "\n  ".join(models), flush=True)
