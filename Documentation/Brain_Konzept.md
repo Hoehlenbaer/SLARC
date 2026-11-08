@@ -447,6 +447,16 @@ Das 2B nennt fast zwei von drei Klassen zu Unrecht (Flasche 18-mal, Tasse 15-mal
 - **(fest)** mmproj Q8_0 statt F16: auf dem PC gleich genau, auf dem Pi halbiert es die Zeit des Bild-Encoders (4B: 18,0 → 10,6 s bei 320 px) und spart ~0,3 GB.
 - **(fest)** Qwen3.5-2B nicht für Bildfragen (Precision 0,37). Für Text noch offen, Qualitätsvergleich mit `compare_models` steht aus. Auf dem Pi ist es 2,5-mal schneller (Zielwahl wiederholt 5,8 s).
 - **(Annahme)** Bildfragen mit dem 4B bei 320 px als Standard (~10 s, Recall nicht klein 0,84), 448 px für Übersichtsfragen (~14–16 s). Nur als seltene Rückfrage im Denk-Zustand, keine laufende Wahrnehmung.
-- **(offen)** Qwen3.5-4B Q4_0 statt Q4_K_M: Prompt 28 statt 19 tok/s (Zielwahl nach Wechsel 53 statt 70 s). Qualität von Q4_0 auf dem PC prüfen (`compare_models`, `compare_vlm --max-side 320`).
+- Qualität auf dem PC (08.11.2026, `compare_models`, 3 Wiederholungen; `compare_vlm` 320 px):
+
+  | Modell | Zielwahl knapp | Chat | Holdout | Objekt | Suchorte | Bild F1 320 px |
+  |---|---|---|---|---|---|---|
+  | Qwen3.5-4B Q4_K_M | 12/12 | 45/45 | 24/24 | 25/30 | 23/24 | 0,78 |
+  | Qwen3.5-4B Q4_0 | 12/12 | 45/45 | 24/24 | 27/30 | 18/24 | 0,77 |
+  | Qwen3.5-2B Q4_K_M | 9/12 | 41/45 | 17/24 | 22/30 | 12/24 | (0,51 bei 640 px) |
+
+  Q4_0 verliert vor allem bei den Suchorten (Koffer dreimal Flur/Kinderzimmer) und gibt bei Bildern viermal eine leere Liste. Das 2B fällt auch bei Text ab (Holdout: „Sophia im Zimmer“ → follow, „Laura“ → person, einmal `check(luz)`).
+- **(Annahme)** Qwen3.5-4B Q4_K_M mit mmproj Q8_0. Q4_0 spart nur ohne Cache Zeit (nach Wechsel 53 statt 70 s, mit Cache gleich), kostet aber Treffer. Kommt der Cache je Aufgabe nicht zustande, Q4_0 neu abwägen.
+- **(offen)** Bestätigungen im Chat behaupten Ergebnisse: „Steht der Staubsauger im Wohnzimmer?“ → „Ja, der Staubsauger steht im Wohnzimmer.“, ebenso „Licht an?“. Beides kann SLARC gar nicht erkennen; `item_problem` greift bisher nur bei `search`. Die Zählung im Holdout wertet nur den Dienst und übersieht das.
 - **(offen)** Aufgabenwechsel kosten 30–70 s, das ist für den Betrieb zu langsam. Mit Cache sind es 9–14 s. Wege: mehrere Slots (`-np 4`, ein Slot je Aufgabe; Speicher messen) oder Slots je Aufgabe mit `--slot-save-path` sichern und laden.
 - **(offen)** Mit Cache bestimmt die Erzeugung die Zeit (~40 Tokens bei ~3 tok/s ≈ 12 s für die Zielwahl). Hebel: kürzere `begruendung` in der Ausgabe und kürzere Beispiele im Prompt (die ohnehin aufgeräumt werden müssen, Abschnitt 15).
