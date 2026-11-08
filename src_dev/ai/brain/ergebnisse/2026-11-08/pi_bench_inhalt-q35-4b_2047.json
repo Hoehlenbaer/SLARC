@@ -1,0 +1,199 @@
+{
+ "rechner": "slarc",
+ "maschine": "aarch64",
+ "bilder": 0,
+ "start": {
+  "zeit": "20:42:06",
+  "cpu_temp_c": 50.1,
+  "throttled": "throttled=0x0",
+  "mem_frei_mb": 3879,
+  "server_rss_mb": 5952,
+  "server_anon_mb": 3366,
+  "server_datei_mb": 2586
+ },
+ "label": "inhalt-q35-4b",
+ "mmproj": "mmproj-Qwen3.5-4B-Q8_0.gguf",
+ "slots": 4,
+ "modell": "Qwen3.5-4B-Q4_K_M.gguf",
+ "vision": true,
+ "bild": {},
+ "text": {
+  "zielwahl": {
+   "wechsel": {
+    "wall_s": 11.69,
+    "prompt_n": 4,
+    "prompt_ms": 399.206,
+    "cache_n": 1128,
+    "gen_n": 38,
+    "gen_ms": 11273.314,
+    "text": "{\"begruendung\": \"Marco bittet um das Handy, das ist wichtiger als die Vase.\", \"ziel\": 1, \"stimmung\": \"eifrig\"}"
+   },
+   "wiederholt": {
+    "wall_s": 11.62,
+    "prompt_n": 4,
+    "prompt_ms": 389.759,
+    "cache_n": 1128,
+    "gen_n": 38,
+    "gen_ms": 11224.678,
+    "text": "{\"begruendung\": \"Marco bittet um das Handy, das ist wichtiger als die Vase.\", \"ziel\": 1, \"stimmung\": \"eifrig\"}"
+   },
+   "anders": [
+    {
+     "wall_s": 19.41,
+     "prompt_n": 132,
+     "prompt_ms": 7593.985,
+     "cache_n": 974,
+     "gen_n": 40,
+     "gen_ms": 11807.517,
+     "text": "{\"begruendung\": \"Mein Energie-Bedarf ist so hoch, dass ich den langen Weg zurück nehme.\", \"ziel\": 1, \"stimmung\": \"muede\"}"
+    },
+    {
+     "wall_s": 19.08,
+     "prompt_n": 144,
+     "prompt_ms": 8146.044,
+     "cache_n": 974,
+     "gen_n": 37,
+     "gen_ms": 10922.532,
+     "text": "{\"begruendung\": \"Ich bin sehr allein und Marco ist hier, ich möchte ihn umarmen.\", \"ziel\": 2, \"stimmung\": \"gesellig\"}"
+    }
+   ],
+   "prompt_tok_s": 10.0,
+   "gen_tok_s": 3.4
+  },
+  "chat": {
+   "wechsel": {
+    "wall_s": 8.43,
+    "prompt_n": 4,
+    "prompt_ms": 373.168,
+    "cache_n": 685,
+    "gen_n": 28,
+    "gen_ms": 8051.955,
+    "text": "{\"dienst\": \"search\", \"gegenstand\": \"fernbedienung\", \"antwort\": \"Ich suche jetzt nach der Fernbedienung.\"}"
+   },
+   "wiederholt": {
+    "wall_s": 8.4,
+    "prompt_n": 4,
+    "prompt_ms": 372.553,
+    "cache_n": 685,
+    "gen_n": 28,
+    "gen_ms": 8019.116,
+    "text": "{\"dienst\": \"search\", \"gegenstand\": \"fernbedienung\", \"antwort\": \"Ich suche jetzt nach der Fernbedienung.\"}"
+   },
+   "anders": [
+    {
+     "wall_s": 9.74,
+     "prompt_n": 22,
+     "prompt_ms": 1468.974,
+     "cache_n": 669,
+     "gen_n": 29,
+     "gen_ms": 8262.881,
+     "text": "{\"dienst\": \"search\", \"gegenstand\": \"rucksack\", \"antwort\": \"Ich suche jetzt deinen Rucksack.\"}"
+    },
+    {
+     "wall_s": 8.85,
+     "prompt_n": 21,
+     "prompt_ms": 1353.521,
+     "cache_n": 669,
+     "gen_n": 27,
+     "gen_ms": 7486.485,
+     "text": "{\"dienst\": \"come\", \"gegenstand\": \"küche\", \"antwort\": \"Ich komme gleich in die Küche.\"}"
+    }
+   ],
+   "prompt_tok_s": 10.7,
+   "gen_tok_s": 3.5
+  },
+  "objekt": {
+   "wechsel": {
+    "wall_s": 10.05,
+    "prompt_n": 4,
+    "prompt_ms": 367.97,
+    "cache_n": 328,
+    "gen_n": 35,
+    "gen_ms": 9681.202,
+    "text": "{\"grund\": \"Die Katze ist ein Haustier, das hier leben soll und nicht verloren ist.\", \"interesse\": \"hoch\", \"melden\": \"nein\"}"
+   },
+   "wiederholt": {
+    "wall_s": 10.03,
+    "prompt_n": 4,
+    "prompt_ms": 359.003,
+    "cache_n": 328,
+    "gen_n": 35,
+    "gen_ms": 9664.147,
+    "text": "{\"grund\": \"Die Katze ist ein Haustier, das hier leben soll und nicht verloren ist.\", \"interesse\": \"hoch\", \"melden\": \"nein\"}"
+   },
+   "anders": [
+    {
+     "wall_s": 14.96,
+     "prompt_n": 25,
+     "prompt_ms": 1545.28,
+     "cache_n": 306,
+     "gen_n": 48,
+     "gen_ms": 13410.338,
+     "text": "{\"grund\": \"Ein Koffer auf dem Flur könnte verloren sein oder auf dem Weg sein, aber ohne Kontext ist es unklar, ob er dort bleiben soll.\", \"interesse\": \"mittel\", \"melden\": \"ja\"}"
+    },
+    {
+     "wall_s": 14.06,
+     "prompt_n": 25,
+     "prompt_ms": 1504.346,
+     "cache_n": 306,
+     "gen_n": 45,
+     "gen_ms": 12545.658,
+     "text": "{\"grund\": \"Ein Teddybär in der Küche ist ungewöhnlich, da er dort nicht hingehört und vielleicht versehentlich dort gelassen wurde.\", \"interesse\": \"hoch\", \"melden\": \"ja\"}"
+    }
+   ],
+   "prompt_tok_s": 10.9,
+   "gen_tok_s": 3.6
+  },
+  "suchorte": {
+   "wechsel": {
+    "wall_s": 12.02,
+    "prompt_n": 4,
+    "prompt_ms": 345.469,
+    "cache_n": 215,
+    "gen_n": 41,
+    "gen_ms": 11667.006,
+    "text": "{\"grund\": \"Tassen werden typischerweise nach dem Gebrauch in der Küche abgewaschen oder direkt auf dem Küchentisch gelassen.\", \"orte\": [\"küche\", \"wohnzimmer\"]}"
+   },
+   "wiederholt": {
+    "wall_s": 12.07,
+    "prompt_n": 4,
+    "prompt_ms": 366.961,
+    "cache_n": 215,
+    "gen_n": 41,
+    "gen_ms": 11700.157,
+    "text": "{\"grund\": \"Tassen werden typischerweise nach dem Gebrauch in der Küche abgewaschen oder direkt auf dem Küchentisch gelassen.\", \"orte\": [\"küche\", \"wohnzimmer\"]}"
+   },
+   "anders": [
+    {
+     "wall_s": 14.98,
+     "prompt_n": 33,
+     "prompt_ms": 1895.16,
+     "cache_n": 186,
+     "gen_n": 46,
+     "gen_ms": 13080.305,
+     "text": "{\"grund\": \"Das Handy wird am häufigsten im Wohnzimmer gelassen, wo man sich entspannt, oder im Bad, wenn man es dort aufgeladen hat.\", \"orte\": [\"wohnzimmer\", \"bad\"]}"
+    },
+    {
+     "wall_s": 11.51,
+     "prompt_n": 34,
+     "prompt_ms": 1988.048,
+     "cache_n": 186,
+     "gen_n": 34,
+     "gen_ms": 9519.05,
+     "text": "{\"grund\": \"Fernbedienungen werden fast immer im Wohnzimmer verwendet, um den Fernseher zu steuern.\", \"orte\": [\"wohnzimmer\", \"flur\"]}"
+    }
+   ],
+   "prompt_tok_s": 11.6,
+   "gen_tok_s": 3.5
+  }
+ },
+ "ende": {
+  "zeit": "20:47:45",
+  "cpu_temp_c": 63.9,
+  "throttled": "throttled=0x0",
+  "mem_frei_mb": 3197,
+  "server_rss_mb": 6526,
+  "server_anon_mb": 4174,
+  "server_datei_mb": 2352
+ }
+}

@@ -1,0 +1,199 @@
+{
+ "rechner": "slarc",
+ "maschine": "aarch64",
+ "bilder": 0,
+ "start": {
+  "zeit": "20:48:59",
+  "cpu_temp_c": 51.2,
+  "throttled": "throttled=0x0",
+  "mem_frei_mb": 4324,
+  "server_rss_mb": 5421,
+  "server_anon_mb": 3045,
+  "server_datei_mb": 2376
+ },
+ "label": "inhalt-q3-4b",
+ "mmproj": null,
+ "slots": 4,
+ "modell": "Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+ "vision": false,
+ "bild": {},
+ "text": {
+  "zielwahl": {
+   "wechsel": {
+    "wall_s": 14.85,
+    "prompt_n": 1,
+    "prompt_ms": 294.058,
+    "cache_n": 1239,
+    "gen_n": 50,
+    "gen_ms": 14546.482,
+    "text": "{\"begruendung\": \"Ich habe Neugier und möchte die unbekannte Vase untersuchen, um nützlich zu sein.\", \"ziel\": 2, \"stimmung\": \"neugierig\"}"
+   },
+   "wiederholt": {
+    "wall_s": 14.86,
+    "prompt_n": 1,
+    "prompt_ms": 318.871,
+    "cache_n": 1239,
+    "gen_n": 50,
+    "gen_ms": 14532.425,
+    "text": "{\"begruendung\": \"Ich habe Neugier und möchte die unbekannte Vase untersuchen, um nützlich zu sein.\", \"ziel\": 2, \"stimmung\": \"neugierig\"}"
+   },
+   "anders": [
+    {
+     "wall_s": 22.77,
+     "prompt_n": 134,
+     "prompt_ms": 11057.493,
+     "cache_n": 1079,
+     "gen_n": 41,
+     "gen_ms": 11704.172,
+     "text": "{\"begruendung\": \"Ich bin müde und habe viel Energie verbraucht, ich gehe zurück.\", \"ziel\": 1, \"stimmung\": \"muede\"}"
+    },
+    {
+     "wall_s": 23.26,
+     "prompt_n": 153,
+     "prompt_ms": 12576.379,
+     "cache_n": 1079,
+     "gen_n": 38,
+     "gen_ms": 10671.667,
+     "text": "{\"begruendung\": \"Ich habe lange allein gestanden und möchte jetzt Nähe zu Marco suchen.\", \"ziel\": 1, \"stimmung\": \"gesellig\"}"
+    }
+   ],
+   "prompt_tok_s": 3.4,
+   "gen_tok_s": 3.4
+  },
+  "chat": {
+   "wechsel": {
+    "wall_s": 9.88,
+    "prompt_n": 1,
+    "prompt_ms": 262.267,
+    "cache_n": 753,
+    "gen_n": 37,
+    "gen_ms": 9609.03,
+    "text": "{\"dienst\": \"search\", \"gegenstand\": \"fernbedienung\", \"antwort\": \"Ich schaue nach, ob sie irgendwo liegt.\"}"
+   },
+   "wiederholt": {
+    "wall_s": 9.67,
+    "prompt_n": 1,
+    "prompt_ms": 259.987,
+    "cache_n": 753,
+    "gen_n": 37,
+    "gen_ms": 9405.14,
+    "text": "{\"dienst\": \"search\", \"gegenstand\": \"fernbedienung\", \"antwort\": \"Ich schaue nach, ob sie irgendwo liegt.\"}"
+   },
+   "anders": [
+    {
+     "wall_s": 10.38,
+     "prompt_n": 16,
+     "prompt_ms": 1155.945,
+     "cache_n": 739,
+     "gen_n": 36,
+     "gen_ms": 9215.177,
+     "text": "{\"dienst\": \"search\", \"gegenstand\": \"rucksack\", \"antwort\": \"Ich schaue nach, ob ich ihn sehe.\"}"
+    },
+    {
+     "wall_s": 9.79,
+     "prompt_n": 14,
+     "prompt_ms": 1121.594,
+     "cache_n": 739,
+     "gen_n": 34,
+     "gen_ms": 8657.016,
+     "text": "{\"dienst\": \"come\", \"gegenstand\": \"kitchen\", \"antwort\": \"Ich komme schon, nur ein paar Schritte!\"}"
+    }
+   ],
+   "prompt_tok_s": 3.8,
+   "gen_tok_s": 3.9
+  },
+  "objekt": {
+   "wechsel": {
+    "wall_s": 8.43,
+    "prompt_n": 1,
+    "prompt_ms": 236.072,
+    "cache_n": 355,
+    "gen_n": 35,
+    "gen_ms": 8193.587,
+    "text": "{\"grund\": \"Eine Katze im Wohnzimmer ist normal und erwartet.\", \"interesse\": \"niedrig\", \"melden\": \"nein\"}"
+   },
+   "wiederholt": {
+    "wall_s": 8.43,
+    "prompt_n": 1,
+    "prompt_ms": 240.516,
+    "cache_n": 355,
+    "gen_n": 35,
+    "gen_ms": 8189.064,
+    "text": "{\"grund\": \"Eine Katze im Wohnzimmer ist normal und erwartet.\", \"interesse\": \"niedrig\", \"melden\": \"nein\"}"
+   },
+   "anders": [
+    {
+     "wall_s": 11.34,
+     "prompt_n": 12,
+     "prompt_ms": 737.785,
+     "cache_n": 343,
+     "gen_n": 45,
+     "gen_ms": 10600.716,
+     "text": "{\"grund\": \"Ein Koffer im Flur ist nicht ungewöhnlich, da er dort plaziert werden könnte.\", \"interesse\": \"niedrig\", \"melden\": \"nein\"}"
+    },
+    {
+     "wall_s": 11.23,
+     "prompt_n": 12,
+     "prompt_ms": 730.309,
+     "cache_n": 343,
+     "gen_n": 44,
+     "gen_ms": 10496.596,
+     "text": "{\"grund\": \"Ein Teddy im Küchenbereich ist ungewöhnlich, da er normalerweise im Wohnzimmer ist.\", \"interesse\": \"hoch\", \"melden\": \"ja\"}"
+    }
+   ],
+   "prompt_tok_s": 4.2,
+   "gen_tok_s": 4.3
+  },
+  "suchorte": {
+   "wechsel": {
+    "wall_s": 10.36,
+    "prompt_n": 1,
+    "prompt_ms": 237.962,
+    "cache_n": 238,
+    "gen_n": 43,
+    "gen_ms": 10119.225,
+    "text": "{\"grund\": \"Tassen werden häufig in der Küche aufbewahrt oder verwendet, da dort Kaffee oder Tee getrunken werden.\", \"orte\": [\"küche\", \"wohnzimmer\"]}"
+   },
+   "wiederholt": {
+    "wall_s": 10.38,
+    "prompt_n": 1,
+    "prompt_ms": 243.995,
+    "cache_n": 238,
+    "gen_n": 43,
+    "gen_ms": 10130.044,
+    "text": "{\"grund\": \"Tassen werden häufig in der Küche aufbewahrt oder verwendet, da dort Kaffee oder Tee getrunken werden.\", \"orte\": [\"küche\", \"wohnzimmer\"]}"
+   },
+   "anders": [
+    {
+     "wall_s": 13.04,
+     "prompt_n": 21,
+     "prompt_ms": 1184.432,
+     "cache_n": 217,
+     "gen_n": 50,
+     "gen_ms": 11848.422,
+     "text": "{\"grund\": \"Handys werden häufig im Wohnzimmer oder im Flur liegen gelassen, da diese Orte häufig als Startpunkte für Aktivitäten dienen.\", \"orte\": [\"wohnzimmer\", \"flur\"]}"
+    },
+    {
+     "wall_s": 9.99,
+     "prompt_n": 24,
+     "prompt_ms": 1309.268,
+     "cache_n": 217,
+     "gen_n": 37,
+     "gen_ms": 8681.325,
+     "text": "{\"grund\": \"Fernbedienungen werden meist im Wohnzimmer aufbewahrt, da dort der Fernseher steht.\", \"orte\": [\"wohnzimmer\"]}"
+    }
+   ],
+   "prompt_tok_s": 4.2,
+   "gen_tok_s": 4.2
+  }
+ },
+ "ende": {
+  "zeit": "20:55:09",
+  "cpu_temp_c": 63.4,
+  "throttled": "throttled=0x0",
+  "mem_frei_mb": 4306,
+  "server_rss_mb": 5470,
+  "server_anon_mb": 3094,
+  "server_datei_mb": 2376
+ }
+}
