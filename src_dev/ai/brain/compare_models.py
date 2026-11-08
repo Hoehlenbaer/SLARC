@@ -1,5 +1,6 @@
 # brain/compare_models.py
 # Version 0.4 (08.11.2026) – Alle Modelle mit beiden Testsuiten gegeneinander.
+# V0.6: --server NAME=URL; Name erscheint im Bericht (sonst hießen zwei Server gleich).
 # V0.5: --server URL (ServerBrain, z. B. Pi oder PC-llama-server, mit --slots).
 #       Zahl der LLM-Bestätigungen, die ein Ergebnis behaupten (vom Code ersetzt), im Bericht.
 # V0.4: mmproj-*.gguf (Bild-Encoder) nicht als Sprachmodell laden.
@@ -157,7 +158,7 @@ def main() -> None:
     ap.add_argument("--repeat", type=int, default=3)
     ap.add_argument("--threads", type=int, default=4)
     ap.add_argument("--gpu-layers", type=int, default=0)
-    ap.add_argument("--server", action="append", default=[], help="llama-server-URL statt GGUF (mehrfach)")
+    ap.add_argument("--server", action="append", default=[], help="llama-server statt GGUF, NAME=URL oder URL (mehrfach)")
     ap.add_argument("--slots", type=int, default=1, help="mit --server: ein Slot je Aufgabe (Server mit -np N)")
     ap.add_argument("--report", default=None, help="Standard: brain/ergebnisse/<Datum>/modellvergleich_<Uhrzeit>.md")
     ap.add_argument("--out", default=None)
@@ -176,10 +177,14 @@ def main() -> None:
         mk.label = "mock"
         makers.append(mk)
     elif a.server:
-        for url in a.server:
-            def mk(url=url):
-                return ServerBrain(url, n_slots=a.slots)
-            mk.label = url
+        for spec in a.server:
+            label, url = spec.split("=", 1) if "=" in spec and not spec.startswith("http") else ("", spec)
+
+            def mk(url=url, label=label):
+                b = ServerBrain(url, n_slots=a.slots)
+                b.name = f"{label} ({b.name})" if label else f"{b.name} @ {url}"
+                return b
+            mk.label = label or url
             makers.append(mk)
     else:
         models = a.model or sorted(m for m in glob.glob(os.path.expanduser("~/.models/*.gguf"))
