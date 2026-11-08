@@ -19,30 +19,22 @@ scp ~/.models/Qwen3.5-4B-Q4_K_M.gguf ~/.models/mmproj-Qwen3.5-4B-f16.gguf <user>
 
 Nur Bilder mit mindestens einem Möbel oder Raum-Anker (Sofa, Bett, Tisch, Toilette, Kühlschrank …).
 
-## 2. llama-server auf dem Pi bauen (einmalig)
+## 2. llama-server auf dem Pi bauen (einmalig, ~10–30 min)
 
-Auf dem Pi gibt es schon llama.cpp: `utilities/setup_venvs.sh` baut llama-cpp-python mit
-OpenBLAS (`-DGGML_BLAS=ON -DGGML_BLAS_VENDOR=OpenBLAS`) ins venv `ai`, die Quellen liegen in
-`~/llama-cpp-python/vendor/llama.cpp`, `libopenblas-dev` ist installiert. Daraus fehlt nur
-das Programm `llama-server`, das `bench_pi.py` und `compare_vlm.py` ansprechen.
-
-Erst prüfen, ob der Stand neu genug für Qwen3.5 ist (Modell seit März 2026):
+`utilities/setup_venvs.sh` baut llama-cpp-python mit OpenBLAS ins venv `ai`. Dessen Quellen
+(`~/llama-cpp-python`) gehören aber root (Skript lief mit sudo) und stammen vom März 2026, also
+eventuell vor der Qwen3.5-Unterstützung. Deshalb ein eigenes llama.cpp als `admin` daneben, mit
+denselben BLAS-Einstellungen (so am 08.11.2026 gebaut, Stand a691b23):
 
 ```
-cd ~/llama-cpp-python/vendor/llama.cpp
-git log -1 --format='%cd %h'
-```
-
-Ist das Datum nach März 2026, mit denselben Einstellungen wie das venv bauen (~20 min):
-
-```
+git clone --depth 1 https://github.com/ggml-org/llama.cpp ~/llama.cpp
+cd ~/llama.cpp
 cmake -B build-server -DCMAKE_BUILD_TYPE=Release -DGGML_BLAS=ON -DGGML_BLAS_VENDOR=OpenBLAS
 cmake --build build-server -j4 --target llama-server
+~/llama.cpp/build-server/bin/llama-server --version
 ```
 
-Ist es älter, ein frisches llama.cpp daneben holen und dort bauen
-(`git clone --depth 1 https://github.com/ggml-org/llama.cpp ~/llama.cpp`, dann dieselben zwei Befehle).
-Das venv `ai` bleibt unberührt.
+Offen: ob das venv `ai` (llama-cpp-python vom März) Qwen3.5 laden kann.
 
 Ob OpenBLAS auf dem Pi hilft, ist offen: llama.cpp nutzt BLAS nur für große Matrix-Batches
 (Prompt, Bild-Encoder), für Q4-Gewichte meist die eigenen ARM-Kernel. Zum Vergleich ein
@@ -55,7 +47,7 @@ Pillow für `bench_pi.py` ist im venv `ai` über torchvision bzw. die System-Pak
 Perzeption und Motion vorher beenden (Messbedingung wie im Denk-Zustand). Terminal 1:
 
 ```
-~/llama-cpp-python/vendor/llama.cpp/build-server/bin/llama-server -m ~/.models/Qwen3.5-4B-Q4_K_M.gguf \
+~/llama.cpp/build-server/bin/llama-server -m ~/.models/Qwen3.5-4B-Q4_K_M.gguf \
     --mmproj ~/.models/mmproj-Qwen3.5-4B-f16.gguf -t 4 -c 4096 -np 1 --port 8080
 ```
 
@@ -64,7 +56,7 @@ Terminal 2, im Repo-Klon auf dem Pi, venv `ai` aktiv:
 
 ```
 source ~/projects/slarc/venvs/ai/bin/activate
-cd <repo>/src_dev/ai
+cd ~/projects/SLARC/src_dev/ai
 python -m brain.vision.bench_pi --images ~/vlm_pi_subset/val2017 -n 10 --sizes 320,448,640
 ```
 

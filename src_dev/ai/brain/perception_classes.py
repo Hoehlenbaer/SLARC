@@ -1,5 +1,8 @@
 # brain/perception_classes.py
-# Version 0.1 (07.11.2026) – Was die Perzeption wirklich erkennen kann.
+# Version 0.2 (08.11.2026) – Was die Perzeption wirklich erkennen kann.
+# V0.2: Außenklassen gelten als erkennbar (SLARC soll auch draußen laufen); DETECTABLE
+#       statt INDOOR für Chat und Synonyme. Bäume erkennt die Detektion vermutlich als
+#       "topfpflanze" (bewusst so akzeptiert, Marco 08.11.2026).
 #
 # Einzige Quelle für Klassen im Brain. Grundlage: FusedHexapodModel V5.0,
 # Detektion mit 40 COCO-Klassen + "unbekannt" (ROBOT_CAT_IDS in
@@ -21,7 +24,7 @@ LANDMARK = "anker"        # steht fest, eignet sich zur Orientierung und zum Erk
 FURNITURE = "moebel"      # Möbel, wird aber verschoben (Stuhl)
 ITEM = "ding"             # tragbar
 LIVING = "lebewesen"
-OUTDOOR = "draussen"      # in der Wohnung nutzlos
+OUTDOOR = "draussen"      # vor allem draußen; dort auch Anker zur Orientierung (Bank, Hydrant, Ampel)
 UNKNOWN = "unbekannt"
 
 
@@ -92,8 +95,11 @@ SYNONYMS = {
     "schulranzen": "rucksack", "ranzen": "rucksack", "schirm": "regenschirm",
     "napf": "schüssel", "tisch": "esstisch", "klo": "toilette", "wc": "toilette",
     "mieze": "katze", "kater": "katze", "mensch": "person",
+    "rad": "fahrrad", "velo": "fahrrad", "wagen": "auto", "pkw": "auto", "parkbank": "bank",
+    "baum": "topfpflanze", "busch": "topfpflanze", "strauch": "topfpflanze",
 }
 
+DETECTABLE = [c.de for c in DET_CLASSES if c.kind != UNKNOWN]
 INDOOR = [c.de for c in DET_CLASSES if c.kind not in (OUTDOOR, UNKNOWN)]
 REPORTABLE = {c.de for c in DET_CLASSES if c.reportable}
 ROUTINE = {c.de for c in DET_CLASSES if c.kind in (LANDMARK, FURNITURE)}
@@ -113,12 +119,12 @@ def normalize_item(text: Optional[str]) -> Optional[str]:
         if t.startswith(prefix):
             t = t[len(prefix):]
     t = t.replace(" ", "")
-    if t in BY_DE and BY_DE[t].kind not in (OUTDOOR, UNKNOWN):
+    if t in BY_DE and BY_DE[t].kind != UNKNOWN:
         return t
     if t in SYNONYMS:
         return SYNONYMS[t]
     # Teilwort: "lesebrille" -> nichts, "fernsehfernbedienung" -> fernbedienung
-    for de in INDOOR:
+    for de in DETECTABLE:
         if len(de) >= 4 and de in t:
             return de
     return None

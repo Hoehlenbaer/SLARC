@@ -121,3 +121,11 @@ def test_item_problem_for_undetectable():
     assert S.item_problem(S.ChatResult("search", "smartphone")) is None
     req = S.to_request(S.ChatResult("search", "smartphone"), "Wo ist mein Smartphone?", "Marco", None, 1.0)
     assert req.arg == "handy"
+
+
+def test_outdoor_classes_are_detectable():
+    from brain.perception_classes import normalize_item
+    assert normalize_item("mein Fahrrad") == "fahrrad"
+    assert normalize_item("Parkbank") == "bank" and normalize_item("Baum") == "topfpflanze"
+    assert S.item_problem(S.ChatResult("search", "fahrrad")) is None
+    assert "fahrrad" in S.CHAT_SYSTEM

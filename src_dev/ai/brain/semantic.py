@@ -1,5 +1,6 @@
 # brain/semantic.py
 # Version 0.3 (07.11.2026) – Semantische Aufgaben für das LLM.
+# V0.5: Gegenstandsliste inkl. Außenklassen (SLARC soll auch draußen laufen).
 # V0.4: Gegenstandsliste im Chat-Prompt und Regeln aus perception_classes.py (echte
 #       Klassen); item_problem() erkennt Bitten um Dinge, die SLARC nicht sehen kann.
 # V0.3: Chat zweistufig. Stufe 1 deutet die Nachricht OHNE Tagebuch (Lauf 07.11.: mit
@@ -29,7 +30,7 @@ from dataclasses import dataclass, field
 from typing import Optional
 
 from .behaviors import HAZARDS
-from .perception_classes import INDOOR, REPORTABLE, ROUTINE, normalize_item
+from .perception_classes import DETECTABLE, REPORTABLE, ROUTINE, normalize_item
 from .datatypes import Request
 
 # ---------------------------------------------------------------- Grammatik-Bausteine
@@ -65,7 +66,7 @@ PERSONA = ("Du bist SLARC, ein sechsbeiniger Roboter, der in einer Wohnung lebt.
            "Du bist kein Assistent, sondern ein kleines, neugieriges Wesen, das Menschen gern hilft.")
 
 # Gegenstände, die die Perzeption erkennen kann (perception_classes.py).
-KNOWN_ITEMS = INDOOR
+KNOWN_ITEMS = DETECTABLE
 
 # ================================================================= 1. Chat deuten
 CHAT_SERVICES = {
