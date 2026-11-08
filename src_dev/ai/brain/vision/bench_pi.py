@@ -1,5 +1,9 @@
 # brain/vision/bench_pi.py
 # Version 0.3 (08.11.2026) – Geschwindigkeit von Qwen3.5-4B (Text und Bild) auf dem Pi 5.
+# V0.6: Messung „anderer Inhalt“: gleiche Aufgabe, gleicher fester Teil, anderer Zustand bzw. Satz
+#       (zweimal hintereinander). So ist es im Betrieb; „wiederholt“ (identischer Prompt) ist der
+#       Bestfall. Wichtig für Qwen3.5 (hybrid/rekurrent): der Server kann den Cache nur über
+#       Checkpoints zurücksetzen.
 # V0.5: Server-Speicher getrennt: RssAnon (echter Arbeitsspeicher: KV-Cache, Puffer, mmproj)
 #       und RssFile (eingeblendete Modelldatei). VmRSS zählte beides zusammen.
 # V0.4: --slots N (ein Slot je Aufgabe wie ServerBrain; Server mit -np N): erst alle Aufgaben
@@ -153,18 +157,27 @@ def system_state() -> dict:
 TASK_KIND = {"zielwahl": "zielwahl", "chat": "chat", "objekt": "objekt", "suchorte": "suchen"}
 
 
-def brain_tasks() -> dict:
-    """Name -> (Nachrichten, Grammatik, max_tokens). Grammatiken wie im Betrieb (V0.4)."""
-    sc = SCENARIOS[1]
+VARIANTS = [   # (Szenario für die Zielwahl, Chat-Satz, Objekt, Suchgegenstand); [V0.6] 0 = Standard
+    (1, "Marco: Wo ist die Fernbedienung?", ("katze", "wohnzimmer"), "tasse"),
+    (2, "Laura: Hast du meinen Rucksack gesehen?", ("koffer", "flur"), "handy"),
+    (3, "Marco: Komm mal bitte in die Küche.", ("teddy", "küche"), "fernbedienung"),
+]
+
+
+def brain_tasks(variant: int = 0) -> dict:
+    """Name -> (Nachrichten, Grammatik, max_tokens). Grammatiken wie im Betrieb (V0.4).
+    variant: anderer Zustand/Satz bei gleichem festem Prompt-Teil (V0.6)."""
+    sc_i, chat, (obj, ort), item = VARIANTS[variant]
+    sc = SCENARIOS[sc_i]
     mem, nm, st = prepare(sc)
     menu = build_options(sc.obs, st, mem, check(sc.obs))
     places = ["flur", "küche", "bad", "wohnzimmer"]
     return {
         "zielwahl": (decision_messages(state_text(sc.obs, st, menu, sc.triggers)), decision_grammar(len(menu)), 120),
-        "chat": (S._messages(S.CHAT_SYSTEM, S.CHAT_SHOTS, "Marco: Wo ist die Fernbedienung?"), S.CHAT_GBNF, 100),
-        "objekt": (S._messages(S.OBJECT_SYSTEM, S.OBJECT_SHOTS, "GEGENSTAND: katze\nORT: wohnzimmer"),
+        "chat": (S._messages(S.CHAT_SYSTEM, S.CHAT_SHOTS, chat), S.CHAT_GBNF, 100),
+        "objekt": (S._messages(S.OBJECT_SYSTEM, S.OBJECT_SHOTS, f"GEGENSTAND: {obj}\nORT: {ort}"),
                    S.OBJECT_GBNF, 100),
-        "suchorte": (S._messages(S.SEARCH_SYSTEM, S.SEARCH_SHOTS, "GEGENSTAND: tasse\nORTE: " + ", ".join(places)),
+        "suchorte": (S._messages(S.SEARCH_SYSTEM, S.SEARCH_SHOTS, f"GEGENSTAND: {item}\nORTE: " + ", ".join(places)),
                      S.search_gbnf(places), 100),
     }
 
@@ -187,7 +200,7 @@ def summarize(paths: list[str]) -> str:
     sizes = sorted({int(k) for r in runs for k in r.get("bild", {})})
     tasks = ["zielwahl", "chat", "objekt", "suchorte"]
     head = ["Lauf", "Modell", "mmproj", "Slots"] + [f"Dose {s} px" for s in sizes] + \
-           [f"{t} Wechsel / wiederholt" for t in tasks] + ["Prompt tok/s (Zielwahl)", "Erzeugung tok/s", "Server anon MB", "Server Datei MB", "frei MB", "°C Ende"]
+           [f"{t} Wechsel / wiederholt / anders" for t in tasks] + ["Prompt tok/s (Zielwahl)", "Erzeugung tok/s", "Server anon MB", "Server Datei MB", "frei MB", "°C Ende"]
     lines = ["| " + " | ".join(head) + " |", "|" + "---|" * len(head)]
     for r in runs:
         b, t, en = r.get("bild", {}), r.get("text", {}), r.get("ende", {})
@@ -195,7 +208,8 @@ def summarize(paths: list[str]) -> str:
         row += [f"{b[str(s)]['dose_s']} s" if str(s) in b else "–" for s in sizes]
         for k in tasks:
             x = t.get(k)
-            row.append(f"{x['wechsel']['wall_s']} / {x['wiederholt']['wall_s']} s" if x else "–")
+            an = "/".join(str(o["wall_s"]) for o in (x or {}).get("anders", [])) or "–"
+            row.append(f"{x['wechsel']['wall_s']} / {x['wiederholt']['wall_s']} / {an} s" if x else "–")
         z = t.get("zielwahl") or {}
         row += [str(z.get("prompt_tok_s")), str(z.get("gen_tok_s")), str(en.get("server_anon_mb")),
                 str(en.get("server_datei_mb")), str(en.get("mem_frei_mb")), str(en.get("cpu_temp_c"))]
@@ -282,11 +296,16 @@ def main() -> None:
             call(a.url, tasks[on][0], None, 5, a.timeout, slot=slot[on])  # andere Aufgabe dazwischen
             cold = call(a.url, msgs, None, mt, a.timeout, gbnf, slot[name])   # nach Aufgabenwechsel
             warm = call(a.url, msgs, None, mt, a.timeout, gbnf, slot[name])   # gleicher Prompt direkt wieder
-            res["text"][name] = {"wechsel": cold, "wiederholt": warm,
+            other = []                                                    # [V0.6] anderer Inhalt, wie im Betrieb
+            for v in (1, 2):
+                vm, vg, vt = brain_tasks(v)[name]
+                other.append(call(a.url, vm, None, vt, a.timeout, vg, slot[name]))
+            res["text"][name] = {"wechsel": cold, "wiederholt": warm, "anders": other,
                                  "prompt_tok_s": rate(cold["prompt_n"], cold["prompt_ms"]),
                                  "gen_tok_s": rate(warm["gen_n"], warm["gen_ms"])}
             print(f"[text] {name}: nach Wechsel {cold['wall_s']} s ({cold['prompt_n']} Tokens neu), "
-                  f"wiederholt {warm['wall_s']} s ({warm['prompt_n']} Tokens neu)", flush=True)
+                  f"wiederholt {warm['wall_s']} s ({warm['prompt_n']} Tokens neu), anderer Inhalt "
+                  + " / ".join(f"{o['wall_s']} s ({o['prompt_n']})" for o in other), flush=True)
     res["ende"] = system_state()
 
     md, js = out_paths("pi_bench_" + a.label if a.label else "pi_bench")
@@ -305,13 +324,16 @@ def main() -> None:
                      f"{b['dose_s']} s | {b['liste_s']} s |")
     if res["text"]:
         lines += ["", "**Brain-Aufgaben ohne Bild**", "",
-                  "| Aufgabe | nach Wechsel | Tokens neu | Prompt tok/s | wiederholt (Cache) | Tokens neu | Erzeugung tok/s |",
-                  "|---|---|---|---|---|---|---|"]
+                  "| Aufgabe | nach Wechsel | Tokens neu | Prompt tok/s | wiederholt (Cache) | Tokens neu | "
+                  "anderer Inhalt 1 / 2 | Tokens neu | Erzeugung tok/s |",
+                  "|---|---|---|---|---|---|---|---|---|"]
         for name, t in res["text"].items():
-            c, w = t["wechsel"], t["wiederholt"]
+            c, w, o = t["wechsel"], t["wiederholt"], t.get("anders", [])
             lines.append(f"| {name} | {c['wall_s']} s | {c['prompt_n']} | {t['prompt_tok_s']} | {w['wall_s']} s | "
-                         f"{w['prompt_n']} | {t['gen_tok_s']} |")
-    lines += ["", "Hinweis: „nach Wechsel“ = vorher lief eine andere Aufgabe. Mit einem Slot muss der feste Teil "
+                         f"{w['prompt_n']} | {' / '.join(str(x['wall_s']) + ' s' for x in o)} | "
+                         f"{' / '.join(str(x['prompt_n']) for x in o)} | {t['gen_tok_s']} |")
+    lines += ["", "„anderer Inhalt“: gleiche Aufgabe, gleicher fester Teil, anderer Zustand/Satz – so wie im Betrieb.",
+              "", "Hinweis: „nach Wechsel“ = vorher lief eine andere Aufgabe. Mit einem Slot muss der feste Teil "
               "neu gerechnet werden; mit --slots behält jede Aufgabe ihren Slot" +
               (f" (hier {a.slots} Slots)." if a.slots > 1 else ".")]
     with open(md, "w", encoding="utf-8") as f:

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # brain/vision/run_pi_matrix.sh
-# Version 0.5 (08.11.2026) – Alle Pi-Messungen nacheinander gegen einen llama-server ohne BLAS.
+# Version 0.6 (08.11.2026) – Alle Pi-Messungen nacheinander gegen einen llama-server ohne BLAS.
+# V0.6: Läufe inhalt-… (Standard): Cache bei anderem Inhalt, Qwen3.5 (hybrid) gegen Qwen3 (reine
+#       Attention), beide mit den Speicher-Einstellungen aus mem-4.
 # V0.5: Läufe mem-… (Speicher unter 4 GB): kleinerer Kontext, KV-Cache q8_0, kleinere Puffer.
 #       Ohne ONLY/ALL laufen jetzt die mem-Läufe.
 # V0.4: -np/-c nur einmal an den Server (doppelt gab eine DEPRECATED-Warnung).
@@ -17,7 +19,7 @@
 # Anpassbar über Umgebungsvariablen, z. B.:
 #   N=3 SIZES=320,448 COOL=60 IMAGES=~/vlm_pi_subset/val2017 bash run_pi_matrix.sh
 #   ONLY=q35-2b bash run_pi_matrix.sh          # nur Läufe, deren Label so beginnt
-#   ALL=1 bash run_pi_matrix.sh                # alle Läufe (ohne ONLY/ALL: nur mem-…)
+#   ALL=1 bash run_pi_matrix.sh                # alle Läufe (ohne ONLY/ALL: nur inhalt-…)
 # Dauer grob 10–15 min je Konfiguration mit Bild (4B), weniger fürs 2B und Text allein.
 
 set -u
@@ -30,13 +32,16 @@ SIZES=${SIZES:-320,448}
 COOL=${COOL:-60}
 PORT=${PORT:-8080}
 ONLY=${ONLY:-}
-[ -z "$ONLY" ] && [ -z "${ALL:-}" ] && ONLY=mem
+[ -z "$ONLY" ] && [ -z "${ALL:-}" ] && ONLY=inhalt
 Q40=${Q40:-$(ls "$M"/Qwen3.5-4B-Q4_0*.gguf 2>/dev/null | head -1)}
 
 Q4KM=$M/Qwen3.5-4B-Q4_K_M.gguf
 Q8MM=$M/mmproj-Qwen3.5-4B-Q8_0.gguf
 # Label | Modell | mmproj (leer = nur Text) | zusätzliche Server-Optionen | zusätzliche bench_pi-Optionen
+MEMOPT="-np 4 -c 8192 -fa on -ctk q8_0 -ctv q8_0 -ub 256"
 CONFIGS=(
+  "inhalt-q35-4b|$Q4KM|$Q8MM|$MEMOPT|--text-only --slots 4"
+  "inhalt-q3-4b|$M/Qwen3-4B-Instruct-2507-Q4_K_M.gguf||$MEMOPT|--text-only --slots 4"
   "slots-1|$Q4KM|$Q8MM||--text-only"
   "slots-4|$Q4KM|$Q8MM|-np 4 -c 12288|--text-only --slots 4"
   "mem-1-c12k|$Q4KM|$Q8MM|-np 4 -c 12288|--text-only --slots 4"

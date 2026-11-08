@@ -123,7 +123,7 @@ def test_bench_slots_and_grammar(url, tmp_path, monkeypatch):
     monkeypatch.setattr(sys, "argv", ["x", "--url", url, "--text-only", "--slots", "4"])
     bench_pi.main()
     measured = [b for b in BODIES if b.get("grammar")]
-    assert len(measured) == 8                                   # 4 Aufgaben x (Wechsel, wiederholt)
+    assert len(measured) == 16                                  # 4 Aufgaben x (Wechsel, wiederholt, 2x anders)
     assert {b["id_slot"] for b in measured} == {0, 1, 2, 3}
     assert json.loads((tmp_path / "s.json").read_text())["slots"] == 4
 
