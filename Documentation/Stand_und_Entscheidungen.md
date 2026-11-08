@@ -74,7 +74,7 @@ Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. N
 - 2× IMX296 mit M12 2,8 mm, Baseline 65 mm (Trigger-Platine 20 × 22 mm dazwischen). Mindestdistanz ≈ 12 cm.
 - **ICM20948** oben mittig, 2 Kernlöcher M2,5 im Abstand 13,6 mm; Bunde hinter der Front, mit Steg bis zur Frontfläche → stehen beim Druck auf dem Bett.
 - **V1.5:** obere Rahmenecken R6, Laschenenden halbrund, Kehlen R2,5 (min. Wand 1,76 mm).
-- **Objektiv ZH3019-14** als Kontrollkörper (Spitze bei x 199,7). Sturzprüfung: mit Beinen in Stehpose treffen die Objektive bei keiner ebenen Anprallrichtung zuerst; Restrisiko nur bei schmalen Hindernissen zwischen den Vorderbeinen. Kein Schutzbügel.
+- **Objektiv ZH3019-14** als Kontrollkörper (Spitze bei x 199,7). Korrektur 08.11.2026: Verbaut ist ein Richer-R 2,8 mm, kein ZH3019-14. Länge und Bildwinkel des Richer-R sind nicht gemessen; Kontrollkörper im Makro und die Sturzprüfung gelten erst nach der Messung. Sturzprüfung: mit Beinen in Stehpose treffen die Objektive bei keiner ebenen Anprallrichtung zuerst; Restrisiko nur bei schmalen Hindernissen zwischen den Vorderbeinen. Kein Schutzbügel.
 - Druck PETG: Front aufs Bett, 0,2 mm, 235/80 °C, 4 Wände, keine Stützen. Gegen hochziehende Ecken: Brim 6–8 mm, Lüfter erst ab Schicht 4 und max. 30–40 %, Bett 85 °C.
 
 ---
