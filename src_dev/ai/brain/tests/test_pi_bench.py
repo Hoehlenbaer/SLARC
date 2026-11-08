@@ -78,3 +78,12 @@ def test_export_subset(tmp_path, monkeypatch):
     assert sorted(os.listdir(out / "val2017")) == ["1.jpg", "3.jpg"]
     sub = json.loads((out / "annotations" / "instances_subset.json").read_text())
     assert {a["image_id"] for a in sub["annotations"]} == {1, 3}
+
+
+def test_bench_text_only(url, tmp_path, monkeypatch):
+    monkeypatch.setattr(bench_pi, "out_paths", lambda s: (str(tmp_path / "t.md"), str(tmp_path / "t.json")))
+    monkeypatch.setattr(sys, "argv", ["x", "--url", url, "--text-only"])
+    bench_pi.main()
+    res = json.loads((tmp_path / "t.json").read_text())
+    assert res["bild"] == {} and "zielwahl" in res["text"]
+    assert "Bildfragen" not in (tmp_path / "t.md").read_text()

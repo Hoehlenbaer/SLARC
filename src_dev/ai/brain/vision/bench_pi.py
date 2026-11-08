@@ -1,5 +1,6 @@
 # brain/vision/bench_pi.py
-# Version 0.1 (08.11.2026) – Geschwindigkeit von Qwen3.5-4B (Text und Bild) auf dem Pi 5.
+# Version 0.2 (08.11.2026) – Geschwindigkeit von Qwen3.5-4B (Text und Bild) auf dem Pi 5.
+# V0.2: --text-only für Modelle ohne Bildeingabe (Vergleich mit Qwen3-4B).
 #
 # Frage: Ist die Inferenz auf dem Pi für die Pipeline praktisch nutzbar?
 # Gemessen über llama-server (Aufbau und Start: brain/vision/README.md):
@@ -139,28 +140,36 @@ def rate(n, ms):
 def main() -> None:
     ap = argparse.ArgumentParser(description="SLARC Brain: VLM- und LLM-Geschwindigkeit auf dem Pi 5")
     ap.add_argument("--url", default="http://127.0.0.1:8080")
-    ap.add_argument("--images", required=True, help="Ordner mit JPEGs (z. B. ~/vlm_pi_subset/val2017)")
+    ap.add_argument("--images", help="Ordner mit JPEGs (z. B. ~/vlm_pi_subset/val2017)")
+    ap.add_argument("--text-only", action="store_true", help="nur Brain-Aufgaben ohne Bild (Modell ohne mmproj)")
     ap.add_argument("-n", type=int, default=10)
     ap.add_argument("--sizes", default="320,448,640", help="längste Bildkante in px, kommagetrennt")
     ap.add_argument("--no-text", action="store_true", help="Brain-Aufgaben ohne Bild überspringen")
     ap.add_argument("--timeout", type=float, default=600.0)
     a = ap.parse_args()
-    try:
-        import PIL  # noqa: F401
-    except ImportError:
-        raise SystemExit("Pillow fehlt: pip install pillow (nötig, damit die Bildgröße wirklich gilt).")
+    if a.text_only:
+        a.no_text, files, sizes = False, [], []
+    else:
+        if not a.images:
+            raise SystemExit("--images angeben (oder --text-only).")
+        try:
+            import PIL  # noqa: F401
+        except ImportError:
+            raise SystemExit("Pillow fehlt: pip install pillow (nötig, damit die Bildgröße wirklich gilt).")
+        files = sorted(f for f in os.listdir(os.path.expanduser(a.images)) if f.lower().endswith((".jpg", ".jpeg", ".png")))
+        files = [os.path.join(os.path.expanduser(a.images), f) for f in files[:a.n]]
+        sizes = [int(x) for x in a.sizes.split(",")]
     check_server(a.url)
-
-    files = sorted(f for f in os.listdir(os.path.expanduser(a.images)) if f.lower().endswith((".jpg", ".jpeg", ".png")))
-    files = [os.path.join(os.path.expanduser(a.images), f) for f in files[:a.n]]
-    sizes = [int(x) for x in a.sizes.split(",")]
     res = {"rechner": platform.node(), "maschine": platform.machine(), "bilder": len(files), "start": system_state(),
            "bild": {}, "text": {}}
     print(f"{len(files)} Bilder, Größen {sizes}. Start: {res['start']}", flush=True)
 
     # Aufwärmen (Modell in den Speicher, erste Kernel), nicht gewertet
-    b64, _ = _jpeg_b64(files[0], sizes[0])
-    call(a.url, image_msgs(b64, CAN_PROMPT), CAN_SCHEMA, 10, a.timeout)
+    if files:
+        b64, _ = _jpeg_b64(files[0], sizes[0])
+        call(a.url, image_msgs(b64, CAN_PROMPT), CAN_SCHEMA, 10, a.timeout)
+    else:
+        call(a.url, [{"role": "user", "content": "Hallo"}], None, 5, a.timeout)
 
     for side in sizes:
         rows = []
@@ -200,9 +209,11 @@ def main() -> None:
     lines = [f"# VLM/LLM-Geschwindigkeit auf {res['rechner']} ({res['maschine']}, {time.strftime('%d.%m.%Y %H:%M')})", "",
              f"{len(files)} Bilder. Temperatur {st['cpu_temp_c']} → {en['cpu_temp_c']} °C, Drosselung "
              f"{st['throttled']} → {en['throttled']}, Server {en['server_rss_mb']} MB, frei {en['mem_frei_mb']} MB.", "",
-             "**Bildfragen** (Median je Bild)", "",
-             "| längste Kante | Bild+Frage Tokens | Prompt tok/s | Erzeugung tok/s | ja/nein (Dose) | Liste (40 Klassen) |",
-             "|---|---|---|---|---|---|"]
+             ]
+    if res["bild"]:
+        lines += ["**Bildfragen** (Median je Bild)", "",
+                  "| längste Kante | Bild+Frage Tokens | Prompt tok/s | Erzeugung tok/s | ja/nein (Dose) | Liste (40 Klassen) |",
+                  "|---|---|---|---|---|---|"]
     for side, b in res["bild"].items():
         lines.append(f"| {side} px | {b['prompt_tokens']} | {b['prompt_tok_s']} | {b['gen_tok_s']} | "
                      f"{b['dose_s']} s | {b['liste_s']} s |")
