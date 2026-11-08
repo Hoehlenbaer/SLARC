@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SLARC – MANUELLE Teleop + AUFNAHME/REPLAY   (slarc_manual V4, 07.11.2026)
+SLARC – MANUELLE Teleop + AUFNAHME/REPLAY   (slarc_manual V4.1, 08.11.2026)
 =========================================================================
 Zwei Modi:
   FUSS-Modus   Fuß-ZIELE fest im Körperframe (Servos halten stur), Tasten bewegen
@@ -11,6 +11,7 @@ Fußpositionen, Kontakt, Fußlast, Gelenkwinkel, Momente, Körperpose, Auswahl,
 Modus, Tripod-Verlagerung) in eine JSONL-Datei; 'k' markiert Keyframes.
 Replay fährt die kommandierten Servowinkel nach (V1/V2-Dateien: Fußziele).
 
+V4.1: w/s und t/g korrigiert (waren vertauscht), Richtungen aller Körpertasten gemessen.
 V4: Rückenlage-Start (--start-back), Startpose in der Aufnahme (Meta-Zeile), Replay startet
     exakt dort; --start-yaw/-tilt/-dx/-dy variieren den Start (Robustheitstest:
     slarc_replay_robust.py), Replay endet mit einer RESULT-Zeile.
@@ -30,7 +31,7 @@ TASTEN (Fenster-Fokus nötig)
  FUSS-Modus (Richtung = WELT, gilt für alle ausgewählten Füße):
   Pfeile L/R  Fuß x    Pfeile U/D  Fuß z    n / m  Fuß y
   w / s  Körper vor/zurück   a / d  Körper links/rechts   r / f  Körper höher/tiefer
-  t / g  Pitch (Nase hoch/runter)   z / h  Roll
+  t / g  Pitch (Nase hoch/runter)   z / h  Roll (rechts runter / links runter)
   u      Gewicht auf Tripod A (FR, ML, RR werden länger -> FL, MR, RL heben ab)
   i      Gewicht auf Tripod B (FL, MR, RL werden länger -> FR, ML, RR heben ab)
   o      Verlagerung zurück auf 0 (läuft selbst)
@@ -510,14 +511,14 @@ while True:
         if down(p.B3G_DOWN_ARROW):  dsel[2]-=STEP
         if down(ord('m')): dsel[1]+=STEP
         if down(ord('n')): dsel[1]-=STEP
-        if down(ord('w')): dall[0]+=STEP
-        if down(ord('s')): dall[0]-=STEP
+        if down(ord('w')): dall[0]-=STEP      # [V4.1] Füße nach hinten = Körper vor (war vertauscht)
+        if down(ord('s')): dall[0]+=STEP
         if down(ord('a')): dall[1]-=STEP      # [V2] Füße nach rechts = Körper nach links
         if down(ord('d')): dall[1]+=STEP      # [V2] Körper nach rechts
         if down(ord('r')): dall[2]-=STEP
         if down(ord('f')): dall[2]+=STEP
-        if down(ord('t')): pitch -= APOS      # Nase HOCH (neg = nose high, Konvention)
-        if down(ord('g')): pitch += APOS      # Nase runter
+        if down(ord('t')): pitch += APOS      # [V4.1] Nase HOCH (Pitch > 0 = Nase hoch, wie V10; war vertauscht)
+        if down(ord('g')): pitch -= APOS      # Nase runter
         if down(ord('z')): roll  -= APOS
         if down(ord('h')): roll  += APOS
         if down(ord('u')): tri_s = min(1.0, tri_s + TRI_RATE); tri_auto0 = False   # [V3] A trägt
