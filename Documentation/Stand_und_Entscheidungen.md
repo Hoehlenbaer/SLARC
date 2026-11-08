@@ -1,6 +1,6 @@
 # SLARC – Stand und Entscheidungen (Mechanik, Elektronik, Simulation)
 
-Stand: 25.10.2026. Zusammenfassung aus dem CAD-, Hardware- und Sim-Chat (Oktober 2026). Quelle der Wahrheit für Code und CAD ist das Repo **Hoehlenbaer/SLARC** (`master`). Dieses Dokument hält Entscheidungen, Begründungen und Messwerte fest, die nicht direkt im Code stehen.
+Stand: 25.10.2026, Brain-Punkte 08.11.2026. Zusammenfassung aus dem CAD-, Hardware- und Sim-Chat (Oktober 2026). Quelle der Wahrheit für Code und CAD ist das Repo **Hoehlenbaer/SLARC** (`master`). Dieses Dokument hält Entscheidungen, Begründungen und Messwerte fest, die nicht direkt im Code stehen.
 
 ---
 
@@ -156,6 +156,7 @@ Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. N
 - Erste Umsetzung in `src_dev/ai/brain/` (V0.1): Bedürfnismodell, Sicherheits-Veto, Menü, Arbiter, Prompt mit GBNF, Testsuite.
 - Erster Modelltest (07.11.2026, Qwen3-4B Q4, PC/GPU): Als Entscheider schlechter als der Code (36/45 gegen 42/45), Regel "Energie hoch" 0/3 eingehalten. Daher (fest): Handlungswahl beim Code, LLM nur für knappe Fälle und semantische Aufgaben (Chat deuten, Objekte einschätzen, Suchorte, Tagebuch). Energie ab "hoch" ist jetzt eine Regel. Details: `Brain_Konzept.md`, Abschnitt 15.
 - Modellvergleich (07.11.2026): Qwen3-4B-2507 und Qwen3.5-4B gleichauf (104/111), Gemma 4 E4B 96/111 bei doppelter Größe. Qwen3.5 und Gemma meldeten den Herd nicht. Vorläufig bleibt Qwen3-4B-2507. Gefahren meldet seitdem immer der Code.
+- Pi-Messung (08.11.2026, `Brain_Konzept.md` Abschnitt 17): llama-server ohne BLAS (kein Unterschied) und mit `--cache-ram 0` (Standard 8 GiB füllte den Swap). mmproj Q8_0 statt F16 (gleich genau, Bild-Encoder halb so lang). Qwen3.5-4B: Bildfrage 320 px ~10 s, Zielwahl mit Cache 12 s, nach Aufgabenwechsel 70 s (Q4_0: 53 s). Qwen3.5-2B ist 2,5-mal schneller, aber für Bilder unbrauchbar (Precision 0,37). Offen: Q4_0-Qualität, 2B für Text, Cache je Aufgabe.
 - Interaktion zunächst ohne Audio: Web-Chat, Handy-Meldungen, Körpersprache, LEDs, Antippen als Lob. Audio später über USB, weil I²S mit dem Kameratrigger an GPIO18 kollidiert.
 
 ---
@@ -173,4 +174,4 @@ Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. N
 9. PR #20 (Verkabelung) mergen.
 10. Sprache der Doku (notiert 01.11.2026): Im Moment sind Doku, Kommentare und Stückliste gemischt Deutsch/Englisch. In der finalen Version soll die ganze Doku auf Englisch sein (inkl. Stückliste und Code-Kommentare). Bis dahin gilt die Regel aus `CLAUDE.md` (Deutsch, `README.md` Englisch).
 11. Akku-Kabel zum Steckerhalter (linke Seite, x −140), gemessen 02.11.2026: Deans reicht, Balancer nur ~45 mm → Verlängerung JST-XH 4-pol. (3S) 1:1, bleibt am Akku. Mit Schrumpfschlauch oder Klebeband sichern.
-12. Brain/Perzeption (07.11.2026): Detektion V5.0 kennt keine Türen, Fenster und Dosen (nur Flasche/Tasse); Meilenstein Dose braucht eine neue Klasse. Idee zum Prüfen: Qwen3.5-4B mit Bildeingabe (mmproj) für seltene Fragen wie „Fenster offen?“. Details: `Brain_Konzept.md`, Abschnitt 13.
+12. Brain/Perzeption (07.11.2026): Detektion V5.0 kennt keine Türen, Fenster und Dosen (nur Flasche/Tasse); Meilenstein Dose braucht eine neue Klasse. Idee zum Prüfen: Qwen3.5-4B mit Bildeingabe (mmproj) für seltene Fragen wie „Fenster offen?“. Gemessen 08.11.2026: auf dem Pi ~10 s je Frage bei 320 px (Q8-mmproj), F1 0,78; als seltene Rückfrage nutzbar. Details: `Brain_Konzept.md`, Abschnitt 13.
