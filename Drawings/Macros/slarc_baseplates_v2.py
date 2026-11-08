@@ -1,12 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – obere + untere Baseplate inkl. Coxa-Servo-Aufnahme, Elektronik und Energieversorgung.   V2.14 (Elektronik-Testbrett)
+SLARC – obere + untere Baseplate inkl. Coxa-Servo-Aufnahme, Elektronik und Energieversorgung.   V2.15 (Relais-Lochbild gemessen, Power-Platine C Löcher korrigiert)
 FreeCAD 0.21 / 1.0: Makro ausführen. Parameter in P (unten) ändern und Makro neu ausführen
 (die Plattenkontur mit den Schwenkfreigängen ist hier bewusst als Python-Geometrie gebaut,
 nicht über Spreadsheet-Ausdrücke).
 
 Koordinaten (wie slarc_sim_V10): X = vorn, Y = links, Z = oben, Ursprung = Körpermitte,
 Z = 0 = Oberkante Hüllmaß der Coxa-Servos (ST3215 liegt mit Horn nach oben zwischen den Platten).
+
+V2.15
+- Relaismodul nachgemessen (Marco, 08.11.2026): 134 x 52, Löcher Ø3, Lochbild laut Herstellerzeichnung
+  128.32/128.93 x 46.52/46.62 (leicht trapezförmig). Jetzt Mittel 128.63 x 46.57 (relay_pat) statt
+  132.2 x 50.8 aus dem STEP. Gilt für untere Platte, Option oben und Testbrett.
+- Power-Platine C (½ 5x7, 50 x 35): Die beiden Löcher liegen an der langen 50-mm-Kante (Abstand 46), nicht an
+  der kurzen (31). Bunde in Power-Brücke und Testbrett korrigiert, Auflage am gegenüberliegenden Rand.
 
 V2.14
 - Elektronik-Testbrett bench_board() für den Prüfstand: Relaismodul, Treiber, Power-Platine C und eine
@@ -124,6 +131,7 @@ P = dict(
     pi_sleeve=(6.0, 2.8),                          # V2.9: Hülse Außen-Ø, Bohrung (M2.5 frei)
     gdr_x=42.5, gdr_so=16.0, gdr_hole_d=2.7,       # Treiberboard: Lochbild-Mitte X, mitgelieferte 16-mm-Hülsen (Stiftleiste unten 9.4)
     relay_on_top=False, relay_x=-110.0, relay_so=5.0, relay_hole_d=3.2,   # Option: Relais oben hinten
+    relay_pat=(128.63, 46.57),     # V2.15: Lochbild Relaismodul gemessen (lang x kurz, Mitte-Mitte), Löcher Ø3
     relay_insert=(4.0, 6.5, 8.0),                  # V2.11: Gewindeeinsatz M3 unten: Kernloch Ø, Tiefe ab Bundoberkante, Bund-Ø
     # Untere Platte / zwischen den Platten
     z_lt=-35.0,             # Oberseite untere Platte = Unterkante Servo-Hüllmaß
@@ -179,7 +187,7 @@ P = dict(
              hub=dict(cx=-115.0, cy=20.0, L=70.0, W=50.0, t_car=3.0, so=4.0,              # 5×7, Löcher 66×46
                       env_mod=10.0, y_mod=24.0, env_con=24.0),    # Modulseite außen (flach, Panzer niedrig), Stecker innen
              pwr=dict(cx=55.0, cy=0.0, L=50.0, W=35.0, deck=(27.0, 83.0, -50.0, 50.0), deck_z=-16.5, deck_t=2.5,
-                      sleeve_d=13.0, so=3.0, env=9.0),                                    # ½ 5×7: Löcher 46 an einem Ende
+                      sleeve_d=13.0, so=3.0, env=9.0),                                    # ½ 5×7: Löcher 46 an der langen Kante
              adp=dict(x0=146.8, y0=-20.0, L=18.5, W=40.0, z0=-27.0, env=17.0)),
     # V2.13: Servo-Wiege auf der unteren Platte: seitliche Führung + hinterer Anschlag -> Stall-Moment formschlüssig
     # (Servo-Frame; Gehäuse volle Breite ±12.3 nur zwischen z -27 und -2, darunter schmaler)
@@ -189,7 +197,7 @@ P = dict(
     lighten=dict(margin=6.0, r=5.0),
     # V2.14: Elektronik-Testbrett (lokal, Ecke 0/0, Oberseite z = t)
     bench=dict(L=220.0, W=175.0, t=4.0, rim=3.0, rim_h=5.0,
-               relay=(40.0, 90.0),          # Lochbild-Mitte Relaismodul (Löcher ±25.4 / ±66.1)
+               relay=(40.0, 90.0),          # Lochbild-Mitte Relaismodul (relay_pat, lange Seite in Y)
                gdr=(140.0, 125.0),          # Lochbild-Mitte Treiber (±24.5 / ±29)
                pwr=(105.0, 15.0),           # Ecke Power-Platine C (Lochende links)
                leg=(170.0, 15.0),           # Ecke Bein-Platine A (Lochende links)
@@ -415,7 +423,8 @@ def gdr_holes():
 
 
 def relay_holes():
-    return [(P["relay_x"] + dx, dy) for dx in (-66.1, 66.1) for dy in (-25.4, 25.4)]
+    a, b = P["relay_pat"][0] / 2, P["relay_pat"][1] / 2
+    return [(P["relay_x"] + dx, dy) for dx in (-a, a) for dy in (-b, b)]
 
 
 def dcdc_screws():
@@ -513,7 +522,8 @@ def split(plate, zb, upper_front):
 
 
 def relay_holes_low():
-    return [(P["relay_low_x"] + dx, dy) for dx in (-25.4, 25.4) for dy in (-66.1, 66.1)]
+    a, b = P["relay_pat"][0] / 2, P["relay_pat"][1] / 2
+    return [(P["relay_low_x"] + dx, dy) for dx in (-b, b) for dy in (-a, a)]
 
 
 def place_m(key, anchor):
@@ -720,10 +730,10 @@ def power_bridge():
                          [cyl(sx, sy, Z_LT - 1, P["col_d"] / 2 + 0.3, z0 - Z_LT + 2)]))
     x0, y0 = w["cx"] - w["L"] / 2, w["cy"] - w["W"] / 2
     zt = z0 + w["deck_t"]
-    for sy in (c["hole_in"], w["W"] - c["hole_in"]):                      # Lochende bei x0
-        pos.append(cyl(x0 + c["hole_in"], y0 + sy, zt - 0.5, c["boss_d"] / 2, w["so"] + 0.5))
-        neg.append(cyl(x0 + c["hole_in"], y0 + sy, zt, c["m2_pilot"] / 2, w["so"] + 0.1))
-    pos.append(box(x0 + w["L"] - 6, y0 + 4, zt - 0.5, 4, w["W"] - 8, w["so"] + 0.5))   # Auflage am freien Ende
+    for sx in (c["hole_in"], w["L"] - c["hole_in"]):                      # V2.15: Löcher an der langen Kante y0
+        pos.append(cyl(x0 + sx, y0 + c["hole_in"], zt - 0.5, c["boss_d"] / 2, w["so"] + 0.5))
+        neg.append(cyl(x0 + sx, y0 + c["hole_in"], zt, c["m2_pilot"] / 2, w["so"] + 0.1))
+    pos.append(box(x0 + 4, y0 + w["W"] - 6, zt - 0.5, w["L"] - 8, 4, w["so"] + 0.5))   # Auflage gegenüber
     neg.append(box(x0 + 8, y0 + 6, z0 - 1, w["L"] - 18, w["W"] - 12, w["deck_t"] + 2))   # Fenster (Kabel nach unten)
     br = cut(fuse(pos), neg)
     ph = box(x0, y0, zt + w["so"], w["L"], w["W"], w["env"])
@@ -833,8 +843,9 @@ def bench_board():
     # Relaismodul: Bunde mit M3-Einsatz (wie untere Platte)
     rx, ry = B["relay"]
     di, depth, bd = P["relay_insert"]
-    for dx in (-25.4, 25.4):
-        for dy in (-66.1, 66.1):
+    a, b = P["relay_pat"][0] / 2, P["relay_pat"][1] / 2
+    for dx in (-b, b):
+        for dy in (-a, a):
             pos.append(cyl(rx + dx, ry + dy, t - 0.5, bd / 2, P["relay_so"] + 0.5))
             neg.append(cyl(rx + dx, ry + dy, t + P["relay_so"] - depth, di / 2, depth + 1))
     # Treiber: Durchgang + Senkung von unten (Hülsen 16 mm oben aufgeschraubt)
@@ -844,11 +855,16 @@ def bench_board():
             neg.append(cyl(gx + dx, gy + dy, -1, P["gdr_hole_d"] / 2, t + 2))
             neg.append(cyl(gx + dx, gy + dy, -1, B["cb"][0] / 2, B["cb"][1] + 1))
     # Power-Platine C (½ 5×7) und Bein-Platine A (½ 3×7): M2-Bunde am Lochende, Stütze am freien Ende
-    for (x0, y0), g in ((B["pwr"], c["pwr"]), (B["leg"], c["leg"])):
-        for sy in (c["hole_in"], g["W"] - c["hole_in"]):
-            pos.append(cyl(x0 + c["hole_in"], y0 + sy, t - 0.5, c["boss_d"] / 2, g["so"] + 0.5))
-            neg.append(cyl(x0 + c["hole_in"], y0 + sy, t, c["m2_pilot"] / 2, g["so"] + 0.1))
-        pos.append(box(x0 + g["L"] - 6, y0 + 4, t - 0.5, 4, g["W"] - 8, g["so"] + 0.5))
+    lx, ly = B["leg"]; g = c["leg"]                     # Bein A: Löcher an der kurzen Kante (Abstand 26)
+    for sy in (c["hole_in"], g["W"] - c["hole_in"]):
+        pos.append(cyl(lx + c["hole_in"], ly + sy, t - 0.5, c["boss_d"] / 2, g["so"] + 0.5))
+        neg.append(cyl(lx + c["hole_in"], ly + sy, t, c["m2_pilot"] / 2, g["so"] + 0.1))
+    pos.append(box(lx + g["L"] - 6, ly + 4, t - 0.5, 4, g["W"] - 8, g["so"] + 0.5))
+    px, py = B["pwr"]; g = c["pwr"]                     # V2.15: Power C: Löcher an der langen Kante (Abstand 46)
+    for sx in (c["hole_in"], g["L"] - c["hole_in"]):
+        pos.append(cyl(px + sx, py + c["hole_in"], t - 0.5, c["boss_d"] / 2, g["so"] + 0.5))
+        neg.append(cyl(px + sx, py + c["hole_in"], t, c["m2_pilot"] / 2, g["so"] + 0.1))
+    pos.append(box(px + 4, py + g["W"] - 6, t - 0.5, g["L"] - 8, 4, g["so"] + 0.5))
     for tx, ty in B["ties"]:                              # Kabelbinder-Schlitzpaare
         for s in (-1, 1):
             neg.append(box(tx - 1.5 + s * 4.0, ty - 2.0, -1, 3.0, 4.0, t + 2))
