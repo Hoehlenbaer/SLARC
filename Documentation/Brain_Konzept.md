@@ -478,3 +478,22 @@ Der Server-Log bestätigt „selected slot by id“ und nach dem ersten Lauf je 
 - KV-Cache q8_0 (`-fa on -ctk q8_0 -ctv q8_0`, `-c 8192`) gegen f16 (`-c 12288`), PC, `compare_models --server … --slots 4 --repeat 10` (08.11.2026 20:11): knapp 39/40 beide, Chat 150/150 beide, Holdout 80/80 beide, Suchorte 70/80 beide, Objekt 77 gegen 79/100, Zielwahl voll 123 gegen 128/150. Unterschiede im Rauschen. **(fest)** KV-Cache q8_0 und `-c 8192`; Speicherwirkung auf dem Pi: Läufe `mem-…` in `run_pi_matrix.sh`.
 - **(offen)** 2,9 GB frei mit Modell und vier Slots, ohne Perzeption und Motion. Ob das neben dem vollen Stack reicht, ist ungemessen. Reserven: `-c 8192` (2048 je Slot, Zielwahl braucht ~1170) oder KV-Cache in q8_0.
 
+**Speicher und Cache bei wechselndem Inhalt (Pi, 08.11.2026 20:32 und 20:56, `pi_matrix_2032.md`, `pi_matrix_2056.md`)**
+
+Server-Arbeitsspeicher (RssAnon) mit 4 Slots und Q8-mmproj: wie bisher 4450 MB, `-c 8192` 4331 MB, dazu KV q8_0 4211 MB, dazu `-ub 256` 4169 MB, ohne mmproj 3813 MB. Zeiten in allen Varianten gleich. Der Arbeitsspeicher enthält die beim Laden für ARM umsortierte Kopie der Gewichte (Repack, ~2,5 GB, Annahme); die eingeblendete Modelldatei ist danach freigebbar, deshalb ist MemAvailable („frei“) die ehrliche Zahl.
+
+Bisher maß „wiederholt“ den identischen Prompt (Bestfall). Neu „anderer Inhalt“: gleicher fester Teil, anderer Zustand bzw. Satz, wie im Betrieb. Für Qwen3.5 (hybrid, rekurrent) war offen, ob llama-server den Cache dann über Checkpoints zurücksetzen kann.
+
+| Aufgabe | Qwen3.5-4B: Tokens neu / Zeit | Qwen3-4B (reine Attention): Tokens neu / Zeit |
+|---|---|---|
+| Zielwahl | 132–144 / 19,1–19,4 s | 134–153 / 22,8–23,3 s |
+| Chat | 21–22 / 8,9–9,7 s | 14–16 / 9,8–10,4 s |
+| Objekt | 25 / 14,1–15,0 s | 12 / 11,2–11,3 s |
+| Suchorte | 33–34 / 11,5–15,0 s | 21–24 / 10,0–13,0 s |
+
+Qwen3.5 rechnet nur den geänderten Teil neu, wie Qwen3. Frei: 3,2 GB (Qwen3.5 mit mmproj), 4,3 GB (Qwen3 ohne).
+
+- **(fest)** Brain-LLM auf dem Pi: Qwen3.5-4B Q4_K_M + mmproj Q8_0 in einem llama-server (ohne BLAS) mit `-np 4 -c 8192 -fa on -ctk q8_0 -ctv q8_0 -ub 256 --cache-ram 0`, angesprochen über `ServerBrain(n_slots=4)`. Server ~4,2 GB.
+- Denkpausen im Betrieb (Pi, gemessen): Chat ~9–10 s, Suchorte ~12–15 s, Objekt ~14 s, Zielwahl ~19 s (davon ~7 s neuer Zustandstext, ~12 s Ausgabe), Bildfrage 320 px ~10 s.
+- **(offen)** Nächster Hebel: kürzere Ausgabe (`begruendung`) und knapperer Zustandstext; Qualität mit `compare_models` prüfen.
+
