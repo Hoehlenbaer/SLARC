@@ -1,0 +1,283 @@
+{
+ "rechner": "slarc",
+ "maschine": "aarch64",
+ "bilder": 3,
+ "start": {
+  "zeit": "15:12:23",
+  "cpu_temp_c": 52.4,
+  "throttled": "throttled=0x0",
+  "mem_frei_mb": 4281,
+  "server_rss_mb": 5489
+ },
+ "label": "q35-4b-q40-q8",
+ "mmproj": "mmproj-Qwen3.5-4B-Q8_0.gguf",
+ "modell": "Qwen3.5-4B-Q4_0.gguf",
+ "vision": true,
+ "bild": {
+  "320": {
+   "liste_s": 15.19,
+   "dose_s": 9.48,
+   "prompt_tokens": 124,
+   "prompt_tok_s": 18.3,
+   "gen_tok_s": 3.5,
+   "rows": [
+    {
+     "bild": "000000001296.jpg",
+     "px": [
+      214,
+      320
+     ],
+     "liste": {
+      "wall_s": 12.39,
+      "prompt_n": 206,
+      "prompt_ms": 9304.811,
+      "cache_n": 0,
+      "gen_n": 11,
+      "gen_ms": 3071.28,
+      "text": "{\"objects\": [\"person\", \"cell phone\"]}"
+     },
+     "dose": {
+      "wall_s": 8.46,
+      "prompt_n": 114,
+      "prompt_ms": 6296.845,
+      "cache_n": 0,
+      "gen_n": 8,
+      "gen_ms": 2160.467,
+      "text": "{\"antwort\": \"nein\"}"
+     }
+    },
+    {
+     "bild": "000000004795.jpg",
+     "px": [
+      320,
+      240
+     ],
+     "liste": {
+      "wall_s": 15.19,
+      "prompt_n": 216,
+      "prompt_ms": 9969.686,
+      "cache_n": 0,
+      "gen_n": 18,
+      "gen_ms": 5214.266,
+      "text": "{\"objects\": [\"cat\", \"laptop\", \"keyboard\", \"cell phone\"]}"
+     },
+     "dose": {
+      "wall_s": 9.51,
+      "prompt_n": 124,
+      "prompt_ms": 6762.572,
+      "cache_n": 0,
+      "gen_n": 10,
+      "gen_ms": 2742.244,
+      "text": "{\n  \"antwort\": \"nein\""
+     }
+    },
+    {
+     "bild": "000000035682.jpg",
+     "px": [
+      240,
+      320
+     ],
+     "liste": {
+      "wall_s": 17.62,
+      "prompt_n": 216,
+      "prompt_ms": 9822.588,
+      "cache_n": 0,
+      "gen_n": 26,
+      "gen_ms": 7789.267,
+      "text": "{\"objects\": [\"person\", \"handbag\", \"chair\", \"dining table\", \"microwave\", \"book\"]}"
+     },
+     "dose": {
+      "wall_s": 9.48,
+      "prompt_n": 124,
+      "prompt_ms": 6681.981,
+      "cache_n": 0,
+      "gen_n": 10,
+      "gen_ms": 2788.401,
+      "text": "{\n  \"antwort\": \"nein\""
+     }
+    }
+   ]
+  },
+  "448": {
+   "liste_s": 19.14,
+   "dose_s": 13.51,
+   "prompt_tokens": 184,
+   "prompt_tok_s": 17.2,
+   "gen_tok_s": 3.3,
+   "rows": [
+    {
+     "bild": "000000001296.jpg",
+     "px": [
+      299,
+      448
+     ],
+     "liste": {
+      "wall_s": 17.01,
+      "prompt_n": 262,
+      "prompt_ms": 12922.789,
+      "cache_n": 0,
+      "gen_n": 14,
+      "gen_ms": 4074.737,
+      "text": "{\"objects\": [\"person\", \"cell phone\", \"cat\"]}"
+     },
+     "dose": {
+      "wall_s": 12.01,
+      "prompt_n": 170,
+      "prompt_ms": 9852.457,
+      "cache_n": 0,
+      "gen_n": 8,
+      "gen_ms": 2142.161,
+      "text": "{\"antwort\": \"nein\"}"
+     }
+    },
+    {
+     "bild": "000000004795.jpg",
+     "px": [
+      448,
+      336
+     ],
+     "liste": {
+      "wall_s": 19.14,
+      "prompt_n": 276,
+      "prompt_ms": 13732.388,
+      "cache_n": 0,
+      "gen_n": 18,
+      "gen_ms": 5394.489,
+      "text": "{\"objects\": [\"cat\", \"laptop\", \"keyboard\", \"cell phone\"]}"
+     },
+     "dose": {
+      "wall_s": 13.51,
+      "prompt_n": 184,
+      "prompt_ms": 10694.803,
+      "cache_n": 0,
+      "gen_n": 10,
+      "gen_ms": 2800.931,
+      "text": "{\n  \"antwort\": \"nein\""
+     }
+    },
+    {
+     "bild": "000000035682.jpg",
+     "px": [
+      336,
+      448
+     ],
+     "liste": {
+      "wall_s": 19.51,
+      "prompt_n": 276,
+      "prompt_ms": 13748.315,
+      "cache_n": 0,
+      "gen_n": 19,
+      "gen_ms": 5745.915,
+      "text": "{\"objects\": [\"person\", \"handbag\", \"chair\", \"dining table\"]}"
+     },
+     "dose": {
+      "wall_s": 13.55,
+      "prompt_n": 184,
+      "prompt_ms": 10710.559,
+      "cache_n": 0,
+      "gen_n": 10,
+      "gen_ms": 2828.728,
+      "text": "{\n  \"antwort\": \"nein\""
+     }
+    }
+   ]
+  }
+ },
+ "text": {
+  "zielwahl": {
+   "wechsel": {
+    "wall_s": 53.48,
+    "prompt_n": 1132,
+    "prompt_ms": 39979.716,
+    "cache_n": 0,
+    "gen_n": 41,
+    "gen_ms": 13488.727,
+    "text": "{\"begruendung\": \"Marco bat um sein Handy, das ist wichtiger als die Vase, die ich untersuche.\", \"ziel\": 1, \"stimmung\": \"eifrig\"}"
+   },
+   "wiederholt": {
+    "wall_s": 14.01,
+    "prompt_n": 4,
+    "prompt_ms": 422.349,
+    "cache_n": 1128,
+    "gen_n": 41,
+    "gen_ms": 13580.796,
+    "text": "{\"begruendung\": \"Marco bat um sein Handy, das ist wichtiger als die Vase, die ich untersuche.\", \"ziel\": 1, \"stimmung\": \"eifrig\"}"
+   },
+   "prompt_tok_s": 28.3,
+   "gen_tok_s": 3.0
+  },
+  "chat": {
+   "wechsel": {
+    "wall_s": 32.1,
+    "prompt_n": 689,
+    "prompt_ms": 23263.67,
+    "cache_n": 0,
+    "gen_n": 28,
+    "gen_ms": 8829.21,
+    "text": "{\"dienst\": \"search\", \"gegenstand\": \"fernbedienung\", \"antwort\": \"Ich suche jetzt nach der Fernbedienung.\"}"
+   },
+   "wiederholt": {
+    "wall_s": 9.25,
+    "prompt_n": 4,
+    "prompt_ms": 397.072,
+    "cache_n": 685,
+    "gen_n": 28,
+    "gen_ms": 8842.33,
+    "text": "{\"dienst\": \"search\", \"gegenstand\": \"fernbedienung\", \"antwort\": \"Ich suche jetzt nach der Fernbedienung.\"}"
+   },
+   "prompt_tok_s": 29.6,
+   "gen_tok_s": 3.2
+  },
+  "objekt": {
+   "wechsel": {
+    "wall_s": 21.11,
+    "prompt_n": 332,
+    "prompt_ms": 11845.233,
+    "cache_n": 0,
+    "gen_n": 30,
+    "gen_ms": 9256.247,
+    "text": "{\"grund\": \"Die Katze gehört zu uns und ist hier zu Hause.\", \"interesse\": \"hoch\", \"melden\": \"nein\"}"
+   },
+   "wiederholt": {
+    "wall_s": 9.55,
+    "prompt_n": 4,
+    "prompt_ms": 376.661,
+    "cache_n": 328,
+    "gen_n": 30,
+    "gen_ms": 9165.625,
+    "text": "{\"grund\": \"Die Katze gehört zu uns und ist hier zu Hause.\", \"interesse\": \"hoch\", \"melden\": \"nein\"}"
+   },
+   "prompt_tok_s": 28.0,
+   "gen_tok_s": 3.3
+  },
+  "suchorte": {
+   "wechsel": {
+    "wall_s": 18.26,
+    "prompt_n": 219,
+    "prompt_ms": 7769.79,
+    "cache_n": 0,
+    "gen_n": 34,
+    "gen_ms": 10490.187,
+    "text": "{\"grund\": \"Tassen werden nach dem Trinken in der Küche abgewischt oder im Bad gewaschen.\", \"orte\": [\"küche\", \"bad\"]}"
+   },
+   "wiederholt": {
+    "wall_s": 10.88,
+    "prompt_n": 4,
+    "prompt_ms": 374.041,
+    "cache_n": 215,
+    "gen_n": 34,
+    "gen_ms": 10503.852,
+    "text": "{\"grund\": \"Tassen werden nach dem Trinken in der Küche abgewischt oder im Bad gewaschen.\", \"orte\": [\"küche\", \"bad\"]}"
+   },
+   "prompt_tok_s": 28.2,
+   "gen_tok_s": 3.2
+  }
+ },
+ "ende": {
+  "zeit": "15:19:36",
+  "cpu_temp_c": 63.4,
+  "throttled": "throttled=0x0",
+  "mem_frei_mb": 4021,
+  "server_rss_mb": 5759
+ }
+}

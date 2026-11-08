@@ -1,0 +1,114 @@
+{
+ "rechner": "slarc",
+ "maschine": "aarch64",
+ "bilder": 0,
+ "start": {
+  "zeit": "15:33:16",
+  "cpu_temp_c": 53.5,
+  "throttled": "throttled=0x0",
+  "mem_frei_mb": 4384,
+  "server_rss_mb": 5382
+ },
+ "label": "q3-4b-text",
+ "mmproj": null,
+ "modell": "Qwen3-4B-Instruct-2507-Q4_K_M.gguf",
+ "vision": false,
+ "bild": {},
+ "text": {
+  "zielwahl": {
+   "wechsel": {
+    "wall_s": 82.94,
+    "prompt_n": 1237,
+    "prompt_ms": 65174.5,
+    "cache_n": 3,
+    "gen_n": 50,
+    "gen_ms": 17760.098,
+    "text": "{\"begruendung\": \"Ich habe Neugier und möchte die unbekannte Vase untersuchen, um nützlich zu sein.\", \"ziel\": 2, \"stimmung\": \"neugierig\"}"
+   },
+   "wiederholt": {
+    "wall_s": 18.12,
+    "prompt_n": 1,
+    "prompt_ms": 345.562,
+    "cache_n": 1239,
+    "gen_n": 50,
+    "gen_ms": 17769.222,
+    "text": "{\"begruendung\": \"Ich habe Neugier und möchte die unbekannte Vase untersuchen, um nützlich zu sein.\", \"ziel\": 2, \"stimmung\": \"neugierig\"}"
+   },
+   "prompt_tok_s": 19.0,
+   "gen_tok_s": 2.8
+  },
+  "chat": {
+   "wechsel": {
+    "wall_s": 46.39,
+    "prompt_n": 746,
+    "prompt_ms": 37230.436,
+    "cache_n": 8,
+    "gen_n": 32,
+    "gen_ms": 9157.053,
+    "text": "{\"dienst\": \"search\", \"gegenstand\": \"fernbedienung\", \"antwort\": \"Ich suche sie gerade für dich.\"}"
+   },
+   "wiederholt": {
+    "wall_s": 9.49,
+    "prompt_n": 1,
+    "prompt_ms": 311.111,
+    "cache_n": 753,
+    "gen_n": 32,
+    "gen_ms": 9172.037,
+    "text": "{\"dienst\": \"search\", \"gegenstand\": \"fernbedienung\", \"antwort\": \"Ich suche sie gerade für dich.\"}"
+   },
+   "prompt_tok_s": 20.0,
+   "gen_tok_s": 3.5
+  },
+  "objekt": {
+   "wechsel": {
+    "wall_s": 25.32,
+    "prompt_n": 348,
+    "prompt_ms": 16592.301,
+    "cache_n": 8,
+    "gen_n": 34,
+    "gen_ms": 8722.95,
+    "text": "{\"grund\": \"Eine Katze im Wohnzimmer ist normal und erwartet.\", \"interesse\": \"hoch\", \"melden\": \"nein\"}"
+   },
+   "wiederholt": {
+    "wall_s": 8.96,
+    "prompt_n": 1,
+    "prompt_ms": 255.541,
+    "cache_n": 355,
+    "gen_n": 34,
+    "gen_ms": 8704.435,
+    "text": "{\"grund\": \"Eine Katze im Wohnzimmer ist normal und erwartet.\", \"interesse\": \"hoch\", \"melden\": \"nein\"}"
+   },
+   "prompt_tok_s": 21.0,
+   "gen_tok_s": 3.9
+  },
+  "suchorte": {
+   "wechsel": {
+    "wall_s": 21.91,
+    "prompt_n": 236,
+    "prompt_ms": 11090.067,
+    "cache_n": 3,
+    "gen_n": 43,
+    "gen_ms": 10812.763,
+    "text": "{\"grund\": \"Tassen werden häufig in der Küche aufbewahrt oder verwendet, da dort Kaffee oder Tee getrunken werden.\", \"orte\": [\"küche\", \"wohnzimmer\"]}"
+   },
+   "wiederholt": {
+    "wall_s": 11.09,
+    "prompt_n": 1,
+    "prompt_ms": 244.709,
+    "cache_n": 238,
+    "gen_n": 43,
+    "gen_ms": 10846.701,
+    "text": "{\"grund\": \"Tassen werden häufig in der Küche aufbewahrt oder verwendet, da dort Kaffee oder Tee getrunken werden.\", \"orte\": [\"küche\", \"wohnzimmer\"]}"
+   },
+   "prompt_tok_s": 21.3,
+   "gen_tok_s": 4.0
+  }
+ },
+ "ende": {
+  "zeit": "15:39:17",
+  "cpu_temp_c": 66.1,
+  "throttled": "throttled=0x0",
+  "mem_frei_mb": 4321,
+  "server_rss_mb": 5461
+ }
+}
