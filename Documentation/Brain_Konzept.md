@@ -1,6 +1,6 @@
 # SLARC – Konzept High-Level-Brain
 
-Stand: 07.11.2026, Entwurf V0.3 (V0.2: Bedürfnis Gesellschaft, erste Umsetzung in `src_dev/ai/brain/`; V0.3: neue Rollenverteilung Code/LLM nach dem ersten Modelltest, Abschnitt 15). Ergebnis aus dem Brain-Chat. Ersetzt das Prinzip "klare Aufgabe → Behavior-Tree-JSON" (`src_dev/ai/exploration_manager_V4.py`) durch ein System, das eigenen Bedürfnissen folgt.
+Stand: 08.11.2026, Entwurf V0.3 (V0.7: Pi-Messung Qwen3.5 Text und Bild, Abschnitt 17; V0.2: Bedürfnis Gesellschaft, erste Umsetzung in `src_dev/ai/brain/`; V0.3: neue Rollenverteilung Code/LLM nach dem ersten Modelltest, Abschnitt 15). Ergebnis aus dem Brain-Chat. Ersetzt das Prinzip "klare Aufgabe → Behavior-Tree-JSON" (`src_dev/ai/exploration_manager_V4.py`) durch ein System, das eigenen Bedürfnissen folgt.
 
 Kennzeichnung wie in `Hardware_Interfaces.md`: **(fest)** entschieden, **(Annahme)** Startwert, **(offen)** noch zu entscheiden.
 
@@ -254,7 +254,7 @@ Das LLM bekommt in jeder Stufe Text; das Konzept ändert sich durch den Kanal ni
 8. Audio-Hardware (Stufe 2/3) im Hardware-Chat.
 9. Bitten aus dem Chat in Dienste übersetzen (eigener kleiner LLM-Aufruf oder Regeln). Bisher kommen Bitten schon strukturiert als `Request` an.
 10. Brain-Prozess mit Denk-Zustand in `launch_all.py` einhängen; Simulation eines ganzen "Tages" mit dem MockBlackboard, um Abwechslung und Rhythmus zu beurteilen.
-11. **Vision-Sprachmodell für seltene Bildfragen** (notiert 07.11.2026): Qwen3.5-4B nimmt laut Modellkarte auch Bilder, braucht dafür zusätzlich `mmproj-Qwen3.5-4B-f16.gguf` (~0,7 GB). Idee: Zustände, die die Detektion nicht kennt („Fenster offen?“, „Licht an?“, „Welcher Raum ist das?“), mit einem einzelnen Kamerabild fragen statt je eine Klasse zu trainieren. Offen: Unterstützung in llama-cpp-python (sonst `llama-server` über HTTP), Dauer je Bild auf dem Pi, Qualität. Erster Test auf dem PC mit Fotos aus der Wohnung. Werkzeug: `brain/vision/compare_vlm.py` (Qwen3.5-4B gegen ein größeres Modell, z. B. Qwen3.5-9B, auf COCO als Wahrheit und mit eigenen Fotos; Vorlage `questions_template.json`). Kein Vergleich mit dem YOLO-Head: der liefert Boxen, das VLM Antworten. Geschwindigkeit auf dem Pi: `brain/vision/bench_pi.py`, Anleitung in `brain/vision/README.md`. Erster Eindruck (PC, 10 COCO-Bilder, 07.11.2026): Precision 0,83, Recall 0,80, 0,32 s je Bild auf der GPU; erkannte Dosen im Kühlregal, die COCO nicht als Klasse kennt. 100 Bilder (PC, 08.11.2026, Seed 7, `--indoor`, 640 px): Precision 0,85, Recall 0,85, Recall für nicht kleine Objekte 0,90, keine ungültige Antwort, 0,32 s je Bild auf der GPU. Häufig übersehen: Handtasche, Stuhl, Schüssel; häufig zusätzlich genannt: Topfpflanze, Tasse, Stuhl, Flasche (teils vermutlich in COCO nur nicht annotiert, nicht geprüft). Einschränkung: `--indoor` lässt auch Straßenszenen mit Regenschirm durch. Größenordnung: Bild-Encoder (mmproj, ~0,3 Mrd. Parameter) + 4 Mrd. Sprachmodell gegen ~5 Mio. für Backbone und YOLO-Head zusammen.
+11. **Vision-Sprachmodell für seltene Bildfragen** (notiert 07.11.2026): Qwen3.5-4B nimmt laut Modellkarte auch Bilder, braucht dafür zusätzlich `mmproj-Qwen3.5-4B-f16.gguf` (~0,7 GB). Idee: Zustände, die die Detektion nicht kennt („Fenster offen?“, „Licht an?“, „Welcher Raum ist das?“), mit einem einzelnen Kamerabild fragen statt je eine Klasse zu trainieren. Offen: Unterstützung in llama-cpp-python (sonst `llama-server` über HTTP), Dauer je Bild auf dem Pi, Qualität. Erster Test auf dem PC mit Fotos aus der Wohnung. Werkzeug: `brain/vision/compare_vlm.py` (Qwen3.5-4B gegen ein größeres Modell, z. B. Qwen3.5-9B, auf COCO als Wahrheit und mit eigenen Fotos; Vorlage `questions_template.json`). Kein Vergleich mit dem YOLO-Head: der liefert Boxen, das VLM Antworten. Geschwindigkeit auf dem Pi: `brain/vision/bench_pi.py`, Anleitung in `brain/vision/README.md`. Erster Eindruck (PC, 10 COCO-Bilder, 07.11.2026): Precision 0,83, Recall 0,80, 0,32 s je Bild auf der GPU; erkannte Dosen im Kühlregal, die COCO nicht als Klasse kennt. 100 Bilder (PC, 08.11.2026, Seed 7, `--indoor`, 640 px): Precision 0,85, Recall 0,85, Recall für nicht kleine Objekte 0,90, keine ungültige Antwort, 0,32 s je Bild auf der GPU. Häufig übersehen: Handtasche, Stuhl, Schüssel; häufig zusätzlich genannt: Topfpflanze, Tasse, Stuhl, Flasche (teils vermutlich in COCO nur nicht annotiert, nicht geprüft). Einschränkung: `--indoor` lässt auch Straßenszenen mit Regenschirm durch. Messungen nach Bildgröße und auf dem Pi (08.11.2026): Abschnitt 17. Größenordnung: Bild-Encoder (mmproj, ~0,3 Mrd. Parameter) + 4 Mrd. Sprachmodell gegen ~5 Mio. für Backbone und YOLO-Head zusammen.
 12. **Perzeption kennt keine Türen, Fenster, Dosen** (07.11.2026): Die Detektion V5.0 hat 40 COCO-Klassen + „unbekannt“ (`ROBOT_CAT_IDS` in `FusedHexapodModel_V5_0-Phase-1.py`), davon 10 Außenklassen (Auto, Ampel, Bank …). Die Außenklassen bleiben: SLARC soll auch draußen laufen, Bank, Hydrant und Ampel taugen dort als Anker, Bäume erkennt die Detektion vermutlich als „topfpflanze“, das ist so akzeptiert (Marco, 08.11.2026). Für Navigation an benennbaren Ankern innen und für den Meilenstein Dose fehlen Tür, Fenster, Dose; sie kommen zusätzlich dazu. Anforderung an den KI-Chat; Quellen z. B. ADE20K, Open Images.
 
 ---
@@ -410,3 +410,43 @@ python -m brain.sim.day --model Qwen3.5-4B-Q4_K_M.gguf --gpu-layers -1
 - Ergebnis ohne LLM: Dösen 45 statt 125 min, Marco wird gesucht, gefunden, begrüßt und begleitet.
 - Offen: Few-Shot im Entscheidungs-Prompt ohne konkrete Inhalte; nur Bedürfnisse ab „mittel“ als Grund.
 
+## 17. Messung auf dem Pi 5: Text und Bild (08.11.2026, V0.7)
+
+Aufbau: Pi 5 (8 GB, OS auf USB3-SSD), llama.cpp a691b23 als `llama-server`, `-t 4 -c 4096 -np 1 --cache-ram 0`, Perzeption und Motion aus. Werkzeug `brain/vision/run_pi_matrix.sh` (startet je Konfiguration einen Server, ruft `bench_pi.py` auf), 3 COCO-Bilder je Größe, Median. Keine Drosselung (`throttled=0x0`), Temperatur ≤ 67 °C. Rohdaten in `brain/ergebnisse/2026-11-08/` (`pi_matrix_1540.md`, `pi_bench_*`).
+
+**Randbedingungen (gemessen)**
+
+- `--cache-ram`: neuere llama-server halten zusätzlich einen Prompt-Cache im RAM, Standard 8192 MiB. Damit lief auf dem Pi der Swap voll (2 GB), und neue Bilder zeigten nur 4 Prompt-Tokens (vermutlich falsch wiederverwendete Zustände). Deshalb **(fest)** `--cache-ram 0`. Der Slot-Cache (`--cache-prompt`) bleibt.
+- OpenBLAS: kein Unterschied (Zielwahl nach Wechsel 69,7 s mit, 70,0 s ohne BLAS; Bild 320 px je 17,4 s). llama.cpp rechnet Q4-Gewichte mit eigenen ARM-Kerneln. **(fest)** Build ohne BLAS.
+- Architektur: Qwen3-4B-2507 ist mit Q4_K_M gleich schnell wie Qwen3.5-4B (Prompt ~19–21 tok/s). Die neue Architektur bremst also nicht.
+
+**Ergebnisse** (Zeit für die ganze Anfrage; „Wechsel“ = fester Prompt-Teil neu gerechnet, „wiederholt“ = im Slot-Cache)
+
+| Modell | mmproj | Bild ja/nein 320 / 448 px | Zielwahl Wechsel / wiederholt | Chat Wechsel / wiederholt | Prompt tok/s | Erzeugung tok/s | frei MB |
+|---|---|---|---|---|---|---|---|
+| Qwen3.5-4B Q4_K_M | F16 | 18,0 / 28,0 s | 72 / 14 s | 44 / 10 s | 19 | 2,8 | 3548 |
+| Qwen3.5-4B Q4_K_M | Q8_0 | 10,6 / 15,6 s | 70 / 12 s | 43 / 8,6 s | 19 | 3,3 | 3810 |
+| Qwen3.5-4B Q4_0 | Q8_0 | 9,5 / 13,5 s | 53 / 14 s | 32 / 9,3 s | 28 | 3,0 | 4021 |
+| Qwen3.5-2B Q4_K_M | F16 | 12,5 / 20,6 s | 28 / 5,8 s | 18 / 5,2 s | 50 | 7,3 | 5159 |
+| Qwen3.5-2B Q4_K_M | Q8_0 | 5,6 / 8,8 s | 28 / 5,8 s | 18 / 5,1 s | 50 | 7,3 | 5444 |
+| Qwen3-4B-2507 Q4_K_M | – | – | 83 / 18 s | 46 / 9,5 s | 19 | 2,8 | 4321 |
+
+**Genauigkeit Bild** (PC, 100 COCO-Bilder, Seed 7, alle Szenen, 08.11.2026; F16 und Q8_0 innerhalb ±0,01)
+
+| Modell | Bildkante | Precision | Recall | F1 | Recall nicht klein | ungültig |
+|---|---|---|---|---|---|---|
+| Qwen3.5-4B | 640 px | 0,84 | 0,86 | 0,85 | 0,91 | 0 |
+| Qwen3.5-4B | 448 px | 0,81 | 0,82 | 0,82 | 0,88 | 0 |
+| Qwen3.5-4B | 320 px | 0,79 | 0,77–0,78 | 0,78 | 0,84–0,85 | 0 |
+| Qwen3.5-2B | 640 px | 0,36–0,37 | 0,82–0,84 | 0,50–0,51 | 0,87–0,88 | 3–5 |
+
+Das 2B nennt fast zwei von drei Klassen zu Unrecht (Flasche 18-mal, Tasse 15-mal, Schüssel 13-mal), es zählt eher die Liste auf, als hinzusehen. „Nicht klein“ ist in Originalpixeln gerechnet (≥ 32×32); bei 320 px Kante schrumpfen solche Objekte auf etwa die Hälfte.
+
+**Folgerungen**
+
+- **(fest)** mmproj Q8_0 statt F16: auf dem PC gleich genau, auf dem Pi halbiert es die Zeit des Bild-Encoders (4B: 18,0 → 10,6 s bei 320 px) und spart ~0,3 GB.
+- **(fest)** Qwen3.5-2B nicht für Bildfragen (Precision 0,37). Für Text noch offen, Qualitätsvergleich mit `compare_models` steht aus. Auf dem Pi ist es 2,5-mal schneller (Zielwahl wiederholt 5,8 s).
+- **(Annahme)** Bildfragen mit dem 4B bei 320 px als Standard (~10 s, Recall nicht klein 0,84), 448 px für Übersichtsfragen (~14–16 s). Nur als seltene Rückfrage im Denk-Zustand, keine laufende Wahrnehmung.
+- **(offen)** Qwen3.5-4B Q4_0 statt Q4_K_M: Prompt 28 statt 19 tok/s (Zielwahl nach Wechsel 53 statt 70 s). Qualität von Q4_0 auf dem PC prüfen (`compare_models`, `compare_vlm --max-side 320`).
+- **(offen)** Aufgabenwechsel kosten 30–70 s, das ist für den Betrieb zu langsam. Mit Cache sind es 9–14 s. Wege: mehrere Slots (`-np 4`, ein Slot je Aufgabe; Speicher messen) oder Slots je Aufgabe mit `--slot-save-path` sichern und laden.
+- **(offen)** Mit Cache bestimmt die Erzeugung die Zeit (~40 Tokens bei ~3 tok/s ≈ 12 s für die Zielwahl). Hebel: kürzere `begruendung` in der Ausgabe und kürzere Beispiele im Prompt (die ohnehin aufgeräumt werden müssen, Abschnitt 15).

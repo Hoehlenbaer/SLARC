@@ -37,7 +37,7 @@ cmake --build build-server -j4 --target llama-server
 
 Offen: ob das venv `ai` (llama-cpp-python vom März) Qwen3.5 laden kann.
 
-Ob OpenBLAS auf dem Pi hilft, ist offen: llama.cpp nutzt BLAS nur für große Matrix-Batches
+Gemessen 08.11.2026: OpenBLAS bringt nichts (gleiche Zeiten), deshalb `build-noblas` verwenden. Hintergrund: llama.cpp nutzt BLAS nur für große Matrix-Batches
 (Prompt, Bild-Encoder), für Q4-Gewichte meist die eigenen ARM-Kernel. Zum Vergleich ein
 zweiter Bau ohne BLAS (`cmake -B build-noblas -DCMAKE_BUILD_TYPE=Release`, sonst gleich).
 
@@ -48,8 +48,8 @@ Pillow für `bench_pi.py` ist im venv `ai` über torchvision bzw. die System-Pak
 Perzeption und Motion vorher beenden (Messbedingung wie im Denk-Zustand). Terminal 1:
 
 ```
-~/llama.cpp/build-server/bin/llama-server -m ~/.models/Qwen3.5-4B-Q4_K_M.gguf \
-    --mmproj ~/.models/mmproj-Qwen3.5-4B-f16.gguf -t 4 -c 4096 -np 1 --cache-ram 0 --port 8080
+~/llama.cpp/build-noblas/bin/llama-server -m ~/.models/Qwen3.5-4B-Q4_K_M.gguf \
+    --mmproj ~/.models/mmproj-Qwen3.5-4B-Q8_0.gguf -t 4 -c 4096 -np 1 --cache-ram 0 --port 8080
 ```
 
 `-np 1`: nur ein Platz, damit der Speicher reicht und der Cache realistisch ist.
