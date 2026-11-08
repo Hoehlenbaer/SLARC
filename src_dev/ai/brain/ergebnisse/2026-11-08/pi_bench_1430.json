@@ -1,0 +1,355 @@
+{
+ "rechner": "slarc",
+ "maschine": "aarch64",
+ "bilder": 3,
+ "start": {
+  "zeit": "14:13:33",
+  "cpu_temp_c": 46.9,
+  "throttled": "throttled=0x0",
+  "mem_frei_mb": 3843,
+  "server_rss_mb": 6019
+ },
+ "bild": {
+  "320": {
+   "liste_s": 24.1,
+   "dose_s": 17.43,
+   "prompt_tokens": 124,
+   "prompt_tok_s": 8.0,
+   "gen_tok_s": 3.6,
+   "rows": [
+    {
+     "bild": "000000001296.jpg",
+     "px": [
+      214,
+      320
+     ],
+     "liste": {
+      "wall_s": 22.08,
+      "prompt_n": 206,
+      "prompt_ms": 19015.347,
+      "cache_n": 0,
+      "gen_n": 11,
+      "gen_ms": 3051.247,
+      "text": "{\"objects\": [\"person\", \"cell phone\"]}"
+     },
+     "dose": {
+      "wall_s": 15.99,
+      "prompt_n": 114,
+      "prompt_ms": 13946.52,
+      "cache_n": 0,
+      "gen_n": 8,
+      "gen_ms": 2035.585,
+      "text": "{\"antwort\": \"nein\"}"
+     }
+    },
+    {
+     "bild": "000000004795.jpg",
+     "px": [
+      320,
+      240
+     ],
+     "liste": {
+      "wall_s": 24.1,
+      "prompt_n": 216,
+      "prompt_ms": 20033.674,
+      "cache_n": 0,
+      "gen_n": 15,
+      "gen_ms": 4054.53,
+      "text": "{\"objects\": [\"cat\", \"laptop\", \"cell phone\"]}"
+     },
+     "dose": {
+      "wall_s": 17.43,
+      "prompt_n": 124,
+      "prompt_ms": 15445.803,
+      "cache_n": 0,
+      "gen_n": 8,
+      "gen_ms": 1977.757,
+      "text": "{\"antwort\": \"nein\"}"
+     }
+    },
+    {
+     "bild": "000000035682.jpg",
+     "px": [
+      240,
+      320
+     ],
+     "liste": {
+      "wall_s": 27.34,
+      "prompt_n": 216,
+      "prompt_ms": 20008.693,
+      "cache_n": 0,
+      "gen_n": 26,
+      "gen_ms": 7321.234,
+      "text": "{\"objects\": [\"person\", \"handbag\", \"cup\", \"dining table\", \"microwave\", \"chair\"]}"
+     },
+     "dose": {
+      "wall_s": 17.52,
+      "prompt_n": 124,
+      "prompt_ms": 15485.048,
+      "cache_n": 0,
+      "gen_n": 8,
+      "gen_ms": 2026.935,
+      "text": "{\"antwort\": \"nein\"}"
+     }
+    }
+   ]
+  },
+  "448": {
+   "liste_s": 34.99,
+   "dose_s": 27.44,
+   "prompt_tokens": 184,
+   "prompt_tok_s": 7.3,
+   "gen_tok_s": 3.6,
+   "rows": [
+    {
+     "bild": "000000001296.jpg",
+     "px": [
+      299,
+      448
+     ],
+     "liste": {
+      "wall_s": 30.61,
+      "prompt_n": 262,
+      "prompt_ms": 27628.437,
+      "cache_n": 0,
+      "gen_n": 11,
+      "gen_ms": 2968.196,
+      "text": "{\"objects\": [\"person\", \"cell phone\"]}"
+     },
+     "dose": {
+      "wall_s": 25.16,
+      "prompt_n": 170,
+      "prompt_ms": 23115.658,
+      "cache_n": 0,
+      "gen_n": 8,
+      "gen_ms": 2035.473,
+      "text": "{\"antwort\": \"nein\"}"
+     }
+    },
+    {
+     "bild": "000000004795.jpg",
+     "px": [
+      448,
+      336
+     ],
+     "liste": {
+      "wall_s": 34.99,
+      "prompt_n": 276,
+      "prompt_ms": 29911.121,
+      "cache_n": 0,
+      "gen_n": 18,
+      "gen_ms": 5061.262,
+      "text": "{\"objects\": [\"cat\", \"laptop\", \"keyboard\", \"cell phone\"]}"
+     },
+     "dose": {
+      "wall_s": 27.48,
+      "prompt_n": 184,
+      "prompt_ms": 25374.305,
+      "cache_n": 0,
+      "gen_n": 8,
+      "gen_ms": 2088.04,
+      "text": "{\"antwort\": \"nein\"}"
+     }
+    },
+    {
+     "bild": "000000035682.jpg",
+     "px": [
+      336,
+      448
+     ],
+     "liste": {
+      "wall_s": 35.3,
+      "prompt_n": 276,
+      "prompt_ms": 29890.6,
+      "cache_n": 0,
+      "gen_n": 19,
+      "gen_ms": 5396.566,
+      "text": "{\"objects\": [\"person\", \"handbag\", \"cup\", \"dining table\"]}"
+     },
+     "dose": {
+      "wall_s": 27.44,
+      "prompt_n": 184,
+      "prompt_ms": 25374.693,
+      "cache_n": 0,
+      "gen_n": 8,
+      "gen_ms": 2048.413,
+      "text": "{\"antwort\": \"nein\"}"
+     }
+    }
+   ]
+  },
+  "640": {
+   "liste_s": 61.69,
+   "dose_s": 55.06,
+   "prompt_tokens": 344,
+   "prompt_tok_s": 6.5,
+   "gen_tok_s": 3.6,
+   "rows": [
+    {
+     "bild": "000000001296.jpg",
+     "px": [
+      427,
+      640
+     ],
+     "liste": {
+      "wall_s": 53.62,
+      "prompt_n": 396,
+      "prompt_ms": 50614.288,
+      "cache_n": 0,
+      "gen_n": 11,
+      "gen_ms": 2985.192,
+      "text": "{\"objects\": [\"person\", \"cell phone\"]}"
+     },
+     "dose": {
+      "wall_s": 48.3,
+      "prompt_n": 304,
+      "prompt_ms": 46187.575,
+      "cache_n": 0,
+      "gen_n": 8,
+      "gen_ms": 2093.427,
+      "text": "{\"antwort\": \"nein\"}"
+     }
+    },
+    {
+     "bild": "000000004795.jpg",
+     "px": [
+      640,
+      480
+     ],
+     "liste": {
+      "wall_s": 61.69,
+      "prompt_n": 436,
+      "prompt_ms": 57455.352,
+      "cache_n": 0,
+      "gen_n": 15,
+      "gen_ms": 4212.581,
+      "text": "{\"objects\": [\"cat\", \"laptop\", \"cell phone\"]}"
+     },
+     "dose": {
+      "wall_s": 55.15,
+      "prompt_n": 344,
+      "prompt_ms": 53059.208,
+      "cache_n": 0,
+      "gen_n": 8,
+      "gen_ms": 2069.299,
+      "text": "{\"antwort\": \"nein\"}"
+     }
+    },
+    {
+     "bild": "000000035682.jpg",
+     "px": [
+      480,
+      640
+     ],
+     "liste": {
+      "wall_s": 64.25,
+      "prompt_n": 436,
+      "prompt_ms": 57529.915,
+      "cache_n": 0,
+      "gen_n": 22,
+      "gen_ms": 6700.084,
+      "text": "{\"objects\": [\"person\", \"handbag\", \"cup\", \"dining table\", \"tv\"]}"
+     },
+     "dose": {
+      "wall_s": 55.06,
+      "prompt_n": 344,
+      "prompt_ms": 52944.911,
+      "cache_n": 0,
+      "gen_n": 8,
+      "gen_ms": 2099.497,
+      "text": "{\"antwort\": \"nein\"}"
+     }
+    }
+   ]
+  }
+ },
+ "text": {
+  "zielwahl": {
+   "wechsel": {
+    "wall_s": 70.01,
+    "prompt_n": 1132,
+    "prompt_ms": 58351.282,
+    "cache_n": 0,
+    "gen_n": 38,
+    "gen_ms": 11644.321,
+    "text": "{\"begruendung\": \"Marco bittet um das Handy, das ist wichtiger als die Vase.\", \"ziel\": 1, \"stimmung\": \"eifrig\"}"
+   },
+   "wiederholt": {
+    "wall_s": 12.14,
+    "prompt_n": 4,
+    "prompt_ms": 454.338,
+    "cache_n": 1128,
+    "gen_n": 38,
+    "gen_ms": 11674.567,
+    "text": "{\"begruendung\": \"Marco bittet um das Handy, das ist wichtiger als die Vase.\", \"ziel\": 1, \"stimmung\": \"eifrig\"}"
+   }
+  },
+  "chat": {
+   "wechsel": {
+    "wall_s": 50.41,
+    "prompt_n": 689,
+    "prompt_ms": 42126.32,
+    "cache_n": 0,
+    "gen_n": 28,
+    "gen_ms": 8244.302,
+    "text": "{\"dienst\": \"search\", \"gegenstand\": \"fernbedienung\", \"antwort\": \"Ich suche jetzt nach der Fernbedienung.\"}"
+   },
+   "wiederholt": {
+    "wall_s": 8.68,
+    "prompt_n": 4,
+    "prompt_ms": 407.71,
+    "cache_n": 685,
+    "gen_n": 28,
+    "gen_ms": 8264.716,
+    "text": "{\"dienst\": \"search\", \"gegenstand\": \"fernbedienung\", \"antwort\": \"Ich suche jetzt nach der Fernbedienung.\"}"
+   }
+  },
+  "objekt": {
+   "wechsel": {
+    "wall_s": 27.83,
+    "prompt_n": 332,
+    "prompt_ms": 17135.246,
+    "cache_n": 0,
+    "gen_n": 37,
+    "gen_ms": 10691.623,
+    "text": "{\"grund\": \"Die Katze ist ein Haustier, das hier leben soll und nicht verloren ist.\", \"interesse\": \"niedrig\", \"melden\": \"nein\"}"
+   },
+   "wiederholt": {
+    "wall_s": 11.16,
+    "prompt_n": 4,
+    "prompt_ms": 378.194,
+    "cache_n": 328,
+    "gen_n": 37,
+    "gen_ms": 10773.397,
+    "text": "{\"grund\": \"Die Katze ist ein Haustier, das hier leben soll und nicht verloren ist.\", \"interesse\": \"niedrig\", \"melden\": \"nein\"}"
+   }
+  },
+  "suchorte": {
+   "wechsel": {
+    "wall_s": 33.24,
+    "prompt_n": 219,
+    "prompt_ms": 11172.52,
+    "cache_n": 0,
+    "gen_n": 38,
+    "gen_ms": 22065.88,
+    "text": "{\"grund\": \"Tassen werden nach dem Trinken meist in der Küche abgewaschen oder auf dem Tisch stehen gelassen.\", \"orte\": [\"küche\", \"wohnzimmer\"]}"
+   },
+   "wiederholt": {
+    "wall_s": 14.26,
+    "prompt_n": 4,
+    "prompt_ms": 787.351,
+    "cache_n": 215,
+    "gen_n": 38,
+    "gen_ms": 13468.508,
+    "text": "{\"grund\": \"Tassen werden nach dem Trinken meist in der Küche abgewaschen oder auf dem Tisch stehen gelassen.\", \"orte\": [\"küche\", \"wohnzimmer\"]}"
+   }
+  }
+ },
+ "ende": {
+  "zeit": "14:30:27",
+  "cpu_temp_c": 63.4,
+  "throttled": "throttled=0x0",
+  "mem_frei_mb": 3437,
+  "server_rss_mb": 4631
+ }
+}
