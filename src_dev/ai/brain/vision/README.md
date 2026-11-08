@@ -7,6 +7,8 @@ Stand 08.11.2026 (--cache-ram 0 ergänzt). Hintergrund: `Documentation/Brain_Kon
 | `compare_vlm.py` | PC oder Pi | Genauigkeit: welche der 40 Klassen sind im Bild (COCO als Wahrheit), Beschreibungen, Fragen an eigene Fotos; mehrere Modelle nebeneinander |
 | `export_subset.py` | PC | kleine Auswahl echter Innenraumbilder + Mini-Annotation zum Kopieren auf den Pi |
 | `bench_pi.py` | Pi | Geschwindigkeit: Bildfragen bei mehreren Bildgrößen und die Brain-Aufgaben ohne Bild |
+| `identify.py` | Brain | Baustein: Ausschnitt um eine Box (mit Rand, quadratisch) ans VLM, „Was ist das?“, Antwort aus Wortliste oder frei, mit „sicher“ |
+| `crops_vlm.py` | PC oder Pi | Test dazu: Boxen der 40 COCO-Klassen, die SLARC nicht kennt, als „Unbekannte“; Treffer je Antwortform und Ausschnittgröße |
 | `run_pi_matrix.sh` | Pi | alle Modell-/mmproj-Varianten nacheinander mit `bench_pi`, Übersichtstabelle |
 
 ## 1. Bilder für den Pi (PC, WSL)
@@ -101,3 +103,19 @@ Der Bericht landet in `brain/ergebnisse/<Datum>/pi_bench_<Uhrzeit>.md`.
 - **Bild+Frage Tokens**: wächst mit der Bildgröße. Ist die Prompt-Geschwindigkeit der Engpass, ist eine kleinere Bildkante der Hebel.
 - **Brain-Aufgaben „nach Wechsel“ / „wiederholt“**: zeigt, was der Cache spart, und wie lang eine Denkpause ohne Bild ist.
 - **Temperatur und Drosselung**: Steigt die Temperatur über ~80 °C oder meldet `get_throttled` etwas anderes als `0x0`, sind die Zahlen ohne Kühlung nicht dauerhaft erreichbar.
+
+## Was ist das? (Ausschnitt eines unbekannten Objekts)
+
+Die Detektion meldet „unbekannt“ mit Box; `identify.py` schneidet die Box mit 25 % Rand quadratisch aus
+und fragt das VLM. Test auf dem PC (Server wie oben, mit Q8-mmproj):
+
+```
+python -m brain.vision.crops_vlm --server 4B=http://127.0.0.1:8081 \
+    --coco-ann ~/datasets/coco/annotations/instances_val2017.json --coco-img ~/datasets/coco/val2017 \
+    -k 5 --sides 160,224,320 --modes liste,frei --known
+```
+
+Lesart: „Treffer Haushalt“ ist die Kennzahl für SLARC (Gabel, Schere, Obst …, ohne Tiere und Fahrzeuge).
+„Treffer wenn sicher“ deutlich über „wenn unsicher“ heißt: „sicher“ taugt als Filter für Antworten ohne
+Vorbehalt. „Prompt-Tokens“ zeigt, was der Ausschnitt gegenüber einem Vollbild spart.
+
