@@ -1,5 +1,7 @@
 # brain/vision/compare_vlm.py
-# Version 0.1 (07.11.2026) – Kleine Vision-Sprachmodelle gegeneinander und gegen COCO.
+# Version 0.2 (08.11.2026) – Kleine Vision-Sprachmodelle gegeneinander und gegen COCO.
+# V0.2: Ohne Pillow wird abgebrochen statt still das Originalbild zu senden (--max-side 320
+#       und 448 lieferten am 08.11. auf dem PC deshalb dieselben Zahlen wie 640).
 #
 # Frage: Kann Qwen3.5-4B mit Bildeingabe (mmproj) Bilder brauchbar deuten? Als
 # Vergleich dient ein größeres Modell (z. B. Qwen3.5-9B), beide über llama-server.
@@ -61,8 +63,6 @@ def _image_b64(path: str, max_side: int) -> str:
         buf = io.BytesIO()
         im.save(buf, "JPEG", quality=90)
         data = buf.getvalue()
-    except ImportError:
-        pass                      # ohne Pillow: Bild unverändert senden
     except OSError as e:          # Pillow kann die Datei nicht lesen: unverändert senden, aber sagen
         print(f"   Hinweis: {path} nicht verkleinert ({e})")
     return base64.b64encode(data).decode()
@@ -253,6 +253,10 @@ def main() -> None:
     ap.add_argument("--max-side", type=int, default=640, help="Bild aufs Modell auf diese Kantenlänge verkleinern")
     ap.add_argument("--questions", help="eigene Fotos mit Fragen (Vorlage questions_template.json)")
     a = ap.parse_args()
+    try:                                                       # [V0.2] ohne Pillow keine Verkleinerung
+        import PIL  # noqa: F401
+    except ImportError:
+        raise SystemExit("Pillow fehlt (conda install -c conda-forge pillow), sonst gilt --max-side nicht.")
     servers = dict(x.split("=", 1) for x in (a.server or ["4B=http://127.0.0.1:8080"]))
     for url in servers.values():
         check_server(url)
