@@ -1,0 +1,119 @@
+{
+ "rechner": "slarc",
+ "maschine": "aarch64",
+ "bilder": 0,
+ "start": {
+  "zeit": "20:13:29",
+  "cpu_temp_c": 50.7,
+  "throttled": "throttled=0x0",
+  "mem_frei_mb": 3661,
+  "server_rss_mb": 6088,
+  "server_anon_mb": 3501,
+  "server_datei_mb": 2586
+ },
+ "label": "mem-2-c8k",
+ "mmproj": "mmproj-Qwen3.5-4B-Q8_0.gguf",
+ "slots": 4,
+ "modell": "Qwen3.5-4B-Q4_K_M.gguf",
+ "vision": true,
+ "bild": {},
+ "text": {
+  "zielwahl": {
+   "wechsel": {
+    "wall_s": 12.07,
+    "prompt_n": 4,
+    "prompt_ms": 406.332,
+    "cache_n": 1128,
+    "gen_n": 38,
+    "gen_ms": 11645.516,
+    "text": "{\"begruendung\": \"Marco bittet um das Handy, das ist wichtiger als die Vase.\", \"ziel\": 1, \"stimmung\": \"eifrig\"}"
+   },
+   "wiederholt": {
+    "wall_s": 12.06,
+    "prompt_n": 4,
+    "prompt_ms": 409.886,
+    "cache_n": 1128,
+    "gen_n": 38,
+    "gen_ms": 11636.502,
+    "text": "{\"begruendung\": \"Marco bittet um das Handy, das ist wichtiger als die Vase.\", \"ziel\": 1, \"stimmung\": \"eifrig\"}"
+   },
+   "prompt_tok_s": 9.8,
+   "gen_tok_s": 3.3
+  },
+  "chat": {
+   "wechsel": {
+    "wall_s": 8.74,
+    "prompt_n": 4,
+    "prompt_ms": 384.688,
+    "cache_n": 685,
+    "gen_n": 28,
+    "gen_ms": 8346.273,
+    "text": "{\"dienst\": \"search\", \"gegenstand\": \"fernbedienung\", \"antwort\": \"Ich suche jetzt nach der Fernbedienung.\"}"
+   },
+   "wiederholt": {
+    "wall_s": 8.65,
+    "prompt_n": 4,
+    "prompt_ms": 401.628,
+    "cache_n": 685,
+    "gen_n": 28,
+    "gen_ms": 8235.046,
+    "text": "{\"dienst\": \"search\", \"gegenstand\": \"fernbedienung\", \"antwort\": \"Ich suche jetzt nach der Fernbedienung.\"}"
+   },
+   "prompt_tok_s": 10.4,
+   "gen_tok_s": 3.4
+  },
+  "objekt": {
+   "wechsel": {
+    "wall_s": 11.09,
+    "prompt_n": 4,
+    "prompt_ms": 358.981,
+    "cache_n": 328,
+    "gen_n": 37,
+    "gen_ms": 10726.267,
+    "text": "{\"grund\": \"Die Katze ist ein Haustier, das hier leben soll und nicht verloren ist.\", \"interesse\": \"niedrig\", \"melden\": \"nein\"}"
+   },
+   "wiederholt": {
+    "wall_s": 10.76,
+    "prompt_n": 4,
+    "prompt_ms": 361.284,
+    "cache_n": 328,
+    "gen_n": 37,
+    "gen_ms": 10395.914,
+    "text": "{\"grund\": \"Die Katze ist ein Haustier, das hier leben soll und nicht verloren ist.\", \"interesse\": \"niedrig\", \"melden\": \"nein\"}"
+   },
+   "prompt_tok_s": 11.1,
+   "gen_tok_s": 3.6
+  },
+  "suchorte": {
+   "wechsel": {
+    "wall_s": 10.87,
+    "prompt_n": 4,
+    "prompt_ms": 343.492,
+    "cache_n": 215,
+    "gen_n": 38,
+    "gen_ms": 10520.537,
+    "text": "{\"grund\": \"Tassen werden nach dem Trinken meist in der Küche abgewaschen oder auf dem Tisch stehen gelassen.\", \"orte\": [\"küche\", \"wohnzimmer\"]}"
+   },
+   "wiederholt": {
+    "wall_s": 11.04,
+    "prompt_n": 4,
+    "prompt_ms": 364.758,
+    "cache_n": 215,
+    "gen_n": 38,
+    "gen_ms": 10674.83,
+    "text": "{\"grund\": \"Tassen werden nach dem Trinken meist in der Küche abgewaschen oder auf dem Tisch stehen gelassen.\", \"orte\": [\"küche\", \"wohnzimmer\"]}"
+   },
+   "prompt_tok_s": 11.6,
+   "gen_tok_s": 3.6
+  }
+ },
+ "ende": {
+  "zeit": "20:17:04",
+  "cpu_temp_c": 63.9,
+  "throttled": "throttled=0x0",
+  "mem_frei_mb": 3026,
+  "server_rss_mb": 6677,
+  "server_anon_mb": 4331,
+  "server_datei_mb": 2345
+ }
+}
