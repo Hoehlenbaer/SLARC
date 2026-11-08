@@ -14,6 +14,9 @@ V2.15
   132.2 x 50.8 aus dem STEP. Gilt für untere Platte, Option oben und Testbrett.
 - Power-Platine C (½ 5x7, 50 x 35): Die beiden Löcher liegen an der langen 50-mm-Kante (Abstand 46), nicht an
   der kurzen (31). Bunde in Power-Brücke und Testbrett korrigiert, Auflage am gegenüberliegenden Rand.
+- Adapterplatten für das bereits gedruckte Testbrett V2.14 (bench_adapters): Relais (auf die alten M3-Einsätze,
+  Modul 10 mm versetzt, neue Löcher mit M3-Mutter im Sechskant von unten) und Power C (auf die alten M2-Bunde,
+  Platine 12 mm versetzt, M2-Muttern seitlich eingeschoben). Keine neuen Gewindeeinsätze nötig.
 
 V2.14
 - Elektronik-Testbrett bench_board() für den Prüfstand: Relaismodul, Treiber, Power-Platine C und eine
@@ -869,6 +872,62 @@ def bench_board():
         for s in (-1, 1):
             neg.append(box(tx - 1.5 + s * 4.0, ty - 2.0, -1, 3.0, 4.0, t + 2))
     return cut(fuse(pos), neg)
+
+
+def hexp(x, y, z0, af, h):
+    """Sechskantprisma, Schlüsselweite af."""
+    r = af / math.sqrt(3)
+    pts = [App.Vector(x + r * math.cos(math.radians(60 * k)), y + r * math.sin(math.radians(60 * k)), z0) for k in range(7)]
+    return Part.Face(Part.makePolygon(pts)).extrude(App.Vector(0, 0, h))
+
+
+def bench_adapters():
+    """V2.15: Adapter vom gedruckten Testbrett V2.14 auf die gemessenen Lochbilder. Lage in Testbrett-Koordinaten,
+    Unterseite liegt auf den alten Bunden. Liefert (relais_adapter, power_c_adapter)."""
+    B, c = P["bench"], P["pcb"]
+    t = B["t"]
+    out = []
+    # --- Relais: alte Bunde (±25.4 / ±66.1, Oberkante t + relay_so) mit M3-Einsatz -> M3x8 von oben
+    rx, ry = B["relay"]
+    z0, pt, so = t + P["relay_so"], 4.0, 4.0           # Plattendicke, Bundhöhe für das Modul
+    a, b = P["relay_pat"][0] / 2, P["relay_pat"][1] / 2
+    dy = 10.0                                           # Modul entlang Y versetzt -> neue Löcher weit weg von den alten
+    old = [(rx + sx * 25.4, ry + sy * 66.1) for sx in (-1, 1) for sy in (-1, 1)]
+    new = [(rx + sx * b, ry + dy + sy * a) for sx in (-1, 1) for sy in (-1, 1)]
+    x0, x1 = rx - 31.0, rx + 31.0
+    y0, y1 = ry - 72.0, ry + dy + 70.0
+    pos = [box(x0, y0, z0, x1 - x0, y1 - y0, pt)]
+    neg = [box(x0 + 10, y0 + 12, z0 - 1, x1 - x0 - 20, y1 - y0 - 24, pt + 2)]          # Fenster
+    for hx, hy in new:
+        pos.append(cyl(hx, hy, z0, 3.5, pt + so))
+        neg.append(cyl(hx, hy, z0 - 1, 1.65, pt + so + 2))
+        neg.append(hexp(hx, hy, z0 - 0.01, 5.9, 2.6))       # M3-Mutter von unten einlegen
+    for hx, hy in old:
+        pos.append(cyl(hx, hy, z0, 4.0, pt))
+        neg.append(cyl(hx, hy, z0 - 1, 1.7, pt + 2))
+    out.append(cut(fuse(pos), neg))
+    # --- Power C: alte M2-Bunde bei (x0+2, y0+2/33), Oberkante t + so -> M2x6 von oben
+    px, py = B["pwr"]; g = c["pwr"]
+    z0, pt, so = t + g["so"], 4.0, 4.0
+    old = [(px + 2.0, py + 2.0), (px + 2.0, py + g["W"] - 2.0)]
+    bx, by = px, py + 12.0                              # Platine 12 mm in +Y versetzt
+    new = [(bx + 2.0, by + 2.0), (bx + g["L"] - 2.0, by + 2.0)]
+    X0, X1, Y0, Y1 = px - 2.0, px + g["L"] + 2.0, py - 2.0, by + g["W"] + 2.0
+    pos = [box(X0, Y0, z0, X1 - X0, Y1 - Y0, pt)]
+    neg = [box(X0 + 9, Y0 + 9, z0 - 1, X1 - X0 - 18, Y1 - Y0 - 18, pt + 2)]
+    for hx, hy in new:
+        pos.append(cyl(hx, hy, z0, 3.0, pt + so))
+        neg.append(cyl(hx, hy, z0 - 1, 1.2, pt + so + 2))
+        # M2-Mutter (SW 4, 1.6 hoch) seitlich von der nächsten Stirnseite (±X) einschieben
+        if hx < (X0 + X1) / 2:
+            neg.append(box(X0 - 1, hy - 2.2, z0 + 1.2, hx - X0 + 3.2, 4.4, 1.9))
+        else:
+            neg.append(box(hx - 2.2, hy - 2.2, z0 + 1.2, X1 - hx + 3.2, 4.4, 1.9))
+    pos.append(box(bx + 4, by + g["W"] - 6, z0, g["L"] - 8, 4, pt + so))               # Auflage gegenüber
+    for hx, hy in old:
+        neg.append(cyl(hx, hy, z0 - 1, 1.2, pt + 2))
+    out.append(cut(fuse(pos), neg))
+    return out
 
 
 # ============================================================ V2.12 Bein-Prüfstand
