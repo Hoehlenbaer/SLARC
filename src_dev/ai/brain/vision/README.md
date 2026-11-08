@@ -115,6 +115,17 @@ python -m brain.vision.crops_vlm --server 4B=http://127.0.0.1:8081 \
     -k 5 --sides 160,224,320 --modes liste,frei --known
 ```
 
+Ergebnis 08.11.2026 22:13 (`vision_ausschnitt_2213.md`): Liste 0,80–0,83 Treffer bei Unbekannten,
+frei 0,63–0,67; „sicher“ wertlos (98–100 % ja). Häufigster Fehler: das VLM nennt, was ebenfalls im
+Ausschnitt ist (Esstisch → Pizza). Deshalb roter Rahmen (`--marks nein,ja`) und kürzere Liste
+(`--vocabs voll,haushalt`), realistischer mit `--min-px 64`:
+
+```
+python -m brain.vision.crops_vlm --server 4B=http://127.0.0.1:8081 \
+    --coco-ann ~/datasets/coco/annotations/instances_val2017.json --coco-img ~/datasets/coco/val2017 \
+    -k 5 --min-px 64 --sides 224 --modes liste --vocabs voll,haushalt --marks nein,ja --known
+```
+
 Lesart: „Treffer Haushalt“ ist die Kennzahl für SLARC (Gabel, Schere, Obst …, ohne Tiere und Fahrzeuge).
 „Treffer wenn sicher“ deutlich über „wenn unsicher“ heißt: „sicher“ taugt als Filter für Antworten ohne
 Vorbehalt. „Prompt-Tokens“ zeigt, was der Ausschnitt gegenüber einem Vollbild spart.

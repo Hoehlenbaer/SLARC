@@ -1,5 +1,10 @@
 # brain/vision/identify.py
-# Version 0.1 (08.11.2026) – Was ist das? Ausschnitt um eine Box ans Vision-Sprachmodell.
+# Version 0.2 (08.11.2026) – Was ist das? Ausschnitt um eine Box ans Vision-Sprachmodell.
+# V0.2: mark=True zeichnet die Box rot in den Ausschnitt („Was ist das rot umrandete Ding?“).
+#       Grund: Lauf 08.11.2026 22:13 – das VLM nannte oft, was ebenfalls im Ausschnitt war
+#       (Esstisch -> Pizza, Rucksack -> Person, Messer -> Teller). vocab="haushalt": Liste ohne
+#       Tiere/Fahrzeuge/Wintersport (weniger Tokens, weniger Fehlgriffe). "sicher" war wertlos
+#       (98–100 % ja, auch bei Fehlern) – bleibt im Schema nur zur Beobachtung.
 #
 # Idee (Marco, 08.11.2026): Die Detektion meldet "unbekannt" mit Bounding Box. Statt das
 # ganze Bild zu schicken, schneidet SLARC die Box mit Rand aus und fragt das VLM, was das
@@ -36,30 +41,49 @@ HOUSEHOLD = ["dose", "schlüssel", "brille", "schuh", "socke", "kleidung", "kabe
              "brot", "sandwich", "pizza", "kuchen", "donut", "hotdog", "krawatte", "handschuh", "schläger",
              "frisbee", "skateboard", "drachen", "ski", "snowboard", "surfbrett"]
 OUTDOOR = ["flugzeug", "zug", "boot", "pferd", "schaf", "kuh", "elefant", "bär", "zebra", "giraffe"]
+SPORT = ["drachen", "ski", "snowboard", "surfbrett"]
 OWN = [c.de for c in DET_CLASSES if c.kind != UNKNOWN]
 VOCAB = list(dict.fromkeys(HOUSEHOLD + OUTDOOR + OWN))
+VOCAB_HAUSHALT = [w for w in dict.fromkeys(HOUSEHOLD + OWN) if w not in SPORT]
+VOCABS = {"voll": VOCAB, "haushalt": VOCAB_HAUSHALT}
 OTHER = "anderes"
 
-PROMPT_LISTE = (
-    "Du bist das Auge eines kleinen Haushaltsroboters. Das folgende Bild ist ein Ausschnitt; "
-    "in der Mitte liegt ein Gegenstand, den der Roboter nicht erkannt hat. Was ist dieser Gegenstand? "
-    "Wähle den passenden Namen aus dieser Liste: " + ", ".join(VOCAB) + ". "
-    f'Passt keiner, nimm "{OTHER}" und schreibe in "anderes" ein deutsches Wort. '
-    '"sicher" ist nur "ja", wenn du den Gegenstand eindeutig erkennst. '
-    'Antwort als JSON: {"name": "...", "anderes": "...", "sicher": "ja|nein"}')
-PROMPT_FREI = (
-    "Du bist das Auge eines kleinen Haushaltsroboters. Das folgende Bild ist ein Ausschnitt; "
-    "in der Mitte liegt ein Gegenstand, den der Roboter nicht erkannt hat. Was ist dieser Gegenstand? "
-    "Antworte mit einem deutschen Wort (Substantiv, ohne Artikel). "
-    '"sicher" ist nur "ja", wenn du den Gegenstand eindeutig erkennst. '
-    'Antwort als JSON: {"name": "...", "sicher": "ja|nein"}')
-QUESTION = "Was liegt in der Mitte des Ausschnitts?"
+_WHERE = {False: "in der Mitte liegt ein Gegenstand, den der Roboter nicht erkannt hat",
+          True: "ein Gegenstand, den der Roboter nicht erkannt hat, ist rot umrandet. Gemeint ist nur "
+                "dieser umrandete Gegenstand, nicht was daneben, darauf oder davor ist"}
 
-SCHEMA_LISTE = {"type": "object", "properties": {
-    "name": {"type": "string", "enum": VOCAB + [OTHER]},
-    "anderes": {"type": "string", "maxLength": 24},
-    "sicher": {"type": "string", "enum": ["ja", "nein"]}},
-    "required": ["name", "anderes", "sicher"]}
+
+def prompt_liste(mark: bool = False, vocab: str = "voll") -> str:
+    return ("Du bist das Auge eines kleinen Haushaltsroboters. Das folgende Bild ist ein Ausschnitt; "
+            + _WHERE[mark] + ". Was ist dieser Gegenstand? "
+            "Wähle den passenden Namen aus dieser Liste: " + ", ".join(VOCABS[vocab]) + ". "
+            f'Passt keiner, nimm "{OTHER}" und schreibe in "anderes" ein deutsches Wort. '
+            '"sicher" ist nur "ja", wenn du den Gegenstand eindeutig erkennst. '
+            'Antwort als JSON: {"name": "...", "anderes": "...", "sicher": "ja|nein"}')
+
+
+def prompt_frei(mark: bool = False) -> str:
+    return ("Du bist das Auge eines kleinen Haushaltsroboters. Das folgende Bild ist ein Ausschnitt; "
+            + _WHERE[mark] + ". Was ist dieser Gegenstand? "
+            "Antworte mit einem deutschen Wort (Substantiv, ohne Artikel). "
+            '"sicher" ist nur "ja", wenn du den Gegenstand eindeutig erkennst. '
+            'Antwort als JSON: {"name": "...", "sicher": "ja|nein"}')
+
+
+PROMPT_LISTE = prompt_liste()
+PROMPT_FREI = prompt_frei()
+QUESTION = {False: "Was liegt in der Mitte des Ausschnitts?", True: "Was ist der rot umrandete Gegenstand?"}
+
+
+def schema_liste(vocab: str = "voll") -> dict:
+    return {"type": "object", "properties": {
+        "name": {"type": "string", "enum": VOCABS[vocab] + [OTHER]},
+        "anderes": {"type": "string", "maxLength": 24},
+        "sicher": {"type": "string", "enum": ["ja", "nein"]}},
+        "required": ["name", "anderes", "sicher"]}
+
+
+SCHEMA_LISTE = schema_liste()
 SCHEMA_FREI = {"type": "object", "properties": {
     "name": {"type": "string", "maxLength": 24},
     "sicher": {"type": "string", "enum": ["ja", "nein"]}},
@@ -76,10 +100,10 @@ class Identified:
     gen_n: int = 0
 
 
-def crop_jpeg(image, box: tuple, margin: float = 0.25, side: int = 224) -> bytes:
+def crop_jpeg(image, box: tuple, margin: float = 0.25, side: int = 224, mark: bool = False) -> bytes:
     """Ausschnitt um box=(x, y, w, h) mit Rand (Anteil der Boxgröße je Seite), quadratisch
-    erweitert und auf `side` px skaliert. image: PIL.Image oder Pfad."""
-    from PIL import Image
+    erweitert und auf `side` px skaliert. image: PIL.Image oder Pfad. mark: Box rot einzeichnen."""
+    from PIL import Image, ImageDraw
     im = Image.open(image).convert("RGB") if isinstance(image, (str, bytes)) else image.convert("RGB")
     x, y, w, h = box
     s = max(w, h) * (1 + 2 * margin)              # quadratisch: Maßstab bleibt erhalten
@@ -89,8 +113,14 @@ def crop_jpeg(image, box: tuple, margin: float = 0.25, side: int = 224) -> bytes
     c = im.crop((l, t, r, b))
     k = side / max(c.size)
     c = c.resize((max(1, round(c.width * k)), max(1, round(c.height * k))), Image.BICUBIC)
+    if mark:                                      # [V0.2] Box in Ausschnitt-Koordinaten, etwas außerhalb
+        lw = max(3, side // 60)
+        bx0, by0 = (x - l) * k - lw, (y - t) * k - lw
+        bx1, by1 = (x + w - l) * k + lw, (y + h - t) * k + lw
+        ImageDraw.Draw(c).rectangle([max(0, bx0), max(0, by0), min(c.width - 1, bx1), min(c.height - 1, by1)],
+                                    outline=(255, 0, 0), width=lw)
     buf = io.BytesIO()
-    c.save(buf, "JPEG", quality=90)
+    c.save(buf, "JPEG", quality=90, subsampling=0)   # 4:4:4, sonst verschmiert die rote Linie
     return buf.getvalue()
 
 
@@ -103,12 +133,16 @@ def normalize(word: str) -> str:
 
 
 def identify(url: str, jpeg: bytes, mode: str = "liste", slot: Optional[int] = None,
-             timeout: float = 300.0) -> Identified:
-    prompt, schema = (PROMPT_LISTE, SCHEMA_LISTE) if mode == "liste" else (PROMPT_FREI, SCHEMA_FREI)
+             timeout: float = 300.0, mark: bool = False, vocab: str = "voll") -> Identified:
+    """mark: der Ausschnitt enthält einen roten Rahmen (crop_jpeg(mark=True))."""
+    if mode == "liste":
+        prompt, schema = prompt_liste(mark, vocab), schema_liste(vocab)
+    else:
+        prompt, schema = prompt_frei(mark), SCHEMA_FREI
     body = {"messages": [{"role": "user", "content": [
                 {"type": "text", "text": prompt},
                 {"type": "image_url", "image_url": {"url": "data:image/jpeg;base64," + base64.b64encode(jpeg).decode()}},
-                {"type": "text", "text": QUESTION}]}],
+                {"type": "text", "text": QUESTION[mark]}]}],
             "temperature": 0.0, "max_tokens": 40, "cache_prompt": True,
             "response_format": {"type": "json_schema", "json_schema": {"name": "ding", "schema": schema}},
             "chat_template_kwargs": {"enable_thinking": False}}
