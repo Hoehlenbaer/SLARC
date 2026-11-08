@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # brain/vision/run_pi_matrix.sh
-# Version 0.2 (08.11.2026) – Alle Pi-Messungen nacheinander gegen einen llama-server ohne BLAS.
+# Version 0.3 (08.11.2026) – Alle Pi-Messungen nacheinander gegen einen llama-server ohne BLAS.
+# V0.3: Zusatzspalten für Server- und bench-Optionen; Läufe „slots-…“ vergleichen einen Slot
+#       mit einem Slot je Aufgabe (-np 4). Standard ohne ONLY: nur die slots-Läufe, ALL=1 für alle.
 # V0.2: BLAS-Prüfung schlug wegen des Ordnernamens build-noblas fälschlich an.
 #
 # Startet für jede Konfiguration selbst einen llama-server, wartet auf /health, lässt
@@ -12,6 +14,7 @@
 # Anpassbar über Umgebungsvariablen, z. B.:
 #   N=3 SIZES=320,448 COOL=60 IMAGES=~/vlm_pi_subset/val2017 bash run_pi_matrix.sh
 #   ONLY=q35-2b bash run_pi_matrix.sh          # nur Läufe, deren Label so beginnt
+#   ALL=1 bash run_pi_matrix.sh                # alle Läufe (ohne ONLY/ALL: nur slots-…)
 # Dauer grob 10–15 min je Konfiguration mit Bild (4B), weniger fürs 2B und Text allein.
 
 set -u
@@ -24,10 +27,15 @@ SIZES=${SIZES:-320,448}
 COOL=${COOL:-60}
 PORT=${PORT:-8080}
 ONLY=${ONLY:-}
+[ -z "$ONLY" ] && [ -z "${ALL:-}" ] && ONLY=slots
 Q40=${Q40:-$(ls "$M"/Qwen3.5-4B-Q4_0*.gguf 2>/dev/null | head -1)}
 
-# Label | Modell | mmproj (leer = nur Text)
+Q4KM=$M/Qwen3.5-4B-Q4_K_M.gguf
+Q8MM=$M/mmproj-Qwen3.5-4B-Q8_0.gguf
+# Label | Modell | mmproj (leer = nur Text) | zusätzliche Server-Optionen | zusätzliche bench_pi-Optionen
 CONFIGS=(
+  "slots-1|$Q4KM|$Q8MM||--text-only"
+  "slots-4|$Q4KM|$Q8MM|-np 4 -c 12288|--text-only --slots 4"
   "q35-4b-q4km-f16|$M/Qwen3.5-4B-Q4_K_M.gguf|$M/mmproj-Qwen3.5-4B-f16.gguf"
   "q35-4b-q4km-q8|$M/Qwen3.5-4B-Q4_K_M.gguf|$M/mmproj-Qwen3.5-4B-Q8_0.gguf"
   "q35-4b-q40-q8|${Q40:-$M/Qwen3.5-4B-Q4_0.gguf}|$M/mmproj-Qwen3.5-4B-Q8_0.gguf"
@@ -69,7 +77,7 @@ SRV=""
 trap '[ -n "$SRV" ] && kill "$SRV" 2>/dev/null; exit 130' INT TERM
 
 for c in "${CONFIGS[@]}"; do
-  IFS='|' read -r LABEL MODEL MMPROJ <<< "$c"
+  IFS='|' read -r LABEL MODEL MMPROJ SXTRA BXTRA <<< "$c"
   [ -n "$ONLY" ] && [[ "$LABEL" != "$ONLY"* ]] && continue
   MISSING=""
   [ -f "$MODEL" ] || MISSING="$MODEL"
@@ -80,6 +88,8 @@ for c in "${CONFIGS[@]}"; do
 
   ARGS=(-m "$MODEL" -t 4 -c 4096 -np 1 --cache-ram 0 --port "$PORT")
   [ -n "$MMPROJ" ] && ARGS+=(--mmproj "$MMPROJ")
+  # shellcheck disable=SC2206
+  [ -n "${SXTRA:-}" ] && ARGS+=($SXTRA)          # spätere Angaben gelten (-np, -c)
   "$BIN" "${ARGS[@]}" > "$LOGDIR/server_$LABEL.log" 2>&1 &
   SRV=$!
 
@@ -93,14 +103,18 @@ for c in "${CONFIGS[@]}"; do
     echo "   Server startet nicht, siehe $LOGDIR/server_$LABEL.log"; kill "$SRV" 2>/dev/null; wait "$SRV" 2>/dev/null; SRV=""; continue
   fi
 
-  BEFORE=$(ls "$LOGDIR"/pi_bench_"$LABEL"_*.json 2>/dev/null)
-  if [ -n "$MMPROJ" ]; then
-    "$PY" -m brain.vision.bench_pi --url "http://127.0.0.1:$PORT" --label "$LABEL" --mmproj "$(basename "$MMPROJ")" \
-        --images "$IMAGES" -n "$N" --sizes "$SIZES"
-  else
-    "$PY" -m brain.vision.bench_pi --url "http://127.0.0.1:$PORT" --label "$LABEL" --text-only
+  MARK=$(mktemp); sleep 1
+  B=(--url "http://127.0.0.1:$PORT" --label "$LABEL")
+  [ -n "$MMPROJ" ] && B+=(--mmproj "$(basename "$MMPROJ")")
+  if [ -n "$MMPROJ" ] && [[ "${BXTRA:-}" != *--text-only* ]]; then
+    B+=(--images "$IMAGES" -n "$N" --sizes "$SIZES")
+  elif [[ "${BXTRA:-}" != *--text-only* ]]; then
+    B+=(--text-only)
   fi
-  NEW=$(comm -13 <(echo "$BEFORE") <(ls "$LOGDIR"/pi_bench_"$LABEL"_*.json 2>/dev/null) | tail -1)
+  # shellcheck disable=SC2206
+  [ -n "${BXTRA:-}" ] && B+=($BXTRA)
+  "$PY" -m brain.vision.bench_pi "${B[@]}"
+  NEW=$(find "$LOGDIR" -name "pi_bench_${LABEL}_*.json" -newer "$MARK" 2>/dev/null | sort | tail -1); rm -f "$MARK"
   [ -n "$NEW" ] && JSONS+=("$NEW")
 
   kill "$SRV" 2>/dev/null; wait "$SRV" 2>/dev/null; SRV=""

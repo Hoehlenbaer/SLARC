@@ -1,5 +1,6 @@
 # brain/open_scenarios.py
 # Version 0.2 (07.11.2026) – Offene Testfälle für die semantischen Aufgaben.
+# V0.5: PERSONS für die Personensuche im Chat (semantic.item_problem).
 # V0.4: HOLDOUT_CHAT – Sätze von Marco (07.11.2026), nie zum Abstimmen benutzen.
 # V0.3: Objekt-Fälle zählen jetzt getrennt nach Regel und LLM (run_open_suite).
 # V0.2: Erwartungen bei Durst/Cola erweitert (Tasse, Glas, Flasche). Begründung: nach
@@ -63,6 +64,9 @@ CHAT_CASES = [
 # Holdout: Sätze, wie Marco sie zu SLARC sagen würde (07.11.2026). Diese Fälle
 # dienen nur zur Prüfung. Prompts und Beispiele dürfen NICHT danach abgestimmt werden,
 # sonst verlieren sie ihren Wert. Erwartungen von Claude festgelegt, vor dem ersten Lauf.
+# [V0.5] Namen, die SLARC als Personen kennt (im Betrieb aus dem Gedächtnis)
+PERSONS = ("Marco", "Laura", "Sophia")
+
 HOLDOUT_CHAT = [
     ChatCase("Suche unser Katze in der Wohnung!", {"search"}, {"katze"}),
     ChatCase("Schau nach, ob Sophia in ihrem Zimmer ist!", {"check", "search"}, {"sophia", "zimmer"}),

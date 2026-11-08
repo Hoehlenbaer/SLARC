@@ -1,5 +1,13 @@
 # brain/semantic.py
-# Version 0.3 (07.11.2026) – Semantische Aufgaben für das LLM.
+# Version 0.6 (08.11.2026) – Semantische Aufgaben für das LLM.
+# V0.6: Bestätigungen für Aufträge (search, check, fetch, push_out, follow, come) baut der
+#       Code aus Vorlagen; die LLM-Antwort bleibt nur in llm_reply. Grund: Qwen3.5-4B
+#       antwortete auf „Steht der Staubsauger im Wohnzimmer?“ mit „Ja, der Staubsauger
+#       steht im Wohnzimmer.“ (Lauf 08.11.2026), also mit erfundenem Ergebnis.
+#       item_problem() gilt auch für check (Räume ausgenommen); claims_result() erkennt
+#       Antworten, die ein Ergebnis behaupten (Heuristik, für die Testsuite). Bekannte
+#       Personennamen (persons) gelten nicht als unerkennbar. come/follow mit einem Raum
+#       („Gehe ins Badezimmer!“) wird ehrlich abgelehnt, bis es einen Dienst „zu Ort gehen“ gibt.
 # V0.5: Gegenstandsliste inkl. Außenklassen (SLARC soll auch draußen laufen).
 # V0.4: Gegenstandsliste im Chat-Prompt und Regeln aus perception_classes.py (echte
 #       Klassen); item_problem() erkennt Bitten um Dinge, die SLARC nicht sehen kann.
@@ -26,6 +34,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, field
 from typing import Optional
 
@@ -122,6 +131,69 @@ class ChatResult:
     latency_s: float = 0.0          # beide Stufen zusammen
     error: str = ""
     talk: bool = False              # Antwort aus Stufe 2 (mit Tagebuch)
+    llm_reply: str = ""             # [V0.6] Antwort des LLM aus Stufe 1, ungeprüft (nur Log/Test)
+
+
+# ---------------------------------------------------------------- [V0.6] ehrliche Bestätigungen
+# Geschlecht der erkennbaren Klassen für Artikel in den Vorlagen (m, f, n).
+GENUS = {"person": "f", "fahrrad": "n", "auto": "n", "motorrad": "n", "bus": "m", "lkw": "m",
+         "ampel": "f", "hydrant": "m", "stoppschild": "n", "parkuhr": "f", "bank": "f", "vogel": "m",
+         "katze": "f", "hund": "m", "rucksack": "m", "regenschirm": "m", "handtasche": "f",
+         "koffer": "m", "flasche": "f", "tasse": "f", "schüssel": "f", "stuhl": "m", "sofa": "n",
+         "topfpflanze": "f", "bett": "n", "esstisch": "m", "toilette": "f", "fernseher": "m",
+         "laptop": "m", "fernbedienung": "f", "tastatur": "f", "handy": "n", "mikrowelle": "f",
+         "ofen": "m", "waschbecken": "n", "kühlschrank": "m", "buch": "n", "uhr": "f", "vase": "f",
+         "teddy": "m"}
+_ART = {"dat": {"m": "dem", "n": "dem", "f": "der"}, "akk": {"m": "den", "n": "das", "f": "die"}}
+
+# Räume und Orte: bei check kein "kann ich nicht erkennen" (es geht um den Ort, nicht ein Ding)
+ROOM_WORDS = ("zimmer", "küche", "bad", "flur", "diele", "keller", "balkon", "garten", "terrasse",
+              "abstellraum", "wohnung", "garage", "dachboden", "treppe")
+
+
+def _np(item: str, case: str) -> str:
+    """'katze' -> 'der Katze' (Dativ); unbekannte Wörter und Namen ohne Artikel."""
+    cls = normalize_item(item) or ""
+    word = (cls or item or "").strip()
+    if not word:
+        return "es" if case == "akk" else "dem"
+    g = GENUS.get(cls)
+    return f"{_ART[case][g]} {word.capitalize()}" if g else word.capitalize()
+
+
+def confirmation(res: "ChatResult") -> Optional[str]:
+    """Bestätigung eines Auftrags aus einer Vorlage; None für Dienste ohne Auftrag."""
+    svc, item = res.service, res.item
+    if svc == "search":
+        return f"Ich suche nach {_np(item, 'dat')} und sage dir Bescheid." if item else "Ich suche und sage dir Bescheid."
+    if svc == "check":
+        return "Ich schaue nach und sage dir dann, was ich gesehen habe."
+    if svc == "fetch":
+        return f"Ich versuche, {_np(item, 'akk')} zu holen." if item else "Ich versuche es zu holen."
+    if svc == "push_out":
+        return f"Ich schaue nach, was unter {_np(item, 'dat')} liegt." if item else "Ich schaue nach, was da liegt."
+    if svc == "follow":
+        return "Ich komme mit."
+    if svc == "come":
+        return "Ich komme zu dir."
+    return None
+
+
+_CLAIM = [re.compile(p) for p in (
+    r"^\s*(ja|nein|doch)\b", r"\bgefunden\b", r"\bnicht (da|hier|zu sehen)\b",
+    r"\b(steht|liegt|ist|sind|brennt)\b[^,.]*\b(im|in der|in dem|auf dem|auf der|unter dem|unter der|an|aus|offen|zu|da)\b")]
+
+
+def claims_result(reply: str) -> bool:
+    """Behauptet die Antwort ein Ergebnis, das SLARC noch nicht haben kann? Heuristik:
+    Ja/Nein am Anfang, 'gefunden', 'steht/liegt/ist … im/an/offen'. Indirekte Fragen
+    ('ich schaue, ob …') zählen nicht."""
+    t = (reply or "").lower()
+    if not t:
+        return False
+    if any(p.search(t) for p in _CLAIM[:3]):
+        return True
+    return " ob " not in f" {t} " and bool(_CLAIM[3].search(t))
 
 
 # Stufe 2: Smalltalk-Antwort mit Tagebuch. Beispiele bewusst mit Inhalten, die nicht im
@@ -165,7 +237,7 @@ def talk_reply(backend, text: str, sender: str = "Marco",
 
 
 def interpret_chat(backend, text: str, sender: str = "Marco",
-                   diary: Optional[list[dict]] = None) -> ChatResult:
+                   diary: Optional[list[dict]] = None, persons: tuple = ()) -> ChatResult:
     """Stufe 1 ohne Tagebuch; bei Smalltalk Stufe 2 mit Tagebuch für die Antwort."""
     g = backend.generate(_messages(CHAT_SYSTEM, CHAT_SHOTS, f"{sender}: {text}"), CHAT_GBNF, 100)
     if g.error:
@@ -175,6 +247,10 @@ def interpret_chat(backend, text: str, sender: str = "Marco",
         svc = d["dienst"] if d.get("dienst") in CHAT_SERVICES else None
         res = ChatResult(svc, d.get("gegenstand", "").strip().lower(), d.get("antwort", "").strip(),
                          g.raw, g.latency_s, "" if svc else "dienst ungültig")
+        res.llm_reply = res.reply
+        safe = item_problem(res, persons) or confirmation(res)   # [V0.6] Code statt LLM
+        if safe:
+            res.reply = safe
     except (json.JSONDecodeError, KeyError) as e:
         return ChatResult(None, raw=g.raw, latency_s=g.latency_s, error=str(e))
     if svc == "smalltalk":
@@ -186,10 +262,18 @@ def interpret_chat(backend, text: str, sender: str = "Marco",
 
 
 
-def item_problem(res: ChatResult) -> Optional[str]:
+def item_problem(res: ChatResult, persons: tuple = ()) -> Optional[str]:
     """Antwort, wenn SLARC das Gewünschte nicht erkennen kann, sonst None.
     Ehrlich ablehnen statt endlos suchen."""
-    if res.service in ("search", "fetch", "push_out") and res.item and normalize_item(res.item) is None:
+    if res.service in ("come", "follow") and res.item and any(w in res.item for w in ROOM_WORDS):
+        return "Allein in einen bestimmten Raum gehen kann ich noch nicht."      # [V0.6]
+    if not res.item or normalize_item(res.item) is not None:
+        return None
+    if res.item in {p.lower() for p in persons}:     # [V0.6] bekannte Namen: Personensuche
+        return None
+    if res.service in ("search", "fetch", "push_out"):
+        return f"{res.item.capitalize()} kann ich leider noch nicht erkennen."
+    if res.service == "check" and not any(w in res.item for w in ROOM_WORDS):    # [V0.6]
         return f"{res.item.capitalize()} kann ich leider noch nicht erkennen."
     return None
 

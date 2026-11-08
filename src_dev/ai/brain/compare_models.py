@@ -1,5 +1,7 @@
 # brain/compare_models.py
 # Version 0.4 (08.11.2026) – Alle Modelle mit beiden Testsuiten gegeneinander.
+# V0.5: --server URL (ServerBrain, z. B. Pi oder PC-llama-server, mit --slots).
+#       Zahl der LLM-Bestätigungen, die ein Ergebnis behaupten (vom Code ersetzt), im Bericht.
 # V0.4: mmproj-*.gguf (Bild-Encoder) nicht als Sprachmodell laden.
 # V0.3: Ergebnisse standardmäßig nach brain/ergebnisse/<Datum>/ (nicht ins Arbeitsverzeichnis).
 # V0.3: Spalte "Chat eigen" (Holdout von Marco) und Liste aller Antworten darauf.
@@ -31,7 +33,7 @@ from collections import Counter
 from . import run_decision_suite as DS
 from . import run_open_suite as OS
 from . import semantic as S
-from .llm import LlamaBrain, MockBrain
+from .llm import LlamaBrain, MockBrain, ServerBrain
 from .open_scenarios import DIARY_SAMPLE
 
 # (Frage, mit Tagebuch?) – ohne Tagebuch darf SLARC nichts erzählen, was er nicht erlebt hat
@@ -129,6 +131,12 @@ def report(results: list[dict], repeat: int) -> str:
             if row["ok"] is False:
                 errs[f"{row['aufgabe']}: {row['fall']} -> {row['ausgabe']}"] += 1
         out += [f"- {n}× {e}" for e, n in errs.most_common(12)] or ["- keine"]
+        o = r["offen"]["summary"]
+        cl = sum(o[t].get("behauptet", 0) for t in ("chat", "eigen"))
+        fin = sum(o[t].get("final_behauptet", 0) for t in ("chat", "eigen"))
+        out += ["", f"**Bestätigungen mit behauptetem Ergebnis:** LLM {cl}, nach Code-Vorlage {fin} (muss 0 sein)."]
+        out += [f"- „{row['fall']}“ → LLM: „{row['llm_antwort']}“" for row in r["offen"]["rows"]
+                if row.get("behauptet")][:6]
         out += ["", "**Eigene Sätze (Holdout, erster Durchlauf)**", ""]
         seen = set()
         for row in r["offen"]["rows"]:
@@ -149,6 +157,8 @@ def main() -> None:
     ap.add_argument("--repeat", type=int, default=3)
     ap.add_argument("--threads", type=int, default=4)
     ap.add_argument("--gpu-layers", type=int, default=0)
+    ap.add_argument("--server", action="append", default=[], help="llama-server-URL statt GGUF (mehrfach)")
+    ap.add_argument("--slots", type=int, default=1, help="mit --server: ein Slot je Aufgabe (Server mit -np N)")
     ap.add_argument("--report", default=None, help="Standard: brain/ergebnisse/<Datum>/modellvergleich_<Uhrzeit>.md")
     ap.add_argument("--out", default=None)
     a = ap.parse_args()
@@ -165,6 +175,12 @@ def main() -> None:
             return MockBrain(responder=OS.mock_responder)
         mk.label = "mock"
         makers.append(mk)
+    elif a.server:
+        for url in a.server:
+            def mk(url=url):
+                return ServerBrain(url, n_slots=a.slots)
+            mk.label = url
+            makers.append(mk)
     else:
         models = a.model or sorted(m for m in glob.glob(os.path.expanduser("~/.models/*.gguf"))
                                   if not os.path.basename(m).lower().startswith("mmproj"))  # [V0.4]

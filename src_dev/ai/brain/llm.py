@@ -1,6 +1,10 @@
 # brain/llm.py
-# Version 0.2 (07.11.2026) – LLM-Anbindung für die Zielwahl.
+# Version 0.5 (08.11.2026) – LLM-Anbindung für die Zielwahl.
 # V0.2: n_gpu_layers wählbar (PC mit CUDA), Modellordner H: auch unter WSL.
+# V0.5 (08.11.2026): ServerBrain – llama-server über HTTP mit festem Slot je Aufgabe.
+#       Grund: Pi-Messung 08.11.2026, mit einem Slot kostet jeder Aufgabenwechsel 30–70 s
+#       (fester Prompt-Teil neu), im Cache 9–14 s. Server dazu mit -np N starten.
+#       Wartet beim Anlegen bis zu wait_s auf /health (sonst Fehler statt lauter Fehlantworten).
 # V0.4: ~/.models zuerst durchsuchen (unter WSL lädt /mnt/… über 9P ~1 min).
 # V0.3: generate() für beliebige Aufgaben mit eigener Grammatik (semantic.py);
 #       optionaler RAM-Cache, damit mehrere Systemprompts im Cache bleiben.
@@ -18,6 +22,8 @@ from __future__ import annotations
 import json
 import os
 import time
+import urllib.error
+import urllib.request
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FutTimeout
 from dataclasses import dataclass
 from typing import Optional
@@ -158,6 +164,90 @@ class LlamaBrain:
         except FutTimeout:
             # llama.cpp lässt sich nicht abbrechen; das Ergebnis wird verworfen
             return LLMResult(None, "", "", "", timeout_s, error="Zeitüberschreitung")
+
+
+# ---------------------------------------------------------------- [V0.5] llama-server
+# Feste Slots nach Wichtigkeit; was keinen eigenen Slot bekommt, teilt sich den letzten.
+TASK_SLOTS = ("zielwahl", "chat", "objekt", "suchen", "plaudern", "tagebuch", "bild")
+
+
+def task_of(msgs: list[dict]) -> str:
+    """Aufgabe am Systemprompt erkennen: 'AUFGABE: x' (semantic.py), sonst Zielwahl/Bild."""
+    first = msgs[0] if msgs else {}
+    if first.get("role") != "system":
+        return "bild" if isinstance(first.get("content"), list) else "zielwahl"
+    head = str(first.get("content", "")).split("\n", 1)[0]
+    return head.split(":", 1)[1].strip() if head.startswith("AUFGABE:") else "zielwahl"
+
+
+def slot_of(task: str, n_slots: int) -> int:
+    i = TASK_SLOTS.index(task) if task in TASK_SLOTS else len(TASK_SLOTS)
+    return min(i, n_slots - 1)
+
+
+class ServerBrain:
+    """Wie LlamaBrain, aber über llama-server (HTTP). Mit n_slots > 1 bekommt jede Aufgabe
+    einen festen Slot (id_slot), damit ihr fester Prompt-Teil im Cache bleibt.
+    Server: llama-server -m … -np 4 -c 12288 --cache-ram 0 (je Slot c/np Tokens)."""
+
+    def __init__(self, url: str = "http://127.0.0.1:8080", n_slots: int = 1, temperature: float = 0.3,
+                 wait_s: float = 120.0):
+        self.url = url.rstrip("/")
+        self.n_slots = max(1, n_slots)
+        self.temperature = temperature
+        self.name = "server"
+        t_end = time.monotonic() + wait_s
+        while True:                                   # Server lädt evtl. noch das Modell
+            try:
+                with urllib.request.urlopen(self.url + "/health", timeout=5) as r:
+                    if r.status == 200:
+                        break
+            except (OSError, ValueError):
+                pass
+            if time.monotonic() > t_end:
+                raise ConnectionError(f"llama-server unter {self.url} nach {wait_s:.0f} s nicht bereit")
+            time.sleep(1.0)
+        try:
+            with urllib.request.urlopen(self.url + "/props", timeout=10) as r:
+                self.name = os.path.basename(json.loads(r.read()).get("model_path") or "") or "server"
+        except (OSError, ValueError):
+            pass
+
+    def _post(self, body: dict, timeout_s: float) -> dict:
+        req = urllib.request.Request(self.url + "/v1/chat/completions", json.dumps(body).encode(),
+                                     {"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=timeout_s) as r:
+            return json.loads(r.read())
+
+    def generate(self, msgs: list[dict], gbnf: Optional[str], max_tokens: int = 160,
+                 temperature: float = 0.2, timeout_s: float = TIMEOUT_S) -> Generation:
+        body = {"messages": msgs, "temperature": temperature, "top_p": 0.9, "top_k": 40,
+                "max_tokens": max_tokens, "cache_prompt": True,
+                "chat_template_kwargs": {"enable_thinking": False}}
+        if gbnf:
+            body["grammar"] = gbnf
+        if self.n_slots > 1:
+            body["id_slot"] = slot_of(task_of(msgs), self.n_slots)
+        t0 = time.perf_counter()
+        try:
+            out = self._post(body, timeout_s)
+        except (urllib.error.URLError, TimeoutError, OSError) as e:
+            return Generation("", time.perf_counter() - t0, error=f"Server: {e}")
+        tm = out.get("timings") or {}
+        return Generation(out["choices"][0]["message"]["content"].strip(), time.perf_counter() - t0,
+                          tm.get("prompt_n", 0), tm.get("predicted_n", 0))
+
+    def warmup(self) -> float:
+        t0 = time.perf_counter()
+        self.generate(messages("ANLASS: keiner\nMÖGLICHE ZIELE\n1 Sich umsehen"), None, 1, 0.0)
+        return time.perf_counter() - t0
+
+    def decide(self, state: str, n_options: int, timeout_s: float = TIMEOUT_S) -> LLMResult:
+        g = self.generate(messages(state), grammar(n_options), 120, self.temperature, timeout_s)
+        if g.error:
+            return LLMResult(None, "", "", "", g.latency_s, error=g.error)
+        z, reason, mood, err = parse(g.raw, n_options)
+        return LLMResult(z, reason, mood, g.raw, g.latency_s, g.tokens_in, g.tokens_out, err)
 
 
 class MockBrain:
