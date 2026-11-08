@@ -256,6 +256,13 @@ Das LLM bekommt in jeder Stufe Text; das Konzept ändert sich durch den Kanal ni
 10. Brain-Prozess mit Denk-Zustand in `launch_all.py` einhängen; Simulation eines ganzen "Tages" mit dem MockBlackboard, um Abwechslung und Rhythmus zu beurteilen.
 11. **Vision-Sprachmodell für seltene Bildfragen** (notiert 07.11.2026): Qwen3.5-4B nimmt laut Modellkarte auch Bilder, braucht dafür zusätzlich `mmproj-Qwen3.5-4B-f16.gguf` (~0,7 GB). Idee: Zustände, die die Detektion nicht kennt („Fenster offen?“, „Licht an?“, „Welcher Raum ist das?“), mit einem einzelnen Kamerabild fragen statt je eine Klasse zu trainieren. Offen: Unterstützung in llama-cpp-python (sonst `llama-server` über HTTP), Dauer je Bild auf dem Pi, Qualität. Erster Test auf dem PC mit Fotos aus der Wohnung. Werkzeug: `brain/vision/compare_vlm.py` (Qwen3.5-4B gegen ein größeres Modell, z. B. Qwen3.5-9B, auf COCO als Wahrheit und mit eigenen Fotos; Vorlage `questions_template.json`). Kein Vergleich mit dem YOLO-Head: der liefert Boxen, das VLM Antworten. Geschwindigkeit auf dem Pi: `brain/vision/bench_pi.py`, Anleitung in `brain/vision/README.md`. Erster Eindruck (PC, 10 COCO-Bilder, 07.11.2026): Precision 0,83, Recall 0,80, 0,32 s je Bild auf der GPU; erkannte Dosen im Kühlregal, die COCO nicht als Klasse kennt. 100 Bilder (PC, 08.11.2026, Seed 7, `--indoor`, 640 px): Precision 0,85, Recall 0,85, Recall für nicht kleine Objekte 0,90, keine ungültige Antwort, 0,32 s je Bild auf der GPU. Häufig übersehen: Handtasche, Stuhl, Schüssel; häufig zusätzlich genannt: Topfpflanze, Tasse, Stuhl, Flasche (teils vermutlich in COCO nur nicht annotiert, nicht geprüft). Einschränkung: `--indoor` lässt auch Straßenszenen mit Regenschirm durch. Messungen nach Bildgröße und auf dem Pi (08.11.2026): Abschnitt 17. Größenordnung: Bild-Encoder (mmproj, ~0,3 Mrd. Parameter) + 4 Mrd. Sprachmodell gegen ~5 Mio. für Backbone und YOLO-Head zusammen.
 12. **Perzeption kennt keine Türen, Fenster, Dosen** (07.11.2026): Die Detektion V5.0 hat 40 COCO-Klassen + „unbekannt“ (`ROBOT_CAT_IDS` in `FusedHexapodModel_V5_0-Phase-1.py`), davon 10 Außenklassen (Auto, Ampel, Bank …). Die Außenklassen bleiben: SLARC soll auch draußen laufen, Bank, Hydrant und Ampel taugen dort als Anker, Bäume erkennt die Detektion vermutlich als „topfpflanze“, das ist so akzeptiert (Marco, 08.11.2026). Für Navigation an benennbaren Ankern innen und für den Meilenstein Dose fehlen Tür, Fenster, Dose; sie kommen zusätzlich dazu. Anforderung an den KI-Chat; Quellen z. B. ADE20K, Open Images.
+13. **Objekte wiedererkennen** (Marco, 08.11.2026): SLARC soll ein Objekt, das er einmal an einem Ort gesehen hat, beim Zurückkommen wiedererkennen. Nutzen: Gewöhnung (bekannt = langweilig), Verschiebung bemerken (`ObjectSeen.moved`, weckt Neugier und Meldung), „Wo ist die Gabel?“ aus dem Gedächtnis. Die Kennungen der Perzeption gelten nur, solange ein Objekt im Bild bleibt; dauerhafte Identität stellt das Brain her. Stufen:
+    1. **Ort + Klasse** (sofort, nur Gedächtnis): gleiche Klasse, gleicher Raum, ungefähr gleiche Stelle = dasselbe Objekt. Grenze: Lokalisierungsgenauigkeit (Raum sicher, Zentimeter fraglich); zwei Tassen auf einem Tisch nicht trennbar.
+    2. **Aussehen als Embedding** (Ausbau): Merkmalsvektor je Ausschnitt speichern, beim Wiedersehen Ähnlichkeit vergleichen. Trennt rote und weiße Tasse, erkennt verschobene Dinge. Quelle: zusätzlicher Head der Perzeption auf dem Hailo, z. B. CLIP-artig (Wiedererkennen und grobes Benennen in Millisekunden statt 10 s VLM). Liegt beim Perzeptions-Chat (Marco, 08.11.2026: „Wenn CLIP, muss es ein weiterer Head werden“).
+    3. **VLM vergleicht zwei Ausschnitte**: ~20 s auf dem Pi, bei ähnlichen Dingen unzuverlässig; nur seltene Rückfrage.
+
+    Abgleich im Brain (Vorschlag): Klasse bzw. VLM-Name passend + gleicher Raum + Position nah + Embedding ähnlich = dasselbe Objekt; alles außer Position = verschoben; sonst neu. Je Objekt ein unsicherer und ein bestätigter Name aus „Was ist das?“ (Abschnitt 17), zwei übereinstimmende Blicke bestätigen. Grenze: wirklich gleiche Dinge (zwei Tassen aus einem Service) bleiben ununterscheidbar; für SLARC meist egal. Test: COCO taugt nicht (jedes Objekt nur einmal); eigene Fotos aus SLARCs Kamera, dieselben Dinge aus 2–3 Blickwinkeln und Entfernungen plus ähnliche andere Dinge.
+    Schnittstelle zur Perzeption (Wunsch): je Detektion zusätzlich ein Embedding-Vektor (fester Länge, normiert), auch für „unbekannt“.
 
 ---
 
@@ -496,4 +503,23 @@ Qwen3.5 rechnet nur den geänderten Teil neu, wie Qwen3. Frei: 3,2 GB (Qwen3.5 m
 - **(fest)** Brain-LLM auf dem Pi: Qwen3.5-4B Q4_K_M + mmproj Q8_0 in einem llama-server (ohne BLAS) mit `-np 4 -c 8192 -fa on -ctk q8_0 -ctv q8_0 -ub 256 --cache-ram 0`, angesprochen über `ServerBrain(n_slots=4)`. Server ~4,2 GB.
 - Denkpausen im Betrieb (Pi, gemessen): Chat ~9–10 s, Suchorte ~12–15 s, Objekt ~14 s, Zielwahl ~19 s (davon ~7 s neuer Zustandstext, ~12 s Ausgabe), Bildfrage 320 px ~10 s.
 - **(offen)** Nächster Hebel: kürzere Ausgabe (`begruendung`) und knapperer Zustandstext; Qualität mit `compare_models` prüfen.
+
+**„Was ist das?“ – Ausschnitt eines unbekannten Objekts ans VLM (PC, 08.11.2026, `vision_ausschnitt_2213.md`, `_2237.md`)**
+
+Idee (Marco): Die Detektion meldet „unbekannt“ mit Box; SLARC schneidet die Box mit 25 % Rand quadratisch aus und fragt das VLM (`brain/vision/identify.py`). Test mit den 40 COCO-Klassen, die SLARC nicht kennt, als „Unbekannte“; Kontrolle mit SLARCs eigenen 40. Qwen3.5-4B Q4_K_M + Q8-mmproj, je Klasse bis 5 Boxen.
+
+| Lauf | Unbekannt | Haushalt | Bekannt (Kontrolle) | Prompt-Tokens |
+|---|---|---|---|---|
+| ≥ 32 px, Liste, 160/224/320 px | 0,80/0,80/0,83 | 0,78/0,76/0,79 | 0,50/0,51/0,54 | 471–516 |
+| ≥ 32 px, freies Wort, 160/224/320 px | 0,63/0,67/0,67 | 0,63/0,70/0,65 | 0,39/0,42/0,42 | 110–185 |
+| ≥ 64 px, Liste voll, 224 px | 0,82 | 0,76 | 0,56 | 488 |
+| ≥ 64 px, Liste voll, roter Rahmen | 0,84 | 0,76 | 0,68 | 509 |
+| ≥ 64 px, Liste Haushalt, roter Rahmen | (0,52) | 0,78 | 0,71 | 468 |
+
+- Wortliste schlägt freies Wort deutlich; die Ausschnittgröße spielt kaum eine Rolle.
+- Der rote Rahmen hilft vor allem, wo unklar war, welches Ding gemeint ist (Kontrolle 0,56 → 0,68). Rest-Fehler dieser Art: Esstisch → was darauf steht, Rucksack → Person (getragen), Schüssel → Tasse, Tasse → Glas.
+- „sicher“ ist als Filter fast wertlos: 93–100 % „ja“, auch bei falschen Antworten. Die seltenen „nein“ waren allerdings alle falsch.
+- Liste „haushalt“ (ohne Tiere/Fahrzeuge/Wintersport) spart ~40 Tokens, gewinnt im Haushalt kaum, benennt Tiere und Fahrzeuge dann falsch statt über „anderes“. Für draußen ungeeignet.
+- **(Annahme)** Für SLARC: volle Liste, roter Rahmen, 224 px. Erwartung im Haushalt ~3 von 4 richtig. Ein VLM-Name gilt deshalb nur als Vermutung („ich glaube, das ist …“), wird im Gedächtnis als unsicher markiert und erst nach einer zweiten, übereinstimmenden Antwort aus anderer Entfernung oder anderem Winkel übernommen; bei „sicher: nein“ kein Name.
+- **(offen)** Zeit auf dem Pi (erwartet: weniger als ein Vollbild, weil der Text vor dem Bild im Slot-Cache liegt); Einbau ins Brain (Auslöser „unbekannt“ nah und groß genug, je Objekt einmal, Ergebnis ins Gedächtnis).
 
