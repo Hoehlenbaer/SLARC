@@ -497,3 +497,22 @@ Qwen3.5 rechnet nur den geänderten Teil neu, wie Qwen3. Frei: 3,2 GB (Qwen3.5 m
 - Denkpausen im Betrieb (Pi, gemessen): Chat ~9–10 s, Suchorte ~12–15 s, Objekt ~14 s, Zielwahl ~19 s (davon ~7 s neuer Zustandstext, ~12 s Ausgabe), Bildfrage 320 px ~10 s.
 - **(offen)** Nächster Hebel: kürzere Ausgabe (`begruendung`) und knapperer Zustandstext; Qualität mit `compare_models` prüfen.
 
+**„Was ist das?“ – Ausschnitt eines unbekannten Objekts ans VLM (PC, 08.11.2026, `vision_ausschnitt_2213.md`, `_2237.md`)**
+
+Idee (Marco): Die Detektion meldet „unbekannt“ mit Box; SLARC schneidet die Box mit 25 % Rand quadratisch aus und fragt das VLM (`brain/vision/identify.py`). Test mit den 40 COCO-Klassen, die SLARC nicht kennt, als „Unbekannte“; Kontrolle mit SLARCs eigenen 40. Qwen3.5-4B Q4_K_M + Q8-mmproj, je Klasse bis 5 Boxen.
+
+| Lauf | Unbekannt | Haushalt | Bekannt (Kontrolle) | Prompt-Tokens |
+|---|---|---|---|---|
+| ≥ 32 px, Liste, 160/224/320 px | 0,80/0,80/0,83 | 0,78/0,76/0,79 | 0,50/0,51/0,54 | 471–516 |
+| ≥ 32 px, freies Wort, 160/224/320 px | 0,63/0,67/0,67 | 0,63/0,70/0,65 | 0,39/0,42/0,42 | 110–185 |
+| ≥ 64 px, Liste voll, 224 px | 0,82 | 0,76 | 0,56 | 488 |
+| ≥ 64 px, Liste voll, roter Rahmen | 0,84 | 0,76 | 0,68 | 509 |
+| ≥ 64 px, Liste Haushalt, roter Rahmen | (0,52) | 0,78 | 0,71 | 468 |
+
+- Wortliste schlägt freies Wort deutlich; die Ausschnittgröße spielt kaum eine Rolle.
+- Der rote Rahmen hilft vor allem, wo unklar war, welches Ding gemeint ist (Kontrolle 0,56 → 0,68). Rest-Fehler dieser Art: Esstisch → was darauf steht, Rucksack → Person (getragen), Schüssel → Tasse, Tasse → Glas.
+- „sicher“ ist als Filter fast wertlos: 93–100 % „ja“, auch bei falschen Antworten. Die seltenen „nein“ waren allerdings alle falsch.
+- Liste „haushalt“ (ohne Tiere/Fahrzeuge/Wintersport) spart ~40 Tokens, gewinnt im Haushalt kaum, benennt Tiere und Fahrzeuge dann falsch statt über „anderes“. Für draußen ungeeignet.
+- **(Annahme)** Für SLARC: volle Liste, roter Rahmen, 224 px. Erwartung im Haushalt ~3 von 4 richtig. Ein VLM-Name gilt deshalb nur als Vermutung („ich glaube, das ist …“), wird im Gedächtnis als unsicher markiert und erst nach einer zweiten, übereinstimmenden Antwort aus anderer Entfernung oder anderem Winkel übernommen; bei „sicher: nein“ kein Name.
+- **(offen)** Zeit auf dem Pi (erwartet: weniger als ein Vollbild, weil der Text vor dem Bild im Slot-Cache liegt); Einbau ins Brain (Auslöser „unbekannt“ nah und groß genug, je Objekt einmal, Ergebnis ins Gedächtnis).
+
