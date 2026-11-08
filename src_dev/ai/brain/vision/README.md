@@ -1,6 +1,6 @@
 # Vision-Sprachmodell (VLM) testen
 
-Stand 08.11.2026. Hintergrund: `Documentation/Brain_Konzept.md`, Abschnitt 13, Punkt 11.
+Stand 08.11.2026 (--cache-ram 0 ergänzt). Hintergrund: `Documentation/Brain_Konzept.md`, Abschnitt 13, Punkt 11.
 
 | Skript | Wo | Zweck |
 |---|---|---|
@@ -48,10 +48,13 @@ Perzeption und Motion vorher beenden (Messbedingung wie im Denk-Zustand). Termin
 
 ```
 ~/llama.cpp/build-server/bin/llama-server -m ~/.models/Qwen3.5-4B-Q4_K_M.gguf \
-    --mmproj ~/.models/mmproj-Qwen3.5-4B-f16.gguf -t 4 -c 4096 -np 1 --port 8080
+    --mmproj ~/.models/mmproj-Qwen3.5-4B-f16.gguf -t 4 -c 4096 -np 1 --cache-ram 0 --port 8080
 ```
 
 `-np 1`: nur ein Platz, damit der Speicher reicht und der Cache realistisch ist.
+`--cache-ram 0`: Neuere llama-server legen zusätzlich einen Prompt-Cache im RAM an, Standard 8192 MiB.
+Auf dem Pi (8 GB) lief damit am 08.11.2026 der Swap voll (2 GB), und neue Bilder zeigten nur
+4 Prompt-Tokens (vermutlich falsch wiederverwendete Zustände). Der Slot-Cache (`--cache-prompt`) bleibt aktiv.
 Terminal 2, im Repo-Klon auf dem Pi, venv `ai` aktiv:
 
 ```
