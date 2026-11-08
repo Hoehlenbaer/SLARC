@@ -200,7 +200,8 @@ Watchdog: Hängt die Firmware mit gezogenen Relais, muss der Task-Watchdog den E
 ## 6. Kameras und IMU (für Pi-Software und KI)
 
 **Kameras:**
-- 2× IMX296 (Global Shutter, 1440 × 1080) mit M12-Objektiv ZH3019-14: 2,8 mm, F2.2, Bildwinkel D 148° / H 118°, Verzeichnung < −17 %.
+- 2× IMX296 (Global Shutter, 1440 × 1080) mit M12-Objektiv Richer-R 2,8 mm (CCTV, 3 MP, für 1/2"–1/3"). Korrigiert 08.11.2026: Die frühere Angabe ZH3019-14 (D 148° / H 118°, Verzeichnung < −17 %) gehört zu einem anderen Objektiv.
+- Bildwinkel und Verzeichnung (offen, messen): Der Hersteller nennt keine Werte. Erwartet wird ein rektilineares Weitwinkel mit Tonnenverzeichnung, horizontal etwa 85–100° (Annahme). Entscheidet über das Verzeichnungsmodell der Rektifikation (Brown-Conrady oder Fisheye). Messung: Breite b an einer Wand im Abstand d, HFOV = 2·atan(b/2d); Kalibrierung mit beiden Modellen vergleichen.
 - Baseline 65 mm, Hardware-Trigger.
 
 **Einbaulage im Körper-Frame** aus dem CAD (Annahme, gilt bis zur Kalibrierung):
@@ -210,11 +211,11 @@ Watchdog: Hängt die Firmware mit gezogenen Relais, muss der Task-Watchdog den E
 | Optische Achsen | parallel zu +X |
 | Sensorebene | x ≈ 177,7 mm |
 | Achsen | y = ±32,5 mm (links +), z = 37,2 mm |
-| Objektivspitze | x 199,7 mm |
+| Objektivspitze | x 199,7 mm (Annahme, aus ZH3019-14 im CAD; Länge des Richer-R messen) |
 | ICM-20948 | auf dem Kamerahalter oben mittig, etwa x 173, y 0, z 62 mm; Achsen noch nicht festgelegt |
 
 - Kamera-zu-Kamera und Kamera-zu-IMU kalibriert Kalibr. Die CAD-Werte dienen nur als Startwerte.
-- Die Mindestdistanz der Stereo-Tiefe liegt bei ~12 cm (fx ≈ 357 px bei 640 × 480, 192 px Disparität).
+- Die Mindestdistanz der Stereo-Tiefe liegt bei ~12 cm (fx ≈ 357 px bei 640 × 480, 192 px Disparität). Annahme: fx ergibt sich aus 2,8 mm / 3,45 µm; die Ausgabe-fx der Rektifikation ist noch festzulegen (offen).
 
 **Was die Kameras sehen:**
 - Die Füße der Vorderbeine.
