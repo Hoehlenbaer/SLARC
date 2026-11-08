@@ -1,5 +1,6 @@
 # brain/tests/test_semantic.py
-# Version 0.1 (07.11.2026) – Tests für semantic.py ohne Sprachmodell.
+# Version 0.2 (08.11.2026) – Tests für semantic.py ohne Sprachmodell.
+# V0.2: ehrliche Bestätigungen (Vorlagen), claims_result, check/Personen in item_problem.
 # Grammatik-Prüfung wie in test_brain.py über SLARC_VOCAB_GGUF.
 
 from __future__ import annotations
@@ -129,3 +130,44 @@ def test_outdoor_classes_are_detectable():
     assert normalize_item("Parkbank") == "bank" and normalize_item("Baum") == "topfpflanze"
     assert S.item_problem(S.ChatResult("search", "fahrrad")) is None
     assert "fahrrad" in S.CHAT_SYSTEM
+
+
+def test_confirmation_replaces_claimed_result():
+    b = fixed('{"dienst": "check", "gegenstand": "staubsauger", "antwort": "Ja, der Staubsauger steht im Wohnzimmer."}')
+    r = S.interpret_chat(b, "Steht der Staubsauger im Wohnzimmer?")
+    assert S.claims_result(r.llm_reply) and not S.claims_result(r.reply)
+    assert "nicht erkennen" in r.reply
+    b = fixed('{"dienst": "search", "gegenstand": "katze", "antwort": "Ich habe die Katze gefunden."}')
+    r = S.interpret_chat(b, "Such die Katze")
+    assert r.reply == "Ich suche nach der Katze und sage dir Bescheid."
+    b = fixed('{"dienst": "smalltalk", "gegenstand": "", "antwort": "Gut, danke!"}')
+    assert S.interpret_chat(MockBrain(responder=lambda m, g: '{"antwort": "Gut, danke!"}'
+                                      if "plaudern" in m[0]["content"] else
+                                      '{"dienst": "smalltalk", "gegenstand": "", "antwort": "x"}'),
+                            "Wie geht's?").reply == "Gut, danke!"
+
+
+def test_check_rooms_and_persons():
+    assert S.item_problem(S.ChatResult("check", "zimmer")) is None
+    assert S.item_problem(S.ChatResult("check", "licht"))
+    assert S.item_problem(S.ChatResult("search", "laura"))
+    assert S.item_problem(S.ChatResult("search", "laura"), ("Marco", "Laura")) is None
+    assert S.confirmation(S.ChatResult("search", "laura")) == "Ich suche nach Laura und sage dir Bescheid."
+    assert S.confirmation(S.ChatResult("push_out", "bett")) == "Ich schaue nach, was unter dem Bett liegt."
+    assert S.confirmation(S.ChatResult("fetch", "flasche")) == "Ich versuche, die Flasche zu holen."
+
+
+def test_claims_result_heuristic():
+    for t in ("Ja, das Licht im Schlafzimmer ist an.", "Nein, nicht zu sehen.", "Ich habe es gefunden."):
+        assert S.claims_result(t), t
+    for t in ("Ich schaue, ob das Licht an ist.", "Ich suche jetzt nach deiner Tasse.",
+              "Ich werde das Wohnzimmer im Auge behalten.", ""):
+        assert not S.claims_result(t), t
+
+
+def test_every_template_is_honest():
+    from brain.perception_classes import DETECTABLE
+    for svc in ("search", "check", "fetch", "push_out", "follow", "come"):
+        for item in DETECTABLE + ["", "laura"]:
+            assert not S.claims_result(S.confirmation(S.ChatResult(svc, item))), (svc, item)
+    assert set(S.GENUS) == set(DETECTABLE)

@@ -72,6 +72,10 @@ bash ~/projects/SLARC/src_dev/ai/brain/vision/run_pi_matrix.sh
 N=3 SIZES=320,448 COOL=60 ONLY=q35-2b bash …/run_pi_matrix.sh     # Optionen über Umgebungsvariablen
 ```
 
+Ohne `ONLY`/`ALL` laufen nur `slots-1` und `slots-4`: Qwen3.5-4B Q4_K_M + Q8-mmproj, Text-Aufgaben mit den
+echten Grammatiken, einmal mit einem Slot und einmal mit einem Slot je Aufgabe (`-np 4 -c 12288`, wie
+`ServerBrain(n_slots=4)` in `brain/llm.py`). „nach Wechsel“ zeigt dann, ob der Cache den Aufgabenwechsel
+übersteht, „frei MB“ den Speicherpreis. Mit `ALL=1` zusätzlich die Läufe vom 08.11.:
 Läufe: Qwen3.5-4B Q4_K_M mit mmproj F16 und Q8_0, Qwen3.5-4B Q4_0 mit Q8_0, Qwen3.5-2B mit F16 und Q8_0,
 Qwen3-4B nur Text. Die Genauigkeit bei kleiner Bildkante misst man schneller auf dem PC:
 `compare_vlm … --max-side 320`.

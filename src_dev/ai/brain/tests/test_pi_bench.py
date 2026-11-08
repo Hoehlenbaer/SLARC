@@ -1,5 +1,6 @@
 # brain/tests/test_pi_bench.py
 # Version 0.2 (08.11.2026) – bench_pi und export_subset gegen nachgebauten Server bzw. Mini-COCO.
+# V0.3: Slots je Aufgabe (bench_pi --slots, ServerBrain), Grammatik im Request.
 # V0.2: Label, /props und Übersicht mehrerer Läufe (run_pi_matrix.sh).
 
 import json
@@ -15,6 +16,9 @@ PIL = pytest.importorskip("PIL.Image")
 from brain.vision import bench_pi, export_subset  # noqa: E402
 
 
+BODIES = []
+
+
 class Fake(BaseHTTPRequestHandler):
     def log_message(self, *a):
         pass
@@ -27,6 +31,7 @@ class Fake(BaseHTTPRequestHandler):
 
     def do_POST(self):
         body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
+        BODIES.append(body)
         last = body["messages"][-1]["content"]
         has_img = isinstance(last, list)
         props = body.get("response_format", {}).get("json_schema", {}).get("schema", {}).get("properties", {})
@@ -110,3 +115,35 @@ def test_label_props_and_summary(url, tmp_path, monkeypatch):
     bench_pi.main()
     m = (tmp_path / "m.md").read_text()
     assert "| q35-2b |" in m and "| q3-text |" in m and "Dose 320 px" in m
+
+
+def test_bench_slots_and_grammar(url, tmp_path, monkeypatch):
+    BODIES.clear()
+    monkeypatch.setattr(bench_pi, "out_paths", lambda s: (str(tmp_path / "s.md"), str(tmp_path / "s.json")))
+    monkeypatch.setattr(sys, "argv", ["x", "--url", url, "--text-only", "--slots", "4"])
+    bench_pi.main()
+    measured = [b for b in BODIES if b.get("grammar")]
+    assert len(measured) == 8                                   # 4 Aufgaben x (Wechsel, wiederholt)
+    assert {b["id_slot"] for b in measured} == {0, 1, 2, 3}
+    assert json.loads((tmp_path / "s.json").read_text())["slots"] == 4
+
+
+def test_server_brain_slots(url):
+    from brain import semantic as S
+    from brain.llm import ServerBrain, slot_of, task_of
+    BODIES.clear()
+    b = ServerBrain(url, n_slots=4)
+    assert b.name == "Qwen3.5-2B-Q4_K_M.gguf"
+    S.interpret_chat(b, "Wo ist mein Handy?")
+    S.search_places(b, "tasse", ["küche", "bad"])
+    S.narrate(b, [{"kind": "x", "text": "y"}])
+    b.decide("ANLASS: keiner\nMÖGLICHE ZIELE\n1 Sich umsehen\n2 Dösen", 2)
+    assert [x["id_slot"] for x in BODIES] == [1, 3, 3, 0]
+    assert all(x.get("grammar") for x in BODIES)
+    assert slot_of("bild", 4) == 3 and slot_of("chat", 1) == 0
+    assert task_of([{"role": "user", "content": [{"type": "image_url"}]}]) == "bild"
+    one = ServerBrain(url)
+    BODIES.clear()
+    one.generate([{"role": "user", "content": "x"}], None, 5)
+    assert "id_slot" not in BODIES[0]
+    assert ServerBrain("http://127.0.0.1:9").generate([{"role": "user", "content": "x"}], None).error

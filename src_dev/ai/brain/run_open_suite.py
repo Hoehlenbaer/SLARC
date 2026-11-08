@@ -1,6 +1,9 @@
 # brain/run_open_suite.py
 # Version 0.2 (07.11.2026) – Testsuite für die semantischen Aufgaben (semantic.py).
 # V0.2: run(..., rows_out=False) für compare_models.py.
+# V0.6: Spalte „behauptet“: Bestätigung des LLM nennt ein Ergebnis (claims_result), obwohl
+#       SLARC noch nicht nachgesehen hat. Seit semantic V0.6 ersetzt der Code diese Antwort;
+#       gezählt wird trotzdem, und die endgültige Antwort darf nie etwas behaupten.
 # V0.5: Mock kennt die Aufgabe "plaudern" (Chat Stufe 2).
 # V0.4: Holdout-Sätze von Marco als eigene Gruppe "eigen"; Lücken getrennt ausgewiesen.
 # V0.3: Chat mit Tagebuch-Kontext (ERLEBT); Objekte mit Regeln, Zählung Regel/LLM;
@@ -22,7 +25,7 @@ import time
 
 from . import semantic as S
 from .llm import LlamaBrain, MockBrain
-from .open_scenarios import CHAT_CASES, DIARY_SAMPLE, HOLDOUT_CHAT, OBJECT_CASES, SEARCH_CASES
+from .open_scenarios import CHAT_CASES, DIARY_SAMPLE, HOLDOUT_CHAT, OBJECT_CASES, PERSONS, SEARCH_CASES
 
 
 def mock_responder(msgs, gbnf):
@@ -44,32 +47,46 @@ def _item_ok(item: str, wanted: set[str]) -> bool:
     return not wanted or any(w in item for w in wanted)
 
 
+ACTION_SERVICES = ("search", "check", "fetch", "push_out", "follow", "come")
+
+
+def _claims(r) -> dict:
+    """[V0.6] behauptet = LLM-Bestätigung eines Auftrags nennt ein Ergebnis;
+    final_behauptet = die Antwort, die der Mensch sieht (muss immer False sein)."""
+    act = r.service in ACTION_SERVICES
+    return {"llm_antwort": r.llm_reply,
+            "behauptet": act and S.claims_result(r.llm_reply),
+            "final_behauptet": act and S.claims_result(r.reply)}
+
+
 def run(b, repeat: int, rows_out: bool = True, use_rules: bool = True) -> dict:
     rows = []
     say = print if rows_out else (lambda *a, **k: None)
 
-    def row(task, case, ok, valid, lat, out, reason="", source="llm"):
+    def row(task, case, ok, valid, lat, out, reason="", source="llm", res=None):
         rows.append({"aufgabe": task, "fall": case, "ok": ok, "gueltig": valid,
-                     "latenz_s": round(lat, 2), "ausgabe": out, "grund": reason, "quelle": source})
+                     "latenz_s": round(lat, 2), "ausgabe": out, "grund": reason, "quelle": source,
+                     **(_claims(res) if res is not None else {})})
         mark = "ok " if ok else "FALSCH" if valid else "UNGÜLTIG"
         say(f"{mark:8} {task:7} {case[:44]:44} -> {out}", flush=True)
 
     for k in range(repeat):
         for c in CHAT_CASES:
-            r = S.interpret_chat(b, c.text, diary=DIARY_SAMPLE)
+            r = S.interpret_chat(b, c.text, diary=DIARY_SAMPLE, persons=PERSONS)
             ok = r.service in c.services and _item_ok(r.item, c.item_any)
             row("chat", c.text, ok, r.service is not None, r.latency_s,
-                f"{r.service}({r.item}) „{r.reply}“")
+                f"{r.service}({r.item}) „{r.reply}“", res=r)
         for c in HOLDOUT_CHAT:
-            r = S.interpret_chat(b, c.text, diary=DIARY_SAMPLE)
+            r = S.interpret_chat(b, c.text, diary=DIARY_SAMPLE, persons=PERSONS)
             out = f"{r.service}({r.item}) „{r.reply}“"
             if c.gap:
                 rows.append({"aufgabe": "luecke", "fall": c.text, "ok": None, "gueltig": r.service is not None,
-                             "latenz_s": round(r.latency_s, 2), "ausgabe": out, "grund": c.gap, "quelle": "llm"})
+                             "latenz_s": round(r.latency_s, 2), "ausgabe": out, "grund": c.gap, "quelle": "llm",
+                             **_claims(r)})
                 say(f"{'LÜCKE':8} {'eigen':7} {c.text[:44]:44} -> {out}", flush=True)
                 continue
             ok = r.service in c.services and _item_ok(r.item, c.item_any)
-            row("eigen", c.text, ok, r.service is not None, r.latency_s, out)
+            row("eigen", c.text, ok, r.service is not None, r.latency_s, out, res=r)
         for c in OBJECT_CASES:
             r = S.assess_object(b, c.cls, c.place, c.context, use_rules=use_rules)
             ok = r.report == c.report and r.interest in c.interest
@@ -95,6 +112,8 @@ def run(b, repeat: int, rows_out: bool = True, use_rules: bool = True) -> dict:
             "llm_treffer": sum(r["ok"] for r in rs if r["quelle"] == "llm"),
             "llm_laeufe": sum(r["quelle"] == "llm" for r in rs),
             "latenz_median_s": round(statistics.median(lats), 2) if lats else None,
+            "behauptet": sum(bool(r.get("behauptet")) for r in rs),
+            "final_behauptet": sum(bool(r.get("final_behauptet")) for r in rs),
         }
     summary["tagebuch"] = text
     return {"summary": summary, "rows": rows}

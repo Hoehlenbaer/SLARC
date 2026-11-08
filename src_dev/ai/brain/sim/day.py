@@ -1,5 +1,6 @@
 # brain/sim/day.py
 # Version 0.1 (07.11.2026) – Ein simulierter Tag: Welt + Arbiter + Behavior Tree (+ LLM).
+# V0.2 (08.11.2026): Personennamen an interpret_chat/item_problem (Personensuche statt „kann ich nicht erkennen“).
 #
 # Aufruf aus src_dev/ai:
 #   python -m brain.sim.day                          # ohne LLM: Code entscheidet, Chat per Stichwort
@@ -128,10 +129,10 @@ def main() -> None:
         while chat_i < len(world.chat) and world.chat[chat_i].t <= world.t:
             ev = world.chat[chat_i]
             chat_i += 1
-            res = S.interpret_chat(brain, ev.text, ev.sender, mem.diary) if brain else keyword_chat(ev.text)
+            res = S.interpret_chat(brain, ev.text, ev.sender, mem.diary, tuple(PEOPLE_PID)) if brain else keyword_chat(ev.text)
             if brain:
                 llm_calls += 1 + (1 if res.talk else 0)
-            problem = S.item_problem(res)
+            problem = S.item_problem(res, tuple(PEOPLE_PID))
             reply = problem or res.reply
             log(f"CHAT {ev.sender}: „{ev.text}“ -> {res.service}({res.item})  SLARC: „{reply}“")
             if problem:
