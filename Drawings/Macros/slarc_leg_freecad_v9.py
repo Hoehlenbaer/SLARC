@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – parametrisches Bein (Coxa/Femur/Tibia) mit 3x ST3215, doppelt gelagert.   V9.4
+SLARC – parametrisches Bein (Coxa/Femur/Tibia) mit 3x ST3215, doppelt gelagert.   V9.5
 FreeCAD 0.21 / 1.0 – Makro ausführen oder in der Python-Konsole:
     exec(open(r"PFAD/slarc_leg_freecad_v8.py", encoding="utf-8").read())
 
+V9.5 (Kabelbinder-Ösen außen)
+- Statt Schlitzpaaren durch die Wand (Kabelbinder ließ sich im Hohlraum nicht zurückführen, Marco 09.11.2026)
+  außen aufgesetzte Ösen an der Oberseite (-Y): Steg mit Kanal 4.2 x 2.0 entlang Z, beim Druck senkrecht,
+  also ohne Stützen. Femur 3x, Tibia 1x (Fußsegment).
 V9.4 (Spitzdach im Hohlprofil)
 - Hohlräume von Femur und Tibia oben als Spitzdach mit 45° (Schnitt mit einer auf die Kante gestellten
   Quadratsäule, roof_d). Vorher war die Decke eine 16-mm-Brücke; Cura legte die Brückenlinien längs, und eine
@@ -180,6 +184,10 @@ PARAMS = [
     ("sw_hd",       1.2,  "Befestigungsstifte Ø (bündig, TPU-Hülse gleitet drüber)"),
     ("roof_p",      4.0,  "TPU-Fuß: halbe Breite der Druckfläche (außen 45°-Dach)"),
     ("wire_w",      4.0,  "Kabelkanal Breite"),
+    ("tie_w",       4.2,  "V9.5: Kabelbinder-Öse Kanalbreite (bis 3.6er Binder)"),
+    ("tie_t",       2.0,  "V9.5: Kabelbinder-Öse Kanalhöhe über der Wand"),
+    ("tie_s",       1.6,  "V9.5: Kabelbinder-Öse Stegdicke"),
+    ("tie_h",       8.0,  "V9.5: Kabelbinder-Öse Länge entlang Z"),
     ("wire_h",      3.0,  "Kabelkanal Höhe"),
     ("deco_t",      1.2,  "PLA-Zierleiste Dicke"),
     ("deco_m",      4.0,  "PLA-Zierleiste Randabstand"),
@@ -450,13 +458,15 @@ def ramps(g, n, x1):
 
 
 def ties(g, n, xs):
-    """Kabelbinder-Schlitzpaare durch die Oberseite (-Y) eines Hohlträgers."""
-    out = []
+    """V9.5: Kabelbinder-Ösen außen auf der Oberseite (-Y) eines Hohlträgers. Liefert (pos, neg).
+    Kanal tie_w x tie_t entlang Z zwischen Wand und Steg (tie_s dick), Öse tie_h hoch."""
+    pos, neg = [], []
     for i, x in enumerate(xs):
-        for k, sz in enumerate((-1, 1)):
-            out.append(box(g, f"{n}_tie{i}{k}", I, f"({x}) - 2", "-link_w/2 - 1", f"zc + ({sz})*5 - 1",
-                           4, "link_wall + 1.5", 2))
-    return out
+        pos.append(box(g, f"{n}_eye{i}", I, f"({x}) - tie_w/2 - 2", "-link_w/2 - tie_t - tie_s", "zc - tie_h/2",
+                       "tie_w + 4", "tie_t + tie_s + 0.5", "tie_h"))
+        neg.append(box(g, f"{n}_eyeh{i}", I, f"({x}) - tie_w/2", "-link_w/2 - tie_t", "zc - tie_h/2 - 1",
+                       "tie_w", "tie_t", "tie_h + 2"))
+    return pos, neg
 
 
 def fork_chamfer(g, n):
@@ -607,7 +617,8 @@ j2 = part(j2b, "J2_Femur", angle="q_femur")
 T = Fr("femur_len", "0", "0")
 pos = fork_pos(j2, "Femur", I, "bridge_t2") + ramps(j2, "Femur", X1); neg = fork_neg(j2, "Femur", I) + fork_chamfer(j2, "Femur")
 b_p, b_n = beam(j2, "Femur", I, X1, "femur_len - back + 0.5", hollow=True)
-b_n += ties(j2, "Femur", [f"({X1}) + ramp_l + 8", "(femur_len - back + ramp_l + r_clr)/2", "femur_len - back - 10"])
+t_p, t_n = ties(j2, "Femur", [f"({X1}) + ramp_l + 8", "(femur_len - back + ramp_l + r_clr)/2", "femur_len - back - 10"])
+b_p += t_p; b_n += t_n                                                                       # V9.5: Ösen
 c_p, c_n, lp, ln = cradle(j2, "TibiaSrv", T)
 femur = with_lips(j2, "Femur_Part", cut(j2, "Femur_core", fuse(j2, "Femur_pos", pos + b_p + c_p), neg + b_n + c_n), lp, ln)
 _color(femur, COL_PETG)
@@ -655,8 +666,9 @@ neg += [common(j3, "Tibia_seg1_cav", seg1_in,                                  #
         s2box("Tibia_swpocket", XSW, "-sw_T/2 - fit", "zc - sw_L/2 - fit", f"({XE}) - ({XSW}) + 1",
               "sw_T + 2*fit", "sw_L + 2*fit"),
         box(j3, "Tibia_wire_exit", I, f"({X1}) + 6", "-link_w/2 - 1", "zc - 3", 10, "link_wall + 2", 6)]
-for k, sz in enumerate((-1, 1)):       # Kabelbinder-Öse am Fußsegment (Zugentlastung Schalterkabel)
-    neg.append(s2box(f"Tibia_tie{k}", "link_w/2 + 4", "-link_w/2 - 1", f"zc + ({sz})*5 - 1", 4, "link_wall + 1.5", 2))
+# V9.5: Kabelbinder-Öse außen am Fußsegment (Zugentlastung Schalterkabel)
+neg.append(s2box("Tibia_eyeh", "link_w/2 + 6 - tie_w/2", "-link_w/2 - tie_t", "zc - tie_h/2 - 1",
+                 "tie_w", "tie_t", "tie_h + 2"))
 for s_, z0 in (("A", "zc + link_h/2 - lip_h - 0.2"), ("B", "zc - link_h/2 - 1")):
     neg.append(s2box(f"Tibia_groove{s_}", f"({XS}) - foot_trav - 0.2", "-link_w/2 - 1", z0,
                      "lip_w + foot_trav + 0.4", "link_w + 2", "lip_h + 1.2"))
@@ -680,7 +692,9 @@ def roof_cut(n, sgn, xr, hw):
 
 for s_, sg in (("L", 1), ("R", -1)):          # Tibia-Ende 45° anfasen
     neg.append(roof_cut(f"Tibia_roof{s_}", sg, XE, "link_w/2"))
-tibia = cut(j3, "Tibia_Part", fuse(j3, "Tibia_pos", pos + [seg1, knuckle, seg2]), neg)
+eye = s2box("Tibia_eye", "link_w/2 + 6 - tie_w/2 - 2", "-link_w/2 - tie_t - tie_s", "zc - tie_h/2",
+            "tie_w + 4", "tie_t + tie_s + 0.5", "tie_h")                                  # V9.5: Öse
+tibia = cut(j3, "Tibia_Part", fuse(j3, "Tibia_pos", pos + [seg1, knuckle, seg2, eye]), neg)
 _color(tibia, COL_PETG)
 for s_, z0 in (("A", "zc + link_h/2"), ("B", "zc - link_h/2 - deco_t")):   # Zierleisten auf dem Fußsegment
     d = s2box(f"Deco_Tibia_{s_}", "link_w/2 + deco_m", "-link_w/2 + deco_m", z0,
