@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – Cura-Projekte (3MF) pro Druckteil erzeugen.   V1.3 (Quelle: Stückliste)
+SLARC – Cura-Projekte (3MF) pro Druckteil erzeugen.   V1.4 (Quelle: Stückliste)
 Drucker: Anycubic Kobra Plus, Cura 5.13 (setting_version 27).
 
 Ablauf:
@@ -23,6 +23,11 @@ Aufruf:  python make_cura_3mf.py               (alle Teile mit STL-Datei)
          python make_cura_3mf.py --force Cap   (auch von Hand gespeicherte Projekte überschreiben)
 Benötigt: numpy, openpyxl.
 Beim Öffnen in Cura für das Profil "neu erstellen" bzw. später "aktualisieren" wählen.
+
+V1.4
+- PETG-Temperaturen aus dem Temperaturturm der Anycubic-PETG-Rolle (Marco, 10.11.2026): 250–240 °C starke Fäden,
+  235 grenzwertig, 230–220 sauber; Schichthaftung auch bei 220 zäh (Bruch nur an den Kerben zwischen den Stufen).
+  Jetzt 230 / erste Schicht 235 / Ende 225 statt 235 / 240 / 230 aus der Vorlage.
 
 V1.3
 - V1.2 zurückgenommen: Stützen wieder nur vom Druckbett. Tree Support führt die Äste um die untere Gabelwange
@@ -54,7 +59,7 @@ TPL = {"PLA": os.path.join(HERE, "templates", "AKP_template_PLA.3mf"),      # eS
 
 # Basiswerte je Material: (global, extruder, Einträge der Vorlage, die entfernt werden)
 # PLA: Temperaturen, Bett, Lüfter, Rückzug kommen aus dem Material (eSUN PLA+: 210 °C, 60 °C, 100 %, 3 mm).
-# PETG: Temperaturen 235/240/230, Bett 80, Lüfter 40 %, Rückzug 4,5 mm aus Marcos Profil (Vorlage) bleiben.
+# PETG: Bett 80, Lüfter 40 %, Rückzug 4,5 mm aus Marcos Profil (Vorlage); Temperaturen V1.4 aus dem Temperaturturm.
 COMMON_G = {"layer_height": "0.2", "layer_height_0": "0.2", "adhesion_type": "skirt",
             "print_sequence": "all_at_once", "support_enable": "False", "support_structure": "tree",
             "support_type": "buildplate", "retraction_combing": "noskin"}
@@ -68,6 +73,8 @@ BASE = {
              "material_final_print_temperature")),
     "PETG": (COMMON_G,
              dict(COMMON_E, top_bottom_thickness="1.0", infill_sparse_density="40", wall_line_count="4",
+                  material_print_temperature="230.0", material_print_temperature_layer_0="235.0",
+                  material_final_print_temperature="225.0",
                   bridge_settings_enabled="True", bridge_wall_speed="20", bridge_skin_speed="25",
                   bridge_fan_speed="100", bridge_skin_material_flow="100", bridge_enable_more_layers="True"),
              ()),
