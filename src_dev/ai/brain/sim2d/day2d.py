@@ -1,5 +1,7 @@
 # brain/sim2d/day2d.py
 # Version 0.2 (11.11.2026) – Simulierter Tag mit Karte: Welt2D + Blackboard + Arbiter + BT.
+# V0.4: Bericht zählt je Verhalten, wer gestartet hat (Code, knapp/Code, LLM, Regel) und bei welcher
+#       Energiestufe (Frage Marco 11.11.: döst Qwen bei niedrigem Energiebedarf?).
 # V0.3: Antworten und Meldungen grammatisch (sprache.py).
 # V0.2: „Was ist das?“: nachgebildetes VLM, Rückfrage an den Menschen; wer zu Hause ist, antwortet
 #       nach ANSWER_DELAY_S im Chat („Das ist eine Socke.“, SIM ONLY); benannte Dinge sind suchbar.
@@ -178,6 +180,7 @@ def run(hours: float = 3.0, seed: int = 1, soc: float = 0.9, brain=None, think_s
     chat_i = 0
     tapped = False
     stats, time_in = Counter(), Counter()
+    who = Counter()                                  # (Verhalten, Quelle, Energiestufe) -> Starts
     llm_calls = 0
     prev_levels = None
     end_reason = "Zeit abgelaufen"
@@ -199,6 +202,10 @@ def run(hours: float = 3.0, seed: int = 1, soc: float = 0.9, brain=None, think_s
         tree, cur, t_start = build_tree(opt, ctx, rng, places_fn, mem.last_seen), opt, world.t
         tree.setup_with_descendants()
         stats[opt.behavior] += 1
+        src = ("LLM" if why.startswith("LLM:") else "LLM ungültig" if why.startswith("LLM ungültig")
+               else "knapp/Code" if why.startswith("knapp") else "Regel" if why.startswith("Energie")
+               else "Code")
+        who[(opt.behavior, src, LEVELS[arb.needs.s.levels["energie"]])] += 1
         bb.robot.behavior = opt.key
         log(f"-> {opt.key}   [{why}]")
         if trees:
@@ -344,6 +351,7 @@ def run(hours: float = 3.0, seed: int = 1, soc: float = 0.9, brain=None, think_s
         "bereiche": sorted(a.name for a in bb.areas.values() if a.cells >= 30), "objekte": len(bb.objects),
         "llm": llm_calls,
         "verhalten": [[b, n, round(time_in[b] / 60, 1)] for b, n in stats.most_common()],
+        "wer_startet": [[b, s, e, n] for (b, s, e), n in sorted(who.items())],
     }
     if not quiet:
         print("\n" + "=" * 60)
@@ -354,6 +362,9 @@ def run(hours: float = 3.0, seed: int = 1, soc: float = 0.9, brain=None, think_s
         print("Verhalten (Starts, Zeit):")
         for b, n, mins in summary["verhalten"]:
             print(f"  {b:18} {n:3}×  {mins:5.1f} min")
+        doze = [(s, e, n) for (b, s, e), n in sorted(who.items()) if b == "doze"]
+        if doze:
+            print("Dösen gestartet von (Quelle, Energie, Anzahl): " + "; ".join(f"{s} bei {e}: {n}×" for s, e, n in doze))
         print("Meldungen an die Menschen:")
         for t, m in world.messages:
             print(f"  [{hms(t)}] {m}")

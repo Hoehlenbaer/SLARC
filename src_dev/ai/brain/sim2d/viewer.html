@@ -286,7 +286,10 @@ function init(D) {
     const msgs = (D.messages || []).map(([t,m]) => `<tr><td class="n">${hms(t)}</td><td colspan="2">${m}</td></tr>`).join("");
     $("sumbody").innerHTML = `<p>Ende nach <b class="mono">${s.ende}</b>: ${s.grund}. Akku ${s.akku_pct} % (${s.akku_v} V), gelaufen ${s.gelaufen_m} m,
       Karte ${s.karte_frei_m2} m² frei, ${s.objekte} Objekte, LLM-Aufrufe ${s.llm}.</p>
-      <table>${rows}</table><p class="lbl" style="margin-top:8px">Meldungen</p><table>${msgs || "<tr><td>keine</td></tr>"}</table>`; }
+      <table>${rows}</table>
+      <p class="lbl" style="margin-top:8px">Wer startet (Verhalten · Quelle · Energie)</p>
+      <table>${(s.wer_startet || []).map(([b,src,e,n]) => `<tr><td>${b}</td><td>${src} · ${e}</td><td class="n">${n}×</td></tr>`).join("")}</table>
+      <p class="lbl" style="margin-top:8px">Meldungen</p><table>${msgs || "<tr><td>keine</td></tr>"}</table>`; }
 
   // Abspielen
   let playing = false, simT = 0, last = 0;
