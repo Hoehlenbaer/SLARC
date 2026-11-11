@@ -1,5 +1,7 @@
 # brain/arbiter.py
 # Version 0.2 (07.11.2026) – Entscheidungszyklus im 1-Hz-Takt (Konzept 8).
+# V0.7 (11.11.2026): Meldung unter dem Ort des Objekts merken, nicht dem des Roboters
+#       (2D-Sim: Handy in der Küche vom Flur aus gesehen -> jede Sekunde neu gemeldet).
 # V0.6: Personen in last_seen merken (für seek_company); Dösezeiten ins doze_log.
 # V0.5: Auslöser unterbrechen ein laufendes Verhalten nur bei Chat oder deutlich besserem
 #       Ziel (INTERRUPT_MARGIN); dasselbe Ziel wird nie neu gestartet; last_seen pflegen;
@@ -202,7 +204,8 @@ class Arbiter:
                 if self.current.service:
                     self.needs.note_useful(now)
                 if beh == "report" and self.current.arg:
-                    self.mem.reported[f"{self.current.arg}@{obs.place}"] = now
+                    place = next((o.place for o in obs.objects if o.oid == self.current.arg), obs.place)
+                    self.mem.reported[f"{self.current.arg}@{place}"] = now
                 if beh in ("greet", "follow"):
                     self.needs.note_contact(now)
                 if beh == "seek_company" and not obs.persons:

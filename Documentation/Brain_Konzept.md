@@ -1,6 +1,6 @@
 # SLARC – Konzept High-Level-Brain
 
-Stand: 08.11.2026, Entwurf V0.3 (V0.7: Pi-Messung Qwen3.5 Text und Bild, Abschnitt 17; V0.2: Bedürfnis Gesellschaft, erste Umsetzung in `src_dev/ai/brain/`; V0.3: neue Rollenverteilung Code/LLM nach dem ersten Modelltest, Abschnitt 15). Ergebnis aus dem Brain-Chat. Ersetzt das Prinzip "klare Aufgabe → Behavior-Tree-JSON" (`src_dev/ai/exploration_manager_V4.py`) durch ein System, das eigenen Bedürfnissen folgt.
+Stand: 11.11.2026, Entwurf V0.3 (V0.8: Blackboard, Karte und 2D-Simulation, Abschnitt 18; V0.7: Pi-Messung Qwen3.5 Text und Bild, Abschnitt 17; V0.2: Bedürfnis Gesellschaft, erste Umsetzung in `src_dev/ai/brain/`; V0.3: neue Rollenverteilung Code/LLM nach dem ersten Modelltest, Abschnitt 15). Ergebnis aus dem Brain-Chat. Ersetzt das Prinzip "klare Aufgabe → Behavior-Tree-JSON" (`src_dev/ai/exploration_manager_V4.py`) durch ein System, das eigenen Bedürfnissen folgt.
 
 Kennzeichnung wie in `Hardware_Interfaces.md`: **(fest)** entschieden, **(Annahme)** Startwert, **(offen)** noch zu entscheiden.
 
@@ -280,6 +280,8 @@ Das LLM bekommt in jeder Stufe Text; das Konzept ändert sich durch den Kanal ni
 | `arbiter.py` | 1-Hz-Zyklus, Regeln, Auslöser, Abkühlzeit 2 min (Chat sofort), Lob durch Antippen |
 | `prompt.py` | Systemprompt, drei Few-Shot-Beispiele, Zustandstext, GBNF-Grammatik |
 | `llm.py` | llama.cpp-Anbindung mit Zeitlimit, Mock-Backend |
+| `blackboard.py`, `nav/` | Blackboard-Formate, Belegungskarte, A*, Grenzen, Objekt-Tracking (Abschnitt 18) |
+| `sim2d/` | 2D-Simulation mit Grundriss, Kamera, Kartenaufbau und HTML-Viewer (Abschnitt 18) |
 | `scenarios.py` | 15 Entscheidungs-Szenarien |
 | `run_decision_suite.py` | Modellvergleich auf dem Pi |
 | `tests/test_brain.py` | Unit-Tests (ohne Modell) |
@@ -524,4 +526,48 @@ Idee (Marco): Die Detektion meldet „unbekannt“ mit Box; SLARC schneidet die 
 - Liste „haushalt“ (ohne Tiere/Fahrzeuge/Wintersport) spart ~40 Tokens, gewinnt im Haushalt kaum, benennt Tiere und Fahrzeuge dann falsch statt über „anderes“. Für draußen ungeeignet.
 - **(Annahme)** Für SLARC: volle Liste, roter Rahmen, 224 px. Erwartung im Haushalt ~3 von 4 richtig. Ein VLM-Name gilt deshalb nur als Vermutung („ich glaube, das ist …“), wird im Gedächtnis als unsicher markiert und erst nach einer zweiten, übereinstimmenden Antwort aus anderer Entfernung oder anderem Winkel übernommen; bei „sicher: nein“ kein Name.
 - **(offen)** Zeit auf dem Pi (erwartet: weniger als ein Vollbild, weil der Text vor dem Bild im Slot-Cache liegt); Einbau ins Brain (Auslöser „unbekannt“ nah und groß genug, je Objekt einmal, Ergebnis ins Gedächtnis).
+
+## 18. Blackboard, Karte und 2D-Simulation (11.11.2026, V0.8)
+
+Ziel (Marco, 11.11.2026): einen SLARC-Tag sehen, bei dem SLARC mit simulierten Sensordaten eine Karte aufbaut, sie mit entdeckten Objekten füllt und darauf mit A* navigiert; dabei die Datenformate des Blackboards festlegen.
+
+**Grundsatz:** Das Brain sieht die Welt nur über das Blackboard (`brain/blackboard.py`, Version `BB 0.1`). `Blackboard.to_observation()` erzeugt daraus die `Observation`, die Arbiter und Bedürfnisse wie bisher bekommen. In der Simulation schreibt `brain/sim2d/world2d.py` ins Blackboard, auf dem Roboter die jeweiligen Prozesse. Damit bleibt das Brain unverändert, wenn die Simulation durch Perzeption und SLAM ersetzt wird.
+
+**Felder und Schreiber** (Einheiten SI, Weltkoordinaten x rechts, y oben, theta gegen den Uhrzeigersinn ab x):
+
+| Feld | Typ | Schreiber (Roboter) | Inhalt |
+|---|---|---|---|
+| `pose`, `home` | `Pose(x, y, theta, t)` | SLAM | eigene Lage, Ausgangspunkt |
+| `map` | `GridMap` | SLAM | Belegungskarte 10 cm, Log-Odds; nach außen ROS-Konvention (-1 unbekannt, 0…100 %); je freie Zelle eine Bereichskennung (Raumname) |
+| `detections` | `[Detection(cls, x, y, conf, t, box)]` | Perzeption | Erkennungen des letzten Bildes in Weltkoordinaten (Stereo-Tiefe), `box` für „Was ist das?“ |
+| `objects` | `{track_id: TrackedObject}` | Tracker (`nav/tracker.py`) | dauerhafte Kennung, Klasse, Lage, Zustand `da`/`fehlt`, `moved`, Bereich, `name_vlm`, `name_sure` |
+| `persons` | `{track_id: PersonTrack}` | Perzeption/Tracking | Lage, zuletzt gesehen, Name (None, solange Personen nicht unterschieden werden) |
+| `frontiers` | `[Frontier(fid, x, y, size, area, reachable)]` | Kartenebenen (`nav/layers.py`) | Grenzen zum Unbekannten mit lesbarem Namen („flur ost“) |
+| `areas` | `{name: Area(x, y, cells)}` | Kartenebenen | bekannte Bereiche mit Mittelpunkt und Größe |
+| `nav` | `NavState(goal, goal_label, path, status, replans, home_dist_m)` | Navigation | Ziel, Wegpunkte, Status (`unterwegs`, `angekommen`, `kein_weg`, `zeit_um`), Weg nach Hause (Dijkstra) |
+| `robot` | `RobotState(battery_v, soc, mode, light, tilt_deg, behavior, node, mood, needs, levels)` | ESP32-Brücke, Brain | Akku, Modus (`stehen`, `laufen`, `drehen`, `liegen`, `denken`), laufendes Verhalten und BT-Blatt, Stimmung, Bedürfnisse |
+| `events` | `(t, art, text)` | alle | neu, fehlt, wieder da, verschoben, Meldung |
+
+`to_dict()` liefert den Zustand JSON-fähig (ohne Raster) für Aufzeichnung, IPC und Viewer.
+
+**Neue portable Module** (`# PORTABLE`, nur numpy, kein scipy, kein matplotlib):
+- `nav/gridmap.py`: Belegungskarte, Tiefenstrahlen eintragen (vektorisiert), Bereichskennungen, Sichtlinie.
+- `nav/astar.py`: nach `src_dev/motion_control/Pathfinder_V4.py` (Kostenkarte mit Wandabstandsstrafe, 8er-Nachbarschaft, euklidische Heuristik). Unterschiede: Schrittkosten = Länge × Zellkosten; harte Sperre im Roboterradius (0,25 m, Annahme), weiche Strafe bis 0,5 m; unbekannte Zellen begehbar, aber teurer (optimistisch planen, unterwegs alle 8 s neu planen); Wegpunkte ausdünnen; Dijkstra für den Weg nach Hause.
+- `nav/frontier.py`: Grenzzellen, Cluster ab 6 Zellen, Name aus Bereich und Himmelsrichtung, Ankerpunkt eines Bereichs.
+- `nav/tracker.py`: Wiedererkennen Stufe 1 (Abschnitt 13, Punkt 13): gleiche Klasse innerhalb 0,6 m = derselbe Track; 4-mal im Blick (nach eigener Karte) und nicht erkannt = „fehlt“; dieselbe Klasse taucht wieder auf: unter 1 m Abstand „wieder da“ (war verdeckt), darüber „verschoben“.
+- `nav/layers.py`: Kostenkarte (nur neu, wenn die Karte sich geändert hat), Grenzen mit Erreichbarkeit, Bereiche, Weg nach Hause alle 5 s; Ziel nach Name (Bereich, Grenze, Objekt, Person, „home“) und Planung.
+
+**2D-Simulation** (`brain/sim2d/`, `# SIM ONLY`): Grundriss der bekannten Wohnung mit Maßen (12 × 9 m, Türen 0,9 m, 12 Möbel als Hindernisse, 8 kleine Dinge, Katze zieht im Mittel alle 15 min um), Kamera mit 80° Sichtkegel und 4 m Reichweite (Annahmen), 15 % verpasste Detektionen, Positionsrauschen 3 cm + 2 cm/m, Verdeckung durch Wände und Möbel. Lokalisierung = wahre Pose (Annahme: SLAM genau genug). Raumnamen bekommen die Zellen beim ersten Freisehen aus der Wahrheit; auf dem Roboter kommen sie aus Ankern oder vom Menschen (offen). BT-Blätter (`bt2d.py`) navigieren mit A* auf der eigenen Karte; „Umsehen“ ist eine Drehung um 360°. Jeder Lauf wird alle 2 s Simulationszeit aufgezeichnet (Pose, Zustand, Kartendiff, geänderte Tracks, Ereignisse) und als HTML-Seite zum Abspielen gespeichert (`viewer.html`).
+
+**Erster Lauf (11.11.2026, ohne LLM, Seed 1, 3 h Vorgabe):** Ende nach 2:57 h, zu Hause ausgeruht, Akku 20 %; 203 m gelaufen; alle 7 Räume kartiert (83 m² frei) nach knapp einer Stunde; 20 Objekte verfolgt; die Katze dreimal als verschoben bemerkt. Rechenzeit ~15 s.
+
+Gefunden und behoben durch die Simulation:
+- Meldung wurde unter dem Ort des Roboters gemerkt, geprüft aber unter dem Ort des Objekts. Mit 4 m Sichtweite sieht SLARC das Handy in der Küche vom Flur aus und meldete es jede Sekunde neu (28 Meldungen in 1 h). `arbiter.py` V0.7 merkt den Ort des Objekts.
+- Verdeckte Dinge (Tisch noch nicht in der Karte) galten nach dem Wiederfinden als verschoben. Jetzt erst ab 1 m Abstand.
+
+**(offen)**
+- Raumnamen auf dem Roboter: Anker (`ROOM_ANCHORS`), Benennen durch den Menschen im Web-Chat, Segmentierung der Karte in Bereiche.
+- Lokalisierungsfehler simulieren (Drift, Ausrichtung), damit Karte und Wiedererkennen unter realistischen Bedingungen laufen.
+- Eine sich bewegende Katze bekommt manchmal einen neuen Track, bevor der alte als fehlend gilt (drei Katzen-Tracks im Lauf). Für Klassen, die meist einmal vorkommen, Zusammenführen prüfen.
+- Lauf mit Qwen über `--server` (Denkpausen sichtbar im Viewer).
 
