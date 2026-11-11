@@ -1,0 +1,309 @@
+<title>SLARC Kartentag</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600&display=swap">
+<style>
+/* Layout: Leitstand – links die wachsende Belegungskarte (10-cm-Raster), rechts Uhr, Zustand, Bedürfnisse, Protokoll */
+:root {
+  --bg: #e9edf1; --panel: #f7f9fb; --fg: #1d2731; --muted: #5d6b78; --line: #c9d2db;
+  --unknown: #dde3e9; --occ: #2a3540; --truth: #9aa7b4; --robot: #d9821b; --fov: rgba(217,130,27,.16);
+  --path: #c4650f; --frontier: #0f8b8d; --obj: #24557a; --obj-miss: #8a96a2; --moved: #b0347a;
+  --person: #6b4fb3; --ok: #2f8a4c; --warn: #c99412; --crit: #c2412d;
+  --a0: #cfe3d4; --a1: #f2dcc0; --a2: #d9d4ea; --a3: #d6e6ef; --a4: #efd3d6; --a5: #e3e6c9; --a6: #cfe4e4;
+  --sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --cond: "IBM Plex Sans Condensed", "Arial Narrow", "IBM Plex Sans", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #12181e; --panel: #19212a; --fg: #dbe3ea; --muted: #8d9aa7; --line: #2c3742;
+  --unknown: #1d252e; --occ: #c3ced8; --truth: #4b5866; --robot: #f0a043; --fov: rgba(240,160,67,.14);
+  --path: #f3b061; --frontier: #39b8b5; --obj: #8cc1e8; --obj-miss: #66727e; --moved: #e277b5;
+  --person: #a993ec; --ok: #5cbc76; --warn: #e2b440; --crit: #ec6a54;
+  --a0: #24402d; --a1: #4a3a24; --a2: #33304b; --a3: #233c4a; --a4: #4a2c31; --a5: #3d4127; --a6: #224241;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #12181e; --panel: #19212a; --fg: #dbe3ea; --muted: #8d9aa7; --line: #2c3742;
+  --unknown: #1d252e; --occ: #c3ced8; --truth: #4b5866; --robot: #f0a043; --fov: rgba(240,160,67,.14);
+  --path: #f3b061; --frontier: #39b8b5; --obj: #8cc1e8; --obj-miss: #66727e; --moved: #e277b5;
+  --person: #a993ec; --ok: #5cbc76; --warn: #e2b440; --crit: #ec6a54;
+  --a0: #24402d; --a1: #4a3a24; --a2: #33304b; --a3: #233c4a; --a4: #4a2c31; --a5: #3d4127; --a6: #224241;
+  color-scheme: dark }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--fg); font: 14px/1.45 var(--sans); }
+.app { min-height: 100%; display: grid; grid-template-rows: auto 1fr; gap: 12px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 14px; box-sizing: border-box; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; }
+h1 { font: 600 20px/1.2 var(--cond); letter-spacing: .02em; margin: 0; text-wrap: balance; }
+.meta { color: var(--muted); font: 12px var(--mono); }
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 14px; min-height: 0; }
+@media (max-width: 900px) { .main { grid-template-columns: minmax(0, 1fr); } }
+.stage { min-width: 0; display: grid; grid-template-rows: auto auto; gap: 8px; align-content: start; }
+.mapwrap { position: relative; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+canvas#map { display: block; width: 100%; height: auto; }
+.transport { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.transport input[type=range] { flex: 1 1 220px; min-width: 0; accent-color: var(--robot); }
+button, select { font: 500 13px var(--sans); color: var(--fg); background: var(--panel); border: 1px solid var(--line);
+  border-radius: 5px; padding: 5px 10px; cursor: pointer; }
+button:hover, select:hover { border-color: var(--muted); }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--robot); outline-offset: 2px; }
+.clock { font: 500 22px var(--mono); font-variant-numeric: tabular-nums; min-width: 6.5ch; }
+.toggles { display: flex; flex-wrap: wrap; gap: 4px 14px; color: var(--muted); font-size: 12px; }
+.toggles label { display: inline-flex; gap: 5px; align-items: center; cursor: pointer; }
+aside { min-width: 0; display: grid; gap: 10px; align-content: start; }
+.box { background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 10px 12px; min-width: 0; }
+.lbl { font: 600 11px var(--cond); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 4px; }
+.row { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; }
+.big { font: 600 16px var(--cond); }
+.mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.pill { display: inline-block; font: 600 11px var(--cond); letter-spacing: .06em; text-transform: uppercase; padding: 2px 8px;
+  border-radius: 99px; border: 1px solid currentColor; }
+.node { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.bar { height: 6px; background: var(--unknown); border-radius: 3px; overflow: hidden; }
+.bar > i { display: block; height: 100%; }
+.needs { display: grid; grid-template-columns: 92px minmax(0, 1fr) 58px; gap: 5px 8px; align-items: center; font-size: 12px; }
+.needs .lv { color: var(--muted); text-align: right; font-size: 11px; }
+.stats { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; font-size: 12px; }
+.stats b { font: 500 13px var(--mono); }
+#log { height: 260px; overflow-y: auto; font: 11.5px/1.45 var(--mono); }
+#log div { padding: 1px 0; border-bottom: 1px dotted var(--line); overflow-wrap: anywhere; }
+#log .t { color: var(--muted); margin-right: 6px; }
+#log .chat { color: var(--person); } #log .msg { color: var(--ok); font-weight: 500; }
+#log .found { color: var(--moved); } #log .beh { color: var(--fg); }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 11.5px; color: var(--muted); }
+.legend span::before { content: ""; display: inline-block; width: 10px; height: 10px; margin-right: 5px; vertical-align: -1px; border-radius: 2px; background: var(--c); }
+.empty { padding: 40px 16px; text-align: center; color: var(--muted); }
+details summary { cursor: pointer; font: 600 12px var(--cond); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+table { border-collapse: collapse; width: 100%; font-size: 12px; }
+td { padding: 2px 4px; border-bottom: 1px dotted var(--line); }
+td.n { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="app">
+  <header>
+    <h1>SLARC Kartentag</h1>
+    <span class="meta" id="meta">–</span>
+  </header>
+  <div class="main" id="main">
+    <div class="stage">
+      <div class="mapwrap"><canvas id="map" width="1300" height="1000" aria-label="Karte der Wohnung aus SLARCs Sicht"></canvas></div>
+      <div class="transport">
+        <button id="play" type="button">Abspielen</button>
+        <span class="clock" id="clock">00:00:00</span>
+        <input id="seek" type="range" min="0" max="0" value="0" step="1" aria-label="Zeitpunkt">
+        <select id="speed" aria-label="Geschwindigkeit">
+          <option value="30">30×</option><option value="60" selected>60×</option>
+          <option value="120">120×</option><option value="300">300×</option>
+        </select>
+      </div>
+      <div class="toggles">
+        <label><input type="checkbox" id="tTruth" checked> Wahre Wände und Dinge</label>
+        <label><input type="checkbox" id="tFov" checked> Sichtkegel</label>
+        <label><input type="checkbox" id="tTrail" checked> Spur</label>
+        <label><input type="checkbox" id="tLabels" checked> Beschriftung</label>
+      </div>
+      <div class="legend">
+        <span style="--c: var(--unknown)">unbekannt</span><span style="--c: var(--a3)">frei (Farbe = Bereich)</span>
+        <span style="--c: var(--occ)">belegt</span><span style="--c: var(--frontier)">Grenze zum Unbekannten</span>
+        <span style="--c: var(--obj)">verfolgtes Objekt</span><span style="--c: var(--moved)">verschoben</span>
+        <span style="--c: var(--obj-miss)">fehlt</span><span style="--c: var(--person)">Mensch</span>
+        <span style="--c: var(--robot)">SLARC, Pfad</span>
+      </div>
+    </div>
+    <aside>
+      <div class="box">
+        <div class="lbl">Verhalten</div>
+        <div class="row"><span class="big" id="beh">–</span><span class="pill" id="mode">–</span></div>
+        <div class="node" id="node">&nbsp;</div>
+      </div>
+      <div class="box">
+        <div class="row"><span class="lbl">Akku</span><span class="mono" id="batt">–</span></div>
+        <div class="bar"><i id="battbar" style="width:0"></i></div>
+      </div>
+      <div class="box">
+        <div class="lbl">Bedürfnisse</div>
+        <div class="needs" id="needs"></div>
+      </div>
+      <div class="box">
+        <div class="lbl">Blackboard</div>
+        <div class="stats">
+          <span>Karte frei</span><b id="sFree">–</b>
+          <span>Bereiche</span><b id="sAreas">–</b>
+          <span>Objekte</span><b id="sObj">–</b>
+          <span>Grenzen</span><b id="sFr">–</b>
+          <span>Ort</span><b id="sPlace">–</b>
+          <span>Weg nach Hause</span><b id="sHome">–</b>
+        </div>
+      </div>
+      <div class="box">
+        <div class="lbl">Protokoll</div>
+        <div id="log" aria-live="off"></div>
+      </div>
+      <div class="box">
+        <details id="sum"><summary>Zusammenfassung des Laufs</summary><div id="sumbody"></div></details>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<script>
+const DATA = /*__SIM_DATA__*/null;
+const NEEDS = [["energie","Energie"],["neugier","Neugier"],["nuetzlichkeit","Nützlichkeit"],["gesellschaft","Gesellschaft"],["unbehagen","Unbehagen"]];
+const LEVELS = ["ruhig","leicht","mittel","hoch","dringend"];
+const MODE = {stehen:"steht", laufen:"läuft", drehen:"dreht", liegen:"liegt", denken:"denkt"};
+const $ = id => document.getElementById(id);
+
+function hms(t){ t = Math.floor(t); const h=Math.floor(t/3600), m=Math.floor(t%3600/60), s=t%60;
+  return [h,m,s].map(v=>String(v).padStart(2,"0")).join(":"); }
+
+if (!DATA) {
+  $("main").innerHTML = '<div class="box empty">Keine Daten eingebettet. Erzeuge die Seite mit<br><code class="mono">python -m brain.sim2d.day2d</code>.</div>';
+} else { init(DATA); }
+
+function init(D) {
+  const M = D.meta.map, T = D.truth, F = D.frames;
+  $("meta").textContent = `Lauf ${D.meta.created} · ${D.meta.model} · Seed ${D.meta.seed} · ${F.length} Bilder à ${D.meta.frame_s} s · Karte ${M.w}×${M.h} Zellen à ${Math.round(M.res*100)} cm`;
+  $("seek").max = F.length - 1;
+  const cv = $("map"), g = cv.getContext("2d");
+  const worldW = M.w * M.res, worldH = M.h * M.res;
+  cv.height = Math.round(cv.width * worldH / worldW);
+  const S = cv.width / worldW;
+  const X = x => (x - M.origin[0]) * S, Y = y => cv.height - (y - M.origin[1]) * S;
+
+  // Wahrheit: Belegung aus Lauflängen
+  const tocc = new Uint8Array(T.w * T.h); { let v = 0, k = 0, ch = T.occ_changes;
+    for (let p = 0; p < tocc.length; p++) { if (k < ch.length && ch[k] === p) { v ^= 1; k++; } tocc[p] = v; } }
+  const tImg = document.createElement("canvas"); tImg.width = T.w; tImg.height = T.h;
+  const mImg = document.createElement("canvas"); mImg.width = M.w; mImg.height = M.h;
+
+  // Zustand, der durch die Frames aufgebaut wird
+  let codes, objs, fronts, trail, logLines, idx = -1;
+  function reset() { codes = new Int16Array(M.w * M.h); objs = new Map(); fronts = []; trail = []; logLines = []; idx = -1; }
+  function apply(k) { const f = F[k];
+    for (const [i, c] of f.map) codes[i] = c;
+    for (const o of f.obj) objs.set(o[0], o);
+    if (f.fr) fronts = f.fr;
+    trail.push([f.p[0], f.p[1]]); if (trail.length > 400) trail.shift();
+    for (const l of f.log) logLines.push(l);
+    idx = k; }
+  function goTo(k) { if (k < idx) reset(); for (let j = idx + 1; j <= k; j++) apply(j); }
+
+  // Farben aus den Tokens (Thema)
+  let C = {};
+  function rgb(css) { const c = document.createElement("canvas").getContext("2d"); c.fillStyle = css; c.fillRect(0,0,1,1);
+    const d = c.getImageData(0,0,1,1).data; return [d[0],d[1],d[2]]; }
+  function readColors() { const cs = getComputedStyle(document.documentElement); const v = n => cs.getPropertyValue(n).trim();
+    C = {}; for (const n of ["unknown","occ","truth","robot","fov","path","frontier","obj","obj-miss","moved","person","fg","muted","panel"]) C[n] = v("--"+n);
+    C.areas = [0,1,2,3,4,5,6].map(i => rgb(v("--a"+i))); C.unknownRGB = rgb(C.unknown); C.occRGB = rgb(C.occ); C.freeRGB = rgb(v("--a3"));
+    const tc = tImg.getContext("2d"), id = tc.createImageData(T.w, T.h), tr = rgb(C.truth);
+    for (let i = 0; i < T.h; i++) for (let j = 0; j < T.w; j++) { const p = ((T.h-1-i)*T.w + j)*4;
+      if (tocc[i*T.w+j]) { id.data[p]=tr[0]; id.data[p+1]=tr[1]; id.data[p+2]=tr[2]; id.data[p+3]=255; } }
+    tc.putImageData(id, 0, 0); }
+  function mapImage() { const mc = mImg.getContext("2d"), id = mc.createImageData(M.w, M.h);
+    for (let i = 0; i < M.h; i++) for (let j = 0; j < M.w; j++) { const c = codes[i*M.w+j], p = ((M.h-1-i)*M.w + j)*4;
+      const col = c === 0 ? null : c === 1 ? C.occRGB : c === 2 ? C.freeRGB : C.areas[(c-3) % 7];
+      if (col) { id.data[p]=col[0]; id.data[p+1]=col[1]; id.data[p+2]=col[2]; id.data[p+3]=255; } }
+    mc.putImageData(id, 0, 0); }
+
+  function draw() {
+    const f = F[idx], tog = id => $(id).checked;
+    g.setTransform(1,0,0,1,0,0); g.fillStyle = C.unknown; g.fillRect(0, 0, cv.width, cv.height);
+    g.imageSmoothingEnabled = false;
+    mapImage(); g.drawImage(mImg, 0, 0, cv.width, cv.height);
+    const tS = cv.width / (T.w * T.res), tx = (T.origin[0] - M.origin[0]) * S, ty = cv.height - (T.origin[1] - M.origin[1]) * S - T.h * T.res * S;
+    if (tog("tTruth")) { g.globalAlpha = .55; g.drawImage(tImg, tx, ty, T.w * T.res * S, T.h * T.res * S); g.globalAlpha = 1;
+      g.font = `500 ${Math.round(S*0.22)}px ${getComputedStyle(document.body).getPropertyValue("--cond") || "sans-serif"}`;
+      g.fillStyle = C.muted; g.textAlign = "center";
+      for (const r of T.rooms) { const [x0,y0,x1,y1] = r.rect; g.fillText(r.name.toUpperCase(), X((x0+x1)/2), Y(y1) + S*0.35); }
+      const movPos = new Map((f.mov||[]).map(m => [m[0], m]));
+      g.strokeStyle = C.truth; g.lineWidth = 1;
+      for (const t of T.things) { if (t.rect) continue; const m = movPos.get(t.oid), x = m ? m[1] : t.x, y = m ? m[2] : t.y;
+        g.beginPath(); g.arc(X(x), Y(y), S*0.06, 0, 7); g.stroke(); } }
+    // Grenzen
+    g.fillStyle = C.frontier; g.strokeStyle = C.frontier; g.font = `500 ${Math.round(S*0.17)}px ${getComputedStyle(document.body).fontFamily}`; g.textAlign = "left";
+    for (const fr of fronts) { g.globalAlpha = fr[4] ? 1 : .4; g.beginPath(); g.arc(X(fr[1]), Y(fr[2]), S*0.09, 0, 7); g.fill();
+      if (tog("tLabels")) g.fillText(fr[0], X(fr[1]) + S*0.12, Y(fr[2]) - S*0.05); }
+    g.globalAlpha = 1;
+    // Spur, Pfad, Sichtkegel
+    if (tog("tTrail") && trail.length > 1) { g.strokeStyle = C.robot; g.globalAlpha = .35; g.lineWidth = 2; g.beginPath();
+      trail.forEach(([x,y], k) => k ? g.lineTo(X(x),Y(y)) : g.moveTo(X(x),Y(y))); g.stroke(); g.globalAlpha = 1; }
+    if (f.path && f.path.length) { g.strokeStyle = C.path; g.lineWidth = 2; g.setLineDash([6,5]); g.beginPath();
+      g.moveTo(X(f.p[0]), Y(f.p[1])); for (const [x,y] of f.path) g.lineTo(X(x), Y(y)); g.stroke(); g.setLineDash([]);
+      if (f.goal) { g.beginPath(); g.arc(X(f.goal[0]), Y(f.goal[1]), S*0.1, 0, 7); g.stroke(); } }
+    const [rx, ry, rth] = f.p;
+    if (tog("tFov") && f.m !== "denken" && f.m !== "liegen") { const half = 40*Math.PI/180, R = 4*S;
+      g.fillStyle = C.fov; g.beginPath(); g.moveTo(X(rx), Y(ry)); g.arc(X(rx), Y(ry), R, -(rth+half), -(rth-half)); g.closePath(); g.fill(); }
+    // Objekte
+    const lblFont = `500 ${Math.round(S*0.16)}px ${getComputedStyle(document.body).fontFamily}`;
+    for (const o of objs.values()) { const [tid, cls, x, y, st, moved] = o;
+      const col = st === "fehlt" ? C["obj-miss"] : moved ? C.moved : C.obj; g.fillStyle = col; g.strokeStyle = col;
+      if (st === "fehlt") { const r = S*0.08; g.lineWidth = 2; g.beginPath(); g.moveTo(X(x)-r,Y(y)-r); g.lineTo(X(x)+r,Y(y)+r);
+        g.moveTo(X(x)+r,Y(y)-r); g.lineTo(X(x)-r,Y(y)+r); g.stroke(); }
+      else { g.beginPath(); g.rect(X(x)-S*0.07, Y(y)-S*0.07, S*0.14, S*0.14); g.fill(); }
+      if (tog("tLabels")) { g.font = lblFont; g.fillText(cls, X(x) + S*0.11, Y(y) + S*0.05); } }
+    // Menschen
+    const seen = new Set(f.seen || []);
+    for (const [pid, name, x, y] of f.per || []) { g.strokeStyle = C.person; g.fillStyle = C.person; g.lineWidth = 2;
+      g.beginPath(); g.arc(X(x), Y(y), S*0.16, 0, 7); seen.has(pid) ? g.fill() : g.stroke();
+      g.font = lblFont; g.fillText(name, X(x) + S*0.2, Y(y) + S*0.05); }
+    // SLARC
+    g.save(); g.translate(X(rx), Y(ry)); g.rotate(-rth); g.fillStyle = C.robot; g.strokeStyle = C.panel; g.lineWidth = 2;
+    const r = S*0.22; g.beginPath(); g.moveTo(r*1.25, 0); g.lineTo(-r*0.8, r*0.75); g.lineTo(-r*0.5, 0); g.lineTo(-r*0.8, -r*0.75); g.closePath(); g.fill(); g.stroke(); g.restore();
+    if (f.m === "denken") { g.fillStyle = C.robot; g.font = `600 ${Math.round(S*0.2)}px sans-serif`; g.fillText("…", X(rx) + S*0.25, Y(ry) - S*0.25); }
+  }
+
+  function panel() { const f = F[idx];
+    $("clock").textContent = hms(f.t); $("seek").value = idx;
+    $("beh").textContent = f.lbl || (f.b ? f.b : "nichts Bestimmtes");
+    $("node").textContent = f.n ? "Knoten: " + f.n : " ";
+    const mode = $("mode"); mode.textContent = MODE[f.m] || f.m;
+    mode.style.color = f.m === "denken" ? "var(--robot)" : f.m === "liegen" ? "var(--muted)" : f.m === "laufen" || f.m === "drehen" ? "var(--frontier)" : "var(--fg)";
+    $("batt").textContent = `${Math.round(f.soc*100)} % · ${f.v.toFixed(2)} V`;
+    const bb = $("battbar"); bb.style.width = (f.soc*100) + "%"; bb.style.background = f.soc < .25 ? "var(--crit)" : f.soc < .45 ? "var(--warn)" : "var(--ok)";
+    $("needs").innerHTML = NEEDS.map(([k, name]) => { const [v, lv] = f.nd[k];
+      const col = lv >= 4 ? "var(--crit)" : lv >= 3 ? "var(--warn)" : lv >= 2 ? "var(--robot)" : "var(--ok)";
+      return `<span>${name}</span><div class="bar"><i style="width:${Math.round(v*100)}%;background:${col}"></i></div><span class="lv">${LEVELS[lv]}</span>`; }).join("");
+    let free = 0, areas = new Set(); for (const c of codes) { if (c >= 2) free++; if (c >= 3) areas.add(c); }
+    $("sFree").textContent = (free * M.res * M.res).toFixed(1) + " m²";
+    $("sAreas").textContent = areas.size; $("sObj").textContent = objs.size; $("sFr").textContent = fronts.length;
+    const ci = Math.floor((f.p[1]-M.origin[1])/M.res)*M.w + Math.floor((f.p[0]-M.origin[0])/M.res), pc = codes[ci];
+    $("sPlace").textContent = pc >= 3 ? (D.areas[pc-3] || "–") : "–";
+    $("sHome").textContent = f.home != null ? f.home + " m" : (f.home === 0 ? "zu Hause" : "–");
+    const lines = logLines.slice(-80).map(([t, s]) => { const cls = s.startsWith("CHAT") ? "chat" : s.includes(">> Meldung") ? "msg"
+        : /neu:|verschoben:|fehlt:/.test(s) ? "found" : s.startsWith("->") || s.startsWith("<-") ? "beh" : "";
+      const esc = s.replace(/&/g,"&amp;").replace(/</g,"&lt;");
+      return `<div class="${cls}"><span class="t">${hms(t)}</span>${esc}</div>`; }).join("");
+    const lg = $("log"); const atEnd = lg.scrollTop + lg.clientHeight >= lg.scrollHeight - 8;
+    lg.innerHTML = lines; if (atEnd || playing) lg.scrollTop = lg.scrollHeight;
+  }
+
+  function summary() { const s = D.summary || {}; const rows = (s.verhalten || []).map(([b,n,m]) => `<tr><td>${b}</td><td class="n">${n}×</td><td class="n">${m} min</td></tr>`).join("");
+    const msgs = (D.messages || []).map(([t,m]) => `<tr><td class="n">${hms(t)}</td><td colspan="2">${m}</td></tr>`).join("");
+    $("sumbody").innerHTML = `<p>Ende nach <b class="mono">${s.ende}</b>: ${s.grund}. Akku ${s.akku_pct} % (${s.akku_v} V), gelaufen ${s.gelaufen_m} m,
+      Karte ${s.karte_frei_m2} m² frei, ${s.objekte} Objekte, LLM-Aufrufe ${s.llm}.</p>
+      <table>${rows}</table><p class="lbl" style="margin-top:8px">Meldungen</p><table>${msgs || "<tr><td>keine</td></tr>"}</table>`; }
+
+  // Abspielen
+  let playing = false, simT = 0, last = 0;
+  function render() { draw(); panel(); }
+  function step(now) { if (!playing) return; const dt = Math.min(0.1, (now - last) / 1000); last = now;
+    simT += dt * +$("speed").value; let k = idx; while (k + 1 < F.length && F[k+1].t <= simT) k++;
+    if (k !== idx) { goTo(k); render(); }
+    if (idx >= F.length - 1) { setPlay(false); return; }
+    requestAnimationFrame(step); }
+  function setPlay(on) { playing = on; $("play").textContent = on ? "Pause" : "Abspielen";
+    if (on) { if (idx >= F.length - 1) { reset(); goTo(0); } simT = F[idx].t; last = performance.now(); requestAnimationFrame(step); } }
+  $("play").addEventListener("click", () => setPlay(!playing));
+  $("seek").addEventListener("input", e => { goTo(+e.target.value); simT = F[idx].t; render(); });
+  for (const id of ["tTruth","tFov","tTrail","tLabels"]) $(id).addEventListener("change", render);
+  const retheme = () => { readColors(); render(); };
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", retheme);
+  new MutationObserver(retheme).observe(document.documentElement, {attributes: true, attributeFilter: ["data-theme"]});
+  document.fonts && document.fonts.ready.then(() => idx >= 0 && render());
+
+  reset(); readColors(); summary();
+  // Startbild: ein Zeitpunkt mit Leben (Mitte des Laufs), damit die Karte sofort etwas zeigt
+  goTo(Math.min(F.length - 1, Math.floor(F.length * 0.4))); simT = F[idx].t; render();
+}
+</script>
