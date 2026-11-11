@@ -99,4 +99,4 @@ def test_blackboard_observation_and_json():
     bb.t = 30.0
     assert not bb.to_observation([], False, False, None).objects          # nicht mehr „im Blick“
     d = json.loads(json.dumps(bb.to_dict()))
-    assert d["version"] == "0.1" and d["map"]["areas"] == ["wohnzimmer"] and d["objects"][0]["track_id"] == "handy-1"
+    assert d["version"] == "0.2" and d["map"]["areas"] == ["wohnzimmer"] and d["objects"][0]["track_id"] == "handy-1"

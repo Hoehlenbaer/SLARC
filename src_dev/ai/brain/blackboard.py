@@ -1,5 +1,7 @@
 # brain/blackboard.py
-# Version 0.1 (11.11.2026) – Blackboard: gemeinsamer Weltzustand auf dem Pi.  # PORTABLE
+# Version 0.2 (11.11.2026) – Blackboard: gemeinsamer Weltzustand auf dem Pi.  # PORTABLE
+# V0.2 (BB 0.2): „Was ist das?“ – Detection.quelle, TrackedObject.ident/answers/name_source;
+#       benannte Dinge erscheinen fürs Brain unter ihrem Namen, verworfene gar nicht.
 #
 # Schreiber und Leser (Konzept: Documentation/Brain_Konzept.md, Abschnitt 18):
 #   SLAM / Lokalisierung  -> pose, map, home
@@ -25,7 +27,7 @@ from typing import Optional
 from .datatypes import ObjectSeen, Observation, Person, Request
 from .nav.gridmap import FREE, GridMap
 
-BB_VERSION = "0.1"
+BB_VERSION = "0.2"
 OBJECT_RECENT_S = 8.0       # so lange gilt ein Objekt als „im Blick“ für das Brain
 PERSON_RECENT_S = 3.0
 AT_HOME_M = 0.4
@@ -50,6 +52,7 @@ class Detection:
     conf: float
     t: float
     box: Optional[tuple] = None      # Bildbox (x, y, w, h) für „Was ist das?“; in der Sim None
+    quelle: str = "yolo"             # yolo | geometrie (etwas ragt aus dem Boden, Klasse unbekannt)
 
 
 @dataclass
@@ -66,8 +69,16 @@ class TrackedObject:
     moved: bool = False    # an anderer Stelle wiedergefunden
     area: Optional[str] = None
     misses: int = 0
-    name_vlm: Optional[str] = None   # „Was ist das?“: Vermutung des VLM
-    name_sure: bool = False          # durch zweiten Blick bestätigt
+    name_vlm: Optional[str] = None   # „Was ist das?“: Name (Vermutung des VLM oder Antwort des Menschen)
+    name_sure: bool = False          # durch zweiten Blick oder den Menschen bestätigt
+    name_source: str = ""            # vlm | mensch
+    ident: str = ""                  # nur "unbekannt": offen | vermutet | unklar | sicher | nichts
+    answers: list = field(default_factory=list)   # Antworten des VLM in der Reihenfolge der Blicke
+
+    @property
+    def label(self) -> str:
+        """Name fürs Brain: bestätigter Name, sonst die Klasse der Detektion."""
+        return self.name_vlm if self.name_sure and self.name_vlm else self.cls
 
 
 @dataclass
@@ -155,7 +166,11 @@ class Blackboard:
 
     def recent_objects(self) -> list[TrackedObject]:
         return [o for o in self.objects.values()
-                if o.state == "da" and self.t - o.last_seen <= OBJECT_RECENT_S]
+                if o.state == "da" and o.ident != "nichts" and self.t - o.last_seen <= OBJECT_RECENT_S]
+
+    def known_names(self) -> set:
+        """Namen, die SLARC durch „Was ist das?“ sicher kennt (für Chat und Suche)."""
+        return {o.name_vlm for o in self.objects.values() if o.name_sure and o.name_vlm}
 
     # ---------------------------------------------------------------- fürs Brain
     def to_observation(self, requests: list[Request], chat_new: bool, tapped: bool,
@@ -171,7 +186,8 @@ class Blackboard:
             frontier=[f.fid for f in fr],
             known_places=sorted(a.name for a in self.areas.values() if a.cells >= MIN_AREA_CELLS),
             unknown_frac=min(1.0, flen / FRONTIER_UNKNOWN_M),
-            objects=[ObjectSeen(o.track_id, o.cls, o.area or self.place(), self.dist(o.x, o.y), True, o.moved)
+            objects=[ObjectSeen(o.track_id, o.label, o.area or self.place(), self.dist(o.x, o.y), True, o.moved,
+                                (o.ident or "offen") if o.label == "unbekannt" else "")
                      for o in self.recent_objects()],
             persons=[Person(p.track_id, p.name, self.dist(p.x, p.y))
                      for p in self.persons.values() if self.t - p.last_seen <= PERSON_RECENT_S],

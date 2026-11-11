@@ -20,6 +20,7 @@ class ObjectSeen:
     dist_m: float            # Abstand zum Körper
     reachable: bool = True   # Weg frei (Planer)
     moved: bool = False      # Lage weicht vom Gedächtnis ab
+    ident: str = ""          # [11.11.2026] nur für "unbekannt": offen | vermutet | unklar (sonst "")
 
 
 @dataclass

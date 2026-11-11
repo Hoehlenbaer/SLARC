@@ -1,6 +1,6 @@
 # SLARC – Konzept High-Level-Brain
 
-Stand: 11.11.2026, Entwurf V0.3 (V0.8: Blackboard, Karte und 2D-Simulation, Abschnitt 18; V0.7: Pi-Messung Qwen3.5 Text und Bild, Abschnitt 17; V0.2: Bedürfnis Gesellschaft, erste Umsetzung in `src_dev/ai/brain/`; V0.3: neue Rollenverteilung Code/LLM nach dem ersten Modelltest, Abschnitt 15). Ergebnis aus dem Brain-Chat. Ersetzt das Prinzip "klare Aufgabe → Behavior-Tree-JSON" (`src_dev/ai/exploration_manager_V4.py`) durch ein System, das eigenen Bedürfnissen folgt.
+Stand: 11.11.2026, Entwurf V0.3 (V0.9: „Was ist das?“ für unbekannte Dinge, Abschnitt 18.1; V0.8: Blackboard, Karte und 2D-Simulation, Abschnitt 18; V0.7: Pi-Messung Qwen3.5 Text und Bild, Abschnitt 17; V0.2: Bedürfnis Gesellschaft, erste Umsetzung in `src_dev/ai/brain/`; V0.3: neue Rollenverteilung Code/LLM nach dem ersten Modelltest, Abschnitt 15). Ergebnis aus dem Brain-Chat. Ersetzt das Prinzip "klare Aufgabe → Behavior-Tree-JSON" (`src_dev/ai/exploration_manager_V4.py`) durch ein System, das eigenen Bedürfnissen folgt.
 
 Kennzeichnung wie in `Hardware_Interfaces.md`: **(fest)** entschieden, **(Annahme)** Startwert, **(offen)** noch zu entscheiden.
 
@@ -570,4 +570,20 @@ Gefunden und behoben durch die Simulation:
 - Lokalisierungsfehler simulieren (Drift, Ausrichtung), damit Karte und Wiedererkennen unter realistischen Bedingungen laufen.
 - Eine sich bewegende Katze bekommt manchmal einen neuen Track, bevor der alte als fehlend gilt (drei Katzen-Tracks im Lauf). Für Klassen, die meist einmal vorkommen, Zusammenführen prüfen.
 - Lauf mit Qwen über `--server` (Denkpausen sichtbar im Viewer).
+
+### 18.1 „Was ist das?“ für unbekannte Dinge (11.11.2026, V0.9)
+
+Bisher behandelte das Brain „unbekannt“ wie jedes neue Objekt: hingehen, annähern, antasten. Danach war es bekannt, aber weiter unbenannt. Neu (Marco, 11.11.2026):
+
+1. **Neugierig, nie antasten.** Unbekannte, noch nicht gefragte Dinge bekommen das Ziel `identify` mit Neugier-Bonus 1,3 (`behaviors.py` V0.7); `inspect_object` und `approach_avoid` gibt es für „unbekannt“ nicht mehr. Schon gefragte (vermutet, unklar) lösen keine Neugier aus.
+2. **Ablauf** (`sim2d/bt2d.py`): auf 0,8 m heran, hindrehen, Denk-Zustand (~10 s), Ausschnitt mit rotem Rahmen ans VLM (`vision/identify.py`), zweiter Blick von der Seite (±45°, gleicher Abstand), Einordnen.
+3. **Einordnen:** zweimal derselbe Name = sicher (`name_sure`, Quelle `vlm`); zweimal „nichts“ = Fehlalarm, Track wird verworfen; verschiedene Antworten oder nur ein Blick = SLARC fragt im Chat („Im Raum schlafzimmer liegt etwas, ich glaube socke. Was ist das?“). Die Antwort („Das ist eine Socke.“, `semantic.naming()`) gilt sofort als sicher (Quelle `mensch`). „nichts“ steht jetzt in der VLM-Wortliste.
+4. **Benannte Dinge** erscheinen fürs Brain unter ihrem Namen (`TrackedObject.label`, `ObjectSeen.cls`), sind im Chat suchbar (`item_problem(known=…)`) und die Suche beginnt dort, wo der Track zuletzt lag.
+5. Blackboard `BB 0.2`: `Detection.quelle` (yolo | geometrie), `TrackedObject.ident`, `answers`, `name_source`; `ObjectSeen.ident` (offen | vermutet | unklar).
+
+Simulation: vier unbekannte Dinge (Dose, Socke, Kabel und ein Fleck als Fehlalarm), nachgebildetes VLM mit 75 % Treffern (gemessen, Haushalt mit Rahmen) und 80 % für „nichts“ (Annahme); wer zu Hause ist, beantwortet Rückfragen nach 90 s. Lauf 11.11.2026 (Seed 1): Kabel und Dose je zweimal gleich erkannt; Socke „kabel“/„socke“, Rückfrage, Marco antwortet; auf „Wo ist meine Socke?“ geht SLARC direkt ins Schlafzimmer und meldet sie nach 54 s.
+
+Ebenfalls gefunden und behoben: „Sehe ich X?“ prüfte nur die letzten 8 s, das Umsehen dauert aber ~12 s; Dinge vom Anfang der Drehung zählten nicht. Jetzt 20 s.
+
+Zur Herkunft von „unbekannt“ (Trainingsskript V5.0): Klasse 40 sind die übrigen 40 COCO-Klassen (Labels aus COCO bzw. Pseudo-Labels eines YOLOv5-Lehrers, ebenfalls nur COCO). Nicht beschriftete Dinge in COCO-Bildern (Socken, Kabel, Schlüssel) waren im Training Hintergrund. Eine allgemeine Objekthaftigkeit ist deshalb nicht zu erwarten, aber ungemessen. **(offen, Perzeption)** Messen mit LVIS-Annotationen der COCO-Val-Bilder (Anteil der Boxen ohne COCO-Gegenstück mit irgendeiner Detektion); Alternativen: geometrisch (Erhebung über der Bodenebene aus Stereo und Bodensegmentierung, `quelle = geometrie`) oder breitere Lehrer-Labels.
 

@@ -1,5 +1,8 @@
 # brain/sim2d/bt2d.py
-# Version 0.1 (11.11.2026) – Behavior-Tree-Blätter auf Karte und Blackboard.
+# Version 0.2 (11.11.2026) – Behavior-Tree-Blätter auf Karte und Blackboard.
+# V0.2: „Was ist das?“ (identify): hingehen ohne Antasten, Denk-Zustand, VLM fragen, zweiter Blick
+#       von der Seite (45°), entscheiden: sicher / unklar (Mensch fragen) / nichts (verwerfen).
+#       Suche beginnt dort, wo ein passender Track zuletzt lag.
 #
 # Gleiche Teilbäume wie brain/sim/bt.py, aber die Blätter navigieren mit A* auf der
 # eigenen Karte (nav/layers.py) und sehen nur, was im Blackboard steht. Die Bewegung
@@ -24,6 +27,7 @@ from .world2d import BASE_W, SPEED_M_S, World2D
 DT = 0.5
 REPLAN_S = 8.0
 ARRIVE_M = 0.35
+SEEN_WINDOW_S = 20.0        # „Sehe ich X?“ zählt, was während des letzten Umsehens im Blick war
 
 
 class Ctx:
@@ -37,6 +41,9 @@ class Ctx:
         self.log = log
         self.found: Optional[str] = None
         self.node = ""
+        self.vision: Optional[Callable[[float, float], Optional[str]]] = None   # „Was ist das?“ an (x, y)
+        self.questions: list[str] = []          # offene Rückfragen an den Menschen (track_id)
+        self.think_s = 10.0                     # Denkpause je Bildfrage (Pi: ~10 s bei 224 px)
         self.prev_point = (world.bb.home.x, world.bb.home.y)
 
     def step(self, power_w: float = BASE_W, sense: bool = True) -> None:
@@ -83,11 +90,14 @@ class NavigateTo(Leaf):
     """Mit A* auf der eigenen Karte zu einem Ziel: Bereich, Grenze, Objekt, Person, "home"."""
 
     def __init__(self, ctx: Ctx, target: Optional[str] = None, target_fn: Optional[Callable[[], Optional[str]]] = None,
-                 approach_m: float = 0.0, label: str = ""):
+                 approach_m: float = 0.0, label: str = "", point_fn: Optional[Callable[[], Optional[tuple]]] = None):
         super().__init__(f"Gehe zu {label or target or '…'}", ctx)
-        self.target, self.target_fn, self.approach_m = target, target_fn, approach_m
+        self.target, self.target_fn, self.approach_m, self.point_fn = target, target_fn, approach_m, point_fn
 
     def _goal(self):
+        if self.point_fn:
+            p = self.point_fn()
+            return ("Punkt" if p else None), p
         tgt = self.target or (self.target_fn() if self.target_fn else None)
         p = self.ctx.layers.target_point(tgt) if tgt else None
         if p and self.approach_m > 0:                 # vor dem Ding stehen bleiben, nicht darauf
@@ -133,6 +143,7 @@ class NavigateTo(Leaf):
         ctx.step()
         if math.hypot(bb.pose.x - self.goal[0], bb.pose.y - self.goal[1]) < ARRIVE_M:
             w.stop()
+            w.sync()
             bb.nav.status, bb.nav.path = "angekommen", []
             return Status.SUCCESS
         if bb.t > self.deadline:
@@ -176,7 +187,9 @@ class Visible(Leaf):
 
     def update(self):
         bb = self.ctx.bb
-        hits = [o for o in bb.recent_objects() if o.cls == self.cls]
+        # alles, was während des Umsehens (Drehung ~12 s) zu sehen war, nicht nur die letzten 8 s
+        hits = [o for o in bb.objects.values() if self.cls in (o.cls, o.label) and o.state == "da"
+                and o.ident != "nichts" and bb.t - o.last_seen <= SEEN_WINDOW_S]
         if hits:
             self.ctx.found = min(hits, key=lambda o: bb.dist(o.x, o.y)).track_id
             return Status.SUCCESS
@@ -203,7 +216,7 @@ class Report(Leaf):
         bb, w = self.ctx.bb, self.ctx.world
         tid = self.tid or self.ctx.found
         o = bb.objects.get(tid) if tid else None
-        text = f"{o.cls.capitalize()} ist im Raum {o.area}." if o else "Ich habe nichts gefunden."
+        text = f"{o.label.capitalize()} ist im Raum {o.area}." if o else "Ich habe nichts gefunden."
         w.messages.append((bb.t, text))
         bb.event("meldung", text)
         self.ctx.log(f"   >> Meldung: {text}")
@@ -220,6 +233,90 @@ class PersonHere(Leaf):
         p = bb.persons.get(self.pid)
         ok = p is not None and bb.t - p.last_seen < 4.0 and bb.dist(p.x, p.y) < 2.5
         return Status.SUCCESS if ok else Status.FAILURE
+
+
+class Think(Leaf):
+    """Denk-Zustand: stehen, Perzeption pausiert, Zeit vergeht (Bildfrage ans VLM)."""
+
+    def __init__(self, ctx: Ctx, name: str = "Denken"):
+        super().__init__(name, ctx)
+
+    def initialise(self):
+        self.left = self.ctx.think_s
+        self.ctx.world.stop()
+
+    def update(self):
+        w = self.ctx.world
+        w.advance(DT)
+        w.sync()
+        self.ctx.bb.robot.mode = "denken"
+        self.left -= DT
+        return Status.SUCCESS if self.left <= 0 else Status.RUNNING
+
+
+class FaceObject(Leaf):
+    def __init__(self, ctx: Ctx, tid: str):
+        super().__init__("Hindrehen", ctx)
+        self.tid = tid
+
+    def initialise(self):
+        o = self.ctx.bb.objects.get(self.tid)
+        if o:
+            self.ctx.world.face(o.x, o.y)
+
+    def update(self):
+        self.ctx.step()
+        return Status.RUNNING if self.ctx.world.moving() else Status.SUCCESS
+
+
+class AskWhat(Leaf):
+    """Ausschnitt um das Objekt ans VLM: „Was ist das?“ (Roboter: vision/identify.py mit roter Box)."""
+
+    def __init__(self, ctx: Ctx, tid: str):
+        super().__init__("Was ist das?", ctx)
+        self.tid = tid
+
+    def update(self):
+        bb, o = self.ctx.bb, self.ctx.bb.objects.get(self.tid)
+        if o is None or self.ctx.vision is None:
+            return Status.FAILURE
+        ans = self.ctx.vision(o.x, o.y)
+        o.answers.append(ans)
+        self.ctx.log(f"   VLM: „{ans}“ ({len(o.answers)}. Blick auf {self.tid})")
+        return Status.SUCCESS
+
+
+class DecideName(Leaf):
+    """Zwei gleiche Antworten = sicher; verschieden = Menschen fragen; zweimal „nichts“ = verwerfen."""
+
+    def __init__(self, ctx: Ctx, tid: str):
+        super().__init__("Einordnen", ctx)
+        self.tid = tid
+
+    def update(self):
+        ctx, bb = self.ctx, self.ctx.bb
+        o = bb.objects.get(self.tid)
+        if o is None or not o.answers:
+            return Status.FAILURE
+        a = o.answers[-2:]
+        if len(a) == 2 and a[0] == a[1] == "nichts":
+            o.ident, o.name_vlm = "nichts", "nichts"
+            text = f"{self.tid} war nichts (zweimal „nichts“), verworfen"
+        elif len(a) == 2 and a[0] == a[1]:
+            o.ident, o.name_vlm, o.name_sure, o.name_source = "sicher", a[0], True, "vlm"
+            text = f"{self.tid} ist {a[0]} (zweimal gleich)"
+        else:
+            o.name_vlm = next((x for x in reversed(a) if x != "nichts"), a[-1])
+            o.ident = "unklar" if len(a) == 2 else "vermutet"
+            ctx.questions.append(self.tid)
+            q = f"Im Raum {o.area} liegt etwas, ich glaube {o.name_vlm}. Was ist das?"
+            ctx.world.messages.append((bb.t, q))
+            bb.event("frage", q)
+            text = f"{self.tid}: {' / '.join(a)} – frage nach"
+            ctx.log(f"   >> Frage: {q}")
+        bb.event("erkannt", text)
+        ctx.log(f"   {text}")
+        return Status.SUCCESS
 
 
 class FollowPerson(Leaf):
@@ -297,7 +394,10 @@ def search_plan(ctx: Ctx, item: str, places_fn=None, last_seen: Optional[dict] =
     bb = ctx.bb
     known = [a for a in bb.areas.values() if a.cells >= 30]
     names = [a.name for a in known]
-    first = [last_seen[item][0]] if last_seen and item in last_seen else []
+    tracked = sorted((o for o in bb.objects.values() if item in (o.label, o.cls) and o.state == "da" and o.area),
+                     key=lambda o: -o.last_seen)                # Blackboard weiß, wo es zuletzt lag
+    first = [o.area for o in tracked]
+    first += [last_seen[item][0]] if last_seen and item in last_seen else []
     first += list(places_fn(item, names)) if places_fn else list(typical_rooms(item))
     first = [r for r in dict.fromkeys(first) if r in names]
     rest = sorted((a for a in known if a.name not in first), key=lambda a: bb.dist(a.x, a.y))
@@ -317,6 +417,21 @@ def build_tree(opt: Option, ctx: Ctx, rng, places_fn=None, last_seen=None) -> py
         return _seq("Dösen", Wait("Hinlegen, Augen halb zu", ctx, 300.0, lying=True))
     if b == "seek_company":
         return _seq(f"Gesellschaft suchen: {a}", NavigateTo(ctx, a), LookAround(ctx))
+    if b == "identify":
+        def side_point():
+            o = bb.objects.get(a)
+            if o is None:
+                return None
+            dx, dy = bb.pose.x - o.x, bb.pose.y - o.y
+            ang = math.atan2(dy, dx) + math.radians(45 if rng.random() < 0.5 else -45)
+            d = max(0.7, math.hypot(dx, dy))
+            return o.x + d * math.cos(ang), o.y + d * math.sin(ang)
+        second = _seq("Zweiter Blick", NavigateTo(ctx, point_fn=side_point, label="Seite"), FaceObject(ctx, a),
+                      Think(ctx, "Denken (2. Blick)"), AskWhat(ctx, a))
+        return _seq(f"Was ist das? {a}", NavigateTo(ctx, a, approach_m=0.8), FaceObject(ctx, a), ObjectHere(ctx, a),
+                    Think(ctx), AskWhat(ctx, a),
+                    _sel("2. Blick, wenn möglich", second, py_trees.behaviours.Success("ohne 2. Blick")),
+                    DecideName(ctx, a))
     if b in ("inspect_object", "approach_avoid"):
         if b == "inspect_object":
             return _seq(f"Untersuchen: {a}", NavigateTo(ctx, a, approach_m=0.6), ObjectHere(ctx, a),

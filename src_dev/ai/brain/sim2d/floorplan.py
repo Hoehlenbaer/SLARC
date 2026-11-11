@@ -1,5 +1,7 @@
 # brain/sim2d/floorplan.py
-# Version 0.1 (11.11.2026) – Grundriss der Beispielwohnung (Wahrheit, SIM ONLY).
+# Version 0.2 (11.11.2026) – Grundriss der Beispielwohnung (Wahrheit, SIM ONLY).
+# V0.2: Dinge, die die Detektion nur als "unbekannt" sieht, haben einen wahren Namen
+#       (true_name) für das nachgebildete VLM; ein Fleck im Flur ist ein Fehlalarm ("nichts").
 #
 # Dieselben sieben Räume wie brain/sim/world.default_flat, jetzt mit Maßen, Wänden,
 # Türen (0,9 m), Möbeln (Hindernisse und zugleich erkennbare Objekte) und kleinen
@@ -32,6 +34,7 @@ class Thing:
     y: float
     rect: tuple | None = None      # Möbel: Grundfläche (Hindernis); kleine Dinge: None
     movable: bool = False
+    true_name: str = ""            # bei cls "unbekannt": was es wirklich ist (für das nachgebildete VLM)
 
 
 @dataclass
@@ -73,12 +76,17 @@ def default_plan() -> Plan:
     I = [  # kleine Dinge am Boden: (oid, cls, x, y, beweglich)
         ("fb1", "fernbedienung", 3.3, 6.5, False),     # liegt nicht da, wo man sie erwartet
         ("tasse1", "tasse", 8.9, 2.9, False), ("handy1", "handy", 9.3, 3.3, False),
-        ("fl1", "flasche", 10.5, 0.5, False), ("unb1", "unbekannt", 11.4, 3.3, False),
+        ("fl1", "flasche", 10.5, 0.5, False),
         ("teddy1", "teddy", 5.2, 6.3, False), ("ruck1", "rucksack", 1.3, 4.45, False),
         ("katze1", "katze", 3.6, 2.4, True),
     ]
     things = [Thing(o, c, (r[0] + r[2]) / 2, (r[1] + r[3]) / 2, r) for o, c, r in F]
     things += [Thing(o, c, x, y, None, mv) for o, c, x, y, mv in I]
+    U = [  # unbekannt für die Detektion: (oid, x, y, wahrer Name)
+        ("unb1", 11.4, 3.3, "dose"), ("unb2", 1.0, 6.3, "socke"), ("unb3", 4.6, 2.7, "kabel"),
+        ("unb4", 8.2, 4.6, "nichts"),                 # Fleck auf dem Boden: Fehlalarm
+    ]
+    things += [Thing(o, "unbekannt", x, y, None, False, n) for o, x, y, n in U]
     return Plan(rooms, walls, doors, things)
 
 
