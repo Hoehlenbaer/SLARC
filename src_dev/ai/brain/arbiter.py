@@ -1,5 +1,6 @@
 # brain/arbiter.py
 # Version 0.2 (07.11.2026) – Entscheidungszyklus im 1-Hz-Takt (Konzept 8).
+# V0.8 (11.11.2026): identify gewöhnt an das Objekt, auch wenn es scheitert (sonst Endlosschleife).
 # V0.7 (11.11.2026): Meldung unter dem Ort des Objekts merken, nicht dem des Roboters
 #       (2D-Sim: Handy in der Küche vom Flur aus gesehen -> jede Sekunde neu gemeldet).
 # V0.6: Personen in last_seen merken (für seek_company); Dösezeiten ins doze_log.
@@ -190,6 +191,9 @@ class Arbiter:
             self.mem.log(now, "lob", f"Antippen bei {self.current.key}")
         if obs.last_result and self.current is not None:
             beh, res = obs.last_result
+            if beh == "identify" and self.current.arg:
+                self.mem.habituate(f"obj:{self.current.arg}", now, HABIT_GAIN_INSPECT)
+                self.needs.note_new_info(now)
             if res == "ok":
                 if beh in ("inspect_object", "approach_avoid") and self.current.arg:
                     self.mem.habituate(f"obj:{self.current.arg}", now, HABIT_GAIN_INSPECT)

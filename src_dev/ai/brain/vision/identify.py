@@ -1,5 +1,6 @@
 # brain/vision/identify.py
 # Version 0.2 (08.11.2026) – Was ist das? Ausschnitt um eine Box ans Vision-Sprachmodell.
+# V0.3 (11.11.2026): "nichts" in der Liste (Schatten, Fleck, Boden: Fehlalarm der Detektion).
 # V0.2: mark=True zeichnet die Box rot in den Ausschnitt („Was ist das rot umrandete Ding?“).
 #       Grund: Lauf 08.11.2026 22:13 – das VLM nannte oft, was ebenfalls im Ausschnitt war
 #       (Esstisch -> Pizza, Rucksack -> Person, Messer -> Teller). vocab="haushalt": Liste ohne
@@ -43,8 +44,9 @@ HOUSEHOLD = ["dose", "schlüssel", "brille", "schuh", "socke", "kleidung", "kabe
 OUTDOOR = ["flugzeug", "zug", "boot", "pferd", "schaf", "kuh", "elefant", "bär", "zebra", "giraffe"]
 SPORT = ["drachen", "ski", "snowboard", "surfbrett"]
 OWN = [c.de for c in DET_CLASSES if c.kind != UNKNOWN]
-VOCAB = list(dict.fromkeys(HOUSEHOLD + OUTDOOR + OWN))
-VOCAB_HAUSHALT = [w for w in dict.fromkeys(HOUSEHOLD + OWN) if w not in SPORT]
+NOTHING = "nichts"
+VOCAB = list(dict.fromkeys(HOUSEHOLD + OUTDOOR + OWN + [NOTHING]))
+VOCAB_HAUSHALT = [w for w in dict.fromkeys(HOUSEHOLD + OWN + [NOTHING]) if w not in SPORT]
 VOCABS = {"voll": VOCAB, "haushalt": VOCAB_HAUSHALT}
 OTHER = "anderes"
 
@@ -57,6 +59,7 @@ def prompt_liste(mark: bool = False, vocab: str = "voll") -> str:
     return ("Du bist das Auge eines kleinen Haushaltsroboters. Das folgende Bild ist ein Ausschnitt; "
             + _WHERE[mark] + ". Was ist dieser Gegenstand? "
             "Wähle den passenden Namen aus dieser Liste: " + ", ".join(VOCABS[vocab]) + ". "
+            f'Ist dort gar kein Gegenstand (Schatten, Fleck, nur Boden), nimm "{NOTHING}". '
             f'Passt keiner, nimm "{OTHER}" und schreibe in "anderes" ein deutsches Wort. '
             '"sicher" ist nur "ja", wenn du den Gegenstand eindeutig erkennst. '
             'Antwort als JSON: {"name": "...", "anderes": "...", "sicher": "ja|nein"}')

@@ -174,3 +174,12 @@ def test_every_template_is_honest():
         for item in DETECTABLE + ["", "laura"]:
             assert not S.claims_result(S.confirmation(S.ChatResult(svc, item))), (svc, item)
     assert set(S.GENUS) == set(DETECTABLE)
+
+
+def test_naming_answers_and_known_items():
+    assert S.naming("Das ist eine Socke.") == "socke"
+    assert S.naming("das ist mein Ladekabel") == "ladekabel"
+    assert S.naming("Das ist nichts, nur ein Fleck.") == "nichts"
+    assert S.naming("Wo ist die Socke?") is None
+    r = S.ChatResult("search", "socke")
+    assert S.item_problem(r) and S.item_problem(r, known=("socke",)) is None

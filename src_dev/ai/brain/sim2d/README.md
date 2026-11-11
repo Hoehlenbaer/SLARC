@@ -31,5 +31,7 @@ direkt im Browser (unter WSL z. B. `explorer.exe sim2d_1840.html`).
 - Karte: unbekannt (grau), frei (Farbe = Bereich), belegt (dunkel); darüber blass die wahren Wände und Dinge.
 - SLARC als Pfeil mit Sichtkegel, gestrichelt der geplante A*-Weg, die Spur der letzten Minuten.
 - Quadrate: verfolgte Objekte; Kreuz: fehlt; Magenta: verschoben. Kreise: Menschen (gefüllt = gerade gesehen).
+- Kleine Kreise: Dinge, die die Detektion nur als „unbekannt“ kennt; gefüllt, sobald „Was ist das?“ einen Namen
+  ergab („?“ = Vermutung, Rückfrage an den Menschen offen).
 - Rechts: Verhalten und BT-Blatt, Akku, Bedürfnisse mit Stufe, Blackboard-Zahlen, Protokoll.
 - Unten: Abspielen, Zeitregler, Geschwindigkeit (30× bis 300× Simulationszeit).

@@ -1,5 +1,8 @@
 # brain/behaviors.py
 # Version 0.4 (07.11.2026) – Verhaltenskatalog, Menübau und Code-Auswahl.
+# V0.7 (11.11.2026): "unbekannt" wird nie angetastet. Noch nicht benannte unbekannte Dinge
+#       bekommen das Ziel identify („Was ist das?“, Ausschnitt ans VLM, zweiter Blick) mit
+#       Neugier-Bonus IDENTIFY_BONUS; benannte (vermutet/unklar) lösen keine Neugier mehr aus.
 # V0.6: Gesellschaft suchen (seek_company), wenn niemand im Raum ist; Dösen sättigt
 #       (je mehr in der letzten Stunde gedöst, desto weniger reizvoll) und lockt bei Energiebedarf.
 # V0.5: Rundgang (wander) und Dösen (doze) als Beschäftigung, wenn alles erkundet ist;
@@ -61,6 +64,7 @@ CLOSE_MAX = 3
 MATCH_BONUS = 0.15              # Fund passt zu offener Bitte: vor der weiteren Suche
 MENU_MAX = 7                    # mehr Optionen überfordern ein 4B-Modell (Annahme, testen)
 INSPECT_MAX = 2
+IDENTIFY_BONUS = 1.3      # unbekannte Dinge sind besonders interessant
 FRONTIER_MAX = 2
 
 # Stimmungen: Ausgabe des LLM -> Ausdrucksparameter für den ESP32 (Konzept 6).
@@ -138,6 +142,8 @@ def build_options(obs: Observation, needs: NeedsState, mem: Memory,
     for o in obs.objects:
         if not o.reachable or o.cls in ROUTINE:
             continue
+        if o.cls == "unbekannt" and o.ident != "offen":
+            continue                                    # schon gefragt: nicht antasten, nicht neu fragen
         h = mem.habituation(f"obj:{o.oid}", now)
         if h < 0.7:
             novel.append((h, o))
@@ -147,6 +153,10 @@ def build_options(obs: Observation, needs: NeedsState, mem: Memory,
         if o.moved:
             state += ", hat sich bewegt"
         where = f"{o.place}, {o.dist_m:.0f} m"
+        if o.cls == "unbekannt":
+            u = min(1.0, v["neugier"] * (1 - h) * (1 - 0.5 * unease) * IDENTIFY_BONUS)
+            add(Option("identify", o.oid, f"Nachsehen, was da liegt ({where})", u))
+            continue
         if unease >= 0.4:
             # Konflikt Neugier gegen Unbehagen: vorsichtig annähern
             u = v["neugier"] * (1 - h) * 0.8

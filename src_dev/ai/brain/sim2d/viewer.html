@@ -107,7 +107,7 @@ td.n { text-align: right; font-family: var(--mono); font-variant-numeric: tabula
         <span style="--c: var(--unknown)">unbekannt</span><span style="--c: var(--a3)">frei (Farbe = Bereich)</span>
         <span style="--c: var(--occ)">belegt</span><span style="--c: var(--frontier)">Grenze zum Unbekannten</span>
         <span style="--c: var(--obj)">verfolgtes Objekt</span><span style="--c: var(--moved)">verschoben</span>
-        <span style="--c: var(--obj-miss)">fehlt</span><span style="--c: var(--person)">Mensch</span>
+        <span style="--c: var(--obj-miss)">fehlt</span><span style="--c: var(--obj)">○ unbekannt, ● benannt („?“ = Vermutung)</span><span style="--c: var(--person)">Mensch</span>
         <span style="--c: var(--robot)">SLARC, Pfad</span>
       </div>
     </div>
@@ -236,12 +236,16 @@ function init(D) {
       g.fillStyle = C.fov; g.beginPath(); g.moveTo(X(rx), Y(ry)); g.arc(X(rx), Y(ry), R, -(rth+half), -(rth-half)); g.closePath(); g.fill(); }
     // Objekte
     const lblFont = `500 ${Math.round(S*0.16)}px ${getComputedStyle(document.body).fontFamily}`;
-    for (const o of objs.values()) { const [tid, cls, x, y, st, moved] = o;
+    for (const o of objs.values()) { const [tid, cls, x, y, st, moved, , name, sure, ident] = o;
+      if (ident === "nichts") continue;                       // als Fehlalarm verworfen
       const col = st === "fehlt" ? C["obj-miss"] : moved ? C.moved : C.obj; g.fillStyle = col; g.strokeStyle = col;
       if (st === "fehlt") { const r = S*0.08; g.lineWidth = 2; g.beginPath(); g.moveTo(X(x)-r,Y(y)-r); g.lineTo(X(x)+r,Y(y)+r);
         g.moveTo(X(x)+r,Y(y)-r); g.lineTo(X(x)-r,Y(y)+r); g.stroke(); }
+      else if (cls === "unbekannt") { g.lineWidth = 2; g.beginPath(); g.arc(X(x), Y(y), S*0.08, 0, 7); g.stroke();
+        if (name) g.fill(); }
       else { g.beginPath(); g.rect(X(x)-S*0.07, Y(y)-S*0.07, S*0.14, S*0.14); g.fill(); }
-      if (tog("tLabels")) { g.font = lblFont; g.fillText(cls, X(x) + S*0.11, Y(y) + S*0.05); } }
+      const label = cls === "unbekannt" ? (name ? name + (sure ? "" : "?") : "?") : cls;
+      if (tog("tLabels")) { g.font = lblFont; g.fillText(label, X(x) + S*0.11, Y(y) + S*0.05); } }
     // Menschen
     const seen = new Set(f.seen || []);
     for (const [pid, name, x, y] of f.per || []) { g.strokeStyle = C.person; g.fillStyle = C.person; g.lineWidth = 2;
@@ -271,7 +275,7 @@ function init(D) {
     $("sPlace").textContent = pc >= 3 ? (D.areas[pc-3] || "–") : "–";
     $("sHome").textContent = f.home != null ? f.home + " m" : (f.home === 0 ? "zu Hause" : "–");
     const lines = logLines.slice(-80).map(([t, s]) => { const cls = s.startsWith("CHAT") ? "chat" : s.includes(">> Meldung") ? "msg"
-        : /neu:|verschoben:|fehlt:/.test(s) ? "found" : s.startsWith("->") || s.startsWith("<-") ? "beh" : "";
+        : /neu:|verschoben:|fehlt:|VLM:|>> Frage| ist .*\(zweimal|benennt|war nichts/.test(s) ? "found" : s.startsWith("->") || s.startsWith("<-") ? "beh" : "";
       const esc = s.replace(/&/g,"&amp;").replace(/</g,"&lt;");
       return `<div class="${cls}"><span class="t">${hms(t)}</span>${esc}</div>`; }).join("");
     const lg = $("log"); const atEnd = lg.scrollTop + lg.clientHeight >= lg.scrollHeight - 8;

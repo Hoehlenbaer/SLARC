@@ -21,10 +21,10 @@ PERSON_MIN_M = 0.3       # keine Annäherung näher als das
 # Verhalten, die den Roboter fortbewegen
 MOVING = {
     "explore_frontier", "inspect_object", "approach_avoid", "search_item",
-    "greet", "follow", "push_out", "fetch", "return_home", "retreat",
+    "greet", "follow", "push_out", "fetch", "return_home", "retreat", "identify",
 }
 # Verhalten, die auf ein Objekt/eine Person zugehen
-APPROACHING = {"inspect_object", "approach_avoid", "greet", "push_out", "fetch"}
+APPROACHING = {"inspect_object", "approach_avoid", "greet", "push_out", "fetch", "identify"}
 
 
 @dataclass

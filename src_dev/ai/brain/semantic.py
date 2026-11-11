@@ -7,7 +7,9 @@
 #       item_problem() gilt auch für check (Räume ausgenommen); claims_result() erkennt
 #       Antworten, die ein Ergebnis behaupten (Heuristik, für die Testsuite). Bekannte
 #       Personennamen (persons) gelten nicht als unerkennbar. Ortswörter auch „…bereich“, „…raum“
-#       („Überwache das Wohnzimmer“ → check(wohnbereich), Lauf 08.11.2026 20:11). come/follow mit einem Raum
+#       („Überwache das Wohnzimmer“ → check(wohnbereich), Lauf 08.11.2026 20:11).
+# V0.7 (11.11.2026): item_problem(known=…) kennt durch „Was ist das?“ benannte Dinge;
+#       naming() liest Antworten wie „Das ist eine Socke“ auf SLARCs Rückfrage (ohne LLM). come/follow mit einem Raum
 #       („Gehe ins Badezimmer!“) wird ehrlich abgelehnt, bis es einen Dienst „zu Ort gehen“ gibt.
 # V0.5: Gegenstandsliste inkl. Außenklassen (SLARC soll auch draußen laufen).
 # V0.4: Gegenstandsliste im Chat-Prompt und Regeln aus perception_classes.py (echte
@@ -263,7 +265,20 @@ def interpret_chat(backend, text: str, sender: str = "Marco",
 
 
 
-def item_problem(res: ChatResult, persons: tuple = ()) -> Optional[str]:
+_NAMING = re.compile(r"^\s*(?:das|des|dies)\s+(?:ist|sind)\s+(?:(?:ein|eine|einen|mein|meine|meinen|unser|unsere|"
+                     r"der|die|das|nur)\s+)?([a-zäöüß-]+)", re.IGNORECASE)
+
+
+def naming(text: str) -> Optional[str]:
+    """Antwort auf SLARCs Rückfrage „Was ist das?“: „Das ist eine Socke.“ -> "socke"."""
+    m = _NAMING.match(text or "")
+    if not m:
+        return None
+    w = m.group(1).lower()
+    return "nichts" if w in ("nichts", "müll", "dreck", "schatten", "fleck") else w
+
+
+def item_problem(res: ChatResult, persons: tuple = (), known: tuple = ()) -> Optional[str]:
     """Antwort, wenn SLARC das Gewünschte nicht erkennen kann, sonst None.
     Ehrlich ablehnen statt endlos suchen."""
     if res.service in ("come", "follow") and res.item and any(w in res.item for w in ROOM_WORDS):
@@ -271,6 +286,8 @@ def item_problem(res: ChatResult, persons: tuple = ()) -> Optional[str]:
     if not res.item or normalize_item(res.item) is not None:
         return None
     if res.item in {p.lower() for p in persons}:     # [V0.6] bekannte Namen: Personensuche
+        return None
+    if res.item in set(known):                         # [V0.7] durch „Was ist das?“ benannt
         return None
     if res.service in ("search", "fetch", "push_out"):
         return f"{res.item.capitalize()} kann ich leider noch nicht erkennen."

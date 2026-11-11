@@ -68,3 +68,50 @@ def test_brain_sees_only_blackboard():
     MapLayers(w.bb).refresh(force=True)
     obs = w.bb.to_observation([], False, False, None)
     assert "flur" in obs.known_places and "bad" not in obs.known_places and obs.frontier
+
+
+def test_identify_option_only_for_open_unknowns():
+    from brain.behaviors import build_options
+    from brain.datatypes import ObjectSeen, Observation
+    from brain.memory import Memory
+    from brain.needs import NeedsModel
+    from brain.safety import check
+    mem = Memory()
+    obs = Observation(t=100.0, battery_v=12.3, home_dist_m=2.0, at_home=False, place="flur",
+                      objects=[ObjectSeen("unbekannt-1", "unbekannt", "flur", 1.5, True, False, "offen"),
+                               ObjectSeen("unbekannt-2", "unbekannt", "flur", 1.5, True, False, "vermutet")])
+    st, _ = NeedsModel(mem).update(obs)
+    keys = [o.key for o in build_options(obs, st, mem, check(obs))]
+    assert any(k.startswith("identify(unbekannt-1") for k in keys)
+    assert not any("unbekannt-2" in k for k in keys)                       # schon gefragt
+    assert not any(k.startswith(("inspect_object(unbekannt", "approach_avoid(unbekannt")) for k in keys)
+
+
+def test_decide_name_cases():
+    from brain.blackboard import TrackedObject
+    from brain.sim2d.bt2d import Ctx, DecideName
+    w = World2D()
+    ctx = Ctx(w, lambda m: None)
+    def track(tid, answers):
+        o = TrackedObject(tid, "unbekannt", 1.0, 4.7, 0.9, 0, 0, 1, area="flur", answers=list(answers))
+        w.bb.objects[tid] = o
+        DecideName(ctx, tid).update()
+        return o
+    o = track("u1", ["dose", "dose"])
+    assert o.name_sure and o.label == "dose" and o.ident == "sicher"
+    o = track("u2", ["kabel", "socke"])
+    assert not o.name_sure and o.ident == "unklar" and o.name_vlm == "socke" and ctx.questions == ["u2"]
+    assert "Was ist das?" in w.messages[-1][1]
+    o = track("u3", ["nichts", "nichts"])
+    assert o.ident == "nichts" and o not in w.bb.recent_objects()
+    o = track("u4", ["kabel"])
+    assert o.ident == "vermutet" and "u4" in ctx.questions
+
+
+def test_day_identifies_asks_and_finds_named_item():
+    data = day2d.run(hours=3.0, quiet=True)
+    logs = [l for f in data["frames"] for _, l in f["log"]]
+    assert any("(zweimal gleich)" in l for l in logs)                     # zwei gleiche Blicke
+    assert any("benennt" in l for l in logs)                              # Mensch antwortet
+    assert any(m == "Socke ist im Raum schlafzimmer." for _, m in data["messages"])
+    assert not any(l.startswith("-> inspect_object(unbekannt") for l in logs)   # Unbekanntes nie antasten

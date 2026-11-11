@@ -1,5 +1,7 @@
 # brain/sim2d/day2d.py
-# Version 0.1 (11.11.2026) – Simulierter Tag mit Karte: Welt2D + Blackboard + Arbiter + BT.
+# Version 0.2 (11.11.2026) – Simulierter Tag mit Karte: Welt2D + Blackboard + Arbiter + BT.
+# V0.2: „Was ist das?“: nachgebildetes VLM, Rückfrage an den Menschen; wer zu Hause ist, antwortet
+#       nach ANSWER_DELAY_S im Chat („Das ist eine Socke.“, SIM ONLY); benannte Dinge sind suchbar.
 #
 # Wie brain/sim/day.py, aber SLARC kennt die Wohnung anfangs nicht: Er baut mit der
 # Kamera eine Belegungskarte auf, verfolgt Objekte, erkundet Grenzen zum Unbekannten
@@ -16,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
 import random
 import time
@@ -32,10 +35,13 @@ from ..needs import LEVELS, NEEDS
 from ..nav.gridmap import FREE, OCC
 from ..prompt import state_text
 from ..sim.day import PEOPLE_PID, hms, keyword_chat
+from ..sim.world import ChatEvent
 from .bt2d import DT, Ctx, build_tree
 from .world2d import World2D, default_people
 
 FRAME_S = 2.0
+ANSWER_DELAY_S = 90.0          # so lange braucht ein Mensch, bis er auf eine Rückfrage antwortet (Annahme)
+ARTIKEL = {"socke": "eine", "dose": "eine", "kabel": "ein", "tüte": "eine", "decke": "eine", "flasche": "eine"}
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -82,7 +88,8 @@ class Recorder:
         self.codes = codes
         objs = []
         for o in bb.objects.values():
-            row = [o.track_id, o.cls, round(o.x, 2), round(o.y, 2), o.state, int(o.moved), o.area or ""]
+            row = [o.track_id, o.cls, round(o.x, 2), round(o.y, 2), o.state, int(o.moved), o.area or "",
+                   o.name_vlm or "", int(o.name_sure), o.ident]
             if self.objs.get(o.track_id) != row:
                 self.objs[o.track_id] = row
                 objs.append(row)
@@ -157,6 +164,8 @@ def run(hours: float = 3.0, seed: int = 1, soc: float = 0.9, brain=None, think_s
             print(f"[{hms(world.t)}] {msg}", flush=True)
 
     ctx = Ctx(world, log)
+    ctx.vision = world.vlm_what                      # SIM ONLY; Roboter: vision/identify.py
+    asked: set = set()
     places_fn = (lambda item, rooms: S.search_places(brain, item, rooms).places) if brain else None
     world.sync()
     ctx.layers.refresh(force=True)
@@ -194,16 +203,41 @@ def run(hours: float = 3.0, seed: int = 1, soc: float = 0.9, brain=None, think_s
         if trees:
             print(py_trees.display.unicode_tree(tree))
 
+    def answer_questions() -> None:
+        """SIM ONLY: Wer zu Hause ist, beantwortet SLARCs Rückfrage nach ANSWER_DELAY_S."""
+        for tid in [q for q in ctx.questions if q not in asked]:
+            home = [p for p in world.persons.values() if p.room]
+            if not home:
+                continue
+            asked.add(tid)
+            truth = min(world.things.values(), key=lambda t: math.hypot(t.x - bb.objects[tid].x, t.y - bb.objects[tid].y))
+            name = truth.true_name or truth.cls
+            text = "Das ist nichts, nur ein Fleck." if name == "nichts" else f"Das ist {ARTIKEL.get(name, 'ein')} {name.capitalize()}."
+            world.chat.append(ChatEvent(world.t + ANSWER_DELAY_S, home[0].name, text))
+            world.chat[chat_i:] = sorted(world.chat[chat_i:], key=lambda e: e.t)
+
     while world.t < hours * 3600:
         chat_new = False
+        answer_questions()
         while chat_i < len(world.chat) and world.chat[chat_i].t <= world.t:
             ev = world.chat[chat_i]
             chat_i += 1
+            named = S.naming(ev.text) if ctx.questions else None
+            if named:                                     # Antwort auf „Was ist das?“
+                tid = ctx.questions.pop(0)
+                o = bb.objects.get(tid)
+                if o is not None:
+                    o.name_vlm, o.name_sure, o.name_source = named, True, "mensch"
+                    o.ident = "nichts" if named == "nichts" else "sicher"
+                reply = "Danke, dann vergesse ich es." if named == "nichts" else f"Danke! Jetzt weiß ich: {named.capitalize()}."
+                log(f"CHAT {ev.sender}: „{ev.text}“ -> benennt {tid} als {named}  SLARC: „{reply}“")
+                bb.event("benannt", f"{tid} = {named} (Mensch)")
+                continue
             res = (S.interpret_chat(brain, ev.text, ev.sender, mem.diary, tuple(PEOPLE_PID)) if brain
                    else keyword_chat(ev.text))
             if brain:
                 llm_calls += 1 + (1 if res.talk else 0)
-            problem = S.item_problem(res, tuple(PEOPLE_PID))
+            problem = S.item_problem(res, tuple(PEOPLE_PID), tuple(bb.known_names()))
             reply = problem or res.reply
             log(f"CHAT {ev.sender}: „{ev.text}“ -> {res.service}({res.item})  SLARC: „{reply}“")
             if problem:

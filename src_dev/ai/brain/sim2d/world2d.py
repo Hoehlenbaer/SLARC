@@ -1,5 +1,7 @@
 # brain/sim2d/world2d.py
-# Version 0.1 (11.11.2026) – 2D-Welt: Wahrheit, Körper, Kamera.  # SIM ONLY
+# Version 0.2 (11.11.2026) – 2D-Welt: Wahrheit, Körper, Kamera.  # SIM ONLY
+# V0.2: nachgebildetes VLM für „Was ist das?“ (vlm_what) mit der gemessenen Trefferquote
+#       (PC 08.11.2026: Haushalt ~0,76–0,78 mit Rahmen); face() dreht zu einem Punkt.
 #
 # Ersetzt für die Simulation: Fortbewegung (ESP32), Stereo-Tiefe, Detektion (Hailo) und
 # Lokalisierung (SLAM). Schreibt nur ins Blackboard; das Brain liest nur dort.
@@ -34,6 +36,9 @@ RAY_STEP_DEG = 2.0
 P_MISS = 0.15                    # Detektion verpasst ein sichtbares Ding
 PERSON_SPEED = 0.8
 MAP_RES = 0.1
+VLM_P_OK = 0.75                  # „Was ist das?“ richtig (gemessen, Haushalt mit Rahmen)
+VLM_P_NOTHING = 0.8              # Fehlalarm als „nichts“ erkannt (Annahme)
+VLM_WRONG = ["socke", "kabel", "spielzeug", "karton", "tüte", "schuh", "dose", "decke", "kissen", "flasche"]
 
 
 @dataclass
@@ -65,6 +70,7 @@ class World2D:
         self.mode = "stehen"
         self.waypoints: list[tuple[float, float]] = []
         self.spin_left = 0.0                      # Restwinkel beim Umsehen
+        self.face_to: Optional[float] = None      # Zielrichtung beim Hindrehen
         self.blocked = False
         self.messages: list[tuple] = []
         W, H = SIZE
@@ -120,14 +126,40 @@ class World2D:
     def stop(self) -> None:
         self.waypoints = []
         self.spin_left = 0.0
+        self.face_to = None
+        if self.mode in ("laufen", "drehen"):
+            self.mode = "stehen"                  # sonst gilt SLARC am Ziel noch eine Sekunde als laufend
 
     def spin(self, angle: float) -> None:
         self.spin_left = angle
 
+    def face(self, x: float, y: float) -> None:
+        self.waypoints = []
+        self.face_to = math.atan2(y - self.y, x - self.x)
+
+    def vlm_what(self, x: float, y: float) -> Optional[str]:
+        """Nachgebildetes VLM: Antwort auf „Was ist das?“ zum Ausschnitt um (x, y). SIM ONLY."""
+        cands = [t for t in self.things.values() if math.hypot(t.x - x, t.y - y) < 0.6]
+        if not cands:
+            return "nichts" if self.rng.random() < VLM_P_NOTHING else self.rng.choice(VLM_WRONG)
+        t = min(cands, key=lambda t: math.hypot(t.x - x, t.y - y))
+        truth = t.true_name or t.cls
+        p = VLM_P_NOTHING if truth == "nichts" else VLM_P_OK
+        if self.rng.random() < p:
+            return truth
+        return self.rng.choice([w for w in VLM_WRONG if w != truth])
+
     def step(self, dt: float, power_w: float = BASE_W) -> None:
         """Ein Zeitschritt Körper: drehen, gehen oder stehen; danach Sinne."""
         walked = 0.0
-        if self.spin_left > 0:
+        if self.face_to is not None:
+            err = (self.face_to - self.th + math.pi) % (2 * math.pi) - math.pi
+            a = min(TURN_RAD_S * dt, abs(err))
+            self.th += math.copysign(a, err)
+            self.mode = "drehen"
+            if abs(err) - a < math.radians(2):
+                self.face_to = None
+        elif self.spin_left > 0:
             a = min(TURN_RAD_S * dt, self.spin_left)
             self.th = (self.th + a) % (2 * math.pi)
             self.spin_left -= a
@@ -158,7 +190,7 @@ class World2D:
         self.sense()
 
     def moving(self) -> bool:
-        return bool(self.waypoints) or self.spin_left > 0
+        return bool(self.waypoints) or self.spin_left > 0 or self.face_to is not None
 
     # ---------------------------------------------------------------- Sinne -> Blackboard
     def sense(self) -> None:
@@ -295,5 +327,6 @@ def default_people() -> tuple[list[SimPerson], list[ChatEvent]]:
         ChatEvent(1.3 * h, "Marco", "Gut gemacht!"),
         ChatEvent(1.8 * h, "Marco", "Hast du heute was Spannendes erlebt?"),
         ChatEvent(2.2 * h, "Marco", "Komm mit, ich zeig dir was."),
+        ChatEvent(1.95 * h, "Marco", "Wo ist meine Socke?"),         # erst nach „Was ist das?“ suchbar
     ]
     return persons, chat
