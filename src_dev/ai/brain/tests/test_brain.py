@@ -181,6 +181,7 @@ def test_llm_only_for_close_cases_and_cooldown():
     assert d1.action == "ask_llm" and 2 <= len(d1.menu) <= 3
     d2 = arb.step(_close_obs(T + 10, "o2"))
     assert d2.action != "ask_llm"                     # Abkühlzeit
+    arb.current = None                                # was d2 gestartet hat, ist fertig
     d3 = arb.step(_close_obs(T + 10 + LLM_MIN_INTERVAL_S, "o3"))
     assert d3.action == "ask_llm"
 
@@ -360,3 +361,34 @@ def test_doze_saturates():
     fresh = _opts(o, mem, ago_contact=60)["doze"].utility
     mem.doze_log.append([T - 40 * 60, T - 5 * 60])              # 35 min gedöst
     assert _opts(o, mem, ago_contact=60)["doze"].utility < 0.3 * fresh
+
+
+def test_doze_without_energy_only_when_bored():
+    """V0.9: Dösen ohne Energiebedarf nur, wenn Neugier, Nützlichkeit und Gesellschaft ruhig sind."""
+    from brain.behaviors import build_options
+    from brain.datatypes import Observation
+    from brain.memory import Memory
+    from brain.needs import NeedsState
+    from brain.safety import check
+    obs = Observation(t=100.0, battery_v=12.3, home_dist_m=1.0, at_home=False, place="flur")
+    def doze_u(levels):
+        st = NeedsState()
+        st.values = {n: 0.0 for n in st.values}
+        st.levels = dict(levels)
+        return next(o.utility for o in build_options(obs, st, Memory(), check(obs)) if o.behavior == "doze")
+    calm = {"energie": 0, "neugier": 0, "nuetzlichkeit": 0, "gesellschaft": 0, "unbehagen": 0}
+    assert doze_u(calm) > 0.2
+    assert doze_u({**calm, "neugier": 1}) == 0.0
+
+
+def test_unknown_not_habituated_by_seeing():
+    from brain.datatypes import ObjectSeen, Observation
+    from brain.memory import Memory
+    from brain.needs import NeedsModel
+    mem = Memory()
+    nm = NeedsModel(mem)
+    for t in range(60):
+        nm.update(Observation(t=float(t), battery_v=12.3, home_dist_m=1.0, at_home=False, place="flur",
+                              objects=[ObjectSeen("u1", "unbekannt", "flur", 1.0, True, False, "offen"),
+                                       ObjectSeen("v1", "vase", "flur", 1.0)]))
+    assert mem.habituation("obj:u1", 60.0) == 0.0 and mem.habituation("obj:v1", 60.0) > 0.1

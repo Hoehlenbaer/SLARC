@@ -1,5 +1,7 @@
 # brain/needs.py
 # Version 0.2 (07.11.2026) – Bedürfnismodell.
+# V0.3 (11.11.2026): Bloßes Sehen gewöhnt nach Nähe abgestuft; unbekannte, noch nicht
+#       angesehene Dinge gar nicht (2D-Sim: Fleck im Flur wurde im Vorbeigehen langweilig).
 # V0.2: Möbel und Anker (ROUTINE) zählen nicht zur Neugier.
 #
 # Fünf Bedürfnisse, je ein Wert 0…1, im 1-Hz-Takt aus Messwerten und Zeit
@@ -176,8 +178,10 @@ class NeedsModel:
             prox = clamp(1.0 - o.dist_m / NOVELTY_RANGE_M, 0.2, 1.0)
             moved = 0.3 if o.moved else 0.0
             novelty = max(novelty, clamp((1.0 - h) * prox + moved))
-            # bloßes Sehen gewöhnt langsam (je Takt)
-            self.mem.habituate(key, now, HABIT_GAIN_SEEN)
+            # bloßes Sehen gewöhnt langsam (je Takt), aus der Ferne weniger; an Unbekanntes,
+            # das noch niemand angesehen hat, gewöhnt man sich nicht
+            if not (o.cls == "unbekannt" and o.ident == "offen"):
+                self.mem.habituate(key, now, HABIT_GAIN_SEEN * prox)
         area = obs.unknown_frac if obs.frontier else 0.0
         return clamp(0.45 * bored + 0.55 * max(novelty, area))
 

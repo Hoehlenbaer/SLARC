@@ -1,5 +1,8 @@
 # brain/behaviors.py
 # Version 0.4 (07.11.2026) – Verhaltenskatalog, Menübau und Code-Auswahl.
+# V0.9 (11.11.2026): Dösen ohne Energiebedarf nur noch bei Langeweile (Neugier, Nützlichkeit,
+#       Gesellschaft alle „ruhig“). Vorher lag es mit 0,3 Grundnutzen fast immer im knappen Fall
+#       (Sim 11.11.: 10 von 28, davon 9 bei Energie „ruhig“) und Qwen wählte es gern.
 # V0.8 (11.11.2026): Raumangaben in den Zielen grammatisch („in der Küche“ statt „im Raum küche“).
 # V0.7 (11.11.2026): "unbekannt" wird nie angetastet. Noch nicht benannte unbekannte Dinge
 #       bekommen das Ziel identify („Was ist das?“, Ausschnitt ans VLM, zweiter Blick) mit
@@ -125,7 +128,8 @@ def build_options(obs: Observation, needs: NeedsState, mem: Memory,
     add(Option("look_around", None, "Sich umsehen", 0.15 + 0.3 * v["neugier"] * (1 - h_here) + 0.2 * unease))
     if unease < 0.5:
         sat = math.exp(-mem.dozed_s(now) / 60.0 / DOZE_SAT_MIN)
-        add(Option("doze", None, "Hinlegen und dösen", DOZE_UTILITY * sat + 0.3 * v["energie"]))
+        bored = all(needs.levels[n] == 0 for n in ("neugier", "nuetzlichkeit", "gesellschaft"))
+        add(Option("doze", None, "Hinlegen und dösen", (DOZE_UTILITY * sat if bored else 0.0) + 0.3 * v["energie"]))
 
     # --- Neugier ---
     for area in obs.frontier[:FRONTIER_MAX]:
