@@ -113,5 +113,5 @@ def test_day_identifies_asks_and_finds_named_item():
     logs = [l for f in data["frames"] for _, l in f["log"]]
     assert any("(zweimal gleich)" in l for l in logs)                     # zwei gleiche Blicke
     assert any("benennt" in l for l in logs)                              # Mensch antwortet
-    assert any(m == "Socke ist im Raum schlafzimmer." for _, m in data["messages"])
+    assert any(m == "Die Socke ist im Schlafzimmer." for _, m in data["messages"])
     assert not any(l.startswith("-> inspect_object(unbekannt") for l in logs)   # Unbekanntes nie antasten

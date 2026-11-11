@@ -1,5 +1,6 @@
 # brain/sim2d/day2d.py
 # Version 0.2 (11.11.2026) – Simulierter Tag mit Karte: Welt2D + Blackboard + Arbiter + BT.
+# V0.3: Antworten und Meldungen grammatisch (sprache.py).
 # V0.2: „Was ist das?“: nachgebildetes VLM, Rückfrage an den Menschen; wer zu Hause ist, antwortet
 #       nach ANSWER_DELAY_S im Chat („Das ist eine Socke.“, SIM ONLY); benannte Dinge sind suchbar.
 #
@@ -36,12 +37,12 @@ from ..nav.gridmap import FREE, OCC
 from ..prompt import state_text
 from ..sim.day import PEOPLE_PID, hms, keyword_chat
 from ..sim.world import ChatEvent
+from ..sprache import cap, noun
 from .bt2d import DT, Ctx, build_tree
 from .world2d import World2D, default_people
 
 FRAME_S = 2.0
 ANSWER_DELAY_S = 90.0          # so lange braucht ein Mensch, bis er auf eine Rückfrage antwortet (Annahme)
-ARTIKEL = {"socke": "eine", "dose": "eine", "kabel": "ein", "tüte": "eine", "decke": "eine", "flasche": "eine"}
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 
@@ -212,7 +213,7 @@ def run(hours: float = 3.0, seed: int = 1, soc: float = 0.9, brain=None, think_s
             asked.add(tid)
             truth = min(world.things.values(), key=lambda t: math.hypot(t.x - bb.objects[tid].x, t.y - bb.objects[tid].y))
             name = truth.true_name or truth.cls
-            text = "Das ist nichts, nur ein Fleck." if name == "nichts" else f"Das ist {ARTIKEL.get(name, 'ein')} {name.capitalize()}."
+            text = "Das ist nichts, nur ein Fleck." if name == "nichts" else f"Das ist {noun(name, definite=False)}."
             world.chat.append(ChatEvent(world.t + ANSWER_DELAY_S, home[0].name, text))
             world.chat[chat_i:] = sorted(world.chat[chat_i:], key=lambda e: e.t)
 
@@ -229,7 +230,8 @@ def run(hours: float = 3.0, seed: int = 1, soc: float = 0.9, brain=None, think_s
                 if o is not None:
                     o.name_vlm, o.name_sure, o.name_source = named, True, "mensch"
                     o.ident = "nichts" if named == "nichts" else "sicher"
-                reply = "Danke, dann vergesse ich es." if named == "nichts" else f"Danke! Jetzt weiß ich: {named.capitalize()}."
+                reply = ("Danke, dann vergesse ich es." if named == "nichts"
+                         else f"Danke! Jetzt weiß ich, dass das {noun(named, definite=False)} ist.")
                 log(f"CHAT {ev.sender}: „{ev.text}“ -> benennt {tid} als {named}  SLARC: „{reply}“")
                 bb.event("benannt", f"{tid} = {named} (Mensch)")
                 continue
@@ -313,9 +315,10 @@ def run(hours: float = 3.0, seed: int = 1, soc: float = 0.9, brain=None, think_s
                         if r.arg == cur.arg or (cur.behavior == "report" and r.service == "search"):
                             requests.remove(r)
                     if not ok and cur.behavior == "search_item":
-                        world.messages.append((world.t, f"{cur.arg} habe ich nicht gefunden."))
-                        bb.event("meldung", f"{cur.arg} habe ich nicht gefunden.")
-                        log(f"   >> Meldung: {cur.arg} habe ich nicht gefunden.")
+                        msg = f"{cap(noun(cur.arg, 'akk'))} habe ich nicht gefunden."
+                        world.messages.append((world.t, msg))
+                        bb.event("meldung", msg)
+                        log(f"   >> Meldung: {msg}")
                 if cur.behavior == "greet" and ok and rng.random() < 0.5:
                     tapped = True
                     log("   (wird angetippt)")

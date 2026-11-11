@@ -8,6 +8,7 @@
 #       Antworten, die ein Ergebnis behaupten (Heuristik, für die Testsuite). Bekannte
 #       Personennamen (persons) gelten nicht als unerkennbar. Ortswörter auch „…bereich“, „…raum“
 #       („Überwache das Wohnzimmer“ → check(wohnbereich), Lauf 08.11.2026 20:11).
+# V0.8 (11.11.2026): Artikel und Räume aus sprache.py (auch für Wörter außerhalb der Klassen).
 # V0.7 (11.11.2026): item_problem(known=…) kennt durch „Was ist das?“ benannte Dinge;
 #       naming() liest Antworten wie „Das ist eine Socke“ auf SLARCs Rückfrage (ohne LLM). come/follow mit einem Raum
 #       („Gehe ins Badezimmer!“) wird ehrlich abgelehnt, bis es einen Dienst „zu Ort gehen“ gibt.
@@ -39,6 +40,9 @@ from __future__ import annotations
 import json
 import re
 from dataclasses import dataclass, field
+
+from .sprache import GENUS as _SPRACHE_GENUS
+from .sprache import cap, in_room, noun
 from typing import Optional
 
 from .behaviors import HAZARDS
@@ -139,15 +143,7 @@ class ChatResult:
 
 # ---------------------------------------------------------------- [V0.6] ehrliche Bestätigungen
 # Geschlecht der erkennbaren Klassen für Artikel in den Vorlagen (m, f, n).
-GENUS = {"person": "f", "fahrrad": "n", "auto": "n", "motorrad": "n", "bus": "m", "lkw": "m",
-         "ampel": "f", "hydrant": "m", "stoppschild": "n", "parkuhr": "f", "bank": "f", "vogel": "m",
-         "katze": "f", "hund": "m", "rucksack": "m", "regenschirm": "m", "handtasche": "f",
-         "koffer": "m", "flasche": "f", "tasse": "f", "schüssel": "f", "stuhl": "m", "sofa": "n",
-         "topfpflanze": "f", "bett": "n", "esstisch": "m", "toilette": "f", "fernseher": "m",
-         "laptop": "m", "fernbedienung": "f", "tastatur": "f", "handy": "n", "mikrowelle": "f",
-         "ofen": "m", "waschbecken": "n", "kühlschrank": "m", "buch": "n", "uhr": "f", "vase": "f",
-         "teddy": "m"}
-_ART = {"dat": {"m": "dem", "n": "dem", "f": "der"}, "akk": {"m": "den", "n": "das", "f": "die"}}
+GENUS = {k: _SPRACHE_GENUS[k] for k in DETECTABLE}     # [V0.8] Quelle: sprache.py
 
 # Räume und Orte: bei check kein "kann ich nicht erkennen" (es geht um den Ort, nicht ein Ding)
 ROOM_WORDS = ("zimmer", "küche", "bad", "flur", "diele", "keller", "balkon", "garten", "terrasse",
@@ -155,13 +151,9 @@ ROOM_WORDS = ("zimmer", "küche", "bad", "flur", "diele", "keller", "balkon", "g
 
 
 def _np(item: str, case: str) -> str:
-    """'katze' -> 'der Katze' (Dativ); unbekannte Wörter und Namen ohne Artikel."""
-    cls = normalize_item(item) or ""
-    word = (cls or item or "").strip()
-    if not word:
-        return "es" if case == "akk" else "dem"
-    g = GENUS.get(cls)
-    return f"{_ART[case][g]} {word.capitalize()}" if g else word.capitalize()
+    """'katze' -> 'der Katze' (Dativ); Namen ohne Artikel. [V0.8] über sprache.noun."""
+    cls = normalize_item(item) or (item or "").strip()
+    return noun(cls, case) if cls else ("es" if case == "akk" else "dem")
 
 
 def confirmation(res: "ChatResult") -> Optional[str]:

@@ -1,5 +1,6 @@
 # brain/behaviors.py
 # Version 0.4 (07.11.2026) – Verhaltenskatalog, Menübau und Code-Auswahl.
+# V0.8 (11.11.2026): Raumangaben in den Zielen grammatisch („in der Küche“ statt „im Raum küche“).
 # V0.7 (11.11.2026): "unbekannt" wird nie angetastet. Noch nicht benannte unbekannte Dinge
 #       bekommen das Ziel identify („Was ist das?“, Ausschnitt ans VLM, zweiter Blick) mit
 #       Neugier-Bonus IDENTIFY_BONUS; benannte (vermutet/unklar) lösen keine Neugier mehr aus.
@@ -44,6 +45,7 @@ SERVICES_ENABLED = {"search", "report", "greet", "follow", "push_out"}   # fetch
 
 # Klassenlisten aus der Detektion (perception_classes.py ist die einzige Quelle)
 from .perception_classes import REPORTABLE, ROUTINE, normalize_item, typical_rooms  # noqa: E402
+from .sprache import in_room  # noqa: E402
 # Gefahren: immer und sofort melden, per Regel (Modellvergleich 07.11.: Qwen3.5 und
 # Gemma meldeten den eingeschalteten Herd 3/3 nicht). Die Detektion V5.0 erkennt aber
 # keine Gefahrenzustände (Herd an, Wasser, Rauch …), daher bleibt die Liste leer, bis
@@ -136,7 +138,7 @@ def build_options(obs: Observation, needs: NeedsState, mem: Memory,
     rooms = [(mem.habituation(f"area:{p}", now), p) for p in obs.known_places if p != obs.place]
     for h, p in sorted(rooms)[:WANDER_MAX]:
         u = 0.6 * v["neugier"] * (1 - unease) * (1 - h)
-        add(Option("wander", p, f"Nachsehen, was es im Raum {p} Neues gibt", u))
+        add(Option("wander", p, f"Nachsehen, was es {in_room(p)} Neues gibt", u))
 
     novel = []
     for o in obs.objects:
@@ -208,7 +210,7 @@ def build_options(obs: Observation, needs: NeedsState, mem: Memory,
         if target:
             why = "zuletzt Menschen" if seen and target == seen[0] else "meist Menschen"
             u = 0.8 * v["gesellschaft"] * (1 - 0.5 * unease)
-            add(Option("seek_company", target, f"Gesellschaft suchen: {why} im Raum {target}", u))
+            add(Option("seek_company", target, f"Gesellschaft suchen: {why} {in_room(target)}", u))
     for p in obs.persons:
         name = p.name or "unbekannte Person"
         if now - mem.last_greet.get(p.pid, -1e9) > GREET_REPEAT_S:
