@@ -3,6 +3,7 @@
 # V0.2: „Was ist das?“ (identify): hingehen ohne Antasten, Denk-Zustand, VLM fragen, zweiter Blick
 #       von der Seite (45°), entscheiden: sicher / unklar (Mensch fragen) / nichts (verwerfen).
 #       Suche beginnt dort, wo ein passender Track zuletzt lag.
+# V0.3: Meldungen und Rückfragen grammatisch (sprache.py).
 #
 # Gleiche Teilbäume wie brain/sim/bt.py, aber die Blätter navigieren mit A* auf der
 # eigenen Karte (nav/layers.py) und sehen nur, was im Blackboard steht. Die Bewegung
@@ -22,6 +23,7 @@ from ..nav.layers import MapLayers
 from ..nav.tracker import ObjectTracker
 from ..perception_classes import normalize_item, typical_rooms
 from ..sim.world import LYING_W
+from ..sprache import cap, in_room, noun
 from .world2d import BASE_W, SPEED_M_S, World2D
 
 DT = 0.5
@@ -216,7 +218,7 @@ class Report(Leaf):
         bb, w = self.ctx.bb, self.ctx.world
         tid = self.tid or self.ctx.found
         o = bb.objects.get(tid) if tid else None
-        text = f"{o.label.capitalize()} ist im Raum {o.area}." if o else "Ich habe nichts gefunden."
+        text = f"{cap(noun(o.label))} ist {in_room(o.area)}." if o else "Ich habe nichts gefunden."
         w.messages.append((bb.t, text))
         bb.event("meldung", text)
         self.ctx.log(f"   >> Meldung: {text}")
@@ -309,7 +311,8 @@ class DecideName(Leaf):
             o.name_vlm = next((x for x in reversed(a) if x != "nichts"), a[-1])
             o.ident = "unklar" if len(a) == 2 else "vermutet"
             ctx.questions.append(self.tid)
-            q = f"Im Raum {o.area} liegt etwas, ich glaube {o.name_vlm}. Was ist das?"
+            q = (f"{cap(in_room(o.area))} liegt etwas. Ich glaube, das ist {noun(o.name_vlm, definite=False)}. "
+                 "Was ist das?")
             ctx.world.messages.append((bb.t, q))
             bb.event("frage", q)
             text = f"{self.tid}: {' / '.join(a)} – frage nach"
