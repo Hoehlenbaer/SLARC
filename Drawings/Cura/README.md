@@ -8,7 +8,7 @@ Alles Teilspezifische steht in `Drawings/Macros/SLARC_Stueckliste.xlsx`, Blatt D
 
 | Spalte | Inhalt | Verwendung |
 |---|---|---|
-| C Material | PLA, PETG, TPU 95A | Vorlage und Profil. Für TPU gibt es noch keine Vorlage, die Zeile wird übersprungen. |
+| C Material | PLA, PETG, TPU 95A | Vorlage und Profil |
 | J Füllung | z. B. „40 % Gyroid“ | erste Zahl = Fülldichte (pro Modell) |
 | K Wände | Linien | Wandlinienanzahl (pro Modell) |
 | M Stützen / Besonderes | Freitext | „Tree Support“ schaltet Stützen ein (pro Modell), Platzierung nur vom Druckbett aus. Die Äste führen um die untere Gabelwange herum (in Cura geprüft). „Brim N mm“ setzt Brim mit N mm. |
@@ -30,7 +30,7 @@ Benötigt `numpy` und `openpyxl`.
 
 ## Hinweise
 
-- Vorlagen in `templates/`: von Marco in Cura 5.13 gespeicherte Projekte für den Anycubic Kobra Plus. PLA mit eSUN PLA+ Black (für Anycubic PLA+ verwendet), PETG mit eSUN PETG Black. Neue Cura-Version oder anderer Drucker: Vorlage neu speichern und ersetzen.
+- Vorlagen in `templates/`: von Marco in Cura 5.13 gespeicherte Projekte für den Anycubic Kobra Plus. PLA mit eSUN PLA+ Black (für Anycubic PLA+ verwendet), PETG mit eSUN PETG Black, TPU (Material in der Vorlage noch PETG, Werte stehen deshalb im Profil). Neue Cura-Version oder anderer Drucker: Vorlage neu speichern und ersetzen.
 - Füllung, Wände und Stützen stehen als „Einstellungen pro Modell“ am Objekt. In Cura sichtbar über Modell anwählen → links „Einstellungen pro Modell“. Die rechte Leiste zeigt nur das Profil.
 - Brim ist in Cura nur global einstellbar. Er steht deshalb als Benutzeränderung im Projekt (Profil mit „*“), nicht im Profil.
 - Projekte, die nicht vom Skript stammen (von Hand in Cura gespeichert, z. B. `AKP_SLARC-Stereo_Mount.3mf`, `AKP_SLARC-Baseplate_Top_Front.3mf`), werden nicht überschrieben, außer mit `--force`. Erkannt am Kommentar `SLARC make_cura_3mf` im Modell.

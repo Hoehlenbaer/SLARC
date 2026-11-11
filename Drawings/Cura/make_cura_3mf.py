@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – Cura-Projekte (3MF) pro Druckteil erzeugen.   V1.4 (Quelle: Stückliste)
+SLARC – Cura-Projekte (3MF) pro Druckteil erzeugen.   V1.5 (Quelle: Stückliste)
 Drucker: Anycubic Kobra Plus, Cura 5.13 (setting_version 27).
 
 Ablauf:
@@ -23,6 +23,11 @@ Aufruf:  python make_cura_3mf.py               (alle Teile mit STL-Datei)
          python make_cura_3mf.py --force Cap   (auch von Hand gespeicherte Projekte überschreiben)
 Benötigt: numpy, openpyxl.
 Beim Öffnen in Cura für das Profil "neu erstellen" bzw. später "aktualisieren" wählen.
+
+V1.5
+- TPU-Vorlage (Marco, 11.11.2026). In der Vorlage ist als Material noch eSUN PETG eingestellt; deshalb setzt
+  das TPU-Profil Rückzug (1.5 mm, 25 mm/s), Lüfter (60 %), Bett (50 °C) und Temperaturen (220 °C) selbst.
+  Schichthöhe 0.2 fest (Vorlage: 0.1 adaptiv, erste Schicht 0.4), alle gleichzeitig statt einzeln.
 
 V1.4
 - PETG-Temperaturen aus dem Temperaturturm der Anycubic-PETG-Rolle (Marco, 10.11.2026): 250–240 °C starke Fäden,
@@ -55,7 +60,8 @@ STL_DIR = os.path.join(HERE, "..", "STL files")
 BOM = os.path.join(HERE, "..", "Macros", "SLARC_Stueckliste.xlsx")
 MARK = "<!-- SLARC make_cura_3mf -->"
 TPL = {"PLA": os.path.join(HERE, "templates", "AKP_template_PLA.3mf"),      # eSUN PLA+ Black
-       "PETG": os.path.join(HERE, "templates", "AKP_template_PETG.3mf")}    # eSUN PETG Black
+       "PETG": os.path.join(HERE, "templates", "AKP_template_PETG.3mf"),    # eSUN PETG Black
+       "TPU": os.path.join(HERE, "templates", "AKP_template_TPU.3mf")}      # V1.5 (Material in der Vorlage: PETG!)
 
 # Basiswerte je Material: (global, extruder, Einträge der Vorlage, die entfernt werden)
 # PLA: Temperaturen, Bett, Lüfter, Rückzug kommen aus dem Material (eSUN PLA+: 210 °C, 60 °C, 100 %, 3 mm).
@@ -78,6 +84,14 @@ BASE = {
                   bridge_settings_enabled="True", bridge_wall_speed="20", bridge_skin_speed="25",
                   bridge_fan_speed="100", bridge_skin_material_flow="100", bridge_enable_more_layers="True"),
              ()),
+    # V1.5: TPU 95A, Bowden: wenig und langsamer Rückzug, Combing überall (weniger Rückzüge)
+    "TPU": (dict(COMMON_G, retraction_combing="all", adaptive_layer_height_enabled="False",
+                 material_bed_temperature="50"),
+            dict(COMMON_E, infill_sparse_density="20", wall_line_count="5",
+                 material_print_temperature="220.0", material_print_temperature_layer_0="220.0",
+                 material_final_print_temperature="215.0", retraction_amount="1.5", retraction_speed="25",
+                 cool_fan_enabled="True", cool_fan_speed="60.0", cool_fan_speed_min="60.0", cool_fan_speed_max="60.0"),
+            ()),
 }
 
 # Druckausrichtung: welche Fläche des STL (Makro-Koordinaten) aufs Bett kommt. Drehung um 90° bzw. 180°.
