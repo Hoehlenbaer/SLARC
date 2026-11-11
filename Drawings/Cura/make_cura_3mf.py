@@ -25,8 +25,9 @@ Benötigt: numpy, openpyxl.
 Beim Öffnen in Cura für das Profil "neu erstellen" bzw. später "aktualisieren" wählen.
 
 V1.5
-- TPU-Vorlage (Marco, 11.11.2026). In der Vorlage ist als Material noch eSUN PETG eingestellt; deshalb setzt
-  das TPU-Profil Rückzug (1.5 mm, 25 mm/s), Lüfter (60 %), Bett (50 °C) und Temperaturen (220 °C) selbst.
+- TPU-Vorlage (Marco, 11.11.2026) mit Material Generic TPU 95A. Das Material legt Rückzug und Lüfter nicht fest
+  (sonst gelten die Cura-Standardwerte), daher setzt das TPU-Profil Rückzug (1.5 mm, 25 mm/s), Lüfter (60 %),
+  Bett (50 °C, Material: 0) und Temperaturen (220 °C) selbst.
   Schichthöhe 0.2 fest (Vorlage: 0.1 adaptiv, erste Schicht 0.4), alle gleichzeitig statt einzeln.
 
 V1.4
@@ -61,7 +62,7 @@ BOM = os.path.join(HERE, "..", "Macros", "SLARC_Stueckliste.xlsx")
 MARK = "<!-- SLARC make_cura_3mf -->"
 TPL = {"PLA": os.path.join(HERE, "templates", "AKP_template_PLA.3mf"),      # eSUN PLA+ Black
        "PETG": os.path.join(HERE, "templates", "AKP_template_PETG.3mf"),    # eSUN PETG Black
-       "TPU": os.path.join(HERE, "templates", "AKP_template_TPU.3mf")}      # V1.5 (Material in der Vorlage: PETG!)
+       "TPU": os.path.join(HERE, "templates", "AKP_template_TPU.3mf")}      # V1.5 Generic TPU 95A
 
 # Basiswerte je Material: (global, extruder, Einträge der Vorlage, die entfernt werden)
 # PLA: Temperaturen, Bett, Lüfter, Rückzug kommen aus dem Material (eSUN PLA+: 210 °C, 60 °C, 100 %, 3 mm).
