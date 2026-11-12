@@ -25,7 +25,7 @@ Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. N
 
 ---
 
-## 2. Bein (Makro V9.5)
+## 2. Bein (Makro V9.6)
 
 **Standardparameter (von Marco festgelegt):** Coxa 60 mm, Femur 150 mm, Tibia-Sehne 175 mm (Knieachse → Fußspitze), Knick 38,6° nach unten, Fußsegment 140 mm → Segment 1 (`tib_a`) = 42,2 mm. Standardpose im Makro: q_femur −15°, q_tibia 100°.
 
@@ -54,6 +54,7 @@ Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. N
 - **Spitzdach im Hohlprofil (V9.4, 06.11.2026):** Die Decke der Hohlräume von Femur und Tibia war eine 16-mm-Brücke. Cura legte die erste Brückenschicht längs, und die Linienrichtung ändert daran nichts, sobald die Brückeneinstellungen an sind. Marco: Eine Deckschicht, die nicht richtig trägt, schwächt das Biegemoment des Glieds. Deshalb jetzt ein 45°-Spitzdach im Hohlraum (8 mm hoch), das ohne Brücke und ohne Stütze druckt. Kosten: Femur +5,3 cm³, Tibia +6,5 cm³, für 6 Beine etwa +71 cm³, rund 50 g bei 40 % Füllung. Für rechtes und gespiegeltes Bein mit Schnitten geprüft.
 - **Kabelbinder-Ösen außen (V9.5, 09.11.2026):** Mit den Schlitzpaaren durch die Wand ließ sich der Kabelbinder im Hohlraum nicht zurückführen (Marco, erster Femur). Jetzt sitzen außen auf der Oberseite Ösen: Kanal 4,2 × 2,0 mm, beim Druck senkrecht, also ohne Stützen. Femur 3×, Tibia 1×. Schwenkbereich geprüft: frei bis ±115°, wie bisher. Femur: Die Senkungen der Tibia-Servo-Laschen öffnen nach unten, 2 mm über dem Bett. Cura stützte sie, deshalb jetzt `minimum_support_area=20`, kleine Flächen werden nicht gestützt.
 - **PETG-Temperatur (10.11.2026):** Neue Anycubic-PETG-Rolle, Temperaturturm 250→220 °C. Bei 250–240 °C starke Fäden und Tropfen, bei 235 °C grenzwertig, bei 230–220 °C sauber. Die Schichthaftung ist auch bei 220 °C zäh, gebrochen ist der Turm nur an den Kerben zwischen den Stufen. Profil jetzt 230 °C, erste Schicht 235, Ende 225 (vorher 235/240/230). Die Rolle lag vor dem Druck einen Tag offen, und gedruckt wurde aus dem laufenden Trockner.
+- **Schaltertasche mit Spitzdach (V9.6, 12.11.2026):** Cura stützte die Decke der Mikroschalter-Tasche durch die Stirnöffnung. Das Stützdach innen ließ sich kaum entfernen (Marco, erste Tibia). Jetzt sitzt über der Tasche ein 45°-Spitzdach, gedruckt ohne Stütze. Der Schalter hält weiter über Haltestifte und seitliche Passung. Für rechtes und gespiegeltes Bein mit Schnitten geprüft.
 - **Gabelmontage:** Die obere Wange (ohne Bund) kommt auf das Servohorn. Die untere Wange mit dem 1-mm-Distanzbund kommt auf die Rückseitenscheibe (passive Lagerung), Bund zum Servo.
 
 ## 3. Baseplates (V2.7)
