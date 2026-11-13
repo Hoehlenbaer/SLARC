@@ -1,0 +1,1581 @@
+{
+ "bilder": 100,
+ "seed": 7,
+ "indoor": true,
+ "max_side": 640,
+ "modelle": {
+  "4B": {
+   "precision": 0.851,
+   "recall": 0.848,
+   "f1": 0.85,
+   "recall_nicht_klein": 0.896,
+   "uebersehen": [
+    [
+     "handbag",
+     5
+    ],
+    [
+     "chair",
+     5
+    ],
+    [
+     "bowl",
+     5
+    ],
+    [
+     "backpack",
+     3
+    ],
+    [
+     "potted plant",
+     3
+    ],
+    [
+     "person",
+     3
+    ],
+    [
+     "dining table",
+     3
+    ],
+    [
+     "cup",
+     3
+    ]
+   ],
+   "erfunden": [
+    [
+     "potted plant",
+     6
+    ],
+    [
+     "cup",
+     5
+    ],
+    [
+     "chair",
+     5
+    ],
+    [
+     "bottle",
+     5
+    ],
+    [
+     "dining table",
+     4
+    ],
+    [
+     "bench",
+     3
+    ],
+    [
+     "backpack",
+     3
+    ],
+    [
+     "cell phone",
+     2
+    ]
+   ],
+   "ungueltig": 0,
+   "latenz_median_s": 0.32
+  }
+ },
+ "rows": [
+  {
+   "image_id": 105455,
+   "file": "000000105455.jpg",
+   "gt": [
+    "car",
+    "clock"
+   ],
+   "4B": [
+    "bench",
+    "car",
+    "clock"
+   ],
+   "4B_text": "Ein kleiner Roboter in einem Raum beschreibt: Ein farbenfroher, historischer Uhrenturm mit goldenem Oberteil und blauen Wänden steht auf einer Straße vor einem Gebäudekomplex."
+  },
+  {
+   "image_id": 365208,
+   "file": "000000365208.jpg",
+   "gt": [
+    "chair",
+    "handbag",
+    "person",
+    "umbrella"
+   ],
+   "4B": [
+    "chair",
+    "person",
+    "umbrella"
+   ],
+   "4B_text": "Ein kleiner Roboter beschreibt ein Schwarz-Weiß-Bild mit einer Person unter einem weißen Vorhang, einem Vogelkäfig und einem parasol auf Sand."
+  },
+  {
+   "image_id": 218362,
+   "file": "000000218362.jpg",
+   "gt": [
+    "clock"
+   ],
+   "4B": [
+    "clock"
+   ],
+   "4B_text": "Ich sehe eine Wand voller verschiedener Uhren, darunter eine mit LED-Zahlen und eine große goldene Spiegelrahmen."
+  },
+  {
+   "image_id": 129322,
+   "file": "000000129322.jpg",
+   "gt": [
+    "toilet"
+   ],
+   "4B": [
+    "toilet"
+   ],
+   "4B_text": "Ich sehe ein altes Badezimmer mit einem Holztoilettsitz, einer alten Wandröhre und einer Badewanne mit Toilettenpapier."
+  },
+  {
+   "image_id": 232563,
+   "file": "000000232563.jpg",
+   "gt": [
+    "handbag",
+    "person",
+    "umbrella"
+   ],
+   "4B": [
+    "backpack",
+    "cell phone",
+    "person",
+    "umbrella"
+   ],
+   "4B_text": "Ein kleiner Roboter im Raum sieht einen Mann mit Zebra-Regenschirm und einer Person mit rosa Regenschirm auf nasser Straße."
+  },
+  {
+   "image_id": 340697,
+   "file": "000000340697.jpg",
+   "gt": [
+    "bottle"
+   ],
+   "4B": [
+    "bottle",
+    "cup"
+   ],
+   "4B_text": "Ich sehe eine Regal mit vielen bunten Glasflaschen und Dosen, die wie kleine, leuchtende Kugeln aussehen."
+  },
+  {
+   "image_id": 502737,
+   "file": "000000502737.jpg",
+   "gt": [
+    "cup",
+    "person"
+   ],
+   "4B": [
+    "cup",
+    "person"
+   ],
+   "4B_text": "Ein kleiner Roboter zeigt ein Schokoriegel mit weißer Zuckerguss-Figur und ein Glas dunkles Getränk."
+  },
+  {
+   "image_id": 60449,
+   "file": "000000060449.jpg",
+   "gt": [
+    "chair",
+    "couch",
+    "dining table",
+    "laptop"
+   ],
+   "4B": [
+    "couch",
+    "dining table",
+    "laptop"
+   ],
+   "4B_text": "Ich sehe einen Laptop auf einem Tisch mit Blick zum Meer und Palmen."
+  },
+  {
+   "image_id": 296634,
+   "file": "000000296634.jpg",
+   "gt": [
+    "bowl"
+   ],
+   "4B": [
+    "bowl"
+   ],
+   "4B_text": "Ich sehe drei weiße Teller mit Essen auf einem Holzboden: ein Salat, eine Gemüse-Salat-Mischung mit Dip und eine Suppe mit kleinen Brötchen."
+  },
+  {
+   "image_id": 548780,
+   "file": "000000548780.jpg",
+   "gt": [
+    "backpack",
+    "bench",
+    "bird",
+    "handbag",
+    "person",
+    "potted plant"
+   ],
+   "4B": [
+    "bench",
+    "bird",
+    "handbag",
+    "person"
+   ],
+   "4B_text": "Zwei Frauen sitzen auf einer Parkbank, eine hält einen Rucksack, und zwei Tauben stehen auf dem Boden."
+  },
+  {
+   "image_id": 55150,
+   "file": "000000055150.jpg",
+   "gt": [
+    "backpack",
+    "book",
+    "car",
+    "person",
+    "suitcase"
+   ],
+   "4B": [
+    "backpack",
+    "car",
+    "person",
+    "suitcase"
+   ]
+  },
+  {
+   "image_id": 360960,
+   "file": "000000360960.jpg",
+   "gt": [
+    "person",
+    "umbrella"
+   ],
+   "4B": [
+    "person",
+    "umbrella"
+   ]
+  },
+  {
+   "image_id": 312237,
+   "file": "000000312237.jpg",
+   "gt": [
+    "backpack",
+    "handbag",
+    "person",
+    "umbrella"
+   ],
+   "4B": [
+    "backpack",
+    "person",
+    "umbrella"
+   ]
+  },
+  {
+   "image_id": 296657,
+   "file": "000000296657.jpg",
+   "gt": [
+    "cell phone",
+    "fire hydrant",
+    "person"
+   ],
+   "4B": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 186282,
+   "file": "000000186282.jpg",
+   "gt": [
+    "keyboard",
+    "tv"
+   ],
+   "4B": [
+    "keyboard",
+    "tv"
+   ]
+  },
+  {
+   "image_id": 267300,
+   "file": "000000267300.jpg",
+   "gt": [
+    "bed",
+    "dog",
+    "potted plant"
+   ],
+   "4B": [
+    "bed",
+    "dog",
+    "potted plant",
+    "vase"
+   ]
+  },
+  {
+   "image_id": 170191,
+   "file": "000000170191.jpg",
+   "gt": [
+    "bed",
+    "person",
+    "suitcase"
+   ],
+   "4B": [
+    "bed",
+    "person",
+    "suitcase"
+   ]
+  },
+  {
+   "image_id": 563653,
+   "file": "000000563653.jpg",
+   "gt": [
+    "car",
+    "handbag",
+    "person",
+    "traffic light",
+    "truck"
+   ],
+   "4B": [
+    "car",
+    "handbag",
+    "person",
+    "traffic light",
+    "truck"
+   ]
+  },
+  {
+   "image_id": 479248,
+   "file": "000000479248.jpg",
+   "gt": [
+    "book",
+    "bottle",
+    "bowl",
+    "clock",
+    "cup",
+    "person",
+    "tv",
+    "vase"
+   ],
+   "4B": [
+    "bed",
+    "book",
+    "bottle",
+    "bowl",
+    "chair",
+    "clock",
+    "couch",
+    "cup",
+    "dining table",
+    "person",
+    "remote",
+    "tv",
+    "vase"
+   ]
+  },
+  {
+   "image_id": 462643,
+   "file": "000000462643.jpg",
+   "gt": [
+    "cell phone",
+    "person"
+   ],
+   "4B": [
+    "cell phone"
+   ]
+  },
+  {
+   "image_id": 549930,
+   "file": "000000549930.jpg",
+   "gt": [
+    "person",
+    "umbrella"
+   ],
+   "4B": [
+    "bench",
+    "person",
+    "umbrella"
+   ]
+  },
+  {
+   "image_id": 295478,
+   "file": "000000295478.jpg",
+   "gt": [
+    "dog",
+    "handbag",
+    "person"
+   ],
+   "4B": [
+    "dog",
+    "handbag",
+    "person"
+   ]
+  },
+  {
+   "image_id": 455157,
+   "file": "000000455157.jpg",
+   "gt": [
+    "bench",
+    "dining table",
+    "laptop",
+    "person",
+    "umbrella"
+   ],
+   "4B": [
+    "backpack",
+    "bench",
+    "dining table",
+    "laptop",
+    "person",
+    "umbrella"
+   ]
+  },
+  {
+   "image_id": 64868,
+   "file": "000000064868.jpg",
+   "gt": [
+    "bottle",
+    "chair",
+    "dog",
+    "oven",
+    "person"
+   ],
+   "4B": [
+    "book",
+    "bottle",
+    "cup",
+    "oven",
+    "person",
+    "sink"
+   ]
+  },
+  {
+   "image_id": 491216,
+   "file": "000000491216.jpg",
+   "gt": [
+    "bottle",
+    "cat",
+    "chair",
+    "oven",
+    "potted plant",
+    "refrigerator",
+    "sink"
+   ],
+   "4B": [
+    "bottle",
+    "cat",
+    "potted plant",
+    "refrigerator",
+    "sink"
+   ]
+  },
+  {
+   "image_id": 475387,
+   "file": "000000475387.jpg",
+   "gt": [
+    "backpack",
+    "handbag",
+    "person",
+    "suitcase"
+   ],
+   "4B": [
+    "backpack",
+    "handbag",
+    "person",
+    "potted plant",
+    "suitcase"
+   ]
+  },
+  {
+   "image_id": 348488,
+   "file": "000000348488.jpg",
+   "gt": [
+    "vase"
+   ],
+   "4B": [
+    "vase"
+   ]
+  },
+  {
+   "image_id": 487583,
+   "file": "000000487583.jpg",
+   "gt": [
+    "cup",
+    "toilet"
+   ],
+   "4B": [
+    "cup",
+    "toilet"
+   ]
+  },
+  {
+   "image_id": 577539,
+   "file": "000000577539.jpg",
+   "gt": [
+    "bowl",
+    "person"
+   ],
+   "4B": [
+    "bowl"
+   ]
+  },
+  {
+   "image_id": 167898,
+   "file": "000000167898.jpg",
+   "gt": [
+    "bottle",
+    "sink",
+    "toilet"
+   ],
+   "4B": [
+    "bottle",
+    "sink",
+    "toilet"
+   ]
+  },
+  {
+   "image_id": 87742,
+   "file": "000000087742.jpg",
+   "gt": [
+    "vase"
+   ],
+   "4B": [
+    "dining table",
+    "potted plant",
+    "vase"
+   ]
+  },
+  {
+   "image_id": 503855,
+   "file": "000000503855.jpg",
+   "gt": [
+    "backpack",
+    "person",
+    "umbrella"
+   ],
+   "4B": [
+    "backpack",
+    "person",
+    "umbrella"
+   ]
+  },
+  {
+   "image_id": 66231,
+   "file": "000000066231.jpg",
+   "gt": [
+    "bottle",
+    "bowl",
+    "person",
+    "refrigerator",
+    "sink"
+   ],
+   "4B": [
+    "bottle",
+    "bowl",
+    "cup",
+    "person",
+    "refrigerator",
+    "sink"
+   ]
+  },
+  {
+   "image_id": 181753,
+   "file": "000000181753.jpg",
+   "gt": [
+    "book",
+    "bowl",
+    "chair",
+    "couch",
+    "cup",
+    "dining table",
+    "vase"
+   ],
+   "4B": [
+    "book",
+    "chair",
+    "couch",
+    "potted plant",
+    "vase"
+   ]
+  },
+  {
+   "image_id": 356248,
+   "file": "000000356248.jpg",
+   "gt": [
+    "bottle",
+    "bowl",
+    "chair",
+    "cup",
+    "dining table",
+    "person",
+    "potted plant"
+   ],
+   "4B": [
+    "bottle",
+    "bowl",
+    "chair",
+    "cup",
+    "dining table",
+    "person",
+    "vase"
+   ]
+  },
+  {
+   "image_id": 113867,
+   "file": "000000113867.jpg",
+   "gt": [
+    "clock"
+   ],
+   "4B": [
+    "clock"
+   ]
+  },
+  {
+   "image_id": 572462,
+   "file": "000000572462.jpg",
+   "gt": [
+    "backpack",
+    "bench",
+    "bottle",
+    "person"
+   ],
+   "4B": [
+    "backpack",
+    "chair",
+    "person"
+   ]
+  },
+  {
+   "image_id": 290163,
+   "file": "000000290163.jpg",
+   "gt": [
+    "bowl",
+    "chair",
+    "dining table",
+    "person"
+   ],
+   "4B": [
+    "bowl",
+    "chair",
+    "dining table",
+    "person"
+   ]
+  },
+  {
+   "image_id": 529966,
+   "file": "000000529966.jpg",
+   "gt": [
+    "bowl"
+   ],
+   "4B": [
+    "bowl"
+   ]
+  },
+  {
+   "image_id": 292024,
+   "file": "000000292024.jpg",
+   "gt": [
+    "cup",
+    "person"
+   ],
+   "4B": [
+    "cup",
+    "dining table",
+    "person"
+   ]
+  },
+  {
+   "image_id": 42528,
+   "file": "000000042528.jpg",
+   "gt": [
+    "cell phone",
+    "chair",
+    "person"
+   ],
+   "4B": [
+    "cell phone",
+    "chair",
+    "person"
+   ]
+  },
+  {
+   "image_id": 194832,
+   "file": "000000194832.jpg",
+   "gt": [
+    "bus",
+    "chair",
+    "couch",
+    "tv"
+   ],
+   "4B": [
+    "bus",
+    "tv"
+   ]
+  },
+  {
+   "image_id": 457262,
+   "file": "000000457262.jpg",
+   "gt": [
+    "dining table"
+   ],
+   "4B": [
+    "dining table"
+   ]
+  },
+  {
+   "image_id": 178469,
+   "file": "000000178469.jpg",
+   "gt": [
+    "book",
+    "cup",
+    "keyboard",
+    "laptop"
+   ],
+   "4B": [
+    "book",
+    "cup",
+    "keyboard",
+    "laptop"
+   ]
+  },
+  {
+   "image_id": 192904,
+   "file": "000000192904.jpg",
+   "gt": [
+    "bed",
+    "cup"
+   ],
+   "4B": [
+    "bed",
+    "cup"
+   ]
+  },
+  {
+   "image_id": 345361,
+   "file": "000000345361.jpg",
+   "gt": [
+    "car",
+    "cup",
+    "dining table",
+    "person"
+   ],
+   "4B": [
+    "bench",
+    "chair",
+    "cup",
+    "dining table",
+    "person"
+   ]
+  },
+  {
+   "image_id": 484415,
+   "file": "000000484415.jpg",
+   "gt": [
+    "person",
+    "toilet"
+   ],
+   "4B": [
+    "toilet"
+   ]
+  },
+  {
+   "image_id": 29984,
+   "file": "000000029984.jpg",
+   "gt": [
+    "chair",
+    "person",
+    "umbrella"
+   ],
+   "4B": [
+    "bird",
+    "chair",
+    "person",
+    "umbrella"
+   ]
+  },
+  {
+   "image_id": 468332,
+   "file": "000000468332.jpg",
+   "gt": [
+    "bench",
+    "car",
+    "clock",
+    "dining table",
+    "person"
+   ],
+   "4B": [
+    "bench",
+    "car",
+    "dining table",
+    "person"
+   ]
+  },
+  {
+   "image_id": 531134,
+   "file": "000000531134.jpg",
+   "gt": [
+    "bicycle",
+    "handbag",
+    "person",
+    "traffic light"
+   ],
+   "4B": [
+    "handbag",
+    "person",
+    "potted plant",
+    "traffic light"
+   ]
+  },
+  {
+   "image_id": 527427,
+   "file": "000000527427.jpg",
+   "gt": [
+    "cell phone",
+    "chair",
+    "dining table",
+    "laptop",
+    "person",
+    "potted plant"
+   ],
+   "4B": [
+    "bottle",
+    "cell phone",
+    "chair",
+    "cup",
+    "dining table",
+    "laptop",
+    "person",
+    "potted plant"
+   ]
+  },
+  {
+   "image_id": 52996,
+   "file": "000000052996.jpg",
+   "gt": [
+    "backpack",
+    "book",
+    "bowl",
+    "cup",
+    "dining table",
+    "handbag",
+    "oven",
+    "person",
+    "refrigerator"
+   ],
+   "4B": [
+    "backpack",
+    "book",
+    "bottle",
+    "bowl",
+    "cup",
+    "person",
+    "refrigerator"
+   ]
+  },
+  {
+   "image_id": 116208,
+   "file": "000000116208.jpg",
+   "gt": [
+    "bottle",
+    "chair",
+    "cup",
+    "dining table",
+    "person"
+   ],
+   "4B": [
+    "bottle",
+    "chair",
+    "cup",
+    "dining table",
+    "person"
+   ]
+  },
+  {
+   "image_id": 14007,
+   "file": "000000014007.jpg",
+   "gt": [
+    "cat",
+    "refrigerator"
+   ],
+   "4B": [
+    "cat",
+    "refrigerator"
+   ]
+  },
+  {
+   "image_id": 509260,
+   "file": "000000509260.jpg",
+   "gt": [
+    "book",
+    "tv"
+   ],
+   "4B": [
+    "book",
+    "tv"
+   ]
+  },
+  {
+   "image_id": 98392,
+   "file": "000000098392.jpg",
+   "gt": [
+    "bus",
+    "car",
+    "clock",
+    "person"
+   ],
+   "4B": [
+    "bus",
+    "car",
+    "clock",
+    "person"
+   ]
+  },
+  {
+   "image_id": 491071,
+   "file": "000000491071.jpg",
+   "gt": [
+    "sink"
+   ],
+   "4B": [
+    "sink"
+   ]
+  },
+  {
+   "image_id": 443303,
+   "file": "000000443303.jpg",
+   "gt": [
+    "book",
+    "cat",
+    "suitcase"
+   ],
+   "4B": [
+    "bed",
+    "book",
+    "cat",
+    "suitcase"
+   ]
+  },
+  {
+   "image_id": 100624,
+   "file": "000000100624.jpg",
+   "gt": [
+    "backpack",
+    "car",
+    "cell phone",
+    "person"
+   ],
+   "4B": [
+    "backpack",
+    "cell phone",
+    "person"
+   ]
+  },
+  {
+   "image_id": 479732,
+   "file": "000000479732.jpg",
+   "gt": [
+    "bowl",
+    "cup"
+   ],
+   "4B": [
+    "cup"
+   ]
+  },
+  {
+   "image_id": 175535,
+   "file": "000000175535.jpg",
+   "gt": [
+    "bowl",
+    "dining table"
+   ],
+   "4B": [
+    "bowl",
+    "cup",
+    "dining table"
+   ]
+  },
+  {
+   "image_id": 31749,
+   "file": "000000031749.jpg",
+   "gt": [
+    "clock"
+   ],
+   "4B": [
+    "clock",
+    "teddy bear"
+   ]
+  },
+  {
+   "image_id": 383337,
+   "file": "000000383337.jpg",
+   "gt": [
+    "dining table",
+    "person"
+   ],
+   "4B": [
+    "dining table",
+    "person"
+   ]
+  },
+  {
+   "image_id": 12576,
+   "file": "000000012576.jpg",
+   "gt": [
+    "cup",
+    "dining table",
+    "person",
+    "tv"
+   ],
+   "4B": [
+    "chair",
+    "cup",
+    "dining table",
+    "person",
+    "tv"
+   ]
+  },
+  {
+   "image_id": 176232,
+   "file": "000000176232.jpg",
+   "gt": [
+    "book",
+    "vase"
+   ],
+   "4B": [
+    "book",
+    "potted plant",
+    "vase"
+   ]
+  },
+  {
+   "image_id": 3845,
+   "file": "000000003845.jpg",
+   "gt": [
+    "cup",
+    "dining table"
+   ],
+   "4B": [
+    "cup",
+    "dining table"
+   ]
+  },
+  {
+   "image_id": 465806,
+   "file": "000000465806.jpg",
+   "gt": [
+    "bowl",
+    "cup",
+    "person"
+   ],
+   "4B": [
+    "cup",
+    "person"
+   ]
+  },
+  {
+   "image_id": 416451,
+   "file": "000000416451.jpg",
+   "gt": [
+    "book",
+    "bottle",
+    "couch",
+    "cup",
+    "person",
+    "remote"
+   ],
+   "4B": [
+    "bicycle",
+    "book",
+    "bottle",
+    "chair",
+    "couch",
+    "cup",
+    "keyboard",
+    "person",
+    "remote"
+   ]
+  },
+  {
+   "image_id": 173004,
+   "file": "000000173004.jpg",
+   "gt": [
+    "bottle",
+    "chair",
+    "cup",
+    "dining table"
+   ],
+   "4B": [
+    "bottle",
+    "chair",
+    "cup",
+    "dining table"
+   ]
+  },
+  {
+   "image_id": 278749,
+   "file": "000000278749.jpg",
+   "gt": [
+    "car",
+    "handbag",
+    "person"
+   ],
+   "4B": [
+    "backpack",
+    "car",
+    "handbag",
+    "person",
+    "suitcase"
+   ]
+  },
+  {
+   "image_id": 25603,
+   "file": "000000025603.jpg",
+   "gt": [
+    "book",
+    "chair",
+    "cup",
+    "dining table",
+    "person"
+   ],
+   "4B": [
+    "book",
+    "bottle",
+    "chair",
+    "cup",
+    "dining table",
+    "person"
+   ]
+  },
+  {
+   "image_id": 11197,
+   "file": "000000011197.jpg",
+   "gt": [
+    "backpack",
+    "bicycle",
+    "car",
+    "person",
+    "traffic light"
+   ],
+   "4B": [
+    "backpack",
+    "bicycle",
+    "car",
+    "handbag",
+    "person",
+    "traffic light"
+   ]
+  },
+  {
+   "image_id": 411754,
+   "file": "000000411754.jpg",
+   "gt": [
+    "backpack",
+    "cell phone",
+    "chair",
+    "person"
+   ],
+   "4B": [
+    "cell phone",
+    "chair",
+    "person"
+   ]
+  },
+  {
+   "image_id": 441543,
+   "file": "000000441543.jpg",
+   "gt": [
+    "backpack",
+    "cell phone",
+    "person",
+    "umbrella"
+   ],
+   "4B": [
+    "backpack",
+    "cell phone",
+    "person",
+    "umbrella"
+   ]
+  },
+  {
+   "image_id": 422836,
+   "file": "000000422836.jpg",
+   "gt": [
+    "chair",
+    "dining table",
+    "person",
+    "potted plant",
+    "suitcase"
+   ],
+   "4B": [
+    "chair",
+    "dining table",
+    "person"
+   ]
+  },
+  {
+   "image_id": 543047,
+   "file": "000000543047.jpg",
+   "gt": [
+    "book",
+    "bowl",
+    "chair",
+    "couch",
+    "cup",
+    "dining table",
+    "handbag",
+    "microwave",
+    "sink"
+   ],
+   "4B": [
+    "book",
+    "chair",
+    "couch",
+    "dining table",
+    "microwave"
+   ]
+  },
+  {
+   "image_id": 290843,
+   "file": "000000290843.jpg",
+   "gt": [
+    "bed",
+    "cat",
+    "laptop",
+    "person"
+   ],
+   "4B": [
+    "bed",
+    "cat",
+    "laptop",
+    "person"
+   ]
+  },
+  {
+   "image_id": 202001,
+   "file": "000000202001.jpg",
+   "gt": [
+    "cell phone",
+    "couch",
+    "person"
+   ],
+   "4B": [
+    "cell phone",
+    "couch",
+    "person"
+   ]
+  },
+  {
+   "image_id": 231879,
+   "file": "000000231879.jpg",
+   "gt": [
+    "chair",
+    "dining table",
+    "person"
+   ],
+   "4B": [
+    "chair",
+    "dining table",
+    "person",
+    "teddy bear"
+   ]
+  },
+  {
+   "image_id": 357742,
+   "file": "000000357742.jpg",
+   "gt": [
+    "backpack",
+    "person"
+   ],
+   "4B": [
+    "backpack",
+    "person"
+   ]
+  },
+  {
+   "image_id": 175443,
+   "file": "000000175443.jpg",
+   "gt": [
+    "potted plant",
+    "teddy bear"
+   ],
+   "4B": [
+    "potted plant",
+    "teddy bear"
+   ]
+  },
+  {
+   "image_id": 427034,
+   "file": "000000427034.jpg",
+   "gt": [
+    "clock",
+    "dog",
+    "laptop",
+    "person"
+   ],
+   "4B": [
+    "bird",
+    "dog",
+    "keyboard",
+    "laptop",
+    "person"
+   ]
+  },
+  {
+   "image_id": 311789,
+   "file": "000000311789.jpg",
+   "gt": [
+    "cat",
+    "keyboard"
+   ],
+   "4B": [
+    "cat",
+    "keyboard"
+   ]
+  },
+  {
+   "image_id": 216497,
+   "file": "000000216497.jpg",
+   "gt": [
+    "chair",
+    "couch",
+    "dining table",
+    "microwave",
+    "oven",
+    "sink"
+   ],
+   "4B": [
+    "chair",
+    "couch",
+    "microwave",
+    "oven",
+    "sink"
+   ]
+  },
+  {
+   "image_id": 17899,
+   "file": "000000017899.jpg",
+   "gt": [
+    "bird",
+    "chair",
+    "couch",
+    "cup",
+    "dining table",
+    "person"
+   ],
+   "4B": [
+    "bottle",
+    "chair",
+    "couch",
+    "cup",
+    "dining table",
+    "person"
+   ]
+  },
+  {
+   "image_id": 567886,
+   "file": "000000567886.jpg",
+   "gt": [
+    "book",
+    "person",
+    "teddy bear"
+   ],
+   "4B": [
+    "book",
+    "person",
+    "teddy bear"
+   ]
+  },
+  {
+   "image_id": 511453,
+   "file": "000000511453.jpg",
+   "gt": [
+    "bottle"
+   ],
+   "4B": [
+    "bottle",
+    "dining table"
+   ]
+  },
+  {
+   "image_id": 500257,
+   "file": "000000500257.jpg",
+   "gt": [
+    "backpack",
+    "person",
+    "suitcase",
+    "tv"
+   ],
+   "4B": [
+    "person",
+    "suitcase",
+    "tv"
+   ]
+  },
+  {
+   "image_id": 274460,
+   "file": "000000274460.jpg",
+   "gt": [
+    "backpack",
+    "bicycle",
+    "person"
+   ],
+   "4B": [
+    "backpack",
+    "person"
+   ]
+  },
+  {
+   "image_id": 492878,
+   "file": "000000492878.jpg",
+   "gt": [
+    "bottle",
+    "cup",
+    "sink"
+   ],
+   "4B": [
+    "bottle",
+    "cup",
+    "sink"
+   ]
+  },
+  {
+   "image_id": 119828,
+   "file": "000000119828.jpg",
+   "gt": [
+    "cat",
+    "cell phone",
+    "cup",
+    "laptop",
+    "remote"
+   ],
+   "4B": [
+    "cat",
+    "cell phone",
+    "cup",
+    "laptop"
+   ]
+  },
+  {
+   "image_id": 519764,
+   "file": "000000519764.jpg",
+   "gt": [
+    "cat",
+    "chair",
+    "laptop"
+   ],
+   "4B": [
+    "cat",
+    "chair",
+    "laptop"
+   ]
+  },
+  {
+   "image_id": 122166,
+   "file": "000000122166.jpg",
+   "gt": [
+    "backpack",
+    "bicycle",
+    "car",
+    "motorcycle",
+    "person",
+    "traffic light",
+    "truck"
+   ],
+   "4B": [
+    "backpack",
+    "bicycle",
+    "car",
+    "person",
+    "traffic light"
+   ]
+  },
+  {
+   "image_id": 371529,
+   "file": "000000371529.jpg",
+   "gt": [
+    "person",
+    "potted plant",
+    "toilet"
+   ],
+   "4B": [
+    "person",
+    "potted plant",
+    "toilet"
+   ]
+  },
+  {
+   "image_id": 187513,
+   "file": "000000187513.jpg",
+   "gt": [
+    "sink",
+    "toilet"
+   ],
+   "4B": [
+    "sink",
+    "toilet"
+   ]
+  },
+  {
+   "image_id": 308466,
+   "file": "000000308466.jpg",
+   "gt": [
+    "sink",
+    "toilet"
+   ],
+   "4B": [
+    "sink",
+    "toilet"
+   ]
+  },
+  {
+   "image_id": 74733,
+   "file": "000000074733.jpg",
+   "gt": [
+    "chair",
+    "cup",
+    "dining table",
+    "person"
+   ],
+   "4B": [
+    "book",
+    "bottle",
+    "chair",
+    "cup",
+    "dining table",
+    "person"
+   ]
+  },
+  {
+   "image_id": 323151,
+   "file": "000000323151.jpg",
+   "gt": [
+    "bowl",
+    "chair",
+    "cup",
+    "dining table"
+   ],
+   "4B": [
+    "cell phone",
+    "dining table"
+   ]
+  },
+  {
+   "image_id": 402346,
+   "file": "000000402346.jpg",
+   "gt": [
+    "bowl",
+    "vase"
+   ],
+   "4B": [
+    "bowl",
+    "potted plant"
+   ]
+  },
+  {
+   "image_id": 27186,
+   "file": "000000027186.jpg",
+   "gt": [
+    "couch",
+    "person",
+    "remote"
+   ],
+   "4B": [
+    "couch",
+    "person",
+    "remote"
+   ]
+  }
+ ]
+}
