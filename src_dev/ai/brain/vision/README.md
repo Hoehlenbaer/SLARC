@@ -1,6 +1,6 @@
 # Vision-Sprachmodell (VLM) testen
 
-Stand 08.11.2026 (--cache-ram 0 ergänzt). Hintergrund: `Documentation/Brain_Konzept.md`, Abschnitt 13, Punkt 11.
+Stand 13.11.2026 (Abschnitt 2: Setup über setup_venvs.sh). Hintergrund: `Documentation/Brain_Konzept.md`, Abschnitt 13, Punkt 11.
 
 | Skript | Wo | Zweck |
 |---|---|---|
@@ -22,28 +22,26 @@ scp ~/.models/Qwen3.5-4B-Q4_K_M.gguf ~/.models/mmproj-Qwen3.5-4B-f16.gguf <user>
 
 Nur Bilder mit mindestens einem Möbel oder Raum-Anker (Sofa, Bett, Tisch, Toilette, Kühlschrank …).
 
-## 2. llama-server auf dem Pi bauen (einmalig, ~10–30 min)
+## 2. llama-server und Modelle auf dem Pi (einmalig)
 
-`utilities/setup_venvs.sh` baut llama-cpp-python mit OpenBLAS ins venv `ai`. Dessen Quellen
-(`~/llama-cpp-python`) gehören aber root (Skript lief mit sudo) und stammen vom März 2026, also
-eventuell vor der Qwen3.5-Unterstützung. Deshalb ein eigenes llama.cpp als `admin` daneben, mit
-denselben BLAS-Einstellungen (so am 08.11.2026 gebaut, Stand a691b23):
+Macht seit 13.11.2026 `utilities/setup_venvs.sh` (V2.0): llama.cpp ohne BLAS nach
+`~/llama.cpp/build-noblas`, Stand a691b23 wie bei den Messungen vom 08.11.2026, dazu
+`Qwen3.5-4B-Q4_K_M.gguf` und `mmproj-Qwen3.5-4B-Q8_0.gguf` nach `~/.models`.
 
 ```
-git clone --depth 1 https://github.com/ggml-org/llama.cpp ~/llama.cpp
-cd ~/llama.cpp
-cmake -B build-server -DCMAKE_BUILD_TYPE=Release -DGGML_BLAS=ON -DGGML_BLAS_VENDOR=OpenBLAS
-cmake --build build-server -j4 --target llama-server
-~/llama.cpp/build-server/bin/llama-server --version
+bash ~/projects/slarc/utilities/setup_venvs.sh                 # fehlt etwas, wird es nachgeholt
+bash ~/projects/slarc/utilities/setup_venvs.sh --update-llama  # neu bauen
+bash ~/projects/slarc/utilities/setup_venvs.sh --llama-ref <commit|tag>   # anderer Stand
 ```
 
-Offen: ob das venv `ai` (llama-cpp-python vom März) Qwen3.5 laden kann.
+Den Server für den Betrieb startet `utilities/llm_server.sh` (Alias `llm-server`) mit den festen
+Optionen aus `Brain_Konzept.md`, Abschnitt 17. Die übrigen Modellvarianten für `run_pi_matrix.sh`
+(F16-mmproj, Q4_0, 2B, Qwen3-4B) lädt das Setup nicht; die bei Bedarf von Hand nach `~/.models`.
 
-Gemessen 08.11.2026: OpenBLAS bringt nichts (gleiche Zeiten), deshalb `build-noblas` verwenden. Hintergrund: llama.cpp nutzt BLAS nur für große Matrix-Batches
-(Prompt, Bild-Encoder), für Q4-Gewichte meist die eigenen ARM-Kernel. Zum Vergleich ein
-zweiter Bau ohne BLAS (`cmake -B build-noblas -DCMAKE_BUILD_TYPE=Release`, sonst gleich).
+Gemessen 08.11.2026: OpenBLAS bringt nichts (gleiche Zeiten). Hintergrund: llama.cpp nutzt BLAS nur
+für große Matrix-Batches (Prompt, Bild-Encoder), für Q4-Gewichte meist die eigenen ARM-Kernel.
 
-Pillow für `bench_pi.py` ist im venv `ai` über torchvision bzw. die System-Pakete schon da.
+Pillow für `bench_pi.py` installiert das Setup im venv `ai`.
 
 ## 3. Messen (Pi)
 
