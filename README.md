@@ -547,7 +547,7 @@ All Python components run in isolated venvs under `~/projects/slarc/venvs/`:
 |---|---|---|
 | `slarc_base` | Shared IPC / messaging | `posix_ipc` |
 | `vision` | Camera, OpenCV, rendering | `picamera2`, `opencv-python`, `moderngl`, `pyzmq` |
-| `ai` | LLM + perception inference | `llama-cpp-python`, `onnxruntime`, `ollama`, `hailort` |
+| `ai` | Perception inference, brain, LLM prototypes | `onnxruntime`, `hailort`, `py_trees`, `pillow`, `pytest`, `llama-cpp-python` |
 | `sensors` | IMU, I²C sensors | `smbus2`, `icm20948`, `scipy` |
 | `motion_control` | Servo / GPIO control | `RPi.GPIO`, `scipy` |
 | `slam` | Mapping and localization | `opencv-python`, `matplotlib` |
@@ -611,42 +611,58 @@ This is already configured automatically by the AI HAT+. If using an M.2 AI Kit,
 
 ## Quick Start
 
-Clone this repository and run the setup script:
+Clone this repository and run the setup script as your normal user:
 ```bash
 # git is required to clone – on a fresh Trixie image it may be missing:
 sudo apt install -y git
 
 git clone https://github.com/Hoehlenbaer/SLARC.git ~/projects/slarc
 cd ~/projects/slarc/utilities
-sudo bash setup_venvs.sh
+bash setup_venvs.sh
 ```
+
+The script asks for `sudo` only where it needs it (apt, Hailo driver). Started with `sudo` anyway, it restarts itself as the calling user, so venvs, models and build folders never end up owned by root; folders that earlier runs left owned by root are handed back once.
 
 That's it. The script handles everything in the correct order:
 
-1. **System packages** – installs `build-essential`, `cmake`, `ninja-build`, `libopenblas-dev`, `python3-venv` and others if missing
+1. **System packages** – installs `build-essential`, `cmake`, `ninja-build`, `libssl-dev`, `python3-venv` and others if missing
 2. **Hailo stack** – installs `hailo-all` via apt if not already present, builds the DKMS kernel module, configures autoload, and installs a post-upgrade hook so the driver survives future kernel updates automatically
 3. **Virtual environments** – creates all project venvs
-4. **Python packages** – installs all pip dependencies per venv, including a custom OpenBLAS-accelerated build of `llama-cpp-python`
-5. **Shell shortcuts** – adds `venv-ai`, `venv-vision`, `venv-off` etc. to `~/.bashrc`
-6. **LLM model** – downloads `Qwen3-4B-Instruct-2507-Q4_K_M.gguf` (~2.3 GB) to `~/.models/` if not already present; download is resumable with Ctrl+C
+4. **Python packages** – installs all pip dependencies per venv, including a source build of `llama-cpp-python` for the earlier LLM prototypes
+5. **llama-server** – builds `llama-server` from llama.cpp (CPU, without BLAS) into `~/llama.cpp/build-noblas`, pinned to the commit used for the Pi measurements (`a691b23`)
+6. **Shell shortcuts** – adds `venv-ai`, `venv-vision`, `venv-off` etc. and `llm-server` to `~/.bashrc`
+7. **Brain models** – downloads `Qwen3.5-4B-Q4_K_M.gguf` (~2.7 GB) and the vision projector `mmproj-Qwen3.5-4B-Q8_0.gguf` (~0.4 GB) to `~/.models/`; downloads are resumable with Ctrl+C
 
-The script is **fully idempotent** – re-running it on an already configured system skips everything that is already in place.
+The script is **idempotent** – re-running it skips everything that is already in place. Options:
 
-> **Note:** the setup script still installs the earlier LLM setup (Qwen3-4B, `llama-cpp-python` with OpenBLAS). The high-level brain now uses Qwen3.5-4B with a vision projector in a `llama-server` built without BLAS (see [High-Level Brain](#high-level-brain--needs-driven-behaviour-src_devaibrain-v09)); the script has not been updated for that yet.
+| Option | Effect |
+|---|---|
+| `--update-llama` | Rebuild `llama-server` and `llama-cpp-python` |
+| `--llama-ref REF` | Build `llama-server` from another llama.cpp commit, tag or branch |
+| `--legacy-llm` | Also download `Qwen3-4B-Instruct-2507-Q4_K_M.gguf` for the earlier prototypes |
+| `--no-models` | Skip all model downloads |
 
 > **After a fresh Hailo installation:** A reboot is required before the Hailo device becomes available. The script will remind you.
 
 ---
 
-## llama-cpp-python
+## Brain LLM server
 
-Built from source with OpenBLAS acceleration. The repository is cloned to `~/llama-cpp-python` and is handled automatically by `setup_venvs.sh`. To rebuild manually:
+The high-level brain talks to one `llama-server` over HTTP (`ServerBrain` in `src_dev/ai/brain/llm.py`, default `http://127.0.0.1:8080`). Start it with the settings fixed in `Documentation/Brain_Konzept.md`, section 17:
 
 ```bash
-cd ~/llama-cpp-python
-source ~/projects/slarc/venvs/ai/bin/activate
-CMAKE_ARGS="-DGGML_BLAS=ON -DGGML_BLAS_VENDOR=OpenBLAS" pip install . --no-cache-dir
-deactivate
+llm-server                       # = bash utilities/llm_server.sh
+curl -s http://127.0.0.1:8080/health
+```
+
+`llm_server.sh` runs Qwen3.5-4B Q4_K_M with the Q8_0 vision projector, 4 slots (one per brain task), q8_0 KV cache and `--cache-ram 0`, ~4.2 GB RAM. `PORT=8081`, `NO_MMPROJ=1` (text only) and extra `llama-server` options are passed through.
+
+## llama-cpp-python
+
+Used by the earlier LLM prototypes (`exploration_manager_V4.py`, `mission_replanner_V1.py`) and by `LlamaBrain`. Built from source (CPU, without BLAS) into the `ai` venv; the repository is cloned to `~/llama-cpp-python`. `setup_venvs.sh` only builds it when it is missing; to rebuild:
+
+```bash
+bash ~/projects/slarc/utilities/setup_venvs.sh --update-llama
 ```
 
 ---
@@ -711,6 +727,7 @@ SLARC/
 │   └── esp32/                  # ESP32 firmware (PlatformIO), currently V0.1 commissioning tool
 ├── utilities/
 │   ├── setup_venvs.sh          # Main setup script (start here)
+│   ├── llm_server.sh           # Starts llama-server for the brain (alias llm-server)
 │   ├── rpi_config_backup.sh    # Backs up RPi config to a .tar.gz archive
 │   ├── rpi_config_restore.sh   # Restores config from archive (Bookworm → Trixie)
 │   └── Motion_development/
@@ -783,8 +800,8 @@ Reboot the Raspberry Pi. The kernel module needs to load after a fresh `hailo-al
 - Verify PCIe is enabled in `/boot/firmware/config.txt`
 - Check kernel version: `uname -r` (must be ≥ 6.6.31)
 
-**llama-cpp-python build fails**
-- Ensure `libopenblas-dev` is installed: `dpkg -s libopenblas-dev`
+**llama-cpp-python or llama-server build fails**
+- Ensure the build tools are installed: `dpkg -s build-essential cmake libssl-dev`
 - Check available disk space – the build temporarily requires several GB
 - If RAM is tight, a swapfile helps: `sudo dphys-swapfile setup`
 
