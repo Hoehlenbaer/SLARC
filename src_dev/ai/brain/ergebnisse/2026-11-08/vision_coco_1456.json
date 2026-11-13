@@ -1,0 +1,3590 @@
+{
+ "bilder": 100,
+ "seed": 7,
+ "indoor": false,
+ "max_side": 640,
+ "modelle": {
+  "4B-f16": {
+   "precision": 0.843,
+   "recall": 0.859,
+   "f1": 0.851,
+   "recall_nicht_klein": 0.908,
+   "uebersehen": [
+    [
+     "handbag",
+     4
+    ],
+    [
+     "stop sign",
+     3
+    ],
+    [
+     "truck",
+     3
+    ],
+    [
+     "person",
+     3
+    ],
+    [
+     "chair",
+     2
+    ],
+    [
+     "bird",
+     2
+    ],
+    [
+     "bench",
+     2
+    ],
+    [
+     "suitcase",
+     2
+    ]
+   ],
+   "erfunden": [
+    [
+     "book",
+     6
+    ],
+    [
+     "backpack",
+     6
+    ],
+    [
+     "bottle",
+     4
+    ],
+    [
+     "teddy bear",
+     3
+    ],
+    [
+     "clock",
+     3
+    ],
+    [
+     "chair",
+     2
+    ],
+    [
+     "tv",
+     2
+    ],
+    [
+     "car",
+     2
+    ]
+   ],
+   "ungueltig": 0,
+   "latenz_median_s": 0.25
+  },
+  "4B-q8": {
+   "precision": 0.84,
+   "recall": 0.863,
+   "f1": 0.851,
+   "recall_nicht_klein": 0.908,
+   "uebersehen": [
+    [
+     "chair",
+     3
+    ],
+    [
+     "handbag",
+     3
+    ],
+    [
+     "stop sign",
+     3
+    ],
+    [
+     "truck",
+     3
+    ],
+    [
+     "person",
+     3
+    ],
+    [
+     "bird",
+     2
+    ],
+    [
+     "suitcase",
+     2
+    ],
+    [
+     "cup",
+     2
+    ]
+   ],
+   "erfunden": [
+    [
+     "book",
+     6
+    ],
+    [
+     "backpack",
+     6
+    ],
+    [
+     "bottle",
+     4
+    ],
+    [
+     "chair",
+     3
+    ],
+    [
+     "teddy bear",
+     3
+    ],
+    [
+     "clock",
+     3
+    ],
+    [
+     "tv",
+     2
+    ],
+    [
+     "car",
+     2
+    ]
+   ],
+   "ungueltig": 0,
+   "latenz_median_s": 0.24
+  },
+  "2B-f16": {
+   "precision": 0.363,
+   "recall": 0.823,
+   "f1": 0.504,
+   "recall_nicht_klein": 0.869,
+   "uebersehen": [
+    [
+     "person",
+     5
+    ],
+    [
+     "dining table",
+     4
+    ],
+    [
+     "cup",
+     3
+    ],
+    [
+     "bowl",
+     3
+    ],
+    [
+     "stop sign",
+     3
+    ],
+    [
+     "handbag",
+     3
+    ],
+    [
+     "chair",
+     2
+    ],
+    [
+     "clock",
+     2
+    ]
+   ],
+   "erfunden": [
+    [
+     "bottle",
+     18
+    ],
+    [
+     "cup",
+     15
+    ],
+    [
+     "bowl",
+     13
+    ],
+    [
+     "backpack",
+     13
+    ],
+    [
+     "book",
+     13
+    ],
+    [
+     "truck",
+     11
+    ],
+    [
+     "tv",
+     11
+    ],
+    [
+     "bicycle",
+     10
+    ]
+   ],
+   "ungueltig": 5,
+   "latenz_median_s": 0.18
+  },
+  "2B-q8": {
+   "precision": 0.371,
+   "recall": 0.835,
+   "f1": 0.514,
+   "recall_nicht_klein": 0.879,
+   "uebersehen": [
+    [
+     "person",
+     4
+    ],
+    [
+     "dining table",
+     3
+    ],
+    [
+     "couch",
+     3
+    ],
+    [
+     "laptop",
+     3
+    ],
+    [
+     "stop sign",
+     3
+    ],
+    [
+     "handbag",
+     3
+    ],
+    [
+     "chair",
+     2
+    ],
+    [
+     "book",
+     2
+    ]
+   ],
+   "erfunden": [
+    [
+     "bottle",
+     19
+    ],
+    [
+     "cup",
+     14
+    ],
+    [
+     "backpack",
+     14
+    ],
+    [
+     "bowl",
+     13
+    ],
+    [
+     "truck",
+     12
+    ],
+    [
+     "book",
+     12
+    ],
+    [
+     "handbag",
+     11
+    ],
+    [
+     "bench",
+     11
+    ]
+   ],
+   "ungueltig": 3,
+   "latenz_median_s": 0.18
+  }
+ },
+ "rows": [
+  {
+   "image_id": 383337,
+   "file": "000000383337.jpg",
+   "gt": [
+    "dining table",
+    "person"
+   ],
+   "4B-f16": [
+    "dining table",
+    "person"
+   ],
+   "4B-q8": [
+    "dining table",
+    "person"
+   ],
+   "2B-f16": [],
+   "2B-q8": []
+  },
+  {
+   "image_id": 366884,
+   "file": "000000366884.jpg",
+   "gt": [
+    "bed",
+    "book",
+    "chair",
+    "dog",
+    "keyboard",
+    "person",
+    "suitcase",
+    "tv"
+   ],
+   "4B-f16": [
+    "bed",
+    "book",
+    "chair",
+    "dog",
+    "keyboard",
+    "person",
+    "suitcase",
+    "tv"
+   ],
+   "4B-q8": [
+    "bed",
+    "book",
+    "chair",
+    "dog",
+    "keyboard",
+    "person",
+    "suitcase",
+    "tv"
+   ],
+   "2B-f16": [
+    "backpack",
+    "bed",
+    "bench",
+    "bicycle",
+    "bird",
+    "book",
+    "bottle",
+    "bowl",
+    "bus",
+    "car",
+    "cat",
+    "chair",
+    "cup",
+    "dog",
+    "fire hydrant",
+    "handbag",
+    "keyboard",
+    "laptop",
+    "motorcycle",
+    "parking meter",
+    "person",
+    "stop sign",
+    "suitcase",
+    "teddy bear",
+    "traffic light",
+    "truck",
+    "tv",
+    "umbrella",
+    "vase"
+   ],
+   "2B-q8": [
+    "backpack",
+    "bed",
+    "bench",
+    "bicycle",
+    "bird",
+    "book",
+    "bottle",
+    "bowl",
+    "bus",
+    "car",
+    "cat",
+    "chair",
+    "cup",
+    "dog",
+    "fire hydrant",
+    "handbag",
+    "keyboard",
+    "laptop",
+    "motorcycle",
+    "parking meter",
+    "person",
+    "stop sign",
+    "suitcase",
+    "teddy bear",
+    "traffic light",
+    "truck",
+    "tv",
+    "umbrella",
+    "vase"
+   ]
+  },
+  {
+   "image_id": 417249,
+   "file": "000000417249.jpg",
+   "gt": [
+    "handbag",
+    "person",
+    "suitcase"
+   ],
+   "4B-f16": [
+    "handbag",
+    "person",
+    "suitcase"
+   ],
+   "4B-q8": [
+    "handbag",
+    "person",
+    "suitcase"
+   ],
+   "2B-f16": [
+    "handbag",
+    "person",
+    "potted plant",
+    "refrigerator",
+    "suitcase"
+   ],
+   "2B-q8": [
+    "handbag",
+    "person",
+    "potted plant",
+    "refrigerator",
+    "suitcase"
+   ]
+  },
+  {
+   "image_id": 231125,
+   "file": "000000231125.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "bottle",
+    "chair",
+    "person"
+   ],
+   "4B-q8": [
+    "bottle",
+    "chair",
+    "person"
+   ],
+   "2B-f16": [
+    "bottle",
+    "bowl",
+    "cup",
+    "person"
+   ],
+   "2B-q8": [
+    "bottle",
+    "bowl",
+    "cup",
+    "person"
+   ]
+  },
+  {
+   "image_id": 295478,
+   "file": "000000295478.jpg",
+   "gt": [
+    "dog",
+    "handbag",
+    "person"
+   ],
+   "4B-f16": [
+    "dog",
+    "handbag",
+    "person"
+   ],
+   "4B-q8": [
+    "dog",
+    "handbag",
+    "person"
+   ],
+   "2B-f16": [
+    "dog",
+    "handbag",
+    "person"
+   ],
+   "2B-q8": [
+    "dog",
+    "handbag",
+    "person"
+   ]
+  },
+  {
+   "image_id": 321333,
+   "file": "000000321333.jpg",
+   "gt": [
+    "person",
+    "teddy bear"
+   ],
+   "4B-f16": [
+    "couch",
+    "person",
+    "teddy bear"
+   ],
+   "4B-q8": [
+    "couch",
+    "person",
+    "teddy bear"
+   ],
+   "2B-f16": [
+    "chair",
+    "couch",
+    "person",
+    "teddy bear"
+   ],
+   "2B-q8": [
+    "chair",
+    "couch",
+    "person",
+    "teddy bear"
+   ]
+  },
+  {
+   "image_id": 566758,
+   "file": "000000566758.jpg",
+   "gt": [
+    "bus",
+    "car"
+   ],
+   "4B-f16": [
+    "bus",
+    "car"
+   ],
+   "4B-q8": [
+    "bus",
+    "car"
+   ],
+   "2B-f16": [
+    "bus",
+    "car"
+   ],
+   "2B-q8": [
+    "bus",
+    "car"
+   ]
+  },
+  {
+   "image_id": 435081,
+   "file": "000000435081.jpg",
+   "gt": [
+    "bowl",
+    "chair",
+    "cup",
+    "dining table",
+    "vase"
+   ],
+   "4B-f16": [
+    "book",
+    "bottle",
+    "bowl",
+    "clock",
+    "cup",
+    "dining table",
+    "teddy bear",
+    "vase"
+   ],
+   "4B-q8": [
+    "book",
+    "bottle",
+    "bowl",
+    "clock",
+    "cup",
+    "dining table",
+    "teddy bear",
+    "vase"
+   ],
+   "2B-f16": [],
+   "2B-q8": [
+    "backpack",
+    "bed",
+    "bench",
+    "bicycle",
+    "bird",
+    "book",
+    "bottle",
+    "bowl",
+    "bus",
+    "car",
+    "cat",
+    "cell phone",
+    "chair",
+    "clock",
+    "couch",
+    "cup",
+    "dining table",
+    "dog",
+    "fire hydrant",
+    "handbag",
+    "keyboard",
+    "laptop",
+    "microwave",
+    "motorcycle",
+    "oven",
+    "parking meter",
+    "person",
+    "potted plant",
+    "refrigerator",
+    "remote",
+    "sink",
+    "stop sign",
+    "suitcase",
+    "teddy bear",
+    "traffic light",
+    "truck",
+    "tv",
+    "umbrella",
+    "vase"
+   ]
+  },
+  {
+   "image_id": 25057,
+   "file": "000000025057.jpg",
+   "gt": [
+    "bottle",
+    "person"
+   ],
+   "4B-f16": [
+    "bottle",
+    "person"
+   ],
+   "4B-q8": [
+    "bottle",
+    "person"
+   ],
+   "2B-f16": [
+    "backpack",
+    "bed",
+    "bench",
+    "bicycle",
+    "bird",
+    "book",
+    "bottle",
+    "bowl",
+    "bus",
+    "car",
+    "cat",
+    "cell phone",
+    "chair",
+    "clock",
+    "couch",
+    "cup",
+    "dining table",
+    "dog",
+    "fire hydrant",
+    "handbag",
+    "keyboard",
+    "laptop",
+    "microwave",
+    "motorcycle",
+    "oven",
+    "parking meter",
+    "person",
+    "potted plant",
+    "refrigerator",
+    "remote",
+    "sink",
+    "stop sign",
+    "suitcase",
+    "teddy bear",
+    "toilet",
+    "traffic light",
+    "truck",
+    "tv",
+    "umbrella",
+    "vase"
+   ],
+   "2B-q8": [
+    "backpack",
+    "bed",
+    "bench",
+    "bicycle",
+    "bird",
+    "book",
+    "bottle",
+    "bowl",
+    "bus",
+    "car",
+    "cat",
+    "cell phone",
+    "chair",
+    "clock",
+    "couch",
+    "cup",
+    "dining table",
+    "dog",
+    "fire hydrant",
+    "handbag",
+    "keyboard",
+    "laptop",
+    "microwave",
+    "motorcycle",
+    "oven",
+    "parking meter",
+    "person",
+    "potted plant",
+    "refrigerator",
+    "remote",
+    "sink",
+    "stop sign",
+    "suitcase",
+    "teddy bear",
+    "toilet",
+    "traffic light",
+    "truck",
+    "tv",
+    "vase"
+   ]
+  },
+  {
+   "image_id": 334417,
+   "file": "000000334417.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "person"
+   ],
+   "4B-q8": [
+    "person"
+   ],
+   "2B-f16": [
+    "person"
+   ],
+   "2B-q8": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 124659,
+   "file": "000000124659.jpg",
+   "gt": [
+    "book",
+    "chair",
+    "clock",
+    "couch",
+    "laptop"
+   ],
+   "4B-f16": [
+    "book",
+    "chair",
+    "clock",
+    "couch",
+    "laptop",
+    "tv"
+   ],
+   "4B-q8": [
+    "book",
+    "chair",
+    "clock",
+    "couch",
+    "laptop",
+    "tv"
+   ],
+   "2B-f16": [
+    "book",
+    "chair",
+    "couch",
+    "laptop",
+    "tv"
+   ],
+   "2B-q8": []
+  },
+  {
+   "image_id": 535858,
+   "file": "000000535858.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "person"
+   ],
+   "4B-q8": [
+    "person"
+   ],
+   "2B-f16": [
+    "person"
+   ],
+   "2B-q8": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 400044,
+   "file": "000000400044.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "person"
+   ],
+   "4B-q8": [
+    "person"
+   ],
+   "2B-f16": [
+    "backpack",
+    "person"
+   ],
+   "2B-q8": [
+    "backpack",
+    "person"
+   ]
+  },
+  {
+   "image_id": 447200,
+   "file": "000000447200.jpg",
+   "gt": [
+    "dog"
+   ],
+   "4B-f16": [
+    "dog"
+   ],
+   "4B-q8": [
+    "dog"
+   ],
+   "2B-f16": [
+    "dog"
+   ],
+   "2B-q8": [
+    "dog",
+    "potted plant"
+   ]
+  },
+  {
+   "image_id": 58705,
+   "file": "000000058705.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "person"
+   ],
+   "4B-q8": [
+    "person"
+   ],
+   "2B-f16": [
+    "person"
+   ],
+   "2B-q8": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 325031,
+   "file": "000000325031.jpg",
+   "gt": [
+    "bench",
+    "person"
+   ],
+   "4B-f16": [
+    "bench",
+    "person"
+   ],
+   "4B-q8": [
+    "bench",
+    "person"
+   ],
+   "2B-f16": [
+    "bench",
+    "book",
+    "bottle",
+    "cup",
+    "person"
+   ],
+   "2B-q8": [
+    "bench",
+    "person"
+   ]
+  },
+  {
+   "image_id": 121417,
+   "file": "000000121417.jpg",
+   "gt": [
+    "bench",
+    "cell phone",
+    "handbag",
+    "person",
+    "umbrella"
+   ],
+   "4B-f16": [
+    "bench",
+    "cell phone",
+    "handbag",
+    "person",
+    "umbrella"
+   ],
+   "4B-q8": [
+    "bench",
+    "cell phone",
+    "handbag",
+    "person",
+    "umbrella"
+   ],
+   "2B-f16": [
+    "bench",
+    "cell phone",
+    "handbag",
+    "person",
+    "umbrella"
+   ],
+   "2B-q8": [
+    "bench",
+    "cell phone",
+    "handbag",
+    "person",
+    "umbrella"
+   ]
+  },
+  {
+   "image_id": 65736,
+   "file": "000000065736.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "person"
+   ],
+   "4B-q8": [
+    "person"
+   ],
+   "2B-f16": [
+    "person"
+   ],
+   "2B-q8": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 43435,
+   "file": "000000043435.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "person"
+   ],
+   "4B-q8": [
+    "person"
+   ],
+   "2B-f16": [
+    "person"
+   ],
+   "2B-q8": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 97988,
+   "file": "000000097988.jpg",
+   "gt": [
+    "bench",
+    "bicycle",
+    "person"
+   ],
+   "4B-f16": [
+    "backpack",
+    "bench",
+    "bicycle",
+    "person"
+   ],
+   "4B-q8": [
+    "backpack",
+    "bench",
+    "bicycle",
+    "person"
+   ],
+   "2B-f16": [
+    "backpack",
+    "bench",
+    "bicycle",
+    "person"
+   ],
+   "2B-q8": [
+    "backpack",
+    "bench",
+    "bicycle",
+    "person"
+   ]
+  },
+  {
+   "image_id": 413404,
+   "file": "000000413404.jpg",
+   "gt": [
+    "bench",
+    "bird",
+    "handbag",
+    "person"
+   ],
+   "4B-f16": [
+    "backpack",
+    "bench",
+    "person"
+   ],
+   "4B-q8": [
+    "backpack",
+    "bench",
+    "person"
+   ],
+   "2B-f16": [
+    "bench",
+    "handbag",
+    "person"
+   ],
+   "2B-q8": [
+    "bench",
+    "handbag",
+    "person"
+   ]
+  },
+  {
+   "image_id": 427055,
+   "file": "000000427055.jpg",
+   "gt": [
+    "car",
+    "clock",
+    "stop sign"
+   ],
+   "4B-f16": [
+    "car",
+    "clock"
+   ],
+   "4B-q8": [
+    "car",
+    "clock"
+   ],
+   "2B-f16": [
+    "car",
+    "clock",
+    "potted plant"
+   ],
+   "2B-q8": [
+    "car",
+    "clock",
+    "potted plant"
+   ]
+  },
+  {
+   "image_id": 132796,
+   "file": "000000132796.jpg",
+   "gt": [
+    "backpack",
+    "bench",
+    "chair",
+    "person"
+   ],
+   "4B-f16": [
+    "backpack",
+    "chair",
+    "person"
+   ],
+   "4B-q8": [
+    "backpack",
+    "chair",
+    "person"
+   ],
+   "2B-f16": [
+    "backpack",
+    "bench",
+    "chair",
+    "person"
+   ],
+   "2B-q8": [
+    "backpack",
+    "bench",
+    "chair",
+    "person"
+   ]
+  },
+  {
+   "image_id": 371677,
+   "file": "000000371677.jpg",
+   "gt": [
+    "cup",
+    "keyboard",
+    "laptop",
+    "teddy bear",
+    "tv"
+   ],
+   "4B-f16": [
+    "bottle",
+    "cup",
+    "keyboard",
+    "laptop",
+    "remote",
+    "teddy bear",
+    "tv"
+   ],
+   "4B-q8": [
+    "bottle",
+    "cup",
+    "keyboard",
+    "laptop",
+    "remote",
+    "teddy bear",
+    "tv"
+   ],
+   "2B-f16": [
+    "bottle",
+    "cup",
+    "keyboard",
+    "laptop",
+    "teddy bear",
+    "tv"
+   ],
+   "2B-q8": [
+    "bottle",
+    "cup",
+    "keyboard",
+    "laptop",
+    "teddy bear",
+    "tv"
+   ]
+  },
+  {
+   "image_id": 124277,
+   "file": "000000124277.jpg",
+   "gt": [
+    "car",
+    "truck"
+   ],
+   "4B-f16": [
+    "car"
+   ],
+   "4B-q8": [
+    "car"
+   ],
+   "2B-f16": [
+    "car"
+   ],
+   "2B-q8": [
+    "car"
+   ]
+  },
+  {
+   "image_id": 472298,
+   "file": "000000472298.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "person"
+   ],
+   "4B-q8": [
+    "person"
+   ],
+   "2B-f16": [
+    "backpack",
+    "bed",
+    "bench",
+    "bicycle",
+    "bird",
+    "book",
+    "bottle",
+    "bowl",
+    "bus",
+    "car",
+    "cat",
+    "cell phone",
+    "chair",
+    "clock",
+    "couch",
+    "cup",
+    "dining table",
+    "dog",
+    "fire hydrant",
+    "handbag",
+    "keyboard",
+    "laptop",
+    "microwave",
+    "motorcycle",
+    "oven",
+    "parking meter",
+    "person",
+    "potted plant",
+    "refrigerator",
+    "remote",
+    "sink",
+    "stop sign",
+    "suitcase",
+    "teddy bear",
+    "toilet",
+    "traffic light",
+    "truck",
+    "tv",
+    "vase"
+   ],
+   "2B-q8": [
+    "backpack",
+    "bed",
+    "bench",
+    "bicycle",
+    "bird",
+    "book",
+    "bottle",
+    "bowl",
+    "bus",
+    "car",
+    "cat",
+    "cell phone",
+    "chair",
+    "clock",
+    "couch",
+    "cup",
+    "dining table",
+    "dog",
+    "fire hydrant",
+    "handbag",
+    "keyboard",
+    "laptop",
+    "microwave",
+    "motorcycle",
+    "oven",
+    "parking meter",
+    "person",
+    "potted plant",
+    "refrigerator",
+    "remote",
+    "sink",
+    "stop sign",
+    "suitcase",
+    "teddy bear",
+    "toilet",
+    "traffic light",
+    "truck",
+    "tv",
+    "umbrella",
+    "vase"
+   ]
+  },
+  {
+   "image_id": 451714,
+   "file": "000000451714.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "backpack",
+    "person"
+   ],
+   "4B-q8": [
+    "backpack",
+    "person"
+   ],
+   "2B-f16": [
+    "backpack",
+    "person"
+   ],
+   "2B-q8": [
+    "backpack",
+    "person"
+   ]
+  },
+  {
+   "image_id": 273715,
+   "file": "000000273715.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "car",
+    "person"
+   ],
+   "4B-q8": [
+    "car",
+    "person"
+   ],
+   "2B-f16": [
+    "car",
+    "person",
+    "truck"
+   ],
+   "2B-q8": [
+    "car",
+    "person",
+    "truck"
+   ]
+  },
+  {
+   "image_id": 397303,
+   "file": "000000397303.jpg",
+   "gt": [
+    "chair",
+    "dining table",
+    "handbag",
+    "laptop",
+    "person"
+   ],
+   "4B-f16": [
+    "book",
+    "cell phone",
+    "chair",
+    "dining table",
+    "laptop",
+    "person"
+   ],
+   "4B-q8": [
+    "book",
+    "cell phone",
+    "chair",
+    "dining table",
+    "laptop",
+    "person"
+   ],
+   "2B-f16": [
+    "book",
+    "cell phone",
+    "chair",
+    "laptop",
+    "person"
+   ],
+   "2B-q8": [
+    "book",
+    "cell phone",
+    "chair",
+    "laptop",
+    "person"
+   ]
+  },
+  {
+   "image_id": 89271,
+   "file": "000000089271.jpg",
+   "gt": [
+    "cat"
+   ],
+   "4B-f16": [
+    "cat"
+   ],
+   "4B-q8": [
+    "cat"
+   ],
+   "2B-f16": [
+    "cat"
+   ],
+   "2B-q8": [
+    "cat"
+   ]
+  },
+  {
+   "image_id": 449312,
+   "file": "000000449312.jpg",
+   "gt": [
+    "car",
+    "person"
+   ],
+   "4B-f16": [
+    "dining table",
+    "person"
+   ],
+   "4B-q8": [
+    "dining table",
+    "person"
+   ],
+   "2B-f16": [
+    "backpack",
+    "bed",
+    "bench",
+    "bicycle",
+    "bird",
+    "book",
+    "bottle",
+    "bowl",
+    "car",
+    "cat",
+    "cell phone",
+    "chair",
+    "clock",
+    "couch",
+    "cup",
+    "dining table",
+    "dog",
+    "fire hydrant",
+    "handbag",
+    "keyboard",
+    "laptop",
+    "microwave",
+    "oven",
+    "parking meter",
+    "person",
+    "potted plant",
+    "refrigerator",
+    "remote",
+    "sink",
+    "stop sign",
+    "suitcase",
+    "teddy bear",
+    "traffic light",
+    "tv",
+    "vase"
+   ],
+   "2B-q8": [
+    "dining table",
+    "person"
+   ]
+  },
+  {
+   "image_id": 286458,
+   "file": "000000286458.jpg",
+   "gt": [
+    "backpack",
+    "suitcase",
+    "teddy bear"
+   ],
+   "4B-f16": [
+    "backpack",
+    "bottle",
+    "suitcase",
+    "teddy bear"
+   ],
+   "4B-q8": [
+    "backpack",
+    "bottle",
+    "suitcase",
+    "teddy bear"
+   ],
+   "2B-f16": [
+    "backpack",
+    "book",
+    "bottle",
+    "cell phone",
+    "suitcase",
+    "teddy bear"
+   ],
+   "2B-q8": [
+    "backpack",
+    "bottle",
+    "cell phone",
+    "suitcase",
+    "teddy bear"
+   ]
+  },
+  {
+   "image_id": 15517,
+   "file": "000000015517.jpg",
+   "gt": [
+    "bus"
+   ],
+   "4B-f16": [
+    "bus",
+    "traffic light"
+   ],
+   "4B-q8": [
+    "bus"
+   ],
+   "2B-f16": [
+    "bus"
+   ],
+   "2B-q8": [
+    "bus"
+   ]
+  },
+  {
+   "image_id": 427256,
+   "file": "000000427256.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "chair",
+    "person"
+   ],
+   "4B-q8": [
+    "chair",
+    "person"
+   ],
+   "2B-f16": [],
+   "2B-q8": [
+    "chair",
+    "person"
+   ]
+  },
+  {
+   "image_id": 519039,
+   "file": "000000519039.jpg",
+   "gt": [
+    "truck"
+   ],
+   "4B-f16": [
+    "truck"
+   ],
+   "4B-q8": [
+    "truck"
+   ],
+   "2B-f16": [
+    "truck"
+   ],
+   "2B-q8": [
+    "truck"
+   ]
+  },
+  {
+   "image_id": 16439,
+   "file": "000000016439.jpg",
+   "gt": [
+    "laptop"
+   ],
+   "4B-f16": [
+    "book",
+    "cup",
+    "laptop"
+   ],
+   "4B-q8": [
+    "book",
+    "chair",
+    "cup",
+    "laptop"
+   ],
+   "2B-f16": [
+    "book",
+    "bottle",
+    "cup",
+    "keyboard",
+    "laptop"
+   ],
+   "2B-q8": [
+    "book",
+    "bottle",
+    "cup",
+    "keyboard",
+    "laptop",
+    "tv"
+   ]
+  },
+  {
+   "image_id": 577539,
+   "file": "000000577539.jpg",
+   "gt": [
+    "bowl",
+    "person"
+   ],
+   "4B-f16": [
+    "bowl"
+   ],
+   "4B-q8": [
+    "bowl"
+   ],
+   "2B-f16": [],
+   "2B-q8": [
+    "bottle",
+    "bowl",
+    "cup",
+    "handbag"
+   ]
+  },
+  {
+   "image_id": 26926,
+   "file": "000000026926.jpg",
+   "gt": [
+    "car",
+    "fire hydrant"
+   ],
+   "4B-f16": [
+    "car",
+    "fire hydrant"
+   ],
+   "4B-q8": [
+    "car",
+    "fire hydrant"
+   ],
+   "2B-f16": [
+    "car",
+    "fire hydrant",
+    "truck"
+   ],
+   "2B-q8": [
+    "car",
+    "fire hydrant",
+    "truck"
+   ]
+  },
+  {
+   "image_id": 252332,
+   "file": "000000252332.jpg",
+   "gt": [
+    "stop sign"
+   ],
+   "4B-f16": [
+    "stop sign"
+   ],
+   "4B-q8": [
+    "bicycle",
+    "stop sign"
+   ],
+   "2B-f16": [
+    "stop sign"
+   ],
+   "2B-q8": [
+    "stop sign"
+   ]
+  },
+  {
+   "image_id": 215723,
+   "file": "000000215723.jpg",
+   "gt": [
+    "car",
+    "person",
+    "traffic light",
+    "truck",
+    "umbrella"
+   ],
+   "4B-f16": [
+    "car",
+    "person",
+    "traffic light",
+    "umbrella"
+   ],
+   "4B-q8": [
+    "car",
+    "person",
+    "traffic light",
+    "umbrella"
+   ],
+   "2B-f16": [
+    "car",
+    "person",
+    "traffic light",
+    "umbrella"
+   ],
+   "2B-q8": [
+    "car",
+    "person",
+    "traffic light",
+    "umbrella"
+   ]
+  },
+  {
+   "image_id": 206027,
+   "file": "000000206027.jpg",
+   "gt": [
+    "bottle",
+    "dining table"
+   ],
+   "4B-f16": [
+    "bottle",
+    "dining table"
+   ],
+   "4B-q8": [
+    "bottle",
+    "dining table"
+   ],
+   "2B-f16": [
+    "bottle",
+    "dining table"
+   ],
+   "2B-q8": [
+    "bottle",
+    "dining table"
+   ]
+  },
+  {
+   "image_id": 289415,
+   "file": "000000289415.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "dining table"
+   ],
+   "4B-q8": [
+    "dining table"
+   ],
+   "2B-f16": [
+    "person"
+   ],
+   "2B-q8": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 424975,
+   "file": "000000424975.jpg",
+   "gt": [
+    "car",
+    "person",
+    "stop sign"
+   ],
+   "4B-f16": [
+    "car",
+    "person"
+   ],
+   "4B-q8": [
+    "car",
+    "person"
+   ],
+   "2B-f16": [
+    "bench",
+    "car",
+    "person"
+   ],
+   "2B-q8": [
+    "bench",
+    "car",
+    "person"
+   ]
+  },
+  {
+   "image_id": 415716,
+   "file": "000000415716.jpg",
+   "gt": [
+    "chair",
+    "clock",
+    "couch",
+    "laptop",
+    "vase"
+   ],
+   "4B-f16": [
+    "book",
+    "chair",
+    "clock",
+    "couch",
+    "laptop",
+    "potted plant",
+    "tv",
+    "vase"
+   ],
+   "4B-q8": [
+    "book",
+    "chair",
+    "clock",
+    "couch",
+    "laptop",
+    "potted plant",
+    "tv",
+    "vase"
+   ],
+   "2B-f16": [
+    "bottle",
+    "bowl",
+    "chair",
+    "clock",
+    "cup",
+    "laptop",
+    "tv",
+    "vase"
+   ],
+   "2B-q8": [
+    "backpack",
+    "bed",
+    "bench",
+    "bicycle",
+    "bird",
+    "book",
+    "bottle",
+    "bowl",
+    "bus",
+    "car",
+    "cat",
+    "cell phone",
+    "chair",
+    "clock",
+    "cup",
+    "dining table",
+    "dog",
+    "fire hydrant",
+    "handbag",
+    "keyboard",
+    "laptop",
+    "microwave",
+    "motorcycle",
+    "oven",
+    "parking meter",
+    "person",
+    "potted plant",
+    "refrigerator",
+    "remote",
+    "sink",
+    "stop sign",
+    "suitcase",
+    "traffic light",
+    "truck",
+    "tv",
+    "umbrella",
+    "vase"
+   ]
+  },
+  {
+   "image_id": 455937,
+   "file": "000000455937.jpg",
+   "gt": [
+    "book",
+    "chair",
+    "clock",
+    "couch",
+    "cup",
+    "handbag",
+    "laptop",
+    "person",
+    "remote",
+    "suitcase",
+    "tv"
+   ],
+   "4B-f16": [
+    "backpack",
+    "book",
+    "clock",
+    "couch",
+    "laptop",
+    "person",
+    "teddy bear",
+    "tv"
+   ],
+   "4B-q8": [
+    "backpack",
+    "book",
+    "clock",
+    "couch",
+    "laptop",
+    "person",
+    "teddy bear",
+    "tv"
+   ],
+   "2B-f16": [],
+   "2B-q8": []
+  },
+  {
+   "image_id": 184611,
+   "file": "000000184611.jpg",
+   "gt": [
+    "bicycle",
+    "car",
+    "handbag",
+    "person",
+    "suitcase"
+   ],
+   "4B-f16": [
+    "backpack",
+    "bicycle",
+    "car",
+    "person"
+   ],
+   "4B-q8": [
+    "backpack",
+    "bicycle",
+    "car",
+    "handbag",
+    "person"
+   ],
+   "2B-f16": [
+    "backpack",
+    "bicycle",
+    "book",
+    "car",
+    "person",
+    "suitcase"
+   ],
+   "2B-q8": [
+    "backpack",
+    "bicycle",
+    "book",
+    "car",
+    "person",
+    "suitcase"
+   ]
+  },
+  {
+   "image_id": 534605,
+   "file": "000000534605.jpg",
+   "gt": [
+    "motorcycle",
+    "person"
+   ],
+   "4B-f16": [
+    "motorcycle",
+    "person"
+   ],
+   "4B-q8": [
+    "motorcycle",
+    "person"
+   ],
+   "2B-f16": [
+    "bicycle",
+    "motorcycle",
+    "person"
+   ],
+   "2B-q8": [
+    "bicycle",
+    "motorcycle",
+    "person"
+   ]
+  },
+  {
+   "image_id": 136600,
+   "file": "000000136600.jpg",
+   "gt": [
+    "bottle",
+    "bowl",
+    "cell phone",
+    "laptop"
+   ],
+   "4B-f16": [
+    "clock",
+    "cup",
+    "laptop"
+   ],
+   "4B-q8": [
+    "clock",
+    "cup",
+    "laptop"
+   ],
+   "2B-f16": [
+    "keyboard",
+    "laptop"
+   ],
+   "2B-q8": [
+    "keyboard",
+    "laptop"
+   ]
+  },
+  {
+   "image_id": 534394,
+   "file": "000000534394.jpg",
+   "gt": [
+    "car"
+   ],
+   "4B-f16": [
+    "car"
+   ],
+   "4B-q8": [
+    "car"
+   ],
+   "2B-f16": [
+    "backpack",
+    "bed",
+    "bench",
+    "bicycle",
+    "bird",
+    "book",
+    "bottle",
+    "bowl",
+    "bus",
+    "car",
+    "cat",
+    "cell phone",
+    "chair",
+    "clock",
+    "couch",
+    "cup",
+    "dining table",
+    "dog",
+    "fire hydrant",
+    "handbag",
+    "keyboard",
+    "laptop",
+    "microwave",
+    "motorcycle",
+    "oven",
+    "parking meter",
+    "person",
+    "potted plant",
+    "refrigerator",
+    "remote",
+    "sink",
+    "stop sign",
+    "suitcase",
+    "teddy bear",
+    "toilet",
+    "traffic light",
+    "truck",
+    "tv",
+    "umbrella",
+    "vase"
+   ],
+   "2B-q8": [
+    "backpack",
+    "bed",
+    "bench",
+    "bicycle",
+    "bird",
+    "book",
+    "bottle",
+    "bowl",
+    "bus",
+    "car",
+    "cat",
+    "cell phone",
+    "chair",
+    "clock",
+    "couch",
+    "cup",
+    "dining table",
+    "dog",
+    "fire hydrant",
+    "handbag",
+    "keyboard",
+    "laptop",
+    "microwave",
+    "motorcycle",
+    "oven",
+    "parking meter",
+    "person",
+    "potted plant",
+    "refrigerator",
+    "remote",
+    "sink",
+    "stop sign",
+    "suitcase",
+    "teddy bear",
+    "toilet",
+    "traffic light",
+    "truck",
+    "tv",
+    "umbrella",
+    "vase"
+   ]
+  },
+  {
+   "image_id": 29596,
+   "file": "000000029596.jpg",
+   "gt": [
+    "book",
+    "chair",
+    "couch",
+    "cup",
+    "dining table",
+    "potted plant",
+    "tv",
+    "vase"
+   ],
+   "4B-f16": [
+    "book",
+    "chair",
+    "couch",
+    "dining table",
+    "tv",
+    "vase"
+   ],
+   "4B-q8": [
+    "book",
+    "chair",
+    "couch",
+    "dining table",
+    "tv",
+    "vase"
+   ],
+   "2B-f16": [
+    "book",
+    "chair",
+    "couch",
+    "dining table",
+    "tv",
+    "vase"
+   ],
+   "2B-q8": [
+    "book",
+    "bottle",
+    "bowl",
+    "chair",
+    "couch",
+    "cup",
+    "dining table",
+    "potted plant",
+    "tv",
+    "vase"
+   ]
+  },
+  {
+   "image_id": 134112,
+   "file": "000000134112.jpg",
+   "gt": [
+    "bed",
+    "dog",
+    "laptop"
+   ],
+   "4B-f16": [
+    "bed",
+    "dog",
+    "laptop"
+   ],
+   "4B-q8": [
+    "bed",
+    "dog",
+    "laptop"
+   ],
+   "2B-f16": [
+    "bed",
+    "dog",
+    "keyboard",
+    "laptop"
+   ],
+   "2B-q8": [
+    "bed",
+    "dog",
+    "keyboard",
+    "laptop"
+   ]
+  },
+  {
+   "image_id": 418961,
+   "file": "000000418961.jpg",
+   "gt": [
+    "clock"
+   ],
+   "4B-f16": [
+    "clock"
+   ],
+   "4B-q8": [
+    "clock"
+   ],
+   "2B-f16": [
+    "clock"
+   ],
+   "2B-q8": [
+    "clock"
+   ]
+  },
+  {
+   "image_id": 15440,
+   "file": "000000015440.jpg",
+   "gt": [
+    "bus",
+    "stop sign"
+   ],
+   "4B-f16": [
+    "bus",
+    "stop sign"
+   ],
+   "4B-q8": [
+    "bus",
+    "stop sign"
+   ],
+   "2B-f16": [
+    "bus",
+    "stop sign"
+   ],
+   "2B-q8": [
+    "bus",
+    "stop sign"
+   ]
+  },
+  {
+   "image_id": 83540,
+   "file": "000000083540.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "person"
+   ],
+   "4B-q8": [
+    "person"
+   ],
+   "2B-f16": [
+    "person"
+   ],
+   "2B-q8": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 307074,
+   "file": "000000307074.jpg",
+   "gt": [
+    "car",
+    "stop sign",
+    "traffic light"
+   ],
+   "4B-f16": [
+    "car",
+    "clock",
+    "traffic light"
+   ],
+   "4B-q8": [
+    "car",
+    "clock",
+    "traffic light"
+   ],
+   "2B-f16": [
+    "car",
+    "fire hydrant",
+    "traffic light",
+    "truck"
+   ],
+   "2B-q8": [
+    "car",
+    "fire hydrant",
+    "traffic light",
+    "truck"
+   ]
+  },
+  {
+   "image_id": 183391,
+   "file": "000000183391.jpg",
+   "gt": [
+    "chair",
+    "person"
+   ],
+   "4B-f16": [
+    "chair",
+    "person"
+   ],
+   "4B-q8": [
+    "person"
+   ],
+   "2B-f16": [
+    "chair",
+    "person"
+   ],
+   "2B-q8": [
+    "chair",
+    "person"
+   ]
+  },
+  {
+   "image_id": 123585,
+   "file": "000000123585.jpg",
+   "gt": [
+    "bird"
+   ],
+   "4B-f16": [
+    "bird"
+   ],
+   "4B-q8": [
+    "bird"
+   ],
+   "2B-f16": [
+    "bird"
+   ],
+   "2B-q8": [
+    "bird"
+   ]
+  },
+  {
+   "image_id": 99810,
+   "file": "000000099810.jpg",
+   "gt": [
+    "chair",
+    "dining table",
+    "person"
+   ],
+   "4B-f16": [
+    "chair",
+    "dining table",
+    "person"
+   ],
+   "4B-q8": [
+    "chair",
+    "dining table",
+    "person"
+   ],
+   "2B-f16": [
+    "chair",
+    "dining table",
+    "person"
+   ],
+   "2B-q8": [
+    "chair",
+    "dining table",
+    "person"
+   ]
+  },
+  {
+   "image_id": 308328,
+   "file": "000000308328.jpg",
+   "gt": [
+    "person",
+    "suitcase",
+    "truck"
+   ],
+   "4B-f16": [
+    "book",
+    "person",
+    "suitcase"
+   ],
+   "4B-q8": [
+    "book",
+    "person",
+    "suitcase"
+   ],
+   "2B-f16": [
+    "bottle",
+    "handbag",
+    "person",
+    "suitcase",
+    "truck"
+   ],
+   "2B-q8": [
+    "bottle",
+    "handbag",
+    "person",
+    "suitcase",
+    "truck"
+   ]
+  },
+  {
+   "image_id": 564091,
+   "file": "000000564091.jpg",
+   "gt": [
+    "bottle",
+    "cell phone",
+    "handbag",
+    "person"
+   ],
+   "4B-f16": [
+    "bottle",
+    "cell phone",
+    "handbag",
+    "person"
+   ],
+   "4B-q8": [
+    "bottle",
+    "cell phone",
+    "handbag",
+    "person"
+   ],
+   "2B-f16": [
+    "backpack",
+    "bottle",
+    "cell phone",
+    "handbag",
+    "person"
+   ],
+   "2B-q8": [
+    "backpack",
+    "bed",
+    "bottle",
+    "bowl",
+    "cell phone",
+    "chair",
+    "couch",
+    "cup",
+    "dining table",
+    "handbag",
+    "keyboard",
+    "laptop",
+    "person",
+    "potted plant",
+    "remote",
+    "toilet",
+    "tv"
+   ]
+  },
+  {
+   "image_id": 263425,
+   "file": "000000263425.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "oven",
+    "person",
+    "truck"
+   ],
+   "4B-q8": [
+    "person",
+    "truck"
+   ],
+   "2B-f16": [
+    "person",
+    "truck"
+   ],
+   "2B-q8": [
+    "person",
+    "truck"
+   ]
+  },
+  {
+   "image_id": 378116,
+   "file": "000000378116.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "person"
+   ],
+   "4B-q8": [
+    "person"
+   ],
+   "2B-f16": [
+    "person"
+   ],
+   "2B-q8": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 46048,
+   "file": "000000046048.jpg",
+   "gt": [
+    "bed",
+    "book",
+    "person"
+   ],
+   "4B-f16": [
+    "bed",
+    "book",
+    "person",
+    "teddy bear"
+   ],
+   "4B-q8": [
+    "bed",
+    "book",
+    "person",
+    "teddy bear"
+   ],
+   "2B-f16": [
+    "bed",
+    "book",
+    "person"
+   ],
+   "2B-q8": [
+    "bed",
+    "book",
+    "person"
+   ]
+  },
+  {
+   "image_id": 244833,
+   "file": "000000244833.jpg",
+   "gt": [
+    "chair",
+    "laptop",
+    "motorcycle",
+    "person"
+   ],
+   "4B-f16": [
+    "chair",
+    "motorcycle",
+    "person"
+   ],
+   "4B-q8": [
+    "chair",
+    "motorcycle",
+    "person"
+   ],
+   "2B-f16": [
+    "bicycle",
+    "chair",
+    "motorcycle",
+    "person"
+   ],
+   "2B-q8": [
+    "bench",
+    "bicycle",
+    "chair",
+    "motorcycle",
+    "person"
+   ]
+  },
+  {
+   "image_id": 510095,
+   "file": "000000510095.jpg",
+   "gt": [
+    "fire hydrant",
+    "person"
+   ],
+   "4B-f16": [
+    "person"
+   ],
+   "4B-q8": [
+    "person"
+   ],
+   "2B-f16": [
+    "person"
+   ],
+   "2B-q8": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 564280,
+   "file": "000000564280.jpg",
+   "gt": [
+    "couch",
+    "dog",
+    "remote"
+   ],
+   "4B-f16": [
+    "couch",
+    "dog",
+    "remote"
+   ],
+   "4B-q8": [
+    "couch",
+    "dog",
+    "remote"
+   ],
+   "2B-f16": [
+    "backpack",
+    "bed",
+    "bench",
+    "bicycle",
+    "bird",
+    "book",
+    "bottle",
+    "bowl",
+    "bus",
+    "car",
+    "cat",
+    "cell phone",
+    "chair",
+    "clock",
+    "couch",
+    "cup",
+    "dining table",
+    "dog",
+    "fire hydrant",
+    "handbag",
+    "laptop",
+    "microwave",
+    "motorcycle",
+    "oven",
+    "parking meter",
+    "potted plant",
+    "refrigerator",
+    "remote",
+    "sink",
+    "stop sign",
+    "suitcase",
+    "teddy bear",
+    "toilet",
+    "traffic light",
+    "truck",
+    "tv",
+    "umbrella",
+    "vase"
+   ],
+   "2B-q8": [
+    "backpack",
+    "bed",
+    "bench",
+    "bicycle",
+    "bird",
+    "book",
+    "bottle",
+    "bowl",
+    "bus",
+    "car",
+    "cat",
+    "cell phone",
+    "chair",
+    "clock",
+    "couch",
+    "cup",
+    "dining table",
+    "dog",
+    "fire hydrant",
+    "handbag",
+    "laptop",
+    "microwave",
+    "motorcycle",
+    "oven",
+    "parking meter",
+    "potted plant",
+    "refrigerator",
+    "remote",
+    "sink",
+    "stop sign",
+    "suitcase",
+    "teddy bear",
+    "toilet",
+    "traffic light",
+    "truck",
+    "tv",
+    "umbrella",
+    "vase"
+   ]
+  },
+  {
+   "image_id": 61418,
+   "file": "000000061418.jpg",
+   "gt": [
+    "chair",
+    "person"
+   ],
+   "4B-f16": [
+    "chair",
+    "person"
+   ],
+   "4B-q8": [
+    "chair",
+    "person"
+   ],
+   "2B-f16": [
+    "chair",
+    "person"
+   ],
+   "2B-q8": [
+    "chair",
+    "person"
+   ]
+  },
+  {
+   "image_id": 311392,
+   "file": "000000311392.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "person"
+   ],
+   "4B-q8": [
+    "person"
+   ],
+   "2B-f16": [
+    "person"
+   ],
+   "2B-q8": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 132587,
+   "file": "000000132587.jpg",
+   "gt": [
+    "bench",
+    "bird",
+    "bottle",
+    "person"
+   ],
+   "4B-f16": [
+    "bench",
+    "bottle",
+    "person"
+   ],
+   "4B-q8": [
+    "bench",
+    "bottle",
+    "person"
+   ],
+   "2B-f16": [
+    "bench",
+    "bottle",
+    "person"
+   ],
+   "2B-q8": [
+    "bench",
+    "bottle",
+    "person"
+   ]
+  },
+  {
+   "image_id": 153568,
+   "file": "000000153568.jpg",
+   "gt": [
+    "stop sign"
+   ],
+   "4B-f16": [
+    "stop sign"
+   ],
+   "4B-q8": [
+    "stop sign"
+   ],
+   "2B-f16": [
+    "stop sign"
+   ],
+   "2B-q8": [
+    "stop sign"
+   ]
+  },
+  {
+   "image_id": 270883,
+   "file": "000000270883.jpg",
+   "gt": [
+    "bed",
+    "clock",
+    "person"
+   ],
+   "4B-f16": [
+    "bed",
+    "clock",
+    "person"
+   ],
+   "4B-q8": [
+    "bed",
+    "clock",
+    "person"
+   ],
+   "2B-f16": [
+    "bed",
+    "clock",
+    "person"
+   ],
+   "2B-q8": [
+    "bed",
+    "clock",
+    "person"
+   ]
+  },
+  {
+   "image_id": 125952,
+   "file": "000000125952.jpg",
+   "gt": [
+    "suitcase"
+   ],
+   "4B-f16": [
+    "suitcase"
+   ],
+   "4B-q8": [
+    "suitcase"
+   ],
+   "2B-f16": [
+    "suitcase"
+   ],
+   "2B-q8": [
+    "suitcase"
+   ]
+  },
+  {
+   "image_id": 328238,
+   "file": "000000328238.jpg",
+   "gt": [
+    "backpack",
+    "bench",
+    "chair",
+    "person"
+   ],
+   "4B-f16": [
+    "backpack",
+    "chair",
+    "person"
+   ],
+   "4B-q8": [
+    "backpack",
+    "bench",
+    "chair",
+    "person"
+   ],
+   "2B-f16": [
+    "backpack",
+    "bed",
+    "bench",
+    "bicycle",
+    "bird",
+    "book",
+    "bottle",
+    "bowl",
+    "bus",
+    "car",
+    "cat",
+    "cell phone",
+    "chair",
+    "clock",
+    "couch",
+    "cup",
+    "dining table",
+    "dog",
+    "fire hydrant",
+    "handbag",
+    "keyboard",
+    "laptop",
+    "microwave",
+    "motorcycle",
+    "oven",
+    "parking meter",
+    "person",
+    "potted plant",
+    "refrigerator",
+    "remote",
+    "sink",
+    "stop sign",
+    "suitcase",
+    "teddy bear",
+    "toilet",
+    "traffic light",
+    "truck",
+    "tv",
+    "umbrella",
+    "vase"
+   ],
+   "2B-q8": [
+    "backpack",
+    "bench",
+    "book",
+    "bottle",
+    "bowl",
+    "chair",
+    "cup",
+    "dining table",
+    "person"
+   ]
+  },
+  {
+   "image_id": 407518,
+   "file": "000000407518.jpg",
+   "gt": [
+    "bird"
+   ],
+   "4B-f16": [
+    "bird"
+   ],
+   "4B-q8": [
+    "bird"
+   ],
+   "2B-f16": [
+    "bird"
+   ],
+   "2B-q8": [
+    "bird"
+   ]
+  },
+  {
+   "image_id": 123131,
+   "file": "000000123131.jpg",
+   "gt": [
+    "truck"
+   ],
+   "4B-f16": [
+    "truck"
+   ],
+   "4B-q8": [
+    "truck"
+   ],
+   "2B-f16": [
+    "truck"
+   ],
+   "2B-q8": [
+    "truck"
+   ]
+  },
+  {
+   "image_id": 535306,
+   "file": "000000535306.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "person"
+   ],
+   "4B-q8": [
+    "person"
+   ],
+   "2B-f16": [
+    "person"
+   ],
+   "2B-q8": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 79031,
+   "file": "000000079031.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "person"
+   ],
+   "4B-q8": [
+    "person"
+   ],
+   "2B-f16": [
+    "person"
+   ],
+   "2B-q8": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 533145,
+   "file": "000000533145.jpg",
+   "gt": [
+    "person",
+    "remote",
+    "tv"
+   ],
+   "4B-f16": [
+    "person",
+    "remote",
+    "tv"
+   ],
+   "4B-q8": [
+    "person",
+    "remote",
+    "tv"
+   ],
+   "2B-f16": [
+    "person",
+    "remote",
+    "tv"
+   ],
+   "2B-q8": [
+    "handbag",
+    "person",
+    "remote",
+    "tv"
+   ]
+  },
+  {
+   "image_id": 161397,
+   "file": "000000161397.jpg",
+   "gt": [
+    "person",
+    "vase"
+   ],
+   "4B-f16": [
+    "vase"
+   ],
+   "4B-q8": [
+    "potted plant",
+    "vase"
+   ],
+   "2B-f16": [
+    "vase"
+   ],
+   "2B-q8": [
+    "vase"
+   ]
+  },
+  {
+   "image_id": 400815,
+   "file": "000000400815.jpg",
+   "gt": [
+    "person",
+    "suitcase",
+    "truck"
+   ],
+   "4B-f16": [
+    "person",
+    "suitcase",
+    "truck"
+   ],
+   "4B-q8": [
+    "person",
+    "suitcase",
+    "truck"
+   ],
+   "2B-f16": [
+    "person",
+    "suitcase",
+    "truck"
+   ],
+   "2B-q8": [
+    "person",
+    "suitcase",
+    "truck"
+   ]
+  },
+  {
+   "image_id": 441586,
+   "file": "000000441586.jpg",
+   "gt": [
+    "bicycle",
+    "motorcycle",
+    "person",
+    "stop sign"
+   ],
+   "4B-f16": [
+    "bicycle",
+    "car",
+    "person",
+    "stop sign"
+   ],
+   "4B-q8": [
+    "bicycle",
+    "car",
+    "person",
+    "stop sign"
+   ],
+   "2B-f16": [
+    "backpack",
+    "bed",
+    "bench",
+    "bicycle",
+    "bird",
+    "book",
+    "bottle",
+    "bowl",
+    "car",
+    "cat",
+    "cell phone",
+    "chair",
+    "clock",
+    "couch",
+    "cup",
+    "dining table",
+    "dog",
+    "handbag",
+    "keyboard",
+    "laptop",
+    "microwave",
+    "oven",
+    "person",
+    "potted plant",
+    "refrigerator",
+    "remote",
+    "sink",
+    "stop sign",
+    "suitcase",
+    "teddy bear",
+    "toilet",
+    "traffic light",
+    "tv",
+    "umbrella",
+    "vase"
+   ],
+   "2B-q8": [
+    "backpack",
+    "bed",
+    "bench",
+    "bicycle",
+    "bird",
+    "book",
+    "bottle",
+    "bowl",
+    "car",
+    "cat",
+    "cell phone",
+    "chair",
+    "clock",
+    "couch",
+    "cup",
+    "dining table",
+    "dog",
+    "handbag",
+    "keyboard",
+    "laptop",
+    "microwave",
+    "oven",
+    "person",
+    "potted plant",
+    "refrigerator",
+    "remote",
+    "sink",
+    "stop sign",
+    "suitcase",
+    "teddy bear",
+    "toilet",
+    "traffic light",
+    "truck",
+    "tv",
+    "umbrella",
+    "vase"
+   ]
+  },
+  {
+   "image_id": 236592,
+   "file": "000000236592.jpg",
+   "gt": [
+    "dog",
+    "oven"
+   ],
+   "4B-f16": [
+    "dog",
+    "oven"
+   ],
+   "4B-q8": [
+    "dog",
+    "oven"
+   ],
+   "2B-f16": [
+    "dog",
+    "oven"
+   ],
+   "2B-q8": [
+    "dog",
+    "microwave",
+    "oven"
+   ]
+  },
+  {
+   "image_id": 232538,
+   "file": "000000232538.jpg",
+   "gt": [
+    "bench",
+    "car"
+   ],
+   "4B-f16": [
+    "bench",
+    "car"
+   ],
+   "4B-q8": [
+    "bench",
+    "car"
+   ],
+   "2B-f16": [
+    "bench"
+   ],
+   "2B-q8": [
+    "bench"
+   ]
+  },
+  {
+   "image_id": 384616,
+   "file": "000000384616.jpg",
+   "gt": [
+    "fire hydrant"
+   ],
+   "4B-f16": [
+    "fire hydrant"
+   ],
+   "4B-q8": [
+    "fire hydrant"
+   ],
+   "2B-f16": [
+    "fire hydrant"
+   ],
+   "2B-q8": [
+    "fire hydrant"
+   ]
+  },
+  {
+   "image_id": 5529,
+   "file": "000000005529.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "backpack",
+    "person"
+   ],
+   "4B-q8": [
+    "backpack",
+    "person"
+   ],
+   "2B-f16": [
+    "backpack",
+    "person"
+   ],
+   "2B-q8": [
+    "backpack",
+    "person"
+   ]
+  },
+  {
+   "image_id": 91495,
+   "file": "000000091495.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "person"
+   ],
+   "4B-q8": [
+    "person"
+   ],
+   "2B-f16": [
+    "person"
+   ],
+   "2B-q8": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 34452,
+   "file": "000000034452.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "person"
+   ],
+   "4B-q8": [
+    "person"
+   ],
+   "2B-f16": [
+    "person"
+   ],
+   "2B-q8": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 44068,
+   "file": "000000044068.jpg",
+   "gt": [
+    "chair",
+    "teddy bear"
+   ],
+   "4B-f16": [
+    "chair",
+    "teddy bear"
+   ],
+   "4B-q8": [
+    "chair",
+    "teddy bear"
+   ],
+   "2B-f16": [
+    "chair",
+    "teddy bear"
+   ],
+   "2B-q8": [
+    "chair",
+    "teddy bear"
+   ]
+  },
+  {
+   "image_id": 579655,
+   "file": "000000579655.jpg",
+   "gt": [
+    "bowl",
+    "cell phone",
+    "cup",
+    "person"
+   ],
+   "4B-f16": [
+    "bowl",
+    "cell phone",
+    "cup",
+    "person"
+   ],
+   "4B-q8": [
+    "bowl",
+    "cell phone",
+    "cup",
+    "person"
+   ],
+   "2B-f16": [
+    "bottle",
+    "bowl",
+    "cell phone",
+    "cup",
+    "person"
+   ],
+   "2B-q8": [
+    "bottle",
+    "bowl",
+    "cell phone",
+    "cup",
+    "person"
+   ]
+  },
+  {
+   "image_id": 482735,
+   "file": "000000482735.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "person"
+   ],
+   "4B-q8": [
+    "person"
+   ],
+   "2B-f16": [
+    "person"
+   ],
+   "2B-q8": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 327592,
+   "file": "000000327592.jpg",
+   "gt": [
+    "clock",
+    "person"
+   ],
+   "4B-f16": [
+    "clock",
+    "person"
+   ],
+   "4B-q8": [
+    "clock",
+    "person"
+   ],
+   "2B-f16": [
+    "bottle",
+    "bowl",
+    "chair",
+    "clock",
+    "cup",
+    "person"
+   ],
+   "2B-q8": [
+    "bottle",
+    "bowl",
+    "chair",
+    "clock",
+    "cup",
+    "person"
+   ]
+  },
+  {
+   "image_id": 362434,
+   "file": "000000362434.jpg",
+   "gt": [
+    "book",
+    "teddy bear"
+   ],
+   "4B-f16": [
+    "teddy bear"
+   ],
+   "4B-q8": [
+    "teddy bear"
+   ],
+   "2B-f16": [
+    "book",
+    "teddy bear"
+   ],
+   "2B-q8": [
+    "book",
+    "teddy bear"
+   ]
+  },
+  {
+   "image_id": 309495,
+   "file": "000000309495.jpg",
+   "gt": [
+    "toilet"
+   ],
+   "4B-f16": [
+    "toilet"
+   ],
+   "4B-q8": [
+    "toilet"
+   ],
+   "2B-f16": [
+    "toilet"
+   ],
+   "2B-q8": [
+    "toilet"
+   ]
+  },
+  {
+   "image_id": 80949,
+   "file": "000000080949.jpg",
+   "gt": [
+    "bottle",
+    "cat",
+    "cup",
+    "laptop"
+   ],
+   "4B-f16": [
+    "bottle",
+    "cat",
+    "cup",
+    "laptop"
+   ],
+   "4B-q8": [
+    "bottle",
+    "cat",
+    "cup",
+    "laptop"
+   ],
+   "2B-f16": [
+    "bottle",
+    "cat",
+    "cup",
+    "laptop",
+    "tv"
+   ],
+   "2B-q8": [
+    "bottle",
+    "cat",
+    "cup",
+    "keyboard",
+    "laptop"
+   ]
+  },
+  {
+   "image_id": 382030,
+   "file": "000000382030.jpg",
+   "gt": [
+    "dining table",
+    "potted plant",
+    "umbrella"
+   ],
+   "4B-f16": [
+    "book",
+    "umbrella"
+   ],
+   "4B-q8": [
+    "book",
+    "umbrella"
+   ],
+   "2B-f16": [
+    "book",
+    "bottle",
+    "bowl",
+    "chair",
+    "couch",
+    "cup",
+    "potted plant",
+    "umbrella"
+   ],
+   "2B-q8": [
+    "book",
+    "bottle",
+    "bowl",
+    "chair",
+    "couch",
+    "cup",
+    "potted plant",
+    "umbrella"
+   ]
+  },
+  {
+   "image_id": 181303,
+   "file": "000000181303.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "person"
+   ],
+   "4B-q8": [
+    "person"
+   ],
+   "2B-f16": [
+    "person"
+   ],
+   "2B-q8": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 163258,
+   "file": "000000163258.jpg",
+   "gt": [
+    "sink",
+    "toilet"
+   ],
+   "4B-f16": [
+    "sink",
+    "toilet"
+   ],
+   "4B-q8": [
+    "sink",
+    "toilet"
+   ],
+   "2B-f16": [
+    "sink",
+    "toilet"
+   ],
+   "2B-q8": [
+    "sink",
+    "toilet"
+   ]
+  },
+  {
+   "image_id": 515025,
+   "file": "000000515025.jpg",
+   "gt": [
+    "bottle",
+    "car",
+    "cat",
+    "cup",
+    "dining table",
+    "person",
+    "truck"
+   ],
+   "4B-f16": [
+    "bench",
+    "bottle",
+    "car",
+    "cat",
+    "cup",
+    "dining table",
+    "person",
+    "truck"
+   ],
+   "4B-q8": [
+    "bench",
+    "bottle",
+    "car",
+    "cat",
+    "cup",
+    "dining table",
+    "person",
+    "truck"
+   ],
+   "2B-f16": [
+    "bench",
+    "bottle",
+    "car",
+    "cat",
+    "cup",
+    "dining table",
+    "person",
+    "truck"
+   ],
+   "2B-q8": [
+    "bench",
+    "bottle",
+    "car",
+    "cat",
+    "cup",
+    "dining table",
+    "person",
+    "truck"
+   ]
+  },
+  {
+   "image_id": 253742,
+   "file": "000000253742.jpg",
+   "gt": [
+    "backpack",
+    "handbag",
+    "person",
+    "umbrella"
+   ],
+   "4B-f16": [
+    "backpack",
+    "handbag",
+    "person",
+    "umbrella"
+   ],
+   "4B-q8": [
+    "backpack",
+    "handbag",
+    "person",
+    "umbrella"
+   ],
+   "2B-f16": [
+    "backpack",
+    "bed",
+    "bench",
+    "bicycle",
+    "bird",
+    "bottle",
+    "bowl",
+    "bus",
+    "car",
+    "cat",
+    "cell phone",
+    "chair",
+    "couch",
+    "cup",
+    "dining table",
+    "dog",
+    "fire hydrant",
+    "handbag",
+    "keyboard",
+    "laptop",
+    "motorcycle",
+    "parking meter",
+    "person",
+    "potted plant",
+    "remote",
+    "stop sign",
+    "teddy bear",
+    "toilet",
+    "traffic light",
+    "truck",
+    "tv",
+    "umbrella",
+    "vase"
+   ],
+   "2B-q8": [
+    "bottle",
+    "cell phone",
+    "handbag",
+    "person",
+    "umbrella"
+   ]
+  },
+  {
+   "image_id": 343524,
+   "file": "000000343524.jpg",
+   "gt": [
+    "person"
+   ],
+   "4B-f16": [
+    "person"
+   ],
+   "4B-q8": [
+    "person"
+   ],
+   "2B-f16": [
+    "person"
+   ],
+   "2B-q8": [
+    "person"
+   ]
+  }
+ ]
+}

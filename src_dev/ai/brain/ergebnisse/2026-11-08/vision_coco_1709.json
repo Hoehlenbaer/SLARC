@@ -1,0 +1,1889 @@
+{
+ "bilder": 100,
+ "seed": 7,
+ "indoor": false,
+ "max_side": 320,
+ "modelle": {
+  "q4km": {
+   "precision": 0.796,
+   "recall": 0.767,
+   "f1": 0.781,
+   "recall_nicht_klein": 0.84,
+   "uebersehen": [
+    [
+     "handbag",
+     5
+    ],
+    [
+     "chair",
+     4
+    ],
+    [
+     "laptop",
+     4
+    ],
+    [
+     "bench",
+     4
+    ],
+    [
+     "car",
+     4
+    ],
+    [
+     "stop sign",
+     4
+    ],
+    [
+     "person",
+     4
+    ],
+    [
+     "suitcase",
+     3
+    ]
+   ],
+   "erfunden": [
+    [
+     "book",
+     7
+    ],
+    [
+     "backpack",
+     6
+    ],
+    [
+     "bottle",
+     4
+    ],
+    [
+     "vase",
+     3
+    ],
+    [
+     "dining table",
+     3
+    ],
+    [
+     "chair",
+     3
+    ],
+    [
+     "potted plant",
+     3
+    ],
+    [
+     "clock",
+     2
+    ]
+   ],
+   "ungueltig": 0,
+   "latenz_median_s": 0.2
+  },
+  "q40": {
+   "precision": 0.785,
+   "recall": 0.763,
+   "f1": 0.774,
+   "recall_nicht_klein": 0.83,
+   "uebersehen": [
+    [
+     "person",
+     5
+    ],
+    [
+     "handbag",
+     5
+    ],
+    [
+     "car",
+     5
+    ],
+    [
+     "dining table",
+     4
+    ],
+    [
+     "laptop",
+     4
+    ],
+    [
+     "stop sign",
+     4
+    ],
+    [
+     "truck",
+     4
+    ],
+    [
+     "suitcase",
+     3
+    ]
+   ],
+   "erfunden": [
+    [
+     "backpack",
+     9
+    ],
+    [
+     "book",
+     6
+    ],
+    [
+     "handbag",
+     5
+    ],
+    [
+     "bottle",
+     3
+    ],
+    [
+     "car",
+     3
+    ],
+    [
+     "bench",
+     3
+    ],
+    [
+     "teddy bear",
+     2
+    ],
+    [
+     "clock",
+     2
+    ]
+   ],
+   "ungueltig": 0,
+   "latenz_median_s": 0.19
+  }
+ },
+ "rows": [
+  {
+   "image_id": 383337,
+   "file": "000000383337.jpg",
+   "gt": [
+    "dining table",
+    "person"
+   ],
+   "q4km": [
+    "dining table",
+    "person"
+   ],
+   "q40": [
+    "handbag",
+    "person"
+   ]
+  },
+  {
+   "image_id": 366884,
+   "file": "000000366884.jpg",
+   "gt": [
+    "bed",
+    "book",
+    "chair",
+    "dog",
+    "keyboard",
+    "person",
+    "suitcase",
+    "tv"
+   ],
+   "q4km": [
+    "bed",
+    "book",
+    "clock",
+    "keyboard",
+    "person",
+    "teddy bear",
+    "tv",
+    "vase"
+   ],
+   "q40": [
+    "bed",
+    "book",
+    "chair",
+    "keyboard",
+    "person",
+    "tv"
+   ]
+  },
+  {
+   "image_id": 417249,
+   "file": "000000417249.jpg",
+   "gt": [
+    "handbag",
+    "person",
+    "suitcase"
+   ],
+   "q4km": [
+    "backpack",
+    "handbag",
+    "person",
+    "suitcase"
+   ],
+   "q40": [
+    "backpack",
+    "handbag",
+    "person",
+    "suitcase"
+   ]
+  },
+  {
+   "image_id": 231125,
+   "file": "000000231125.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "bowl",
+    "person"
+   ],
+   "q40": [
+    "bowl",
+    "handbag",
+    "person"
+   ]
+  },
+  {
+   "image_id": 295478,
+   "file": "000000295478.jpg",
+   "gt": [
+    "dog",
+    "handbag",
+    "person"
+   ],
+   "q4km": [
+    "dog",
+    "handbag",
+    "person"
+   ],
+   "q40": [
+    "dog",
+    "handbag",
+    "person"
+   ]
+  },
+  {
+   "image_id": 321333,
+   "file": "000000321333.jpg",
+   "gt": [
+    "person",
+    "teddy bear"
+   ],
+   "q4km": [
+    "couch",
+    "person",
+    "teddy bear"
+   ],
+   "q40": [
+    "person",
+    "teddy bear"
+   ]
+  },
+  {
+   "image_id": 566758,
+   "file": "000000566758.jpg",
+   "gt": [
+    "bus",
+    "car"
+   ],
+   "q4km": [
+    "bus",
+    "car"
+   ],
+   "q40": [
+    "bus",
+    "car"
+   ]
+  },
+  {
+   "image_id": 435081,
+   "file": "000000435081.jpg",
+   "gt": [
+    "bowl",
+    "chair",
+    "cup",
+    "dining table",
+    "vase"
+   ],
+   "q4km": [
+    "book",
+    "bottle",
+    "bowl",
+    "clock",
+    "cup",
+    "dining table",
+    "vase"
+   ],
+   "q40": [
+    "book",
+    "bowl",
+    "clock",
+    "cup",
+    "dining table",
+    "teddy bear",
+    "vase"
+   ]
+  },
+  {
+   "image_id": 25057,
+   "file": "000000025057.jpg",
+   "gt": [
+    "bottle",
+    "person"
+   ],
+   "q4km": [
+    "bottle",
+    "person"
+   ],
+   "q40": [
+    "bottle",
+    "person"
+   ]
+  },
+  {
+   "image_id": 334417,
+   "file": "000000334417.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "bottle",
+    "person"
+   ],
+   "q40": [
+    "handbag",
+    "person"
+   ]
+  },
+  {
+   "image_id": 124659,
+   "file": "000000124659.jpg",
+   "gt": [
+    "book",
+    "chair",
+    "clock",
+    "couch",
+    "laptop"
+   ],
+   "q4km": [
+    "book",
+    "chair",
+    "clock",
+    "couch",
+    "suitcase",
+    "tv",
+    "vase"
+   ],
+   "q40": [
+    "book",
+    "chair",
+    "clock",
+    "couch",
+    "suitcase",
+    "tv",
+    "vase"
+   ]
+  },
+  {
+   "image_id": 535858,
+   "file": "000000535858.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "person"
+   ],
+   "q40": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 400044,
+   "file": "000000400044.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "backpack",
+    "person"
+   ],
+   "q40": [
+    "backpack",
+    "person"
+   ]
+  },
+  {
+   "image_id": 447200,
+   "file": "000000447200.jpg",
+   "gt": [
+    "dog"
+   ],
+   "q4km": [
+    "dog"
+   ],
+   "q40": [
+    "dog"
+   ]
+  },
+  {
+   "image_id": 58705,
+   "file": "000000058705.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "person"
+   ],
+   "q40": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 325031,
+   "file": "000000325031.jpg",
+   "gt": [
+    "bench",
+    "person"
+   ],
+   "q4km": [
+    "person"
+   ],
+   "q40": []
+  },
+  {
+   "image_id": 121417,
+   "file": "000000121417.jpg",
+   "gt": [
+    "bench",
+    "cell phone",
+    "handbag",
+    "person",
+    "umbrella"
+   ],
+   "q4km": [
+    "bench",
+    "cell phone",
+    "handbag",
+    "person",
+    "umbrella"
+   ],
+   "q40": [
+    "bench",
+    "handbag",
+    "person",
+    "umbrella"
+   ]
+  },
+  {
+   "image_id": 65736,
+   "file": "000000065736.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "person"
+   ],
+   "q40": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 43435,
+   "file": "000000043435.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "person"
+   ],
+   "q40": [
+    "dog",
+    "person"
+   ]
+  },
+  {
+   "image_id": 97988,
+   "file": "000000097988.jpg",
+   "gt": [
+    "bench",
+    "bicycle",
+    "person"
+   ],
+   "q4km": [
+    "bench",
+    "bicycle",
+    "person"
+   ],
+   "q40": [
+    "backpack",
+    "bench",
+    "bicycle",
+    "person"
+   ]
+  },
+  {
+   "image_id": 413404,
+   "file": "000000413404.jpg",
+   "gt": [
+    "bench",
+    "bird",
+    "handbag",
+    "person"
+   ],
+   "q4km": [
+    "backpack",
+    "bench",
+    "person"
+   ],
+   "q40": [
+    "backpack",
+    "bench",
+    "person"
+   ]
+  },
+  {
+   "image_id": 427055,
+   "file": "000000427055.jpg",
+   "gt": [
+    "car",
+    "clock",
+    "stop sign"
+   ],
+   "q4km": [
+    "clock"
+   ],
+   "q40": [
+    "car",
+    "clock"
+   ]
+  },
+  {
+   "image_id": 132796,
+   "file": "000000132796.jpg",
+   "gt": [
+    "backpack",
+    "bench",
+    "chair",
+    "person"
+   ],
+   "q4km": [
+    "chair",
+    "person"
+   ],
+   "q40": [
+    "chair",
+    "person"
+   ]
+  },
+  {
+   "image_id": 371677,
+   "file": "000000371677.jpg",
+   "gt": [
+    "cup",
+    "keyboard",
+    "laptop",
+    "teddy bear",
+    "tv"
+   ],
+   "q4km": [
+    "book",
+    "keyboard",
+    "teddy bear",
+    "tv"
+   ],
+   "q40": [
+    "book",
+    "bottle",
+    "clock",
+    "cup",
+    "keyboard",
+    "teddy bear",
+    "tv"
+   ]
+  },
+  {
+   "image_id": 124277,
+   "file": "000000124277.jpg",
+   "gt": [
+    "car",
+    "truck"
+   ],
+   "q4km": [
+    "car"
+   ],
+   "q40": []
+  },
+  {
+   "image_id": 472298,
+   "file": "000000472298.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "person"
+   ],
+   "q40": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 451714,
+   "file": "000000451714.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "person"
+   ],
+   "q40": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 273715,
+   "file": "000000273715.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "person"
+   ],
+   "q40": [
+    "backpack",
+    "person"
+   ]
+  },
+  {
+   "image_id": 397303,
+   "file": "000000397303.jpg",
+   "gt": [
+    "chair",
+    "dining table",
+    "handbag",
+    "laptop",
+    "person"
+   ],
+   "q4km": [
+    "cell phone",
+    "chair",
+    "laptop",
+    "person"
+   ],
+   "q40": [
+    "cell phone",
+    "chair",
+    "laptop",
+    "person"
+   ]
+  },
+  {
+   "image_id": 89271,
+   "file": "000000089271.jpg",
+   "gt": [
+    "cat"
+   ],
+   "q4km": [
+    "cat"
+   ],
+   "q40": [
+    "cat"
+   ]
+  },
+  {
+   "image_id": 449312,
+   "file": "000000449312.jpg",
+   "gt": [
+    "car",
+    "person"
+   ],
+   "q4km": [
+    "chair",
+    "dining table",
+    "person"
+   ],
+   "q40": [
+    "chair",
+    "dining table",
+    "person"
+   ]
+  },
+  {
+   "image_id": 286458,
+   "file": "000000286458.jpg",
+   "gt": [
+    "backpack",
+    "suitcase",
+    "teddy bear"
+   ],
+   "q4km": [
+    "backpack",
+    "book",
+    "bottle",
+    "suitcase"
+   ],
+   "q40": [
+    "backpack",
+    "book",
+    "bottle",
+    "suitcase"
+   ]
+  },
+  {
+   "image_id": 15517,
+   "file": "000000015517.jpg",
+   "gt": [
+    "bus"
+   ],
+   "q4km": [
+    "bus"
+   ],
+   "q40": [
+    "bus",
+    "car"
+   ]
+  },
+  {
+   "image_id": 427256,
+   "file": "000000427256.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "chair",
+    "person"
+   ],
+   "q40": [
+    "chair",
+    "person"
+   ]
+  },
+  {
+   "image_id": 519039,
+   "file": "000000519039.jpg",
+   "gt": [
+    "truck"
+   ],
+   "q4km": [
+    "fire hydrant",
+    "truck"
+   ],
+   "q40": [
+    "fire hydrant",
+    "truck"
+   ]
+  },
+  {
+   "image_id": 16439,
+   "file": "000000016439.jpg",
+   "gt": [
+    "laptop"
+   ],
+   "q4km": [
+    "book",
+    "chair",
+    "cup",
+    "laptop"
+   ],
+   "q40": [
+    "book",
+    "cup",
+    "laptop"
+   ]
+  },
+  {
+   "image_id": 577539,
+   "file": "000000577539.jpg",
+   "gt": [
+    "bowl",
+    "person"
+   ],
+   "q4km": [
+    "bowl"
+   ],
+   "q40": [
+    "bowl"
+   ]
+  },
+  {
+   "image_id": 26926,
+   "file": "000000026926.jpg",
+   "gt": [
+    "car",
+    "fire hydrant"
+   ],
+   "q4km": [
+    "car",
+    "fire hydrant",
+    "person"
+   ],
+   "q40": [
+    "car",
+    "fire hydrant",
+    "person"
+   ]
+  },
+  {
+   "image_id": 252332,
+   "file": "000000252332.jpg",
+   "gt": [
+    "stop sign"
+   ],
+   "q4km": [
+    "stop sign"
+   ],
+   "q40": [
+    "stop sign"
+   ]
+  },
+  {
+   "image_id": 215723,
+   "file": "000000215723.jpg",
+   "gt": [
+    "car",
+    "person",
+    "traffic light",
+    "truck",
+    "umbrella"
+   ],
+   "q4km": [
+    "car",
+    "person",
+    "traffic light",
+    "umbrella"
+   ],
+   "q40": [
+    "car",
+    "person",
+    "traffic light",
+    "umbrella"
+   ]
+  },
+  {
+   "image_id": 206027,
+   "file": "000000206027.jpg",
+   "gt": [
+    "bottle",
+    "dining table"
+   ],
+   "q4km": [
+    "bottle",
+    "dining table"
+   ],
+   "q40": [
+    "bottle",
+    "dining table"
+   ]
+  },
+  {
+   "image_id": 289415,
+   "file": "000000289415.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "dining table"
+   ],
+   "q40": [
+    "dining table"
+   ]
+  },
+  {
+   "image_id": 424975,
+   "file": "000000424975.jpg",
+   "gt": [
+    "car",
+    "person",
+    "stop sign"
+   ],
+   "q4km": [
+    "person"
+   ],
+   "q40": [
+    "car",
+    "person"
+   ]
+  },
+  {
+   "image_id": 415716,
+   "file": "000000415716.jpg",
+   "gt": [
+    "chair",
+    "clock",
+    "couch",
+    "laptop",
+    "vase"
+   ],
+   "q4km": [
+    "book",
+    "chair",
+    "couch",
+    "potted plant",
+    "vase"
+   ],
+   "q40": [
+    "book",
+    "chair",
+    "couch",
+    "vase"
+   ]
+  },
+  {
+   "image_id": 455937,
+   "file": "000000455937.jpg",
+   "gt": [
+    "book",
+    "chair",
+    "clock",
+    "couch",
+    "cup",
+    "handbag",
+    "laptop",
+    "person",
+    "remote",
+    "suitcase",
+    "tv"
+   ],
+   "q4km": [
+    "book",
+    "clock",
+    "couch",
+    "laptop",
+    "person",
+    "teddy bear",
+    "tv",
+    "vase"
+   ],
+   "q40": [
+    "book",
+    "chair",
+    "clock",
+    "couch",
+    "laptop",
+    "person",
+    "remote",
+    "teddy bear",
+    "tv",
+    "vase"
+   ]
+  },
+  {
+   "image_id": 184611,
+   "file": "000000184611.jpg",
+   "gt": [
+    "bicycle",
+    "car",
+    "handbag",
+    "person",
+    "suitcase"
+   ],
+   "q4km": [
+    "backpack",
+    "bicycle",
+    "person"
+   ],
+   "q40": [
+    "backpack",
+    "bicycle",
+    "person"
+   ]
+  },
+  {
+   "image_id": 534605,
+   "file": "000000534605.jpg",
+   "gt": [
+    "motorcycle",
+    "person"
+   ],
+   "q4km": [
+    "backpack",
+    "motorcycle",
+    "person"
+   ],
+   "q40": [
+    "backpack",
+    "motorcycle",
+    "person"
+   ]
+  },
+  {
+   "image_id": 136600,
+   "file": "000000136600.jpg",
+   "gt": [
+    "bottle",
+    "bowl",
+    "cell phone",
+    "laptop"
+   ],
+   "q4km": [
+    "book",
+    "bottle",
+    "cup",
+    "keyboard",
+    "laptop"
+   ],
+   "q40": [
+    "book",
+    "bottle",
+    "cup",
+    "keyboard",
+    "laptop"
+   ]
+  },
+  {
+   "image_id": 534394,
+   "file": "000000534394.jpg",
+   "gt": [
+    "car"
+   ],
+   "q4km": [
+    "car"
+   ],
+   "q40": []
+  },
+  {
+   "image_id": 29596,
+   "file": "000000029596.jpg",
+   "gt": [
+    "book",
+    "chair",
+    "couch",
+    "cup",
+    "dining table",
+    "potted plant",
+    "tv",
+    "vase"
+   ],
+   "q4km": [
+    "book",
+    "chair",
+    "couch",
+    "dining table",
+    "tv",
+    "vase"
+   ],
+   "q40": [
+    "book",
+    "chair",
+    "couch",
+    "dining table",
+    "tv",
+    "vase"
+   ]
+  },
+  {
+   "image_id": 134112,
+   "file": "000000134112.jpg",
+   "gt": [
+    "bed",
+    "dog",
+    "laptop"
+   ],
+   "q4km": [
+    "bed",
+    "dog",
+    "laptop"
+   ],
+   "q40": [
+    "bed",
+    "dog",
+    "keyboard",
+    "laptop"
+   ]
+  },
+  {
+   "image_id": 418961,
+   "file": "000000418961.jpg",
+   "gt": [
+    "clock"
+   ],
+   "q4km": [
+    "clock"
+   ],
+   "q40": [
+    "clock"
+   ]
+  },
+  {
+   "image_id": 15440,
+   "file": "000000015440.jpg",
+   "gt": [
+    "bus",
+    "stop sign"
+   ],
+   "q4km": [
+    "car",
+    "stop sign"
+   ],
+   "q40": [
+    "car",
+    "stop sign"
+   ]
+  },
+  {
+   "image_id": 83540,
+   "file": "000000083540.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "person"
+   ],
+   "q40": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 307074,
+   "file": "000000307074.jpg",
+   "gt": [
+    "car",
+    "stop sign",
+    "traffic light"
+   ],
+   "q4km": [
+    "car",
+    "traffic light"
+   ],
+   "q40": [
+    "car",
+    "traffic light"
+   ]
+  },
+  {
+   "image_id": 183391,
+   "file": "000000183391.jpg",
+   "gt": [
+    "chair",
+    "person"
+   ],
+   "q4km": [
+    "chair",
+    "person"
+   ],
+   "q40": [
+    "chair",
+    "person"
+   ]
+  },
+  {
+   "image_id": 123585,
+   "file": "000000123585.jpg",
+   "gt": [
+    "bird"
+   ],
+   "q4km": [
+    "bird",
+    "bowl"
+   ],
+   "q40": [
+    "bird"
+   ]
+  },
+  {
+   "image_id": 99810,
+   "file": "000000099810.jpg",
+   "gt": [
+    "chair",
+    "dining table",
+    "person"
+   ],
+   "q4km": [
+    "chair",
+    "dining table",
+    "person"
+   ],
+   "q40": [
+    "chair",
+    "dining table",
+    "person"
+   ]
+  },
+  {
+   "image_id": 308328,
+   "file": "000000308328.jpg",
+   "gt": [
+    "person",
+    "suitcase",
+    "truck"
+   ],
+   "q4km": [
+    "person",
+    "suitcase"
+   ],
+   "q40": [
+    "backpack",
+    "person",
+    "suitcase"
+   ]
+  },
+  {
+   "image_id": 564091,
+   "file": "000000564091.jpg",
+   "gt": [
+    "bottle",
+    "cell phone",
+    "handbag",
+    "person"
+   ],
+   "q4km": [
+    "bottle",
+    "cell phone",
+    "person"
+   ],
+   "q40": [
+    "bottle",
+    "cell phone",
+    "person"
+   ]
+  },
+  {
+   "image_id": 263425,
+   "file": "000000263425.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "person",
+    "truck"
+   ],
+   "q40": [
+    "person",
+    "truck"
+   ]
+  },
+  {
+   "image_id": 378116,
+   "file": "000000378116.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "person"
+   ],
+   "q40": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 46048,
+   "file": "000000046048.jpg",
+   "gt": [
+    "bed",
+    "book",
+    "person"
+   ],
+   "q4km": [
+    "bed",
+    "book",
+    "person"
+   ],
+   "q40": [
+    "bed",
+    "book",
+    "person"
+   ]
+  },
+  {
+   "image_id": 244833,
+   "file": "000000244833.jpg",
+   "gt": [
+    "chair",
+    "laptop",
+    "motorcycle",
+    "person"
+   ],
+   "q4km": [
+    "motorcycle",
+    "person"
+   ],
+   "q40": [
+    "chair",
+    "motorcycle",
+    "person"
+   ]
+  },
+  {
+   "image_id": 510095,
+   "file": "000000510095.jpg",
+   "gt": [
+    "fire hydrant",
+    "person"
+   ],
+   "q4km": [
+    "person"
+   ],
+   "q40": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 564280,
+   "file": "000000564280.jpg",
+   "gt": [
+    "couch",
+    "dog",
+    "remote"
+   ],
+   "q4km": [
+    "couch",
+    "dog",
+    "remote"
+   ],
+   "q40": [
+    "couch",
+    "dog",
+    "remote"
+   ]
+  },
+  {
+   "image_id": 61418,
+   "file": "000000061418.jpg",
+   "gt": [
+    "chair",
+    "person"
+   ],
+   "q4km": [
+    "chair",
+    "person"
+   ],
+   "q40": [
+    "bench",
+    "chair",
+    "person"
+   ]
+  },
+  {
+   "image_id": 311392,
+   "file": "000000311392.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "person"
+   ],
+   "q40": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 132587,
+   "file": "000000132587.jpg",
+   "gt": [
+    "bench",
+    "bird",
+    "bottle",
+    "person"
+   ],
+   "q4km": [
+    "bench",
+    "bottle",
+    "person"
+   ],
+   "q40": [
+    "bench",
+    "bottle",
+    "person"
+   ]
+  },
+  {
+   "image_id": 153568,
+   "file": "000000153568.jpg",
+   "gt": [
+    "stop sign"
+   ],
+   "q4km": [
+    "stop sign"
+   ],
+   "q40": [
+    "stop sign"
+   ]
+  },
+  {
+   "image_id": 270883,
+   "file": "000000270883.jpg",
+   "gt": [
+    "bed",
+    "clock",
+    "person"
+   ],
+   "q4km": [
+    "bed",
+    "bottle",
+    "person"
+   ],
+   "q40": [
+    "bed",
+    "bottle",
+    "person"
+   ]
+  },
+  {
+   "image_id": 125952,
+   "file": "000000125952.jpg",
+   "gt": [
+    "suitcase"
+   ],
+   "q4km": [
+    "backpack",
+    "suitcase"
+   ],
+   "q40": [
+    "backpack",
+    "suitcase"
+   ]
+  },
+  {
+   "image_id": 328238,
+   "file": "000000328238.jpg",
+   "gt": [
+    "backpack",
+    "bench",
+    "chair",
+    "person"
+   ],
+   "q4km": [
+    "backpack",
+    "chair",
+    "dining table",
+    "person"
+   ],
+   "q40": [
+    "backpack",
+    "bench",
+    "chair",
+    "person"
+   ]
+  },
+  {
+   "image_id": 407518,
+   "file": "000000407518.jpg",
+   "gt": [
+    "bird"
+   ],
+   "q4km": [
+    "bird"
+   ],
+   "q40": [
+    "bird"
+   ]
+  },
+  {
+   "image_id": 123131,
+   "file": "000000123131.jpg",
+   "gt": [
+    "truck"
+   ],
+   "q4km": [
+    "truck"
+   ],
+   "q40": [
+    "truck"
+   ]
+  },
+  {
+   "image_id": 535306,
+   "file": "000000535306.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "person"
+   ],
+   "q40": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 79031,
+   "file": "000000079031.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "person"
+   ],
+   "q40": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 533145,
+   "file": "000000533145.jpg",
+   "gt": [
+    "person",
+    "remote",
+    "tv"
+   ],
+   "q4km": [
+    "remote",
+    "tv"
+   ],
+   "q40": [
+    "remote",
+    "tv"
+   ]
+  },
+  {
+   "image_id": 161397,
+   "file": "000000161397.jpg",
+   "gt": [
+    "person",
+    "vase"
+   ],
+   "q4km": [
+    "potted plant",
+    "vase"
+   ],
+   "q40": [
+    "potted plant",
+    "vase"
+   ]
+  },
+  {
+   "image_id": 400815,
+   "file": "000000400815.jpg",
+   "gt": [
+    "person",
+    "suitcase",
+    "truck"
+   ],
+   "q4km": [
+    "person",
+    "suitcase",
+    "truck"
+   ],
+   "q40": [
+    "person",
+    "suitcase"
+   ]
+  },
+  {
+   "image_id": 441586,
+   "file": "000000441586.jpg",
+   "gt": [
+    "bicycle",
+    "motorcycle",
+    "person",
+    "stop sign"
+   ],
+   "q4km": [
+    "bicycle",
+    "car",
+    "motorcycle",
+    "person"
+   ],
+   "q40": [
+    "bicycle",
+    "car",
+    "motorcycle",
+    "person"
+   ]
+  },
+  {
+   "image_id": 236592,
+   "file": "000000236592.jpg",
+   "gt": [
+    "dog",
+    "oven"
+   ],
+   "q4km": [
+    "dog",
+    "oven"
+   ],
+   "q40": [
+    "dog",
+    "oven"
+   ]
+  },
+  {
+   "image_id": 232538,
+   "file": "000000232538.jpg",
+   "gt": [
+    "bench",
+    "car"
+   ],
+   "q4km": [
+    "car"
+   ],
+   "q40": []
+  },
+  {
+   "image_id": 384616,
+   "file": "000000384616.jpg",
+   "gt": [
+    "fire hydrant"
+   ],
+   "q4km": [
+    "fire hydrant"
+   ],
+   "q40": [
+    "fire hydrant"
+   ]
+  },
+  {
+   "image_id": 5529,
+   "file": "000000005529.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "person"
+   ],
+   "q40": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 91495,
+   "file": "000000091495.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "person"
+   ],
+   "q40": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 34452,
+   "file": "000000034452.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "person"
+   ],
+   "q40": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 44068,
+   "file": "000000044068.jpg",
+   "gt": [
+    "chair",
+    "teddy bear"
+   ],
+   "q4km": [
+    "chair",
+    "teddy bear"
+   ],
+   "q40": [
+    "chair",
+    "teddy bear"
+   ]
+  },
+  {
+   "image_id": 579655,
+   "file": "000000579655.jpg",
+   "gt": [
+    "bowl",
+    "cell phone",
+    "cup",
+    "person"
+   ],
+   "q4km": [
+    "cell phone",
+    "cup",
+    "person"
+   ],
+   "q40": [
+    "cell phone",
+    "person"
+   ]
+  },
+  {
+   "image_id": 482735,
+   "file": "000000482735.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "person"
+   ],
+   "q40": [
+    "person"
+   ]
+  },
+  {
+   "image_id": 327592,
+   "file": "000000327592.jpg",
+   "gt": [
+    "clock",
+    "person"
+   ],
+   "q4km": [
+    "bicycle",
+    "person",
+    "potted plant"
+   ],
+   "q40": [
+    "handbag",
+    "person"
+   ]
+  },
+  {
+   "image_id": 362434,
+   "file": "000000362434.jpg",
+   "gt": [
+    "book",
+    "teddy bear"
+   ],
+   "q4km": [
+    "book",
+    "teddy bear"
+   ],
+   "q40": [
+    "book",
+    "teddy bear"
+   ]
+  },
+  {
+   "image_id": 309495,
+   "file": "000000309495.jpg",
+   "gt": [
+    "toilet"
+   ],
+   "q4km": [
+    "toilet"
+   ],
+   "q40": [
+    "toilet"
+   ]
+  },
+  {
+   "image_id": 80949,
+   "file": "000000080949.jpg",
+   "gt": [
+    "bottle",
+    "cat",
+    "cup",
+    "laptop"
+   ],
+   "q4km": [
+    "cat",
+    "cup",
+    "laptop"
+   ],
+   "q40": [
+    "cat",
+    "cup",
+    "laptop"
+   ]
+  },
+  {
+   "image_id": 382030,
+   "file": "000000382030.jpg",
+   "gt": [
+    "dining table",
+    "potted plant",
+    "umbrella"
+   ],
+   "q4km": [
+    "book",
+    "umbrella"
+   ],
+   "q40": [
+    "handbag",
+    "umbrella"
+   ]
+  },
+  {
+   "image_id": 181303,
+   "file": "000000181303.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "bench",
+    "person"
+   ],
+   "q40": [
+    "bench",
+    "person"
+   ]
+  },
+  {
+   "image_id": 163258,
+   "file": "000000163258.jpg",
+   "gt": [
+    "sink",
+    "toilet"
+   ],
+   "q4km": [
+    "sink",
+    "toilet"
+   ],
+   "q40": [
+    "sink",
+    "toilet"
+   ]
+  },
+  {
+   "image_id": 515025,
+   "file": "000000515025.jpg",
+   "gt": [
+    "bottle",
+    "car",
+    "cat",
+    "cup",
+    "dining table",
+    "person",
+    "truck"
+   ],
+   "q4km": [
+    "bottle",
+    "car",
+    "cat",
+    "cup",
+    "dining table",
+    "person",
+    "truck"
+   ],
+   "q40": [
+    "bench",
+    "bottle",
+    "car",
+    "cat",
+    "cup",
+    "person",
+    "truck"
+   ]
+  },
+  {
+   "image_id": 253742,
+   "file": "000000253742.jpg",
+   "gt": [
+    "backpack",
+    "handbag",
+    "person",
+    "umbrella"
+   ],
+   "q4km": [
+    "handbag",
+    "person",
+    "umbrella"
+   ],
+   "q40": [
+    "handbag",
+    "person",
+    "umbrella"
+   ]
+  },
+  {
+   "image_id": 343524,
+   "file": "000000343524.jpg",
+   "gt": [
+    "person"
+   ],
+   "q4km": [
+    "person"
+   ],
+   "q40": [
+    "person"
+   ]
+  }
+ ]
+}

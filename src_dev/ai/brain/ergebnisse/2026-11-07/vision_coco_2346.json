@@ -1,0 +1,193 @@
+{
+ "bilder": 10,
+ "seed": 7,
+ "indoor": true,
+ "max_side": 640,
+ "modelle": {
+  "4B": {
+   "precision": 0.833,
+   "recall": 0.8,
+   "f1": 0.816,
+   "recall_nicht_klein": 0.864,
+   "uebersehen": [
+    [
+     "handbag",
+     2
+    ],
+    [
+     "chair",
+     1
+    ],
+    [
+     "backpack",
+     1
+    ],
+    [
+     "potted plant",
+     1
+    ]
+   ],
+   "erfunden": [
+    [
+     "bench",
+     1
+    ],
+    [
+     "cell phone",
+     1
+    ],
+    [
+     "backpack",
+     1
+    ],
+    [
+     "cup",
+     1
+    ]
+   ],
+   "ungueltig": 0,
+   "latenz_median_s": 0.32
+  }
+ },
+ "rows": [
+  {
+   "image_id": 105455,
+   "file": "000000105455.jpg",
+   "gt": [
+    "car",
+    "clock"
+   ],
+   "4B": [
+    "bench",
+    "car",
+    "clock"
+   ],
+   "4B_text": "Ein kleiner Roboter in einem Raum beschreibt: Ein farbenfroher, historischer Uhrenturm mit goldenem Oberteil und blauen Wänden steht auf einer Straße vor einem Gebäudekomplex."
+  },
+  {
+   "image_id": 365208,
+   "file": "000000365208.jpg",
+   "gt": [
+    "chair",
+    "handbag",
+    "person",
+    "umbrella"
+   ],
+   "4B": [
+    "chair",
+    "person",
+    "umbrella"
+   ],
+   "4B_text": "Ein kleiner Roboter beschreibt ein Schwarz-Weiß-Bild mit einer Person unter einem weißen Vorhang, einem Vogelkäfig und einem parasol auf Sand."
+  },
+  {
+   "image_id": 218362,
+   "file": "000000218362.jpg",
+   "gt": [
+    "clock"
+   ],
+   "4B": [
+    "clock"
+   ],
+   "4B_text": "Ich sehe eine Wand voller verschiedener Uhren, darunter eine mit LED-Zahlen und eine große goldene Spiegelrahmen."
+  },
+  {
+   "image_id": 129322,
+   "file": "000000129322.jpg",
+   "gt": [
+    "toilet"
+   ],
+   "4B": [
+    "toilet"
+   ],
+   "4B_text": "Ich sehe ein altes Badezimmer mit einem Holztoilettsitz, einer alten Wandröhre und einer Badewanne mit Toilettenpapier."
+  },
+  {
+   "image_id": 232563,
+   "file": "000000232563.jpg",
+   "gt": [
+    "handbag",
+    "person",
+    "umbrella"
+   ],
+   "4B": [
+    "backpack",
+    "cell phone",
+    "person",
+    "umbrella"
+   ],
+   "4B_text": "Ein kleiner Roboter im Raum sieht einen Mann mit Zebra-Regenschirm und einer Person mit rosa Regenschirm auf nasser Straße."
+  },
+  {
+   "image_id": 340697,
+   "file": "000000340697.jpg",
+   "gt": [
+    "bottle"
+   ],
+   "4B": [
+    "bottle",
+    "cup"
+   ],
+   "4B_text": "Ich sehe eine Regal mit vielen bunten Glasflaschen und Dosen, die wie kleine, leuchtende Kugeln aussehen."
+  },
+  {
+   "image_id": 502737,
+   "file": "000000502737.jpg",
+   "gt": [
+    "cup",
+    "person"
+   ],
+   "4B": [
+    "cup",
+    "person"
+   ],
+   "4B_text": "Ein kleiner Roboter zeigt ein Schokoriegel mit weißer Zuckerguss-Figur und ein Glas dunkles Getränk."
+  },
+  {
+   "image_id": 60449,
+   "file": "000000060449.jpg",
+   "gt": [
+    "chair",
+    "couch",
+    "dining table",
+    "laptop"
+   ],
+   "4B": [
+    "couch",
+    "dining table",
+    "laptop"
+   ],
+   "4B_text": "Ich sehe einen Laptop auf einem Tisch mit Blick zum Meer und Palmen."
+  },
+  {
+   "image_id": 296634,
+   "file": "000000296634.jpg",
+   "gt": [
+    "bowl"
+   ],
+   "4B": [
+    "bowl"
+   ],
+   "4B_text": "Ich sehe drei weiße Teller mit Essen auf einem Holzboden: ein Salat, eine Gemüse-Salat-Mischung mit Dip und eine Suppe mit kleinen Brötchen."
+  },
+  {
+   "image_id": 548780,
+   "file": "000000548780.jpg",
+   "gt": [
+    "backpack",
+    "bench",
+    "bird",
+    "handbag",
+    "person",
+    "potted plant"
+   ],
+   "4B": [
+    "bench",
+    "bird",
+    "handbag",
+    "person"
+   ],
+   "4B_text": "Zwei Frauen sitzen auf einer Parkbank, eine hält einen Rucksack, und zwei Tauben stehen auf dem Boden."
+  }
+ ]
+}
