@@ -25,7 +25,7 @@ Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. N
 
 ---
 
-## 2. Bein (Makro V9.7)
+## 2. Bein (Makro V9.8)
 
 **Standardparameter (von Marco festgelegt):** Coxa 60 mm, Femur 150 mm, Tibia-Sehne 175 mm (Knieachse → Fußspitze), Knick 38,6° nach unten, Fußsegment 140 mm → Segment 1 (`tib_a`) = 42,2 mm. Standardpose im Makro: q_femur −15°, q_tibia 100°.
 
@@ -56,7 +56,7 @@ Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. N
 - **PETG-Temperatur (10.11.2026):** Neue Anycubic-PETG-Rolle, Temperaturturm 250→220 °C. Bei 250–240 °C starke Fäden und Tropfen, bei 235 °C grenzwertig, bei 230–220 °C sauber. Die Schichthaftung ist auch bei 220 °C zäh, gebrochen ist der Turm nur an den Kerben zwischen den Stufen. Profil jetzt 230 °C, erste Schicht 235, Ende 225 (vorher 235/240/230). Die Rolle lag vor dem Druck einen Tag offen, und gedruckt wurde aus dem laufenden Trockner.
 - **Schaltertasche mit Spitzdach (V9.6, 12.11.2026):** Cura stützte die Decke der Mikroschalter-Tasche durch die Stirnöffnung. Das Stützdach innen ließ sich kaum entfernen (Marco, erste Tibia). Jetzt sitzt über der Tasche ein 45°-Spitzdach, gedruckt ohne Stütze. Der Schalter hält weiter über Haltestifte und seitliche Passung. Für rechtes und gespiegeltes Bein mit Schnitten geprüft.
 - **Anschlusskammer hinter dem Mikroschalter (V9.7, 12.11.2026):** Marco hat den D2FC-F-7N gemessen: Pins 3,25 mm lang, Abstand 4,15 mm, mittig in der Dicke. Die Pins stießen auf den Taschenboden, nur der mittlere traf den 4 × 3-Kabelkanal. Jetzt liegt hinter der Tasche eine Kammer, 6 mm tief und 10,8 mm hoch, so breit wie die Tasche, mit 45°-Spitzdach. Platz für Pins, Lötstellen und Litzenbogen. Der Schalter liegt auf zwei Schultern von je 1,2 mm an den Enden, die Stößellage bleibt gleich. Mit Schnitten durch die Tibia-STL geprüft.
-- **TPU-Fuß zu eng (13.11.2026):** Der erste Fuß mit slide_c 0,3 gleitet nicht. Marco misst innen ca. 20,2 × 28 statt 20,6 × 28,6 mm (schwer messbar, TPU gibt nach). Neues Makro `slarc_foot_fit_test_v1.py`: 8 kurze Viereck-Ringe mit dem Hülsenquerschnitt und der gestuften Rastlippe, slide_c 0,3–1,0 mm, Wert erhaben auf einer Lasche, alle auf einem Druck (`AKP_SLARC_Foot_Fit_Rings.3mf`). Offen: den passenden Ring auf der Tibia ermitteln und als slide_c ins Bein-Makro übernehmen.
+- **TPU-Fuß zu eng (13.11.2026):** Der erste Fuß mit slide_c 0,3 gleitet nicht. Marco misst innen ca. 20,2 × 28 statt 20,6 × 28,6 mm (schwer messbar, TPU gibt nach). Neues Makro `slarc_foot_fit_test_v1.py`: 8 kurze Viereck-Ringe mit dem Hülsenquerschnitt und der gestuften Rastlippe, slide_c 0,3–1,0 mm, Wert erhaben auf einer Lasche, alle auf einem Druck (`AKP_SLARC_Foot_Fit_Rings.3mf`). Ergebnis: Marco hat die Ringe getestet und 0,6 mm gewählt. slide_c ist jetzt 0,6 (Bein V9.8), der Fuß ist neu exportiert (17,45 cm³). Offen: Probedruck des Fußes, danach entscheiden, ob 0,6 bleibt.
 - **Gabelmontage:** Die obere Wange (ohne Bund) kommt auf das Servohorn. Die untere Wange mit dem 1-mm-Distanzbund kommt auf die Rückseitenscheibe (passive Lagerung), Bund zum Servo.
 
 ## 3. Baseplates (V2.7)

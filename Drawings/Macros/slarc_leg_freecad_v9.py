@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – parametrisches Bein (Coxa/Femur/Tibia) mit 3x ST3215, doppelt gelagert.   V9.7
+SLARC – parametrisches Bein (Coxa/Femur/Tibia) mit 3x ST3215, doppelt gelagert.   V9.8
 FreeCAD 0.21 / 1.0 – Makro ausführen oder in der Python-Konsole:
     exec(open(r"PFAD/slarc_leg_freecad_v8.py", encoding="utf-8").read())
 
+V9.8 (Gleitspiel TPU-Fuß)
+- slide_c 0.3 -> 0.6: Der erste Fuß war zu eng (innen ca. 20.2 x 28 statt 20.6 x 28.6). Mit den Passungsringen
+  (slarc_foot_fit_test_v1.py) hat Marco 0.6 gewählt (13.11.2026).
 V9.7 (Anschlusskammer hinter dem Mikroschalter)
 - Die drei Pins des D2FC-F-7N (Marco gemessen 12.11.2026: 3.25 mm lang, Abstand 4.15 mm, mittig in der Dicke)
   stießen auf den Taschenboden; nur der mittlere traf den 4x3-Kabelkanal. Jetzt Kammer hinter der Tasche
@@ -181,7 +184,7 @@ PARAMS = [
     ("rib_h",       1.0,  "TPU-Rippen Höhe"),
     ("foot_trav",   1.0,  "Federweg TPU-Fuß bis Anschlag"),
     ("foot_gap",    0.2,  "Ruhespalt TPU-Kappe -> Schalterstößel"),
-    ("slide_c",     0.3,  "Gleitspiel TPU-Hülse auf Tibia (95A ist griffig -> etwas mehr Spiel)"),
+    ("slide_c",     0.6,  "V9.8: Gleitspiel TPU-Hülse auf Tibia je Seite (Passungsringe, Marco 13.11.2026)"),
     ("lip_w",       1.5,  "Rastlippe TPU Breite"),
     ("lip_h",       0.8,  "Rastlippe TPU Höhe = Nuttiefe"),
     ("sw_L",       12.8,  "Mikroschalter Länge, quer (PRÜFEN – Typ D2F angenommen)"),
