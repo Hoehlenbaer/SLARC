@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – Cura-Projekte (3MF) pro Druckteil erzeugen.   V1.5 (Quelle: Stückliste)
+SLARC – Cura-Projekte (3MF) pro Druckteil erzeugen.   V1.6 (Quelle: Stückliste)
 Drucker: Anycubic Kobra Plus, Cura 5.13 (setting_version 27).
 
 Ablauf:
@@ -23,6 +23,13 @@ Aufruf:  python make_cura_3mf.py               (alle Teile mit STL-Datei)
          python make_cura_3mf.py --force Cap   (auch von Hand gespeicherte Projekte überschreiben)
 Benötigt: numpy, openpyxl.
 Beim Öffnen in Cura für das Profil "neu erstellen" bzw. später "aktualisieren" wählen.
+
+V1.6
+- Stützdach schwer lösbar (Marco, 12.11.2026). Cura 5.13 hat keine eigene Lüfterdrehzahl für das Stützdach.
+  Am nächsten kommt "Lüfterdrehzahl überschreiben" (support_fan_enable) mit "Lüfterdrehzahl für gestützte
+  Haut" (support_supported_skin_fan_speed) = 100 %: die erste Hautschicht über dem Stützdach wird voll
+  gekühlt und verbindet sich weniger mit dem Dach. Beide nur global einstellbar -> im Profil aller Materialien.
+  Wirkt nur dort, wo Stützen gedruckt werden.
 
 V1.5
 - TPU-Vorlage (Marco, 11.11.2026) mit Material Generic TPU 95A. Das Material legt Rückzug und Lüfter nicht fest
@@ -69,7 +76,8 @@ TPL = {"PLA": os.path.join(HERE, "templates", "AKP_template_PLA.3mf"),      # eS
 # PETG: Bett 80, Lüfter 40 %, Rückzug 4,5 mm aus Marcos Profil (Vorlage); Temperaturen V1.4 aus dem Temperaturturm.
 COMMON_G = {"layer_height": "0.2", "layer_height_0": "0.2", "adhesion_type": "skirt",
             "print_sequence": "all_at_once", "support_enable": "False", "support_structure": "tree",
-            "support_type": "buildplate", "retraction_combing": "noskin"}
+            "support_type": "buildplate", "retraction_combing": "noskin",
+            "support_fan_enable": "True", "support_supported_skin_fan_speed": "100"}   # V1.6
 COMMON_E = {"wall_line_width": "0.42", "hole_xy_offset": "0.15", "xy_offset_layer_0": "-0.1",
             "initial_layer_line_width_factor": "120", "brim_width": "8", "infill_pattern": "gyroid"}
 BASE = {

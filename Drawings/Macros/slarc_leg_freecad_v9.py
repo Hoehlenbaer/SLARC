@@ -1,9 +1,19 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – parametrisches Bein (Coxa/Femur/Tibia) mit 3x ST3215, doppelt gelagert.   V9.5
+SLARC – parametrisches Bein (Coxa/Femur/Tibia) mit 3x ST3215, doppelt gelagert.   V9.7
 FreeCAD 0.21 / 1.0 – Makro ausführen oder in der Python-Konsole:
     exec(open(r"PFAD/slarc_leg_freecad_v8.py", encoding="utf-8").read())
 
+V9.7 (Anschlusskammer hinter dem Mikroschalter)
+- Die drei Pins des D2FC-F-7N (Marco gemessen 12.11.2026: 3.25 mm lang, Abstand 4.15 mm, mittig in der Dicke)
+  stießen auf den Taschenboden; nur der mittlere traf den 4x3-Kabelkanal. Jetzt Kammer hinter der Tasche
+  (sw_cav tief, 2*sw_cz hoch, Taschenbreite) mit 45°-Spitzdach. Der Schalter liegt auf zwei Schultern an den
+  Enden (je ca. 1.2 mm), Stößellage unverändert.
+V9.6 (Schaltertasche mit Spitzdach)
+- Die Decke der Mikroschalter-Tasche (6.2 mm breit, beim Druck waagerecht) wurde von Cura mit Baumstützen durch
+  die Stirnöffnung gestützt; das Stützdach innen ließ sich kaum entfernen (Marco, 12.11.2026). Jetzt 45°-Spitzdach
+  über der Tasche (roof() mit eigener Spitzenhöhe) -> druckt ohne Stütze. Der Schalter hält weiter über die
+  Haltestifte und die seitliche Passung; über ihm bleibt ein dreieckiger Freiraum.
 V9.5 (Kabelbinder-Ösen außen)
 - Statt Schlitzpaaren durch die Wand (Kabelbinder ließ sich im Hohlraum nicht zurückführen, Marco 09.11.2026)
   außen aufgesetzte Ösen an der Oberseite (-Y): Steg mit Kanal 4.2 x 2.0 entlang Z, beim Druck senkrecht,
@@ -182,6 +192,10 @@ PARAMS = [
     ("sw_hs",       6.5,  "Befestigungslöcher Abstand (PRÜFEN)"),
     ("sw_hx",       2.0,  "Befestigungslöcher: Abstand von der Anschlussseite (PRÜFEN)"),
     ("sw_hd",       1.2,  "Befestigungsstifte Ø (bündig, TPU-Hülse gleitet drüber)"),
+    ("sw_pin",      3.25, "V9.7: Pinlänge ab Gehäuse (Marco gemessen)"),
+    ("sw_pp",       4.15, "V9.7: Pinabstand (Marco gemessen)"),
+    ("sw_cav",      6.0,  "V9.7: Tiefe Anschlusskammer hinter dem Schalter (Pin + Lötstelle + Litzenbogen)"),
+    ("sw_cz",       5.4,  "V9.7: halbe Höhe der Anschlusskammer (Pinabstand + Lötstelle)"),
     ("roof_p",      4.0,  "TPU-Fuß: halbe Breite der Druckfläche (außen 45°-Dach)"),
     ("wire_w",      4.0,  "Kabelkanal Breite"),
     ("tie_w",       4.2,  "V9.5: Kabelbinder-Öse Kanalbreite (bis 3.6er Binder)"),
@@ -493,7 +507,7 @@ def fork_neg(g, n, fr):
     return t
 
 
-def roof(g, n, x0, L, px="0", py="0", ang="0"):
+def roof(g, n, x0, L, px="0", py="0", ang="0", z_apex="zc + link_h/2 - link_wall"):
     """V9.4: Quadratsäule (Seite roof_d*sqrt(2)), um 45° auf die Kante gestellt, entlang des Glieds (lokal x).
     Ihre obere Spitze liegt an der Hohlraumdecke; Schnitt mit dem Hohlraum ergibt ein 45°-Spitzdach.
     Symmetrisch zu y = 0, daher im Spiegelbild nur Drehung und Basis gespiegelt."""
@@ -505,7 +519,7 @@ def roof(g, n, x0, L, px="0", py="0", ang="0"):
     if MIR < 0:
         by = f"-({by})"
     _x(o, "Placement.Base.x", bx); _x(o, "Placement.Base.y", by)
-    _x(o, "Placement.Base.z", "zc + link_h/2 - link_wall - 2*roof_d")
+    _x(o, "Placement.Base.z", f"({z_apex}) - 2*roof_d")
     return o
 
 
@@ -665,6 +679,18 @@ neg += [common(j3, "Tibia_seg1_cav", seg1_in,                                  #
               "wire_w", "wire_h"),
         s2box("Tibia_swpocket", XSW, "-sw_T/2 - fit", "zc - sw_L/2 - fit", f"({XE}) - ({XSW}) + 1",
               "sw_T + 2*fit", "sw_L + 2*fit"),
+        common(j3, "Tibia_swroof",                                                  # V9.6: Spitzdach
+               roof(j3, "Tibia_swroof_sq", XSW, f"({XE}) - ({XSW}) + 1", "tib_a", 0, BEND,
+                    "zc + sw_L/2 + fit + sw_T/2 + fit"),
+               s2box("Tibia_swroof_lim", XSW, "-sw_T/2 - fit", "zc + sw_L/2 + fit - 0.1",
+                     f"({XE}) - ({XSW}) + 1", "sw_T + 2*fit", "sw_T/2 + fit + 0.2")),
+        s2box("Tibia_swcav", f"({XSW}) - sw_cav", "-sw_T/2 - fit", "zc - sw_cz",  # V9.7: Anschlusskammer
+              "sw_cav + 0.1", "sw_T + 2*fit", "2*sw_cz"),
+        common(j3, "Tibia_swcavroof",                                               # V9.7: Spitzdach
+               roof(j3, "Tibia_swcavroof_sq", f"({XSW}) - sw_cav", "sw_cav + 0.1", "tib_a", 0, BEND,
+                    "zc + sw_cz + sw_T/2 + fit"),
+               s2box("Tibia_swcavroof_lim", f"({XSW}) - sw_cav", "-sw_T/2 - fit", "zc + sw_cz - 0.1",
+                     "sw_cav + 0.1", "sw_T + 2*fit", "sw_T/2 + fit + 0.2")),
         box(j3, "Tibia_wire_exit", I, f"({X1}) + 6", "-link_w/2 - 1", "zc - 3", 10, "link_wall + 2", 6)]
 # V9.5: Kabelbinder-Öse außen am Fußsegment (Zugentlastung Schalterkabel)
 neg.append(s2box("Tibia_eyeh", "link_w/2 + 6 - tie_w/2", "-link_w/2 - tie_t", "zc - tie_h/2 - 1",
