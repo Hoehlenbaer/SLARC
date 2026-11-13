@@ -28,6 +28,8 @@ V1.7
 - TPU-Vorlage hatte Beschleunigungs- und Ruckkontrolle an, aber keine Werte -> Cura-Standard 3000/5000 mm/s²
   und Ruck 20/30 mm/s, viel zu hoch für den Kobra Plus (Marco, 13.11.2026). TPU jetzt wie PETG-Druck:
   500 mm/s², Ruck 5 mm/s; Fahrt 1000 mm/s², Ruck 8 mm/s.
+- PETG: Fahrt war ebenfalls nicht gesetzt (5000 mm/s², Ruck 30) -> 1000 mm/s², Ruck 8 mm/s. Der Drucker
+  vibrierte deutlich beim Stützendruck (viele kurze Fahrten zwischen den Ästen).
 
 V1.6
 - Stützdach schwer lösbar (Marco, 12.11.2026). Cura 5.13 hat keine eigene Lüfterdrehzahl für das Stützdach.
@@ -96,7 +98,8 @@ BASE = {
                   material_print_temperature="230.0", material_print_temperature_layer_0="235.0",
                   material_final_print_temperature="225.0",
                   bridge_settings_enabled="True", bridge_wall_speed="20", bridge_skin_speed="25",
-                  bridge_fan_speed="100", bridge_skin_material_flow="100", bridge_enable_more_layers="True"),
+                  bridge_fan_speed="100", bridge_skin_material_flow="100", bridge_enable_more_layers="True",
+                  acceleration_travel="1000.0", jerk_travel="8.0"),                       # V1.7
              ()),
     # V1.5: TPU 95A, Bowden: wenig und langsamer Rückzug, Combing überall (weniger Rückzüge)
     "TPU": (dict(COMMON_G, retraction_combing="all", adaptive_layer_height_enabled="False",
