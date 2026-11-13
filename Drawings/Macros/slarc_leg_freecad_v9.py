@@ -1,9 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – parametrisches Bein (Coxa/Femur/Tibia) mit 3x ST3215, doppelt gelagert.   V9.8
+SLARC – parametrisches Bein (Coxa/Femur/Tibia) mit 3x ST3215, doppelt gelagert.   V9.9
 FreeCAD 0.21 / 1.0 – Makro ausführen oder in der Python-Konsole:
     exec(open(r"PFAD/slarc_leg_freecad_v8.py", encoding="utf-8").read())
 
+V9.9 (Fuß: Lippe kürzer, Spiel 0.7)
+- Auch der Passungsring mit 1.0 mm Spiel (sichtbarer Spalt) fällt nicht von allein, der Haftanteil ist bei allen
+  Ringen gleich (Marco, 13.11.2026). Vermutung: Die Lippen ragen unabhängig vom Spiel lip_h = 0.8 über die
+  Tibia; die Nut ist 1.0 tief. Mit dem TPU-Übermaß (ca. 0.2–0.3 je Seite) schleifen sie am Nutgrund.
+  Neu lip_p = 0.5 (Überstand der Fußlippe, nur Fuß), Nut bleibt lip_h + 0.2 -> Tibia unverändert. slide_c 0.7.
 V9.8 (Gleitspiel TPU-Fuß)
 - slide_c 0.3 -> 0.6: Der erste Fuß war zu eng (innen ca. 20.2 x 28 statt 20.6 x 28.6). Mit den Passungsringen
   (slarc_foot_fit_test_v1.py) hat Marco 0.6 gewählt (13.11.2026).
@@ -184,9 +189,10 @@ PARAMS = [
     ("rib_h",       1.0,  "TPU-Rippen Höhe"),
     ("foot_trav",   1.0,  "Federweg TPU-Fuß bis Anschlag"),
     ("foot_gap",    0.2,  "Ruhespalt TPU-Kappe -> Schalterstößel"),
-    ("slide_c",     0.6,  "V9.8: Gleitspiel TPU-Hülse auf Tibia je Seite (Passungsringe, Marco 13.11.2026)"),
+    ("slide_c",     0.7,  "V9.9: Gleitspiel TPU-Hülse auf Tibia je Seite (0.6 zu straff, Marco 13.11.2026)"),
     ("lip_w",       1.5,  "Rastlippe TPU Breite"),
-    ("lip_h",       0.8,  "Rastlippe TPU Höhe = Nuttiefe"),
+    ("lip_h",       0.8,  "Bezugshöhe Rastlippe: Nuttiefe in der Tibia = lip_h + 0.2"),
+    ("lip_p",       0.5,  "V9.9: Überstand der Fußlippe über die Tibia-Oberfläche (< Nuttiefe, Luft am Nutgrund)"),
     ("sw_L",       12.8,  "Mikroschalter Länge, quer (PRÜFEN – Typ D2F angenommen)"),
     ("sw_T",        5.8,  "Mikroschalter Dicke, entlang Gelenkachse (PRÜFEN)"),
     ("sw_H",        6.5,  "Mikroschalter Höhe ohne Stößel, entlang Fußsegment (PRÜFEN)"),
@@ -753,7 +759,7 @@ socket = s2box("Foot_socket", f"({XS}) - 1", "-link_w/2 - slide_c", "zc - link_h
 body_tpu = cut(j3, "Foot_body", fuse(j3, "Foot_pos", [ball, sleeve] + ribs), [socket])
 lips = []
 for s_, sz in (("A", 1), ("B", -1)):          # gestufte Rastlippen: halbe Höhe an der Öffnung = Einführschräge
-    for k, (dx, hh) in enumerate((("0", "lip_h/2"), ("lip_w/2", "lip_h"))):
+    for k, (dx, hh) in enumerate((("0", "lip_p/2"), ("lip_w/2", "lip_p"))):   # V9.9: lip_p statt lip_h
         z0 = f"zc + link_h/2 - ({hh})" if sz > 0 else "zc - link_h/2 - slide_c"
         lips.append(s2box(f"Foot_lip{s_}{k}", f"({XS}) + {dx}", "-link_w/2 - slide_c", z0,
                           "lip_w/2", "link_w + 2*slide_c", f"({hh}) + slide_c"))

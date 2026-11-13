@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – Passungsringe für den TPU-Fuß (Gleitspiel auf der Tibia).   V1.0
+SLARC – Passungsringe für den TPU-Fuß (Gleitspiel auf der Tibia).   V1.1
 FreeCAD 0.21 / 1.0 – Makro ausführen oder:
     exec(open(r"PFAD/slarc_foot_fit_test_v1.py", encoding="utf-8").read())
+
+V1.1 (13.11.2026)
+- Lippenüberstand wie Bein V9.9: lip_p 0.5 statt 0.8 (Nut 1.0 tief). Erkennbar am Punkt rechts auf der Lasche. Reihe 0.5–0.8, um zu prüfen, ob die
+  kürzere Lippe das Haften beseitigt. V1.0 (Lippe 0.8, Spiel 0.3–1.0): alle Ringe hafteten gleich.
 
 Zweck
 - Der erste TPU-Fuß (slide_c 0.3) ist zu eng zum Gleiten (Marco, 13.11.2026: innen ca. 20.2 x 28 statt
@@ -19,7 +23,7 @@ Test: Ring von der Fußspitze her auf die Tibia schieben, bis die Lippen in die 
 Der passende Ring gleitet leicht und ohne Wackeln über die 1 mm Federweg und rastet sicher.
 Das Spiel dieses Rings kommt als slide_c ins Bein-Makro.
 
-Maße aus slarc_leg_freecad_v9.py (dort ändern, hier nachziehen): link_w, link_h, boot_t, lip_w, lip_h.
+Maße aus slarc_leg_freecad_v9.py (dort ändern, hier nachziehen): link_w, link_h, boot_t, lip_w, lip_p.
 Koordinaten: Z = Druckrichtung (Z=0 Bett = Öffnung), X = link_h-Richtung, Y = link_w-Richtung.
 """
 import os
@@ -33,10 +37,10 @@ LINK_W = 20.0      # Glied quer zur Gelenkachse (Lippen an diesen Seiten)
 LINK_H = 28.0      # Glied entlang der Gelenkachse
 BOOT_T = 2.0       # Wand der Fußhülse
 LIP_W = 1.5        # Lippe axial (halb gestuft)
-LIP_H = 0.8        # Lippe über Tibia-Oberfläche = Nuttiefe
+LIP_H = 0.5        # V1.1: Lippe über Tibia-Oberfläche = lip_p im Bein-Makro (Nut ist 1.0 tief)
 
 # --- Testreihe ---
-CLEAR = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]   # slide_c je Seite; 0.3 = erster Fuß (Referenz)
+CLEAR = [0.5, 0.6, 0.7, 0.8]   # V1.1: slide_c je Seite (V1.0: 0.3–1.0 mit Lippe 0.8)
 RING_H = 8.0       # Ringhöhe (axial)
 COLS = 4           # Anordnung auf dem Bett
 PITCH_X = 46.0     # Raster
@@ -102,6 +106,8 @@ def ring(c, idx):
     t = number("%.1f" % c, 0, cy)
     for d in ([t] if t is not None else dots(idx + 1, 0, cy)):
         r = r.fuse(d)
+    # V1.1: Punkt am Laschenende unterscheidet die Reihe mit Lippe 0.5 von V1.0 (Lippe 0.8, ohne Punkt)
+    r = r.fuse(Part.makeCylinder(0.9, TXT_T, V(TAB_L / 2 - 1.6, cy, TAB_T)))
     return r.removeSplitter()
 
 
@@ -109,7 +115,8 @@ def build():
     shapes = []
     for i, c in enumerate(CLEAR):
         s = ring(c, i)
-        s.translate(V((i % COLS - (COLS - 1) / 2) * PITCH_X, -(i // COLS - 0.5) * PITCH_Y, 0))
+        rows = (len(CLEAR) + COLS - 1) // COLS
+        s.translate(V((i % COLS - (COLS - 1) / 2) * PITCH_X, -(i // COLS - (rows - 1) / 2) * PITCH_Y, 0))
         shapes.append(s)
     return shapes
 
