@@ -30,7 +30,7 @@ Benötigt `numpy` und `openpyxl`.
 
 ## Hinweise
 
-- Vorlagen in `templates/`: von Marco in Cura 5.13 gespeicherte Projekte für den Anycubic Kobra Plus. PLA mit eSUN PLA+ Black (für Anycubic PLA+ verwendet), PETG mit eSUN PETG Black, TPU mit Generic TPU 95A (Rückzug, Lüfter, Bett stehen im Profil). Neue Cura-Version oder anderer Drucker: Vorlage neu speichern und ersetzen.
+- Vorlagen in `templates/`: von Marco in Cura 5.13 gespeicherte Projekte für den Anycubic Kobra Plus. PLA mit eSUN PLA+ Black (für Anycubic PLA+ verwendet), PETG mit eSUN PETG Black, TPU mit Generic TPU 95A (Rückzug, Lüfter, Bett, Beschleunigung und Ruck stehen im Profil). Neue Cura-Version oder anderer Drucker: Vorlage neu speichern und ersetzen.
 - Füllung, Wände und Stützen stehen als „Einstellungen pro Modell“ am Objekt. In Cura sichtbar über Modell anwählen → links „Einstellungen pro Modell“. Die rechte Leiste zeigt nur das Profil.
 - Stützen: Cura 5.13 hat keine eigene Lüfterdrehzahl für das Stützdach. Alle Profile setzen deshalb „Lüfterdrehzahl überschreiben“ mit „Lüfterdrehzahl für gestützte Haut“ 100 % (V1.6): Die erste Schicht über dem Stützdach wird voll gekühlt und haftet weniger am Dach. Die Einstellung ist nur global möglich und wirkt nur über Stützen. Weil die Stützen pro Modell und nicht global eingeschaltet sind, kann Cura sie ausgegraut anzeigen. Ob sie greift, zeigt der G-Code (M106 S255 vor der Haut über dem Stützdach). Noch nicht geprüft.
 - Brim ist in Cura nur global einstellbar. Er steht deshalb als Benutzeränderung im Projekt (Profil mit „*“), nicht im Profil.
