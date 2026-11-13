@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – Cura-Projekte (3MF) pro Druckteil erzeugen.   V1.6 (Quelle: Stückliste)
+SLARC – Cura-Projekte (3MF) pro Druckteil erzeugen.   V1.7 (Quelle: Stückliste)
 Drucker: Anycubic Kobra Plus, Cura 5.13 (setting_version 27).
 
 Ablauf:
@@ -23,6 +23,11 @@ Aufruf:  python make_cura_3mf.py               (alle Teile mit STL-Datei)
          python make_cura_3mf.py --force Cap   (auch von Hand gespeicherte Projekte überschreiben)
 Benötigt: numpy, openpyxl.
 Beim Öffnen in Cura für das Profil "neu erstellen" bzw. später "aktualisieren" wählen.
+
+V1.7
+- TPU-Vorlage hatte Beschleunigungs- und Ruckkontrolle an, aber keine Werte -> Cura-Standard 3000/5000 mm/s²
+  und Ruck 20/30 mm/s, viel zu hoch für den Kobra Plus (Marco, 13.11.2026). TPU jetzt wie PETG-Druck:
+  500 mm/s², Ruck 5 mm/s; Fahrt 1000 mm/s², Ruck 8 mm/s.
 
 V1.6
 - Stützdach schwer lösbar (Marco, 12.11.2026). Cura 5.13 hat keine eigene Lüfterdrehzahl für das Stützdach.
@@ -99,7 +104,9 @@ BASE = {
             dict(COMMON_E, infill_sparse_density="20", wall_line_count="5",
                  material_print_temperature="220.0", material_print_temperature_layer_0="220.0",
                  material_final_print_temperature="215.0", retraction_amount="1.5", retraction_speed="25",
-                 cool_fan_enabled="True", cool_fan_speed="60.0", cool_fan_speed_min="60.0", cool_fan_speed_max="60.0"),
+                 cool_fan_enabled="True", cool_fan_speed="60.0", cool_fan_speed_min="60.0", cool_fan_speed_max="60.0",
+                 acceleration_print="500.0", acceleration_travel="1000.0",              # V1.7
+                 jerk_print="5.0", jerk_travel="8.0"),
             ()),
 }
 
