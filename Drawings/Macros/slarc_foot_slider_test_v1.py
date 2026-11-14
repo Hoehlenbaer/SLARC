@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – Gleithülse PETG mit Federzungen für den zweiteiligen Fuß (Testreihe).   V1.0
+SLARC – Gleithülse PETG mit Federzungen für den zweiteiligen Fuß (Testreihe).   V1.1
 FreeCAD 0.21 / 1.0 – Makro ausführen oder:
     exec(open(r"PFAD/slarc_foot_slider_test_v1.py", encoding="utf-8").read())
+
+V1.1 (14.11.2026)
+- Statt Gewindeeinsatz + Madenschraube: Zylinderschraube M3x6 (vorhanden, ISO 4762) direkt in PETG geschnitten
+  (Kernloch SCR_D), Kopf in einer Senkung von außen. Der Kopf liegt nicht auf, die Schraube hält durch die
+  Reibung im selbst geschnittenen Gewinde. Stirnwand 8 statt 6 mm, damit der Kopf versenkt bleibt.
 
 Hintergrund (14.11.2026)
 - Der einteilige TPU-Fuß hat zwei Probleme: Gleitpassung TPU auf PETG streut stark, und der innere Anschlag
@@ -16,9 +21,10 @@ Gleithülse
 - Halt ohne neue Tibia: zwei Federzungen (U-Schlitze) auf den 20-mm-Seiten, an der Spitze je ein starrer Haken,
   der in die vorhandene Nut der Tibia greift (Nut 1.0 tief, 2.9 lang). Haken ragt HOOK_P über die Tibia;
   Weg zwischen Anschlag und Haken an der Nutwand ca. 1.2 mm (wie TPU-Fuß).
-- Schaltpunkt einstellbar: Gewindeeinsatz M3 (5.7 lang, Ø4.6, wie Panzersäulen) in der Stirnwand, von außen
-  eingeschmolzen; Madenschraube M3x8 drückt durch die offene Schaltertasche auf den Stößel. Einstellen:
-  Hülse auf Anschlag drücken, Schraube eindrehen bis der Schalter klickt, dann ca. 1/8 Umdrehung weiter.
+- Schaltpunkt einstellbar: Zylinderschraube M3x6 von außen durch die Stirnwand, direkt ins PETG geschnitten.
+  Das Schraubenende drückt durch die offene Schaltertasche auf den Stößel. Überstand innen = 6 - SCR_WALL -
+  Kopfabstand zum Senkungsgrund, also 0 bis 3.5 mm. Einstellen: Hülse auf Anschlag drücken, Schraube eindrehen,
+  bis der Schalter klickt, dann ca. 1/8 Umdrehung weiter (0.06 mm).
 - Testreihe: Spiel CLEAR je Seite, Wert vertieft auf einer 28-mm-Seite.
 
 Maße aus slarc_leg_freecad_v9.py (dort ändern, hier nachziehen): link_w, link_h, foot_trav, lip_w, Nut.
@@ -38,8 +44,10 @@ INNER_L = 30.0     # Stirnwand innen bis Öffnung (= boot_l): Haken liegt bei An
 # --- Hülse ---
 CLEAR = [0.2, 0.3, 0.4]   # Gleitspiel je Seite (PETG-Bohrungen werden je Seite ca. 0.12 enger)
 WALL = 1.6         # Wand (4 Linien)
-END_T = 6.0        # Stirnwand (Gewindeeinsatz 5.7 lang)
-INS_D = 4.0        # Bohrung Gewindeeinsatz M3 Ø4.6 (Einschmelzen)
+END_T = 8.0        # V1.1: Stirnwand (Senkung für den Kopf + Gewindewand)
+SCR_D = 2.8        # V1.1: Kernloch M3 im Modell (PETG-Bohrungen ca. 0.12 je Seite enger -> ca. 2.55)
+SCR_WALL = 2.5     # V1.1: Gewindewand innen (Schraube M3x6 greift hier)
+CB_D = 6.5         # V1.1: Senkung für den Zylinderkopf Ø5.5 x 3
 HOOK_W = 1.5       # Haken axial (= lip_w)
 HOOK_P = 0.6       # Haken über Tibia-Oberfläche (Nut 1.0 tief -> 0.4 Luft am Nutgrund)
 HOOK_CH = 0.6      # Einführschräge 45° an der Öffnungsseite des Hakens
@@ -98,8 +106,9 @@ def slider(c):
     ox, oy = ix + 2 * WALL, iy + 2 * WALL
     h = END_T + INNER_L
     s = box(-ox / 2, -oy / 2, 0, ox, oy, h).cut(box(-ix / 2, -iy / 2, END_T, ix, iy, h))
-    # Gewindeeinsatz mittig (über dem Stößel), durch die Stirnwand
-    s = s.cut(Part.makeCylinder(INS_D / 2, END_T + 1, V(0, 0, -0.5)))
+    # V1.1: Schraube mittig (über dem Stößel): Kernloch durch, Kopfsenkung von außen (Bettseite)
+    s = s.cut(Part.makeCylinder(SCR_D / 2, END_T + 1, V(0, 0, -0.5)))
+    s = s.cut(Part.makeCylinder(CB_D / 2, END_T - SCR_WALL + 0.5, V(0, 0, -0.5)))
     # Zungen: U-Schlitze in den beiden x-Wänden
     for sx in (1, -1):
         x0 = ix / 2 - 0.1 if sx > 0 else -ox / 2 - 0.1
