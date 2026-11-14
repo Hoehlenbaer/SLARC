@@ -27,7 +27,7 @@ Stand 25.10.2026. Plan für Energie, Servo-Bus, Fußkontakte, Relais und Sensori
   - Auf dem Hub (B) verteilt sich DATA sternförmig auf die sechs Beine.
   - H5 und H6 hängen auf dem Treiber am selben Bustreiber (SN74LVC1G125), deshalb genügt H5.
   - GND läuft in jedem Signalkabel mit. So hat DATA eine saubere Masse, auch wenn auf den Stromleitungen ein paar Zehntel Volt abfallen.
-- **Fußkontakte am MCP23017-Modul auf dem Hub.** Jeder Fußschalter läuft mit zwei Adern das Bein hoch zur Bein-Platine. Von dort geht er im 3-adrigen Signalkabel (GND · DATA · SW) zum Hub. Dort sitzt ein 10-kΩ-Pull-up nach 3,3 V.
+- **Fußkontakte am MCP23017-Modul auf dem Hub.** Jeder Fußschalter läuft mit zwei Adern das Bein hoch zur Bein-Platine. Von dort geht er im 3-adrigen Signalkabel (GND · DATA · SW) zum Hub. Dort sitzt ein 10-kΩ-Pull-up nach 3,3 V. Parallel dazu zeigt je eine LED mit Vorwiderstand den Schalterzustand an (14.11.2026).
 - **Pi-Versorgung kurz und doppelt.** Vom DC-DC-Ausgang laufen je Pol 2× AWG20 zum Pi, über die USB-C-Buchse oder die 5-V-Pins der GPIO-Leiste.
 - **Strommessung am Treiber.** Das INA219 auf dem Treiber misst nur noch den Strom des Treibers. Die Akkuspannung sieht es weiterhin.
 
@@ -122,7 +122,7 @@ Bei Versorgung über die GPIO-5-V-Pins oder ein Netzteil ohne USB-PD: `PSU_MAX_C
 
 | Pin | Funktion |
 |---|---|
-| PA0 | Fußschalter RR |
+| PA0 | Fußschalter RR (LED zeigt Kontakt, siehe Hub) |
 | PA1 | Fußschalter RL |
 | PA2 | Fußschalter MR |
 | PA3 | Fußschalter ML |
@@ -165,6 +165,12 @@ Eine halbe 3×7-cm-Platine (10 × 11 Löcher), aus jeder 3×7 entstehen zwei Bei
 - **Was das Modul schon mitbringt:** RST-Pull-up (10 kΩ) und I²C-Pull-ups (4,7 kΩ). Mit den Pull-ups auf dem Treiber parallel ist das unkritisch.
 - **Adresse:** Die Lötbrücken A0–A2 müssen auf GND stehen, das ergibt 0x20. Bitte nachsehen.
 - **Pull-ups für die Füße:** sechs 10-kΩ-Widerstände, stehend, von PA0–5 nach 3,3 V. Die 3,3 V kommen vom VCC-Pin des Moduls.
+- **Kontakt-LEDs (14.11.2026, im Layout noch nicht eingezeichnet):** je Fuß eine LED mit 1 kΩ in Reihe von 3,3 V nach PAx, also parallel zum Pull-up. Anode zu 3,3 V, Kathode zu PAx. Die LED leuchtet, wenn der Schalter schließt, und zeigt den echten Schalterzustand auch ohne Firmware.
+  - **Nicht in Reihe zum Schalter:** Dann läge PAx bei Kontakt auf der LED-Flussspannung (rot ~1,8 V). Der MCP23017 erkennt Low aber erst unter 0,2 × VDD = 0,66 V, der Kontakt würde unsicher erkannt.
+  - **Farbe:** rot, grün oder orange. Blau und weiß (~2,9 V) haben an 3,3 V zu wenig Reserve.
+  - **Strom:** rot ~1,4 mA je LED, alle sechs < 10 mA aus dem 3,3-V-Pin des Moduls. Der Schalter führt dann ~1,7 statt 0,33 mA, das hilft eher gegen Kontaktprobleme.
+  - **Nicht an 12 V:** Eine LED von 12 V auf PAx würde den Pin bei offenem Schalter über 3,3 V ziehen und den MCP beschädigen. Deshalb gehören die LEDs auf den Hub und nicht auf die Bein-Platinen (dort gibt es kein 3,3 V).
+  - **Offen:** Platz auf der Platine (die Spalten 9–11 sind mit den Pull-ups belegt) und Sichtbarkeit. Der Hub liegt unter dem Panzer, die LEDs sind also nur bei abgenommenem Panzer zu sehen. Für die Inbetriebnahme reicht das. Sollen sie im Betrieb sichtbar sein, braucht es eine kleine LED-Leiste an einer sichtbaren Stelle mit 7 Adern vom Hub (3,3 V + PA0–5).
 - **Datenstern:** Spalte 14 auf der Unterseite verbindet J2 (von H5) mit den DATA-Pins aller sechs Beinstecker.
 - **Ein/Aus-Taster:** J6 (Taster), R7 10 kΩ nach 3,3 V, J7 führt IO35 und GND zum Treiber.
 - **Montage (Baseplates V2.8):** auf dem gedruckten Hub-Träger (2× M3 auf den Modulplatz MCP, 4× M2x5 in die Eckbohrungen 66 × 46). Die Platine liegt bei x −150…−80, y −5…45 und überdeckt den Reserveplatz MUX. Die Modulseite zeigt nach außen, wo der Panzer niedrig ist (dort nur ~10 mm Bauhöhe): I²C- und INT-Leitungen direkt in die Kopfleisten-Löcher des Moduls löten, keine Stiftleiste. Die XH-Stecker der Beine liegen innen.
