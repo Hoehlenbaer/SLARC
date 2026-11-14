@@ -9,9 +9,10 @@ V1.2 (14.11.2026)
   Eine Änderung nach der anderen: Spiel fest 0.4, Innenlänge (Stirnwand bis Öffnung = Lage der Haken)
   29.6 / 30.0 / 30.4. Längere Hülse -> Haken weiter zum Knie -> mehr Weg bis zur fußseitigen Nutwand,
   aber weniger Luft zur knieseitigen Nutwand beim Anschlag. Beschriftung = Innenlänge.
-- Stößel sitzt nicht mittig, sondern ca. 1.9 mm außermittig entlang der 28-mm-Richtung (X) (Marco gemessen).
-  Je nachdem, wie herum Schalter und Hülse sitzen, liegt er bei X = +1.9 oder -1.9: zwei Schraublöcher bei
-  ±SCR_X, gemeinsame Langsenkung. Benutzt wird das Loch über dem Stößel, das andere bleibt leer.
+- Stößel sitzt nicht mittig, sondern ca. 1.9 mm außermittig entlang der 28-mm-Richtung (X) (Marco gemessen,
+  Höhe über Gehäuse 0.9). Ein Schraubloch bei X = +SCR_X. Markierung: senkrechte Kerbe außen auf der
+  +X-Wand unten. Montage: Schalter mit dem Stößel zur Oberseite der Tibia (oben beim Druck), Hülse mit der
+  Kerbe zur selben Seite. Der Stößel taucht ins Kernloch, die Schraubenspitze darin setzt den Schaltpunkt.
 
 V1.1 (14.11.2026)
 - Statt Gewindeeinsatz + Madenschraube: Zylinderschraube M3x6 (vorhanden, ISO 4762) direkt in PETG geschnitten
@@ -58,7 +59,7 @@ END_T = 8.0        # V1.1: Stirnwand (Senkung für den Kopf + Gewindewand)
 SCR_D = 2.8        # V1.1: Kernloch M3 im Modell (PETG-Bohrungen ca. 0.12 je Seite enger -> ca. 2.55)
 SCR_WALL = 2.5     # V1.1: Gewindewand innen (Schraube M3x6 greift hier)
 CB_D = 6.5         # V1.1: Senkung für den Zylinderkopf Ø5.5 x 3
-SCR_X = 1.9        # V1.2: Stößel außermittig (sw_po im Bein-Makro) -> Löcher bei X = ±SCR_X
+SCR_X = 1.9        # V1.2: Stößel außermittig (sw_po im Bein-Makro) -> Loch bei X = +SCR_X
 HOOK_W = 1.5       # Haken axial (= lip_w)
 HOOK_P = 0.6       # Haken über Tibia-Oberfläche (Nut 1.0 tief -> 0.4 Luft am Nutgrund)
 HOOK_CH = 0.6      # Einführschräge 45° an der Öffnungsseite des Hakens
@@ -119,10 +120,9 @@ def slider(c, inner_l=INNER_L):
     s = box(-ox / 2, -oy / 2, 0, ox, oy, h).cut(box(-ix / 2, -iy / 2, END_T, ix, iy, h))
     # V1.1: Schraube mittig (über dem Stößel): Kernloch durch, Kopfsenkung von außen (Bettseite)
     cbh = END_T - SCR_WALL + 0.5
-    for sx in (1, -1):                                          # V1.2: zwei Löcher über den Stößellagen
-        s = s.cut(Part.makeCylinder(SCR_D / 2, END_T + 1, V(sx * SCR_X, 0, -0.5)))
-        s = s.cut(Part.makeCylinder(CB_D / 2, cbh, V(sx * SCR_X, 0, -0.5)))
-    s = s.cut(box(-SCR_X, -CB_D / 2, -0.5, 2 * SCR_X, CB_D, cbh))
+    s = s.cut(Part.makeCylinder(SCR_D / 2, END_T + 1, V(SCR_X, 0, -0.5)))   # V1.2: Loch über dem Stößel
+    s = s.cut(Part.makeCylinder(CB_D / 2, cbh, V(SCR_X, 0, -0.5)))
+    s = s.cut(box(ox / 2 - 0.5, -0.4, 1.0, 1.0, 0.8, 6.0))                  # V1.2: Kerbe = Stößelseite
     # Zungen: U-Schlitze in den beiden x-Wänden
     for sx in (1, -1):
         x0 = ix / 2 - 0.1 if sx > 0 else -ox / 2 - 0.1

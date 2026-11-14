@@ -10,7 +10,8 @@ V9.10 (Schaltertasche weiter)
   enger -> real ca. 0.18 je Seite).
 - Stößel D2FC-F-7N gemessen (Marco, 14.11.2026): 1.7 breit, Abstand zu den Gehäusekanten 3.8 und 7.6 (Summe
   13.1 statt 12.8, schwer messbar) -> Stößelmitte ca. 1.9 außermittig entlang sw_L (sw_po). Nur Darstellung
-  SW_plunger; der Schalter passt in beiden Lagen in die Tasche. Stößelhöhe sw_pl weiter ungeprüft.
+  SW_plunger; der Schalter passt in beiden Lagen in die Tasche. Stößelhöhe sw_pl 0.9 (gemessen, vorher 1.0
+  angenommen): Stößelspitze bleibt bei XI - foot_gap, Tasche wandert 0.1 Richtung Fuß.
 V9.9 (Fuß: Lippe kürzer, Spiel 0.7)
 - Auch der Passungsring mit 1.0 mm Spiel (sichtbarer Spalt) fällt nicht von allein, der Haftanteil ist bei allen
   Ringen gleich (Marco, 13.11.2026). Vermutung: Die Lippen ragen unabhängig vom Spiel lip_h = 0.8 über die
@@ -204,7 +205,7 @@ PARAMS = [
     ("sw_L",       12.8,  "Mikroschalter Länge, quer (PRÜFEN – Typ D2F angenommen)"),
     ("sw_T",        5.8,  "Mikroschalter Dicke, entlang Gelenkachse (PRÜFEN)"),
     ("sw_H",        6.5,  "Mikroschalter Höhe ohne Stößel, entlang Fußsegment (PRÜFEN)"),
-    ("sw_pl",       1.0,  "Stößelüberstand (PRÜFEN)"),
+    ("sw_pl",       0.9,  "Stößelüberstand über Gehäuse (Marco gemessen 14.11.2026)"),
     ("sw_pw",       1.7,  "Stößelbreite (Marco gemessen 14.11.2026)"),
     ("sw_po",       1.9,  "V9.10: Stößelmitte außermittig entlang sw_L (gemessen 3.8/7.6 von den Kanten)"),
     ("sw_hs",       6.5,  "Befestigungslöcher Abstand (PRÜFEN)"),
