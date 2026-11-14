@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – Cura-Projekte (3MF) pro Druckteil erzeugen.   V1.8 (Quelle: Stückliste)
+SLARC – Cura-Projekte (3MF) pro Druckteil erzeugen.   V1.9 (Quelle: Stückliste)
 Drucker: Anycubic Kobra Plus, Cura 5.13 (setting_version 27).
 
 Ablauf:
@@ -23,6 +23,12 @@ Aufruf:  python make_cura_3mf.py               (alle Teile mit STL-Datei)
          python make_cura_3mf.py --force Cap   (auch von Hand gespeicherte Projekte überschreiben)
 Benötigt: numpy, openpyxl.
 Beim Öffnen in Cura für das Profil "neu erstellen" bzw. später "aktualisieren" wählen.
+
+V1.9
+- TPU-Fahrt wieder 120 mm/s (Fahrbeschleunigung 1000, Ruck 8 bleiben). Der erste Fuß (V1.6, Cura-Standard
+  3000/5000 mm/s², Ruck 20/30, Fahrt 120) hatte eine saubere Kugelkuppe, der zweite (V1.8, Fahrt 80) Fäden und
+  Löcher. Das war der einzige Unterschied im Projekt; langsamere Fahrten lassen TPU (Bowden) länger nachlaufen.
+  Zusätzlich Brim 5 mm am Fuß (Stückliste). Welche der beiden Maßnahmen hilft, ist nicht getrennt geprüft.
 
 V1.8
 - TPU: Fahrgeschwindigkeit fehlte in der Vorlage -> Cura-Standard 120 mm/s. Jetzt 80 mm/s wie PETG.
@@ -112,7 +118,7 @@ BASE = {
                  material_final_print_temperature="215.0", retraction_amount="1.5", retraction_speed="25",
                  cool_fan_enabled="True", cool_fan_speed="60.0", cool_fan_speed_min="60.0", cool_fan_speed_max="60.0",
                  acceleration_print="500.0", acceleration_travel="1000.0",              # V1.7
-                 jerk_print="5.0", jerk_travel="8.0", speed_travel="80.0"),            # V1.8 Fahrt
+                 jerk_print="5.0", jerk_travel="8.0", speed_travel="120.0"),           # V1.9 Fahrt (V1.8: 80)
             ()),
 }
 
