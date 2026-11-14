@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – parametrisches Bein (Coxa/Femur/Tibia) mit 3x ST3215, doppelt gelagert.   V9.9
+SLARC – parametrisches Bein (Coxa/Femur/Tibia) mit 3x ST3215, doppelt gelagert.   V9.10
 FreeCAD 0.21 / 1.0 – Makro ausführen oder in der Python-Konsole:
     exec(open(r"PFAD/slarc_leg_freecad_v8.py", encoding="utf-8").read())
 
+V9.10 (Schaltertasche weiter)
+- Tasche kam beim Druck genau auf Schaltermaß heraus (Marco, 14.11.2026). Eigener Parameter sw_fit = 0.3 statt
+  des allgemeinen fit = 0.2 für Tasche, Spitzdach und Anschlusskammer (PETG-Taschen werden je Seite ca. 0.12
+  enger -> real ca. 0.18 je Seite).
 V9.9 (Fuß: Lippe kürzer, Spiel 0.7)
 - Auch der Passungsring mit 1.0 mm Spiel (sichtbarer Spalt) fällt nicht von allein, der Haftanteil ist bei allen
   Ringen gleich (Marco, 13.11.2026). Vermutung: Die Lippen ragen unabhängig vom Spiel lip_h = 0.8 über die
@@ -193,6 +197,7 @@ PARAMS = [
     ("lip_w",       1.5,  "Rastlippe TPU Breite"),
     ("lip_h",       0.8,  "Bezugshöhe Rastlippe: Nuttiefe in der Tibia = lip_h + 0.2"),
     ("lip_p",       0.5,  "V9.9: Überstand der Fußlippe über die Tibia-Oberfläche (< Nuttiefe, Luft am Nutgrund)"),
+    ("sw_fit",      0.3,  "V9.10: Spiel Schaltertasche je Seite (0.2 kam genau auf Schaltermaß)"),
     ("sw_L",       12.8,  "Mikroschalter Länge, quer (PRÜFEN – Typ D2F angenommen)"),
     ("sw_T",        5.8,  "Mikroschalter Dicke, entlang Gelenkachse (PRÜFEN)"),
     ("sw_H",        6.5,  "Mikroschalter Höhe ohne Stößel, entlang Fußsegment (PRÜFEN)"),
@@ -686,20 +691,20 @@ neg += [common(j3, "Tibia_seg1_cav", seg1_in,                                  #
                roof(j3, "Tibia_seg2_roof", -1, f"({XV}) + 2", "tib_a", 0, BEND)),
         s2box("Tibia_wire", f"({XV}) - 1", "-wire_w/2", "zc - wire_h/2", f"({XSW}) - ({XV}) + 2",
               "wire_w", "wire_h"),
-        s2box("Tibia_swpocket", XSW, "-sw_T/2 - fit", "zc - sw_L/2 - fit", f"({XE}) - ({XSW}) + 1",
-              "sw_T + 2*fit", "sw_L + 2*fit"),
+        s2box("Tibia_swpocket", XSW, "-sw_T/2 - sw_fit", "zc - sw_L/2 - sw_fit", f"({XE}) - ({XSW}) + 1",
+              "sw_T + 2*sw_fit", "sw_L + 2*sw_fit"),
         common(j3, "Tibia_swroof",                                                  # V9.6: Spitzdach
                roof(j3, "Tibia_swroof_sq", XSW, f"({XE}) - ({XSW}) + 1", "tib_a", 0, BEND,
-                    "zc + sw_L/2 + fit + sw_T/2 + fit"),
-               s2box("Tibia_swroof_lim", XSW, "-sw_T/2 - fit", "zc + sw_L/2 + fit - 0.1",
-                     f"({XE}) - ({XSW}) + 1", "sw_T + 2*fit", "sw_T/2 + fit + 0.2")),
-        s2box("Tibia_swcav", f"({XSW}) - sw_cav", "-sw_T/2 - fit", "zc - sw_cz",  # V9.7: Anschlusskammer
-              "sw_cav + 0.1", "sw_T + 2*fit", "2*sw_cz"),
+                    "zc + sw_L/2 + sw_fit + sw_T/2 + sw_fit"),
+               s2box("Tibia_swroof_lim", XSW, "-sw_T/2 - sw_fit", "zc + sw_L/2 + sw_fit - 0.1",
+                     f"({XE}) - ({XSW}) + 1", "sw_T + 2*sw_fit", "sw_T/2 + sw_fit + 0.2")),
+        s2box("Tibia_swcav", f"({XSW}) - sw_cav", "-sw_T/2 - sw_fit", "zc - sw_cz",  # V9.7: Anschlusskammer
+              "sw_cav + 0.1", "sw_T + 2*sw_fit", "2*sw_cz"),
         common(j3, "Tibia_swcavroof",                                               # V9.7: Spitzdach
                roof(j3, "Tibia_swcavroof_sq", f"({XSW}) - sw_cav", "sw_cav + 0.1", "tib_a", 0, BEND,
-                    "zc + sw_cz + sw_T/2 + fit"),
-               s2box("Tibia_swcavroof_lim", f"({XSW}) - sw_cav", "-sw_T/2 - fit", "zc + sw_cz - 0.1",
-                     "sw_cav + 0.1", "sw_T + 2*fit", "sw_T/2 + fit + 0.2")),
+                    "zc + sw_cz + sw_T/2 + sw_fit"),
+               s2box("Tibia_swcavroof_lim", f"({XSW}) - sw_cav", "-sw_T/2 - sw_fit", "zc + sw_cz - 0.1",
+                     "sw_cav + 0.1", "sw_T + 2*sw_fit", "sw_T/2 + sw_fit + 0.2")),
         box(j3, "Tibia_wire_exit", I, f"({X1}) + 6", "-link_w/2 - 1", "zc - 3", 10, "link_wall + 2", 6)]
 # V9.5: Kabelbinder-Öse außen am Fußsegment (Zugentlastung Schalterkabel)
 neg.append(s2box("Tibia_eyeh", "link_w/2 + 6 - tie_w/2", "-link_w/2 - tie_t", "zc - tie_h/2 - 1",
