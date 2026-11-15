@@ -1,9 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – parametrisches Bein (Coxa/Femur/Tibia) mit 3x ST3215, doppelt gelagert.   V9.10
+SLARC – parametrisches Bein (Coxa/Femur/Tibia) mit 3x ST3215, doppelt gelagert.   V9.11
 FreeCAD 0.21 / 1.0 – Makro ausführen oder in der Python-Konsole:
     exec(open(r"PFAD/slarc_leg_freecad_v8.py", encoding="utf-8").read())
 
+V9.11 (Tibia-Spitze als Pyramidenstumpf, Langlöcher für die Fuß-Hülse)
+- Gleitpassungen klemmen (TPU und PETG). Neues Konzept (Marco, 15.11.2026): PETG-Hülse mit großem Spiel, vier
+  Federzungen mit Nocken auf 45°-Fasen der Tibia-Spitze (Rückstellung + Zentrierung), zwei M3-Schrauben in
+  Einschmelzbuchsen der Hülse laufen in Langlöchern der Tibia (Verliersicherung + Anschlag), Schaltschraube.
+- Spitze: zusätzlich zu den Fasen auf den 28-mm-Seiten (roof_p) jetzt Fasen auf den 20-mm-Seiten ab |z - zc| =
+  tip_zc (Pyramidenstumpf). tip_zc liegt über dem Spitzdach der Schaltertasche.
+- Langlöcher (pin_x, pin_trav) auf beiden Seitenflächen (±y), 45°-Decke zum Drucken. Länge pin_d + pin_trav
+  (Weg = pin_trav; gedruckt wird das Loch je Ende ca. 0.12 kürzer), Höhe pin_d + 2*pin_cl.
+- Die alten Nuten und der einteilige Foot_TPU bleiben vorerst im Modell (ersetzt, sobald die Hülse getestet ist).
 V9.10 (Schaltertasche weiter)
 - Tasche kam beim Druck genau auf Schaltermaß heraus (Marco, 14.11.2026). Eigener Parameter sw_fit = 0.3 statt
   des allgemeinen fit = 0.2 für Tasche, Spitzdach und Anschlusskammer (PETG-Taschen werden je Seite ca. 0.12
@@ -200,6 +209,12 @@ PARAMS = [
     ("slide_c",     0.7,  "V9.9: Gleitspiel TPU-Hülse auf Tibia je Seite (0.6 zu straff, Marco 13.11.2026)"),
     ("lip_w",       1.5,  "Rastlippe TPU Breite"),
     ("lip_h",       0.8,  "Bezugshöhe Rastlippe: Nuttiefe in der Tibia = lip_h + 0.2"),
+    ("tip_zc",     11.0,  "V9.11: Fasen der Spitze auf den 20-mm-Seiten ab |z - zc| (über Taschendach 9.9)"),
+    ("pin_x",      96.0,  "V9.11: Mitte Langloch entlang Fußsegment ab Knickmitte"),
+    ("pin_d",       3.0,  "V9.11: Stift = M3-Schraubenspitze"),
+    ("pin_cl",      0.2,  "V9.11: Spiel Stift im Langloch je Seite"),
+    ("pin_trav",    1.5,  "V9.11: Weg der Hülse (Ruhe -> Anschlag)"),
+    ("slot_d",      2.5,  "V9.11: Tiefe Langloch in der Seitenfläche"),
     ("lip_p",       0.5,  "V9.9: Überstand der Fußlippe über die Tibia-Oberfläche (< Nuttiefe, Luft am Nutgrund)"),
     ("sw_fit",      0.3,  "V9.10: Spiel Schaltertasche je Seite (0.2 kam genau auf Schaltermaß)"),
     ("sw_L",       12.8,  "Mikroschalter Länge, quer (PRÜFEN – Typ D2F angenommen)"),
@@ -737,6 +752,46 @@ def roof_cut(n, sgn, xr, hw):
 
 for s_, sg in (("L", 1), ("R", -1)):          # Tibia-Ende 45° anfasen
     neg.append(roof_cut(f"Tibia_roof{s_}", sg, XE, "link_w/2"))
+
+
+def zcut(n, sgn):
+    """V9.11: Halbraum jenseits der 45°-Fläche x + sgn*(z - zc) = XE + tip_zc (Fase auf der 20-mm-Seite).
+    Box im Frame Knick (Yaw) + Pitch -sgn*45° um die lokale y-Achse; symmetrisch in y, daher im Spiegelbild
+    nur der Knickwinkel gespiegelt."""
+    o = doc.addObject("Part::Box", n); j3.addObject(o)
+    _x(o, "Length", 30); _x(o, "Width", "link_w + 4"); _x(o, "Height", 80)
+    o.Placement = App.Placement(V(), ROT(0, -45 * sgn, 0))
+    ang = BEND if MIR > 0 else f"-({BEND})"
+    _x(o, "Placement.Rotation.Yaw", ang)
+    _x(o, "Placement.Rotation.Pitch", str(-45 * sgn))
+    u0 = f"(({XE}) + tip_zc)*{SQ}"
+    if sgn > 0:
+        w0 = f"(-({XE}) - 40)*{SQ}"
+        sx, sz = f"(({u0}) - ({w0}))*{SQ}", f"zc + (({u0}) + ({w0}))*{SQ}"
+    else:
+        w0 = f"(({XE}) - 30)*{SQ}"
+        sx, sz = f"(({u0}) + ({w0}))*{SQ}", f"zc + ((-({u0})) + ({w0}))*{SQ}"
+    bx, by = rpt("tib_a", 0, ang, sx, "-(link_w + 4)/2")
+    _x(o, "Placement.Base.x", bx); _x(o, "Placement.Base.y", by); _x(o, "Placement.Base.z", sz)
+    return o
+
+
+for s_, sg in (("T", 1), ("U", -1)):          # V9.11: Fasen auf den 20-mm-Seiten -> Pyramidenstumpf
+    neg.append(zcut(f"Tibia_zcut{s_}", sg))
+SLOT_L = "pin_d + pin_trav"               # axial ohne Spiel: Weg = pin_trav
+SLOT_H = "pin_d + 2*pin_cl"
+for s_, sy in (("L", 1), ("R", -1)):          # V9.11: Langlöcher für die Stifte der Fuß-Hülse
+    y0 = "link_w/2 - slot_d" if sy > 0 else "-link_w/2 - 1"
+    neg.append(s2box(f"Tibia_slot{s_}", f"pin_x - ({SLOT_L})/2", y0, f"zc - ({SLOT_H})/2",
+                     SLOT_L, "slot_d + 1", SLOT_H))
+    # 45°-Decke nach außen ansteigend: Begrenzungsbox minus Inneres einer auf die Spitze gestellten
+    # Quadratsäule (untere Spitze bei y = 0) -> bleibt der Bereich unter z = Spitze + |y|
+    y1 = "link_w/2 - slot_d - 0.1" if sy > 0 else "-link_w/2 - 1"
+    neg.append(cut(j3, f"Tibia_slotroof{s_}",
+                   s2box(f"Tibia_slotroof{s_}_lim", f"pin_x - ({SLOT_L})/2", y1,
+                         f"zc + ({SLOT_H})/2 - 0.1", SLOT_L, "slot_d + 1.1", "slot_d + 0.2"),
+                   [roof(j3, f"Tibia_slotroof{s_}_sq", f"pin_x - ({SLOT_L})/2 - 1", f"({SLOT_L}) + 2",
+                         "tib_a", 0, BEND, f"zc + ({SLOT_H})/2 - (link_w/2 - slot_d) + 2*roof_d")]))
 eye = s2box("Tibia_eye", "link_w/2 + 6 - tie_w/2 - 2", "-link_w/2 - tie_t - tie_s", "zc - tie_h/2",
             "tie_w + 4", "tie_t + tie_s + 0.5", "tie_h")                                  # V9.5: Öse
 tibia = cut(j3, "Tibia_Part", fuse(j3, "Tibia_pos", pos + [seg1, knuckle, seg2, eye]), neg)
