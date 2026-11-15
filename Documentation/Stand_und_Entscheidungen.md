@@ -25,7 +25,7 @@ Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. N
 
 ---
 
-## 2. Bein (Makro V9.10)
+## 2. Bein (Makro V9.11)
 
 **Standardparameter (von Marco festgelegt):** Coxa 60 mm, Femur 150 mm, Tibia-Sehne 175 mm (Knieachse → Fußspitze), Knick 38,6° nach unten, Fußsegment 140 mm → Segment 1 (`tib_a`) = 42,2 mm. Standardpose im Makro: q_femur −15°, q_tibia 100°.
 
@@ -62,6 +62,19 @@ Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. N
 - **Gleithülse Test 1 (14.11.2026):** Marcos Testergebnis: Die Hülse mit 0,4 mm Spiel gleitet gut und rastet ein, mit 0,2 und 0,3 nicht. Eingerastet bleibt aber nur ein Weg von weniger als 0,2 mm, geplant waren etwa 1,2 mm. Die Schraube war nicht eingesetzt. Nominal ist die Reserve knapp: Nut 2,9 mm, Haken 1,5 mm. Mögliche Ursachen: Stützreste in der unteren Nut (in der ganzen Tibia liegt das Fußsegment 9 mm über dem Bett, darunter stehen Baumstützen), die durchhängende Rastfläche am Haken, die PETG-Maßabweichung. Außerdem hat Marcos Tibia noch die Schaltertasche von vor V9.7. Nächster Schritt, eine Änderung nach der anderen: Hülse V1.2 mit Spiel 0,4 und Innenlänge 29,6 / 30,0 / 30,4 mm. Dazu ein frisches Tibia-Endstück (`slarc_tibia_stub_test_v1.py`, Bein V9.10), gedruckt mit der Unterseite auf dem Bett, ohne Stützen.
 - **Schaltertasche weiter (Bein V9.10, 14.11.2026):** Die Tasche kam beim Druck genau auf Schaltermaß heraus. Neuer Parameter sw_fit = 0,3 (vorher das allgemeine fit = 0,2) für Tasche, Spitzdach und Anschlusskammer. Nachgemessen im Endstück-STL: Tasche 6,4 × 13,4 mm.
 - **Stößel D2FC-F-7N außermittig (14.11.2026, Marco gemessen):** Der Stößel ist 1,7 mm breit und liegt 3,8 bzw. 7,6 mm von den Gehäusekanten entfernt. Die Summe ergibt 13,1 statt 12,8 mm, das Maß ist schwer zu messen. Die Stößelmitte liegt damit etwa 1,9 mm außermittig entlang der Schalterlänge (Gelenkachse). Bein-Makro: sw_pw 1,7, sw_po 1,9. Stößelhöhe über dem Gehäuse 0,9 mm (sw_pl, vorher 1,0 angenommen). Die Stößelspitze bleibt damit bei 0,8 mm über der Tibia-Stirn, die Tasche wandert 0,1 mm Richtung Fuß. Festgelegte Einbaulage: Stößel zur Oberseite der Tibia (oben beim Druck). Die Gleithülse V1.2 hat ein Schraubloch bei +1,9 mm, die Kerbe außen zeigt zur Stößelseite. Der Stößel taucht ins Kernloch, die Schraubenspitze darin setzt den Schaltpunkt.
+- **Gleithülse Test 2 (15.11.2026):** Die Schaltertasche mit Dach funktioniert, der Schalter lässt sich gut einsetzen. Auch die Hülse mit Innenlänge 30,4 mm klemmt. Entscheidung (Marco): keine Gleitpassung mehr. Stattdessen großes Spiel, Rückstellung durch Federn, Anschlag über Schrauben.
+- **Fuß-Federhülse + Pyramidenstumpf (Bein V9.11, 15.11.2026):**
+  - Tibia-Spitze: Zu den bisherigen 45°-Fasen auf den 28-mm-Seiten kommen Fasen auf den 20-mm-Seiten ab |z − zc| = 11 (tip_zc), oberhalb des Taschendachs bei 9,9.
+  - Langlöcher auf beiden Seitenflächen: Mitte bei 96 mm ab Knick (pin_x), 2,5 mm tief, 4,5 × 3,4 mm, 45°-Decke.
+  - Hülse aus PETG (`slarc_foot_spring_test_v1.py`):
+    - 1,0 mm Spiel je Seite.
+    - Vier Federzungen, 8 mm breit, Wurzel oben, mit 45°-Nocken auf den vier Fasen. Sie stellen zurück und zentrieren. Vorspannung in Ruhe 0,3 mm, am Anschlag 1,8 mm.
+    - Zwei Zylinderschrauben M3x10 in Einschmelzbuchsen (Augen auf den 28-mm-Seiten) laufen in den Langlöchern: Verliersicherung und Anschlag, Weg 1,5 mm (pin_trav). Am Anschlag bleibt der Boden 0,5 mm vor der Stirn.
+    - Schaltschraube M3x6 bei +1,9 mm.
+  - Montage am Modell geprüft: In Ruhe und am Anschlag berühren sich Hülse und Tibia nur an den Nocken, die Stifte liegen jeweils am Langlochende an.
+  - Federkraft nur grob überschlagen (Ruhe etwa 0,5 N, Anschlag etwa 3 N bei 0,8 mm Zungendicke), deshalb zwei Varianten: 0,8 und 1,0 mm.
+  - Die Druckstege unter den Zungen werden nach dem Druck abgeknipst.
+  - Offen: Test auf dem neuen Endstück, danach den TPU-Überzug konstruieren und alten Fuß, Nuten und Foot_TPU im Bein-Makro ersetzen. Kaufteile (Buchsen, Schrauben) erst danach in die Stückliste.
 - **TPU-Druckqualität Kugelkuppe (14.11.2026):** Der erste Fuß (Cura V1.6) war sauber, der zweite (V1.8) hatte Fäden und Löcher an der Kuppe. Im Projekt unterschieden sich nur Beschleunigung, Ruck und Fahrt (3000/5000 → 500/1000 mm/s², Ruck 20/30 → 5/8, Fahrt 120 → 80). Cura V1.9: Fahrt wieder 120 mm/s, Fahrbeschleunigung 1000 und Ruck 8 bleiben. Dazu Brim 5 mm am Fuß. Nicht getrennt geprüft, welche der beiden Maßnahmen wirkt.
 - **Gabelmontage:** Die obere Wange (ohne Bund) kommt auf das Servohorn. Die untere Wange mit dem 1-mm-Distanzbund kommt auf die Rückseitenscheibe (passive Lagerung), Bund zum Servo.
 
