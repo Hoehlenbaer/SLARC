@@ -71,8 +71,8 @@ def wire(p, q, color, mid=None, w=4):
         add(f'<circle cx="{x}" cy="{y}" r="3.5" fill="{color}" stroke="#222" stroke-width=".8"/>')
 
 # ---------------- Mikroschalter (Spalten 4/6/8, Reihe e)
-cCOM, cNC, cNO = 4, 6, 8
-sx0, sx1 = hx(cCOM) - 14, hx(cNO) + 14
+cCOM, cNO, cNC = 4, 6, 8  # NO ist der mittlere Pin (Marco, 18.11.2026)
+sx0, sx1 = hx(min(cCOM, cNO, cNC)) - 14, hx(max(cCOM, cNO, cNC)) + 14
 sy, sh = rows["c"] - 9, rows["d"] - rows["c"] + 14
 add(f'<rect x="{sx0}" y="{sy}" width="{sx1-sx0}" height="{sh}" rx="3" fill="#2e2e2e"/>')
 add(f'<path d="M{sx0+4},{sy+2} L{sx1-6},{sy-8}" stroke="#9aa" stroke-width="3" stroke-linecap="round"/>')  # Hebel
@@ -115,15 +115,15 @@ lx0, ly0 = 30, 470
 add(f'<rect x="{lx0}" y="{ly0}" width="330" height="200" rx="8" fill="#fff" stroke="#ccc"/>')
 T(lx0 + 12, ly0 + 24, "Verbindungen", 14, w="bold")
 lines = [("#111", "GND → Rail −, Rail − → COM, Kathode → Rail −"),
-         ("#2b6cd6", "D2 → NO (Spalte 8)"),
+         ("#2b6cd6", "D2 → NO (Mitte, Spalte 6)"),
          ("#e0a800", "D8 → 330 Ω (Spalte 15)"),
          ("#999", "330 Ω (Reihe b) → LED-Anode (Spalte 19)")]
 for i, (c, s) in enumerate(lines):
     y = ly0 + 50 + i * 24
     add(f'<line x1="{lx0+14}" y1="{y-4}" x2="{lx0+40}" y2="{y-4}" stroke="{c}" stroke-width="5" stroke-linecap="round"/>')
     T(lx0 + 50, y, s, 12)
-T(lx0 + 12, ly0 + 158, "NC bleibt frei. Pinbelegung des Schalters mit dem", 11, fill="#555")
-T(lx0 + 12, ly0 + 174, "Durchgangsprüfer bestätigen: COM–NO schließt beim Drücken.", 11, fill="#555")
+T(lx0 + 12, ly0 + 158, "NC (äußerer Pin) bleibt frei. Bei den verwendeten Schaltern", 11, fill="#555")
+T(lx0 + 12, ly0 + 174, "ist NO der mittlere Pin. COM–NO schließt beim Drücken.", 11, fill="#555")
 T(lx0 + 12, ly0 + 190, "Ohne externe LED zeigt die Board-LED L (D13) den Zustand.", 11, fill="#555")
 
 # Schaltplan

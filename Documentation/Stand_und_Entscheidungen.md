@@ -116,7 +116,7 @@ Arbeitsweise mit Claude: jede Änderung auf eigenem Branch + PR, Marco merged. N
 
 ## 6. Elektronik – Entscheidungen
 
-- **Fußkontakte über MCP23017-E-Modul** (Breakout, ~7,30 €, billiger als der DIP-Chip) auf dem Hub, I²C des ESP32 (IO32/33), Adresse 0x20, 10-kΩ-Pull-ups nach 3,3 V, ITA → **IO34**. Zuordnung: PA0 RR, PA1 RL, PA2 MR, PA3 ML, PA4 FR, PA5 FL. Bank B frei. Kontakt-LEDs (14.11.2026): je Fuß LED + 1 kΩ von 3,3 V nach PAx parallel zum Pull-up, nicht in Reihe zum Schalter (sonst PAx bei Kontakt auf ~1,8 V, über der Low-Schwelle 0,66 V). Platz im Hub-Layout und Sichtbarkeit offen.
+- **Fußkontakte über MCP23017-E-Modul** (Breakout, ~7,30 €, billiger als der DIP-Chip) auf dem Hub, I²C des ESP32 (IO32/33), Adresse 0x20, 10-kΩ-Pull-ups nach 3,3 V, ITA → **IO34**. Zuordnung: PA0 RR, PA1 RL, PA2 MR, PA3 ML, PA4 FR, PA5 FL. Bank B frei. Fußschalter: NO ist der mittlere Pin (Marco, 18.11.2026), verdrahtet werden COM und NO. Kontakt-LEDs (14.11.2026): je Fuß LED + 1 kΩ von 3,3 V nach PAx parallel zum Pull-up, nicht in Reihe zum Schalter (sonst PAx bei Kontakt auf ~1,8 V, über der Low-Schwelle 0,66 V). Platz im Hub-Layout und Sichtbarkeit offen.
 - **LEDs:** WS2812 an **IO4**, 5 V vom Treiber (bis ~10 LEDs) oder DC-DC.
 - **GPIOs am Treiber:** IO16 (K1, Open-Drain), IO27 (K2…K7), IO34 (ITA), IO4 (LEDs). Frei: IO35 (nur Eingang), IO5 (Strapping).
 - **Puffer SN74LVC1G125 ist bereits auf dem Treiberboard** → H5/H6 am selben Bustreiber.
