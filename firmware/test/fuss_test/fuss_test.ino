@@ -1,8 +1,9 @@
 // SLARC – Testaufbau Fußschalter (Arduino Uno)
-// Stand V1.0 (18.11.2026)
+// Stand V1.1 (18.11.2026)
 //
 // Schaltung:
-//   Mikroschalter COM -> GND, NO -> D2 (interner Pull-up). 0 = Kontakt.
+//   Mikroschalter COM -> GND, NO (mittlerer Pin) -> D2 (interner Pull-up). 0 = Kontakt.
+//   V1.1 (18.11.2026): NO ist bei den verwendeten Schaltern der mittlere Pin.
 //   LED: D8 -> 330 Ohm -> LED-Anode, LED-Kathode -> GND. Zusätzlich Board-LED D13.
 //
 // Entprellen in Software: Ein neuer Zustand gilt erst, wenn der Pin
@@ -41,7 +42,7 @@ void setup() {
   lastChangeMs = millis();
   showState(stableState);
 
-  Serial.println(F("SLARC Fussschalter-Test V1.0"));
+  Serial.println(F("SLARC Fussschalter-Test V1.1"));
   Serial.print(F("Entprellzeit ")); Serial.print(DEBOUNCE_MS); Serial.println(F(" ms"));
   Serial.println(stableState ? F("Start: KONTAKT") : F("Start: offen"));
 }
