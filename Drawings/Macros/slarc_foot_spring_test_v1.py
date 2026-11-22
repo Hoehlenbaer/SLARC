@@ -1,8 +1,17 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – Fuß-Hülse mit Federzungen, Stiften und Schaltschraube (Testreihe).   V1.0
+SLARC – Fuß-Hülse mit Federzungen, Stiften und Schaltschraube (Testreihe).   V1.1
 FreeCAD 0.21 / 1.0 – Makro ausführen oder:
     exec(open(r"PFAD/slarc_foot_spring_test_v1.py", encoding="utf-8").read())
+
+V1.1 (22.11.2026)
+- Test V1.0: Vierfachfeder funktioniert, Schalter schaltet sauber (Prellen beim Schließen 0.5-1 ms). Die
+  Hülse kippelt aber um die Stiftachse (beide Stifte auf einer Achse, dagegen halten nur die Federzungen der
+  kurzen Seiten). Papier (ca. 0.4 mm) im Spalt an den kurzen Seiten half deutlich (Marco).
+- Neu: Gleitnasen auf den kurzen Seiten (±X), je zwei neben der Federzunge, nahe am Hülsenboden (h PAD_H0 ..
+  PAD_H0 + PAD_L). Dort ist der Hebel zur Stiftachse (h 28.25) am größten; an der Öffnung wären es nur ~5 mm,
+  außerdem liegt dort die alte Nut der Tibia. Luft PAD_CL zur Tibia, 45°-Unterseite und -Oberseite.
+  Testreihe: Zungen 1.0, Luft 0.3 / 0.5; Beschriftung = Luft.
 
 Konzept (Marco, 15.11.2026), passend zum Bein-Makro V9.11
 - Gleitpassungen klemmen (TPU und PETG, auch 30.4/0.4). Daher großes Spiel CLEAR je Seite: die Hülse berührt
@@ -20,7 +29,7 @@ Konzept (Marco, 15.11.2026), passend zum Bein-Makro V9.11
   Die Zungen hängen unten frei; damit ihre erste Schicht nicht in der Luft liegt, tragen je zwei dünne
   Druckstege (POST_W breit) das freie Ende über dem Spalt. NACH DEM DRUCK MIT DEM SEITENSCHNEIDER ENTFERNEN.
   An der Wurzel geht die Zunge mit 45° in die volle Wanddicke über (kein Überhang).
-- Testreihe: Zungendicke TONGUE_T, Wert vertieft auf der +Y-Seite neben der Zunge.
+- Testreihe: VARIANTS (Zungendicke, Luft an den Gleitnasen), Luft vertieft auf der +Y-Seite (V1.0: Dicke).
 
 Federkraft grob (E_PETG ~2000 MPa, Biegebalken, ohne Reibung), Zungen 8 breit:
   t 0.8: Ruhe ca. 0.5 N, Anschlag ca. 3 N (Summe der 4 Zungen, seitlich ~ axial bei 45°)
@@ -47,7 +56,9 @@ PIN_X = 96.0       # Langloch-Mitte ab Knickmitte
 PIN_TRAV = 1.5     # Weg
 
 # --- Hülse ---
-TONGUE_T = [0.8, 1.0]      # Testreihe: Zungendicke
+VARIANTS = [(1.0, 0.3), (1.0, 0.5)]   # V1.1: (Zungendicke, Luft Gleitnase); V1.0: Dicke 0.8/1.0 ohne Nasen
+PAD_Y0, PAD_W = 5.3, 3.0  # V1.1: Gleitnasen neben der Zunge (|y| 5.3 .. 8.3), kurze Seiten (±X)
+PAD_H0, PAD_L = 6.0, 5.0   # V1.1: über dem Hülsenboden; Tibia-Seitenfläche dort eben (Fase erst ab XE - 3)
 CLEAR = 1.0        # Spiel je Seite
 WALL = 1.6
 END_T = 8.0        # Stirnwand
@@ -116,7 +127,7 @@ def text_cut(text, y_face, cx, cz):
         return None
 
 
-def sleeve(t):
+def sleeve(t, pad_cl=None):
     ix, iy = LINK_H / 2 + CLEAR, LINK_W / 2 + CLEAR          # 15, 11 (halbe Innenmaße)
     ox, oy = ix + WALL, iy + WALL
     h_open = END_T + INNER_L
@@ -175,7 +186,15 @@ def sleeve(t):
     s = s.cut(Part.makeCylinder(SCR_D / 2, END_T + 1, V(SCR_X, 0, -0.5)))
     s = s.cut(Part.makeCylinder(CB_D / 2, END_T - SCR_WALL + 0.5, V(SCR_X, 0, -0.5)))
     s = s.cut(box(ox - 0.5, -0.4 - TW, 1.0, 1.0, 0.8, 6.0))
-    t_ = text_cut("%.1f" % t, oy, -10.5, z0 + 8)
+    if pad_cl is not None:                                    # V1.1: Gleitnasen gegen Kippeln
+        pp = CLEAR - pad_cl                                   # Überstand ab Innenwand
+        za, zb = z0 + PAD_H0, z0 + PAD_H0 + PAD_L
+        pts = [(ix, za - pp), (ix - pp, za), (ix - pp, zb), (ix, zb + pp)]
+        for sg in (1, -1):
+            for sy in (1, -1):
+                y0 = PAD_Y0 if sy > 0 else -PAD_Y0 - PAD_W
+                s = s.fuse(prism_xz([(sg * x, z) for x, z in pts], y0, PAD_W))
+    t_ = text_cut("%.1f" % (pad_cl if pad_cl is not None else t), oy, -10.5, z0 + 8)
     if t_ is not None:
         s = s.cut(t_)
     return s.removeSplitter()
@@ -183,16 +202,16 @@ def sleeve(t):
 
 doc = App.newDocument("SLARC_Foot_Spring_Test")
 parts = []
-for i, t in enumerate(TONGUE_T):
-    p = sleeve(t)
-    p.translate(V((i - (len(TONGUE_T) - 1) / 2) * PITCH, 0, 0))
-    o = doc.addObject("Part::Feature", "Sleeve_T%02d" % int(round(t * 10)))
+for i, (t, pc) in enumerate(VARIANTS):
+    p = sleeve(t, pc)
+    p.translate(V((i - (len(VARIANTS) - 1) / 2) * PITCH, 0, 0))
+    o = doc.addObject("Part::Feature", "Sleeve_T%02d_P%02d" % (int(round(t * 10)), int(round(pc * 10))))
     o.Shape = p
     parts.append(p)
 allp = doc.addObject("Part::Feature", "Foot_Spring_Test")
 allp.Shape = Part.makeCompound(parts)
 doc.recompute()
-print("Federhülsen erzeugt: Zungendicke", TONGUE_T, "| Stifthöhe %.2f | Schrift:" % H_PIN, FONT or "keine")
+print("Federhülsen erzeugt (Zungendicke, Luft Nase):", VARIANTS, "| Stifthöhe %.2f | Schrift:" % H_PIN, FONT or "keine")
 try:
     import FreeCADGui as Gui
     if Gui.ActiveDocument:
