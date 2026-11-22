@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-SLARC – Cura-Projekte (3MF) pro Druckteil erzeugen.   V1.9 (Quelle: Stückliste)
+SLARC – Cura-Projekte (3MF) pro Druckteil erzeugen.   V1.10 (Quelle: Stückliste)
 Drucker: Anycubic Kobra Plus, Cura 5.13 (setting_version 27).
 
 Ablauf:
@@ -23,6 +23,11 @@ Aufruf:  python make_cura_3mf.py               (alle Teile mit STL-Datei)
          python make_cura_3mf.py --force Cap   (auch von Hand gespeicherte Projekte überschreiben)
 Benötigt: numpy, openpyxl.
 Beim Öffnen in Cura für das Profil "neu erstellen" bzw. später "aktualisieren" wählen.
+
+V1.10
+- Cura-Extras mit Schlüsseln aus GLOBAL_KEYS (z. B. layer_height) gehen in die globalen Benutzeränderungen,
+  weil Cura sie nicht pro Modell erlaubt. Erster Fall: Fuß-Federhülse mit 0.1-mm-Schichten (glattere
+  45°-Flanken an den Nocken, Marco 22.11.2026). Erste Schicht bleibt 0.2.
 
 V1.9
 - TPU-Fahrt wieder 120 mm/s (Fahrbeschleunigung 1000, Ruck 8 bleiben). Der erste Fuß (V1.6, Cura-Standard
@@ -204,6 +209,9 @@ def set_vals(txt, name, vals, dels=()):
     return head + "[values]\n" + "\n".join(sorted(lines)) + "\n\n"
 
 
+GLOBAL_KEYS = {"layer_height"}       # V1.10: nur global einstellbar -> Benutzeränderungen
+
+
 def make(stl_name, part, force=False):
     mat, orient, obj, brim, tree = part
     if mat not in TPL:
@@ -216,6 +224,9 @@ def make(stl_name, part, force=False):
                 return
     g_vals, e_vals, e_del = BASE[mat]
     g_user, e_user = ({"adhesion_type": "brim"}, {"brim_width": brim}) if brim else ({}, {})
+    obj = dict(obj)
+    for k in [k for k in obj if k in GLOBAL_KEYS]:          # V1.10
+        g_user[k] = obj.pop(k)
     t = read_stl(os.path.join(STL_DIR, stl_name + ".stl")) @ ORIENT[orient].T
     flat = t.reshape(-1, 3)
     c = (flat.max(0) + flat.min(0)) / 2
@@ -235,11 +246,12 @@ def make(stl_name, part, force=False):
                 if b"type = quality_changes" in d:
                     d = set_vals(d.decode(), "%s SLARC" % mat, e_vals if ext else g_vals,
                                  e_del if ext else ()).encode()
-                elif b"type = user" in d:                    # Benutzeränderungen: nur Brim
-                    d = set_vals(d.decode(), None, e_user if ext else g_user, ("adhesion_type", "brim_width", "support_type")).encode()
+                elif b"type = user" in d:                    # Benutzeränderungen: Brim und GLOBAL_KEYS
+                    d = set_vals(d.decode(), None, e_user if ext else g_user,
+                                 ("adhesion_type", "brim_width", "support_type") + tuple(GLOBAL_KEYS)).encode()
             zout.writestr(it, d)
-    print("%-40s %-4s %-3s Höhe %5.1f mm  Brim %-3s %s" % (os.path.basename(out), mat, orient,
-                                                           t[:, :, 2].max(), brim or "-", obj))
+    print("%-40s %-4s %-3s Höhe %5.1f mm  Brim %-3s %s %s" % (os.path.basename(out), mat, orient,
+                                                              t[:, :, 2].max(), brim or "-", obj, g_user))
 
 
 if __name__ == "__main__":
